@@ -17,6 +17,7 @@ import { community } from "./community";
 import { admissions } from "./admissions";
 import { privacy } from "./privacy";
 import { reviews } from "./reviews";
+import { authoring } from "./authoring";
 
 /**
  * Platform façade. In production each export is a typed HTTP/gRPC client to the
@@ -79,7 +80,7 @@ export function tickAll() {
   return { commerce: commerce.tick(), lms: lms.tick(), live: live.tick(), labsStopped: cloudlab.tick() };
 }
 
-export { admissions, privacy, reviews, catalog, cloudlab, commerce, community, credentials, cx, entitlements, identity, live, lms, studio, teams, tutor };
+export { admissions, authoring, privacy, reviews, catalog, cloudlab, commerce, community, credentials, cx, entitlements, identity, live, lms, studio, teams, tutor };
 export { capabilities } from "./status";
 export { checkClaims, partners } from "./partners";
 export { publicQuiz } from "./lms";

@@ -249,6 +249,14 @@ export function AppShell({ viewer, current, children }: { viewer: Viewer; curren
               </a>
             </li>
           )}
+          {viewer.roles.some((r) => r === "instructor" || r === "platform_admin") && (
+            <li>
+              <a href="/teach" aria-current={current.startsWith("/teach") ? "page" : undefined}>
+                <Icon name="book" size={18} />
+                Teach
+              </a>
+            </li>
+          )}
           {isStaff && (
             <li>
               <a href="/admin" aria-current={current.startsWith("/admin") ? "page" : undefined}>

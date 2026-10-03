@@ -68,7 +68,7 @@ const PUBLIC = ["/", "/explore", "/explore?q=agentic%20ai&free=1&level=Beginner"
 
 const LEARNER = ["/app", "/app/courses", "/app/calendar", "/app/live", "/app/grades", "/app/credentials", "/app/tutor", "/app/proctoring", "/app/account", "/app/security", "/learn/26-agentic-ai-systems-design-7-week-live-intensive/apply", "/app/notifications", "/app/onboarding", "/app/course/prd_cop1047c", "/app/course/prd_cop1047c/modules", "/app/course/prd_cop1047c/module/5", "/app/course/prd_cop1047c/grades", "/app/course/prd_cop1047c/resources", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_lesson", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_reading", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_lab", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_quiz", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_project", "/app/course/prd_cop1047c/item/itm_cop1047c_capstone", "/app/course/prd_cai4505c/module/6", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_discussion", "/app/course/prd_cai4505c/item/itm_cai4505c_m6_discussion", "/financial-aid/apply?product=16-certificate-in-agentic-ai-for-developers"];
 
-const ADMIN = ["/admin", "/admin/admissions", "/app/security", "/admin/moderation", "/admin/aid", "/admin/grading", "/admin/studio", "/admin/live", "/admin/support", "/admin/claims?text=accredited%20degree"];
+const ADMIN = ["/admin", "/admin/admissions", "/admin/course-reviews", "/teach", "/app/security", "/admin/moderation", "/admin/aid", "/admin/grading", "/admin/studio", "/admin/live", "/admin/support", "/admin/claims?text=accredited%20degree"];
 
 console.log(`Smoke testing ${BASE}`);
 for (const p of PUBLIC) await expect("public", p, 200);
@@ -163,6 +163,19 @@ if (!/In review/.test(app.text)) {
 
 const admin = await signIn("admin@demo.scholarion.test", "ScholarionAdmin1");
 for (const p of ADMIN) await expect("admin", p, 200, { cookie: admin });
+// Course builder: a new draft is editable but not public.
+const created = await req("/api/v1/teach/courses", { method: "POST", cookie: admin, form: { title: "Smoke Test Course", level: "Beginner" } });
+const draftPath = (created.headers.get("location") ?? "").replace(/^https?:\/\/[^/]+/, "").split("?")[0];
+if (created.status !== 303 || !/^\/teach\/prd_/.test(draftPath)) {
+  failures++;
+  console.log(`FAIL create draft course (${created.status} ${draftPath})`);
+} else {
+  console.log("ok   303 create draft course");
+  await expect("course builder", draftPath, 200, { cookie: admin });
+  await expect("draft is not public", "/learn/smoke-test-course", 404);
+}
+await expect("learner can't open Teach", "/teach", 307, { cookie: learner });
+
 const status = await (await req("/api/v1/status")).json();
 console.log(`status board: ${status.capabilities.map((c) => `${c.key}=${c.status}`).join(", ")}`);
 

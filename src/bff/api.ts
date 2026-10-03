@@ -13,6 +13,7 @@ import {
   identity,
   privacy,
   reviews,
+  authoring,
   live,
   lms,
   publicUser,
@@ -349,6 +350,64 @@ on("GET", "credentials/:id/pdf", async (c) => {
   return new Response(new Uint8Array(pdf), { headers: { "content-type": "application/pdf", "content-disposition": `attachment; filename="${file}"`, "cache-control": "private, no-store" } });
 }, "user");
 on("GET", "credentials/issuer-key", () => json(credentials.publicJwk()));
+
+/* ---------------- Course builder (instructors) ---------------- */
+
+const T = (id: string) => `/teach/${id}`;
+const TI = (courseId: string, itemId: string) => `/teach/${courseId}/item/${itemId}`;
+const itemCourse = (itemId: string) => getDb().items.find((i) => i.id === itemId)?.courseId ?? "";
+on("POST", "teach/courses", (c) => {
+  const p = authoring.createCourse(c.user!.id, { title: c.data.title ?? "", tagline: c.data.tagline, level: c.data.level, description: c.data.description, skills: c.data.skills });
+  return redirect(withQuery(T(p.id), { notice: "Draft created. Add modules and items, then submit it for review." }));
+}, "staff");
+on("POST", "teach/courses/:id", (c) => (authoring.updateCourse(c.user!.id, c.params.id, c.data), redirect(withQuery(T(c.params.id), { notice: "Course details saved." }))), "staff");
+on("POST", "teach/courses/:id/modules", (c) => (authoring.addModule(c.user!.id, c.params.id, { title: c.data.title ?? "", overview: c.data.overview, objectives: c.data.objectives }), redirect(withQuery(T(c.params.id), { notice: "Module added." }) + "#modules")), "staff");
+on("POST", "teach/courses/:id/modules/:no", (c) => (authoring.updateModule(c.user!.id, c.params.id, Number(c.params.no), c.data), redirect(withQuery(T(c.params.id), { notice: "Module saved." }) + "#modules")), "staff");
+on("POST", "teach/courses/:id/modules/:no/delete", (c) => (authoring.deleteModule(c.user!.id, c.params.id, Number(c.params.no)), redirect(withQuery(T(c.params.id), { notice: "Module deleted." }) + "#modules")), "staff");
+on("POST", "teach/courses/:id/items", (c) => {
+  const it = authoring.addItem(c.user!.id, c.params.id, Number(c.data.moduleNo), c.data.kind ?? "", c.data.title ?? "");
+  return redirect(withQuery(TI(c.params.id, it.id), { notice: "Item added. Fill it in below." }));
+}, "staff");
+on("POST", "teach/courses/:id/submit", (c) => (authoring.submitForReview(c.user!.id, c.params.id), redirect(withQuery(T(c.params.id), { notice: "Submitted for review. A reviewer will publish it or ask for changes." }))), "staff");
+on("POST", "teach/courses/:id/withdraw", (c) => (authoring.withdraw(c.user!.id, c.params.id), redirect(withQuery(T(c.params.id), { notice: "Withdrawn from review. You can edit again." }))), "staff");
+on("GET", "teach/courses/:id/checklist", (c) => json({ issues: authoring.checklist(c.user!.id, c.params.id) }), "staff");
+on("POST", "teach/items/:id", (c) => {
+  const it = authoring.updateItem(c.user!.id, c.params.id, c.data);
+  return redirect(withQuery(TI(it.courseId, it.id), { notice: "Saved." }));
+}, "staff");
+on("POST", "teach/items/:id/move", (c) => {
+  const course = itemCourse(c.params.id);
+  authoring.moveItem(c.user!.id, c.params.id, c.data.dir === "up" ? "up" : "down");
+  return redirect(T(course) + "#modules");
+}, "staff");
+on("POST", "teach/items/:id/delete", (c) => {
+  const course = itemCourse(c.params.id);
+  authoring.deleteItem(c.user!.id, c.params.id);
+  return redirect(withQuery(T(course), { notice: "Item deleted." }) + "#modules");
+}, "staff");
+on("POST", "teach/items/:id/questions", (c) => {
+  authoring.addQuestion(c.user!.id, c.params.id, { prompt: c.data.prompt ?? "", options: c.data.options ?? "", answer: c.data.answer ?? "", explanation: c.data.explanation ?? "" });
+  return redirect(withQuery(TI(itemCourse(c.params.id), c.params.id), { notice: "Question added." }) + "#questions");
+}, "staff");
+on("POST", "teach/items/:id/questions/:qid/delete", (c) => (authoring.removeQuestion(c.user!.id, c.params.id, c.params.qid), redirect(withQuery(TI(itemCourse(c.params.id), c.params.id), { notice: "Question removed." }) + "#questions")), "staff");
+on("POST", "teach/items/:id/tests", (c) => {
+  authoring.addTest(c.user!.id, c.params.id, { name: c.data.name ?? "", code: c.data.code ?? "", points: c.data.points ?? "5" });
+  return redirect(withQuery(TI(itemCourse(c.params.id), c.params.id), { notice: "Test added. Run it against your solution." }) + "#tests");
+}, "staff");
+on("POST", "teach/items/:id/tests/:idx/delete", (c) => (authoring.removeTest(c.user!.id, c.params.id, Number(c.params.idx)), redirect(withQuery(TI(itemCourse(c.params.id), c.params.id), { notice: "Test removed." }) + "#tests")), "staff");
+on("POST", "teach/items/:id/verify", (c) => {
+  const r = authoring.verifyLab(c.user!.id, c.params.id);
+  const to = TI(itemCourse(c.params.id), c.params.id);
+  if (!r.ran) return redirect(withQuery(to, { error: r.error ?? "The lab runner isn't connected here." }) + "#tests");
+  const failed = r.feedback.filter((f) => !f.passed).map((f) => f.name);
+  return redirect(withQuery(to, failed.length ? { error: `Your solution scored ${r.score}/${r.max}. Failing: ${failed.join(", ")}${r.error ? ` (${r.error})` : ""}` } : { notice: `All tests pass: ${r.score}/${r.max}.` }) + "#tests");
+}, "staff");
+on("POST", "admin/course-reviews/:id/:decision", (c) => {
+  const d = c.params.decision === "approve" ? "approve" : c.params.decision === "changes" ? "changes" : null;
+  if (!d) throw new PlatformError("not_found", "Unknown decision", 404);
+  const p = authoring.decide(c.user!.id, c.params.id, d, c.data.note);
+  return redirect(withQuery("/admin/course-reviews", { notice: d === "approve" ? `${p.title} is published.` : "Changes requested. The author has been emailed." }));
+}, "reviewer");
 
 /* ---------------- Verified reviews ---------------- */
 

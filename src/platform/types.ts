@@ -95,6 +95,9 @@ export interface LabSpec {
   tests: { name: string; code: string; points: number }[];
   resourceClass: "cpu-small" | "gpu-t4";
   timeLimitMinutes: number;
+  /** Builder only: the author's reference solution (never sent to learners) and its last check. */
+  solution?: string;
+  verified?: { at: ISODate; hash: string; score: number; max: number };
 }
 
 export interface Item {
@@ -164,6 +167,18 @@ export interface Product {
   livePlan?: { weeks: number; sessionHours: number; segmentMinutes: number; schedule: string; capacity: number; cohort: string };
   credential: { kind: "certificate" | "badge"; title: string; criteria: string[] };
   faq: { q: string; a: string }[];
+  /** Instructor-built courses: who may edit, and the publish review. */
+  authorIds?: ID[];
+  review?: CourseReview;
+}
+
+export interface CourseReview {
+  state: "submitted" | "changes_requested" | "approved";
+  submittedAt: ISODate;
+  submittedBy: ID;
+  decidedAt?: ISODate;
+  decidedBy?: ID;
+  note?: string;
 }
 
 export type EdgeType = "stacks_into" | "credit_toward" | "waives" | "includes" | "prerequisite";

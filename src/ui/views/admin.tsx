@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
-import type { adminVM, admissionsVM, aidQueueVM, claimsVM, gradingVM, liveAdminVM, moderationVM, studioVM, supportVM, Viewer } from "@/bff/views";
+import type { adminVM, admissionsVM, courseReviewsVM, aidQueueVM, claimsVM, gradingVM, liveAdminVM, moderationVM, studioVM, supportVM, Viewer } from "@/bff/views";
 import { fmtDateTime, StatusBadge } from "../components/cards";
 import { AppShell, Flash } from "../components/chrome";
+import { CourseReviewQueue } from "./teach";
 
 type V = NonNullable<Viewer>;
 type FlashProps = { notice?: string; error?: string };
@@ -19,6 +20,7 @@ function AdminTabs({ current }: { current: string }) {
       {t("/admin/admissions", "Admissions")}
       {t("/admin/grading", "Grading")}
       {t("/admin/studio", "Studio review")}
+      {t("/admin/course-reviews", "Course reviews")}
       {t("/admin/moderation", "Moderation")}
       {t("/admin/live", "Live sessions")}
       {t("/admin/support", "Support & leads")}
@@ -584,6 +586,15 @@ export function AdminAdmissionsView({ viewer, vm, flash }: { viewer: V; vm: Retu
           </section>
         ))}
       </div>
+    </Shell>
+  );
+}
+
+export function AdminCourseReviewsView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<typeof courseReviewsVM>; flash: FlashProps }) {
+  return (
+    <Shell viewer={viewer} current="/admin/course-reviews" title="Course reviews" flash={flash}>
+      <p className="small muted">Instructor-built courses waiting to publish. They passed the checklist when submitted; check the teaching quality and that nothing promises credit, jobs or partner endorsements.</p>
+      <CourseReviewQueue vm={vm} />
     </Shell>
   );
 }

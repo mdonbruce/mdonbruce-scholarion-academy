@@ -18,6 +18,8 @@ import {
   admissions,
   community,
   reviews,
+  authoring,
+  cloudlab,
   studio,
   teams,
   type Item,
@@ -204,7 +206,7 @@ export function itemVM(userId: string, courseId: string, itemId: string) {
   return {
     course,
     module: catalog.module(courseId, item.moduleNo)!,
-    item: { ...item, quiz: undefined, lab: item.lab ? { ...item.lab, tests: [] as never[] } : undefined },
+    item: { ...item, quiz: undefined, lab: item.lab ? { ...item.lab, tests: [] as never[], solution: undefined, verified: undefined } : undefined },
     quiz: item.quiz && !locked ? publicQuiz(item) : null,
     locked,
     status: lms.itemStatus(userId, itemId),
@@ -431,4 +433,48 @@ export function mfaDemoCode(pendingToken: string): string | null {
   const u = t && getDb().users.find((x) => x.id === t.userId);
   if (!u?.mfaSecret || !u.email.endsWith("@demo.scholarion.test")) return null;
   return totp(u.mfaSecret);
+}
+
+/* ---------------- Course builder ---------------- */
+
+export function teachHomeVM(userId: string) {
+  ensurePlatform();
+  return authoring.myCourses(userId).map((p) => {
+    const items = getDb().items.filter((i) => i.courseId === p.id);
+    return { course: p, modules: getDb().modules.filter((m) => m.courseId === p.id).length, items: items.length, issues: authoring.checklist(userId, p.id).length, learners: getDb().enrollments.filter((e) => e.courseId === p.id).length };
+  });
+}
+
+export function teachCourseVM(userId: string, courseId: string) {
+  ensurePlatform();
+  try {
+    return { ...authoring.outline(userId, courseId), checklist: authoring.checklist(userId, courseId), kinds: authoring.BUILDER_KINDS };
+  } catch {
+    return null;
+  }
+}
+
+export function teachItemVM(userId: string, itemId: string) {
+  ensurePlatform();
+  try {
+    const r = authoring.item(userId, itemId);
+    const issues = authoring.checklist(userId, r.course.id).filter((i) => i.href?.endsWith(`/item/${itemId}`));
+    return { ...r, issues, runner: cloudlab.runnerEnabled(), locked: r.course.review?.state === "submitted" };
+  } catch {
+    return null;
+  }
+}
+
+export function teachAnalyticsVM(userId: string, courseId: string) {
+  ensurePlatform();
+  try {
+    return authoring.analytics(userId, courseId);
+  } catch {
+    return null;
+  }
+}
+
+export function courseReviewsVM(reviewerId: string) {
+  ensurePlatform();
+  return authoring.reviewQueue().map((p) => ({ ...authoring.outline(reviewerId, p.id), checklist: authoring.checklist(reviewerId, p.id), authors: (p.authorIds ?? []).map((id) => getDb().users.find((u) => u.id === id)?.name ?? "Former instructor") }));
 }

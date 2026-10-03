@@ -149,6 +149,18 @@ export function registerHavenRoute(): void {
   );
   subscribe("havenroute", "identity.mfa.enabled", (e) => email(e, "mfa_enabled", "Two-step sign-in is on", "Two-step sign-in is now on for your Scholarion account. You'll enter a code from your authenticator app when you sign in."));
   subscribe("havenroute", "identity.mfa.disabled", (e) => email(e, "mfa_disabled", "Two-step sign-in was turned off", "Two-step sign-in was turned off for your account. If this wasn't you, reset your password and contact support."));
+  // Course builder: tell every author about the review decision.
+  for (const [type, template] of [["authoring.course.published", "course_published"], ["authoring.course.changes_requested", "course_changes"]] as const) {
+    subscribe("havenroute", type, (e) => {
+      const p = getDb().products.find((x) => x.id === e.data.productId);
+      if (!p?.authorIds) return;
+      for (const userId of p.authorIds) {
+        const ev = { ...e, data: { ...e.data, userId } };
+        if (template === "course_published") email(ev, template, `Published: ${p.title}`, `A reviewer approved ${p.title}. It's live at ${publicUrl()}/learn/${p.slug}. Track enrollments and item analytics in Teach.`);
+        else email(ev, template, `Changes requested: ${p.title}`, `A reviewer asked for changes before ${p.title} can publish:\n\n${p.review?.note ?? ""}\n\nOpen it in Teach to make the changes and resubmit.`);
+      }
+    });
+  }
   subscribe("havenroute", "live.application.submitted", (e) => {
     const p = catalog.get(e.data.productId as string);
     email(e, "application_received", `Application received: ${p?.title}`, `Thanks for applying to ${p?.title}. Our admissions team reviews applications in the order they arrive, and we'll email you a decision.`);

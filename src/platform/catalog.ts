@@ -101,7 +101,8 @@ export const catalog = {
 
   get(idOrSlug: string): Product | undefined {
     const p = getDb().products.find((x) => x.id === idOrSlug || x.slug === idOrSlug);
-    if (!p || p.type === "degree" || p.status === "hidden") return undefined;
+    // Drafts (course builder) stay private until a reviewer publishes them.
+    if (!p || p.type === "degree" || p.status === "hidden" || p.status === "draft") return undefined;
     return p;
   },
 

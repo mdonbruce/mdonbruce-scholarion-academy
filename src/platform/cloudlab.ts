@@ -183,6 +183,24 @@ export const cloudlab = {
     return result;
   },
 
+  /** Runs code against tests without a session or gradebook event (course builder checks). */
+  check(code: string, tests: { name: string; code: string; points: number }[]): { ran: boolean; score: number; max: number; feedback: { name: string; passed: boolean; points: number }[]; error: string | null } {
+    const max = tests.reduce((a, t) => a + t.points, 0);
+    if (!runnerEnabled()) return { ran: false, score: 0, max, feedback: [], error: "The Cloud Lab runner is not connected in this environment." };
+    const r = execute(code, "grade", tests);
+    const marker = r.stdout.lastIndexOf("@@RESULT@@");
+    let parsed: { results: { name: string; passed: boolean; points: number }[]; error: string | null } | null = null;
+    try {
+      parsed = marker >= 0 ? JSON.parse(r.stdout.slice(marker + "@@RESULT@@".length)) : null;
+    } catch {
+      parsed = null;
+    }
+    const feedback = parsed?.results ?? tests.map((t) => ({ name: t.name, passed: false, points: t.points }));
+    return { ran: true, score: feedback.filter((f) => f.passed).reduce((a, f) => a + f.points, 0), max, feedback, error: r.timedOut ? "Timed out after 5 seconds." : parsed?.error ?? (parsed ? null : r.stderr.slice(-2000)) };
+  },
+
+  runnerEnabled,
+
   /** Idle shutdown after 30 minutes. */
   tick(): number {
     let n = 0;
