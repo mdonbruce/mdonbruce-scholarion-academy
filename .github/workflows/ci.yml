@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   test-and-build:
@@ -13,12 +14,35 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: npm ci || npm install
-      - run: npm test
+
+      # Each step tees its output; on failure the tail is surfaced as an annotation
+      # so it is readable from the run summary without downloading logs.
+      - name: Install
+        run: |
+          set -o pipefail
+          (if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi) 2>&1 | tee install.log
+      - name: Test
         env:
           CLOUDLAB_LOCAL_RUNNER: "1"
-      - run: npm run build
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee test.log
+      - name: Build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee build.log
+
+      - name: Report failure output
+        if: failure()
+        run: |
+          for f in install test build; do
+            [ -f "$f.log" ] || continue
+            tail -n 80 "$f.log" | sed 's/\x1b\[[0-9;]*m//g' > tail.txt
+            msg=$(python3 -c "import sys;print(open('tail.txt').read().replace('%','%25').replace('\r','').replace('\n','%0A'))")
+            echo "::error title=$f output (last 80 lines)::$msg"
+          done

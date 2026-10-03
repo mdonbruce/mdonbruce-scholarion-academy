@@ -12,6 +12,10 @@ export default [
       "@next/next/no-img-element": "off",
       // Plain <a> links keep views framework-agnostic (preview renderer, tests).
       "@next/next/no-html-link-for-pages": "off",
+      // Apostrophes in JSX copy ("you'll", "can't") render correctly in React.
+      "react/no-unescaped-entities": "off",
+      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-explicit-any": "warn",
     },
   },
   { ignores: [".next/", "preview/", "node_modules/"] },

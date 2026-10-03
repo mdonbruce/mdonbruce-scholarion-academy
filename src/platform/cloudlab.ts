@@ -58,19 +58,36 @@ function runnerEnabled(): boolean {
   return process.env.CLOUDLAB_LOCAL_RUNNER === "1";
 }
 
+function pythonCommand(): string {
+  return process.env.CLOUDLAB_PYTHON || (process.platform === "win32" ? "python" : "python3");
+}
+
+/** Minimal environment for learner code. Windows needs SystemRoot/TEMP or Python fails to start. */
+function runnerEnv(): NodeJS.ProcessEnv {
+  const env: NodeJS.ProcessEnv = { PATH: process.env.PATH ?? "/usr/bin:/bin", PYTHONIOENCODING: "utf-8" };
+  if (process.platform === "win32") {
+    for (const k of ["SystemRoot", "SYSTEMROOT", "TEMP", "TMP", "PATHEXT", "COMSPEC"]) if (process.env[k]) env[k] = process.env[k];
+  }
+  return env;
+}
+
 function execute(code: string, mode: "run" | "grade", tests: unknown[] = []): { stdout: string; stderr: string; timedOut: boolean; status: number | null } {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "scholarion-lab-"));
   try {
     fs.writeFileSync(path.join(dir, "learner.py"), code);
     fs.writeFileSync(path.join(dir, "tests.json"), JSON.stringify(tests));
     fs.writeFileSync(path.join(dir, "harness.py"), HARNESS);
-    const res = spawnSync(process.env.CLOUDLAB_PYTHON ?? "python3", ["-I", "harness.py", mode], {
+    const res = spawnSync(pythonCommand(), ["-I", "harness.py", mode], {
       cwd: dir,
       timeout: RUN_TIMEOUT_MS,
       encoding: "utf8",
       maxBuffer: 256 * 1024,
-      env: { PATH: process.env.PATH ?? "/usr/bin:/bin", PYTHONIOENCODING: "utf-8" },
+      env: runnerEnv(),
+      windowsHide: true,
     });
+    if (res.error && (res.error as NodeJS.ErrnoException).code === "ENOENT") {
+      return { stdout: "", stderr: `Python wasn't found ("${pythonCommand()}"). Install Python 3 or set CLOUDLAB_PYTHON in .env.local.`, timedOut: false, status: 127 };
+    }
     const timedOut = res.error ? (res.error as NodeJS.ErrnoException).code === "ETIMEDOUT" : res.signal === "SIGTERM";
     return { stdout: res.stdout ?? "", stderr: (res.stderr ?? "").replace(/File "[^"]*harness\.py"[^\n]*\n[^\n]*\n/g, ""), timedOut, status: res.status };
   } finally {
