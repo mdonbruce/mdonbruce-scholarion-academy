@@ -13,7 +13,9 @@ import {
   live,
   lms,
   publicUser,
+  community,
   studio,
+  teams,
   tickAll,
   tutor,
   type Action,
@@ -304,6 +306,84 @@ on(
   },
   "user",
 );
+
+/* ---------------- Teams & organizations ---------------- */
+
+const orgBack = (id: string) => `/org/${id}`;
+on(
+  "POST",
+  "teams/orgs",
+  (c) => {
+    const o = teams.purchase({ adminId: c.user!.id, name: c.data.name ?? "", seats: Number(c.data.seats), domain: c.data.domain || null, ssoEnabled: c.data.sso === "on" });
+    return redirect(withQuery(orgBack(o.id), { notice: `${o.name} is set up with ${o.seats} seats (sandbox). Assign a program, then invite your people.` }));
+  },
+  "user",
+);
+on(
+  "POST",
+  "teams/orgs/:id/invites",
+  (c) => {
+    const r = teams.invite(c.params.id, c.user!.id, c.data.emails ?? "");
+    const parts = [`${r.created.length} invitation${r.created.length === 1 ? "" : "s"} sent.`];
+    if (r.skipped.length) parts.push(`Skipped: ${r.skipped.join("; ")}.`);
+    return redirect(withQuery(orgBack(c.params.id), { notice: parts.join(" ") }));
+  },
+  "user",
+);
+on("POST", "teams/orgs/:id/invites/:token/revoke", (c) => (teams.revokeInvite(c.params.id, c.user!.id, c.params.token), redirect(withQuery(orgBack(c.params.id), { notice: "Invitation cancelled." }))), "user");
+on(
+  "POST",
+  "teams/orgs/:id/programs",
+  (c) => {
+    const p = catalog.get(c.data.productId ?? "");
+    teams.assignProgram(c.params.id, c.user!.id, p?.id ?? "");
+    return redirect(withQuery(orgBack(c.params.id), { notice: `${p?.title} added. Every member now has access and is enrolled.` }));
+  },
+  "user",
+);
+on("POST", "teams/orgs/:id/programs/:pid/remove", (c) => (teams.unassignProgram(c.params.id, c.user!.id, c.params.pid), redirect(withQuery(orgBack(c.params.id), { notice: "Program removed. Members keep their progress and any credentials they earned." }))), "user");
+on("POST", "teams/orgs/:id/seats", (c) => {
+  const o = teams.addSeats(c.params.id, c.user!.id, Number(c.data.extra));
+  return redirect(withQuery(orgBack(c.params.id), { notice: `You now have ${o.seats} seats (sandbox order recorded).` }));
+}, "user");
+on("POST", "teams/orgs/:id/sso", (c) => {
+  const o = teams.updateSso(c.params.id, c.user!.id, c.data.domain || null, c.data.enabled === "on");
+  return redirect(withQuery(orgBack(c.params.id), { notice: o.ssoEnabled ? `Anyone signing in with an @${o.domain} address can now take a seat.` : "Organization sign-in is off. People join by invitation only." }));
+}, "user");
+on("POST", "teams/orgs/:id/members/:userId/revoke", (c) => (teams.revokeSeat(c.params.id, c.user!.id, c.params.userId), redirect(withQuery(orgBack(c.params.id), { notice: "Seat freed. The learner keeps their progress and credentials." }))), "user");
+on("GET", "teams/orgs/:id/report.csv", (c) => {
+  if (!c.user) throw new PlatformError("not_signed_in", "Sign in to download reports.", 401);
+  const csv = teams.reportCsv(c.params.id, c.user.id);
+  return new Response(csv, { headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="scholarion-${c.params.id}-progress.csv"`, "cache-control": "no-store" } });
+});
+on("POST", "teams/invites/:token/accept", (c) => {
+  const o = teams.acceptInvite(c.params.token, c.user!.id);
+  return redirect(withQuery("/app", { notice: `Welcome to ${o.name} on Scholarion. Your organization's programs are below.` }));
+}, "user");
+on("POST", "teams/orgs/:id/sso-join", (c) => {
+  const o = teams.joinViaSso(c.params.id, c.user!.id);
+  return redirect(withQuery("/app", { notice: `Signed in with ${o.name}. Your organization's programs are below.` }));
+}, "user");
+
+/* ---------------- Community & peer review ---------------- */
+
+on("POST", "community/posts", (c) => {
+  community.post({ userId: c.user!.id, itemId: c.data.itemId ?? "", body: c.data.body ?? "", parentId: c.data.parentId || null });
+  return redirect(withQuery(back(c, "/app"), { notice: "Posted." }));
+}, "user");
+on("POST", "community/posts/:id/report", (c) => (community.report(c.params.id, c.user!.id), redirect(withQuery(back(c, "/app"), { notice: "Thanks — course staff will review this post." }))), "user");
+on("POST", "admin/community/posts/:id/:action", (c) => {
+  const action = c.params.action as "hide" | "restore" | "dismiss";
+  if (!["hide", "restore", "dismiss"].includes(action)) throw new PlatformError("not_found", "Unknown action", 404);
+  community.moderate(c.params.id, c.user!.id, action);
+  return redirect(withQuery(back(c, "/admin/moderation"), { notice: action === "hide" ? "Post hidden." : action === "restore" ? "Post restored." : "Reports dismissed." }));
+}, "staff");
+on("POST", "lms/peer-reviews", (c) => {
+  const scores: Record<string, number> = {};
+  for (const [k, v] of Object.entries(c.data)) if (k.startsWith("score:")) scores[k.slice(6)] = Number(v);
+  lms.submitPeerReview({ reviewerId: c.user!.id, submissionId: c.data.submissionId ?? "", scores, comment: c.data.comment ?? "" });
+  return redirect(withQuery(back(c, "/app"), { notice: "Review submitted. Thank you — your feedback goes to your classmate anonymously." }));
+}, "user");
 
 /* ---------------- Admin / staff ---------------- */
 

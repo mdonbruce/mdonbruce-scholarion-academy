@@ -14,7 +14,9 @@ import {
   nowIso,
   partners,
   publicQuiz,
+  community,
   studio,
+  teams,
   type Item,
   type Product,
   type User,
@@ -26,8 +28,8 @@ import type { SearchFilters } from "@/platform/catalog";
  * plain data to views; nothing here leaks answers, other learners' data or PII.
  */
 
-export type Viewer = { id: string; name: string; roles: string[] } | null;
-export const viewerOf = (u: User | null): Viewer => (u ? { id: u.id, name: u.name, roles: u.roles } : null);
+export type Viewer = { id: string; name: string; roles: string[]; orgAdminOf?: string } | null;
+export const viewerOf = (u: User | null): Viewer => (u ? { id: u.id, name: u.name, roles: u.roles, orgAdminOf: teams.adminOf(u.id)[0]?.id } : null);
 
 export function homeVM() {
   ensurePlatform();
@@ -99,7 +101,16 @@ export function dashboardVM(userId: string) {
   ensurePlatform();
   const d = lms.dashboard(userId);
   const next = d.courses.map((c) => ({ course: c.course, item: c.progress.nextItem })).find((x) => x.item);
-  return { ...d, next, live: live.sessionsFor(userId).filter((s) => s.session.startsAt >= nowIso()).slice(0, 2), recommendations: recommendationsFor(userId) };
+  const user = getDb().users.find((u) => u.id === userId)!;
+  const sso = teams.ssoMatch(user);
+  return {
+    ...d,
+    next,
+    live: live.sessionsFor(userId).filter((s) => s.session.startsAt >= nowIso()).slice(0, 2),
+    recommendations: recommendationsFor(userId),
+    ssoOffer: sso ? { id: sso.id, name: sso.name, domain: sso.domain } : null,
+    orgs: teams.membershipsOf(userId).map((m) => ({ id: m.org.id, name: m.org.name })),
+  };
 }
 
 function recommendationsFor(userId: string) {
@@ -196,6 +207,21 @@ export function itemVM(userId: string, courseId: string, itemId: string) {
     moduleItems: catalog.items(courseId, item.moduleNo).map((i) => ({ id: i.id, title: i.title, kind: i.kind, status: lms.itemStatus(userId, i.id) })),
     tutorEnabled: entitlements.check(userId, "content.view", courseId).allow,
     canView: entitlements.check(userId, "content.view", courseId).allow,
+    threads: item.kind === "discussion" && !locked ? community.threads(item.id, userId) : [],
+    peer: item.project?.peerReview && !locked ? peerVM(userId, item.id) : null,
+  };
+}
+
+function peerVM(userId: string, itemId: string) {
+  const status = lms.peerStatus(userId, itemId);
+  const q = lms.reviewQueue(userId, itemId);
+  const rubric = catalog.item(itemId)!.project!.rubric;
+  return {
+    ...status,
+    available: q.available,
+    // Classmate's work is shown without their name (anonymous review).
+    next: q.next ? { id: q.next.id, text: q.next.text, fileName: q.next.fileName ?? null, createdAt: q.next.createdAt } : null,
+    rubric,
   };
 }
 
@@ -284,7 +310,7 @@ export function adminVM() {
     now: nowIso(),
     events: [...db.events].reverse().slice(0, 40),
     outbox: cx.outbox().slice(0, 20),
-    counts: { users: db.users.length, enrollments: db.enrollments.length, credentials: db.credentials.length, aidPending: commerce.aidQueue().length, studioDrafts: studio.drafts().length, tickets: db.tickets.filter((t) => t.status === "open").length, submissions: lms.pendingSubmissions().length },
+    counts: { users: db.users.length, enrollments: db.enrollments.length, credentials: db.credentials.length, aidPending: commerce.aidQueue().length, studioDrafts: studio.drafts().length, tickets: db.tickets.filter((t) => t.status === "open").length, reported: community.queue().filter((p) => p.reports.length && !p.hiddenAt).length, submissions: lms.pendingSubmissions().length },
     credentials: db.credentials.slice(-10).reverse().map((c) => ({ id: c.id, title: c.title, holderName: c.holderName, issuedAt: c.issuedAt, revokedAt: c.revokedAt })),
   };
 }
@@ -301,7 +327,7 @@ export function studioVM() {
 
 export function gradingVM() {
   ensurePlatform();
-  return lms.pendingSubmissions().map((s) => ({ ...s, item: catalog.item(s.itemId), learner: getDb().users.find((u) => u.id === s.userId)?.name ?? "Learner" }));
+  return lms.pendingSubmissions().map((s) => ({ ...s, item: catalog.item(s.itemId), learner: getDb().users.find((u) => u.id === s.userId)?.name ?? "Learner", peerReviews: lms.peerReviewsOf(s.id) }));
 }
 
 export function claimsVM(text: string) {
@@ -335,4 +361,26 @@ export function checkoutVM(id: string, userId: string) {
 export function aidApplyVM(slug: string) {
   ensurePlatform();
   return { product: catalog.get(slug) ?? null, guidance: commerce.aidGuidance };
+}
+
+export function moderationVM() {
+  ensurePlatform();
+  return community.queue();
+}
+
+export function orgVM(orgId: string, userId: string) {
+  ensurePlatform();
+  const d = teams.dashboard(orgId, userId);
+  const assignable = catalog.all().filter((p) => p.format === "self_paced" && p.type !== "guided_project" && !d.org.programIds.includes(p.id));
+  return { ...d, assignable };
+}
+
+export function joinVM(token: string) {
+  ensurePlatform();
+  return teams.invitation(token);
+}
+
+export function teamsQuote(seats = 10) {
+  ensurePlatform();
+  return teams.quote(seats);
 }

@@ -28,6 +28,8 @@ export function capabilities(): Capability[] {
     { key: "studio", name: "Studio outputs", phase: "3", status: "SIMULATED", implementation: "Deterministic flashcards and study guides; staff approval before publish", fallback: "Extras strip hidden" },
     { key: "havenconnect", name: "HavenConnect CX + HavenRoute", phase: "4", status: "SIMULATED", implementation: "Help-center agent, tickets, leads; email outbox (nothing sent)", fallback: "Contact form, email retry" },
     { key: "live", name: "Zoom/Webex live engine", phase: "4", status: "SIMULATED", implementation: "40-minute segments, per-user links (example.invalid), attendance webhook stand-in, failover", fallback: "Switch provider, manual attendance" },
+    { key: "teams", name: "Teams & organizations", phase: "4", status: "SIMULATED", implementation: "Seat purchase (sandbox), invites, org sign-in by email domain, curated programs, admin dashboard, CSV report; SAML/OIDC SSO and SCIM planned", fallback: "Invite links; seats keep working from entitlements" },
+    { key: "community", name: "Discussions & peer review", phase: "3", status: "SIMULATED", implementation: "Threaded course discussions with reports and staff moderation; rubric peer review with calibration check", fallback: "Staff grading queue" },
     { key: "partners", name: "Partner Registry features (§15)", phase: "5+", status: "PLANNED", implementation: "Registry model + claims checker in place; no partner records", fallback: "Default Scholarion-only wording" },
     { key: "degrees", name: "Degrees section", phase: "5+", status: "PLANNED", implementation: "Route returns 404; product type hidden", fallback: "—" },
   ];

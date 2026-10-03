@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { adminVM, aidQueueVM, claimsVM, gradingVM, liveAdminVM, studioVM, supportVM, Viewer } from "@/bff/views";
+import type { adminVM, aidQueueVM, claimsVM, gradingVM, liveAdminVM, moderationVM, studioVM, supportVM, Viewer } from "@/bff/views";
 import { fmtDateTime, StatusBadge } from "../components/cards";
 import { AppShell, Flash } from "../components/chrome";
 
@@ -18,6 +18,7 @@ function AdminTabs({ current }: { current: string }) {
       {t("/admin/aid", "Financial aid")}
       {t("/admin/grading", "Grading")}
       {t("/admin/studio", "Studio review")}
+      {t("/admin/moderation", "Moderation")}
       {t("/admin/live", "Live sessions")}
       {t("/admin/support", "Support & leads")}
       {t("/admin/claims", "Claims checker")}
@@ -94,6 +95,9 @@ export function AdminHomeView({ viewer, vm, flash }: { viewer: V; vm: ReturnType
             </li>
             <li>
               <a href="/admin/studio">Studio drafts awaiting review: {vm.counts.studioDrafts}</a>
+            </li>
+            <li>
+              <a href="/admin/moderation">Reported discussion posts: {vm.counts.reported}</a>
             </li>
             <li>
               <a href="/admin/support">Open tickets: {vm.counts.tickets}</a>
@@ -244,6 +248,18 @@ export function AdminGradingView({ viewer, vm, flash }: { viewer: V; vm: ReturnT
               {s.learner} · {fmtDateTime(s.createdAt)} {s.fileName ? `· ${s.fileName}` : ""}
             </div>
             <p className="small">{s.text}</p>
+            {s.needsStaff && (
+              <div className="notice notice-warn small">
+                Peer reviewers disagreed by more than 25% of the maximum, so this needs a staff grade.
+                <ul style={{ margin: "6px 0 0" }}>
+                  {s.peerReviews.map((r) => (
+                    <li key={r.id}>
+                      {r.total}/{r.max} — {r.comment}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <form method="post" action={`/api/v1/admin/submissions/${s.id}/grade`} className="row">
               <input name="score" type="number" min={0} max={100} required placeholder="Score" style={{ width: 100 }} aria-label="Score" />
               <input name="max" type="number" min={1} max={100} defaultValue={s.item?.project?.rubric.reduce((a, r) => a + r.points, 0) ?? 50} style={{ width: 90 }} aria-label="Out of" />
@@ -432,6 +448,52 @@ export function AdminClaimsView({ viewer, vm }: { viewer: V; vm: ReturnType<type
           </tbody>
         </table>
       )}
+    </Shell>
+  );
+}
+
+export function AdminModerationView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<typeof moderationVM>; flash: FlashProps }) {
+  return (
+    <Shell viewer={viewer} current="/admin/moderation" title="Discussion moderation" flash={flash}>
+      <p className="small muted">Posts learners reported, and posts staff have hidden. Hidden posts show as removed to learners.</p>
+      {vm.length === 0 && <div className="panel muted">Nothing to review.</div>}
+      <div className="stack">
+        {vm.map((p) => (
+          <section key={p.id} className="card card-pad">
+            <div className="row between">
+              <span className="small">
+                <strong>{p.author}</strong> in {p.course?.code} · {p.item?.title} · {fmtDateTime(p.createdAt)}
+              </span>
+              <span className="row" style={{ ["--gap" as string]: "6px" }}>
+                {p.reports.length > 0 && <span className="badge badge-red">{p.reports.length} report{p.reports.length > 1 ? "s" : ""}</span>}
+                {p.hiddenAt && <span className="badge">Hidden</span>}
+              </span>
+            </div>
+            <p className="small" style={{ margin: "8px 0" }}>
+              {p.body}
+            </p>
+            <div className="row">
+              {p.hiddenAt ? (
+                <form method="post" action={`/api/v1/admin/community/posts/${p.id}/restore`}>
+                  <button className="btn btn-outline btn-sm">Restore</button>
+                </form>
+              ) : (
+                <form method="post" action={`/api/v1/admin/community/posts/${p.id}/hide`}>
+                  <button className="btn btn-danger btn-sm">Hide post</button>
+                </form>
+              )}
+              {p.reports.length > 0 && !p.hiddenAt && (
+                <form method="post" action={`/api/v1/admin/community/posts/${p.id}/dismiss`}>
+                  <button className="btn btn-ghost btn-sm">Dismiss reports</button>
+                </form>
+              )}
+              <a className="small" href={`/app/course/${p.courseId}/item/${p.itemId}`}>
+                Open discussion
+              </a>
+            </div>
+          </section>
+        ))}
+      </div>
     </Shell>
   );
 }

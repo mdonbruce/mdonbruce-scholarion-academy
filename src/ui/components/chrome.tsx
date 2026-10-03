@@ -9,6 +9,7 @@ export interface Viewer {
   id: string;
   name: string;
   roles: string[];
+  orgAdminOf?: string;
 }
 
 export function Brand({ compact = false, href = "/" }: { compact?: boolean; href?: string }) {
@@ -234,6 +235,14 @@ export function AppShell({ viewer, current, children }: { viewer: Viewer; curren
               Help
             </a>
           </li>
+          {viewer.orgAdminOf && (
+            <li>
+              <a href={`/org/${viewer.orgAdminOf}`} aria-current={current.startsWith("/org") ? "page" : undefined}>
+                <Icon name="users" size={18} />
+                My Organization
+              </a>
+            </li>
+          )}
           {isStaff && (
             <li>
               <a href="/admin" aria-current={current.startsWith("/admin") ? "page" : undefined}>
@@ -259,7 +268,7 @@ export function AppShell({ viewer, current, children }: { viewer: Viewer; curren
               </span>
               <span>
                 <strong>{viewer.name}</strong>
-                <small>{viewer.roles.includes("platform_admin") ? "Admin" : viewer.roles.includes("instructor") ? "Instructor" : "Student"}</small>
+                <small>{viewer.roles.includes("platform_admin") ? "Admin" : viewer.roles.includes("instructor") ? "Instructor" : viewer.orgAdminOf ? "Organization admin" : "Student"}</small>
               </span>
             </div>
             <form method="post" action="/api/v1/auth/signout">

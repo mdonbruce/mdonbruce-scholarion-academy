@@ -2,7 +2,7 @@
 
 The public website, learner app and BFF for **Scholarion Academy** — "Learn. Earn. Build Your Future." Built on the Scholarion platform per the *Master Build Prompt* and the *Platform Integration Spec*.
 
-This is the **Phase 1 + integrations** build. Phase 1 screens are complete. All nine platform connections — Catalog & Pathways, Commerce, LMS, Cloud Lab, AI Tutor, Credentials, Studio, HavenConnect/HavenRoute, and the Zoom/Webex live engine — are wired end to end against in-process stand-ins. Every stand-in reports **SIMULATED** on the status board until its real service is connected.
+This is the **Phase 1 + integrations** build, plus Scholarion for Teams, course discussions and peer review. Phase 1 screens are complete. All nine platform connections — Catalog & Pathways, Commerce, LMS, Cloud Lab, AI Tutor, Credentials, Studio, HavenConnect/HavenRoute, and the Zoom/Webex live engine — are wired end to end against in-process stand-ins. Every stand-in reports **SIMULATED** on the status board until its real service is connected.
 
 ## Run it
 
@@ -12,7 +12,8 @@ Requires Node 20.11+ (and Python 3 for the local Cloud Lab runner).
 npm install
 cp .env.example .env.local
 npm run dev            # http://localhost:3000
-npm test               # 25 acceptance + API tests (node:test, no browser needed)
+npm test               # 32 acceptance + API tests (node:test, no browser needed)
+npm run smoke          # page + flow checks against a running server (CI runs it after next build)
 npm run build          # production build (type-checks)
 ```
 
@@ -24,6 +25,9 @@ npm run build          # production build (type-checks)
 | Admin, reviewer, instructor, support | `admin@demo.scholarion.test` | `ScholarionAdmin1` |
 | Instructor | `faculty@demo.scholarion.test` | `ScholarionFaculty1` |
 | Auditing learner with an aid application in review | `tunde@demo.scholarion.test` | `LearnEarnBuild2` |
+| Organization admin, Brightpath Health (demo) | `orgadmin@demo.scholarion.test` | `ScholarionTeams1` |
+| Brightpath learner (joined by organization sign-in) | `kemi@brightpath.example` | `LearnEarnBuild3` |
+| Not yet a member — sees "Sign in with Brightpath" | `chidi@brightpath.example` | `LearnEarnBuild4` |
 
 State persists to `.data/db.json` when `SCHOLARION_PERSIST=1`. Run `npm run db:reset` to start fresh.
 
@@ -35,7 +39,10 @@ State persists to `.data/db.json` when `SCHOLARION_PERSIST=1`. Run `npm run db:r
 4. **Financial aid:** as admin, open *Staff → Financial aid*, approve Tunde's application, and see the entitlement and email.
 5. **Live:** as Amara, open *Live Sessions* to see 40-minute segment cards. As admin, record attendance under *Staff → Live sessions*.
 6. **Integrity:** in any graded quiz the AI Tutor is off. In a lab, ask the tutor to *write the code* and it refuses with a hint and citations.
-7. **Claims checker:** *Staff → Claims checker* blocks degree, credit, salary and unregistered-partner claims. `/degrees` returns 404.
+7. **Teams:** sign in as the organization admin and open *My Organization*: seats, the curated academy, progress per person, invitations, organization sign-in and CSV export. Sign in as Chidi to join with organization sign-in. The Riverbend Logistics organization is never visible to Brightpath.
+8. **Peer review:** as Amara, submit the Module 5 mini project, then review the two waiting classmates. Grades post when two reviews are received and two given; if reviewers disagree by more than 25% of the maximum, the project goes to *Staff → Grading*.
+9. **Discussions:** post and reply on the Module 5 discussion; report a post; hide it under *Staff → Moderation*.
+10. **Claims checker:** *Staff → Claims checker* blocks degree, credit, salary and unregistered-partner claims. `/degrees` returns 404.
 
 ## Architecture
 
@@ -92,6 +99,8 @@ docs/               Integration notes and ADRs
 | Studio outputs | 3 | SIMULATED |
 | HavenConnect CX + HavenRoute | 4 | SIMULATED |
 | Zoom/Webex live engine | 4 | SIMULATED |
+| Teams & organizations | 4 | SIMULATED (SAML/OIDC SSO and SCIM planned) |
+| Discussions & peer review | 3 | SIMULATED |
 | Partner Registry features | 5+ | PLANNED |
 | Degrees | 5+ | PLANNED |
 

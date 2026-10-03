@@ -216,8 +216,115 @@ export const lms = {
     return getDb().submissions.filter((s) => s.userId === userId && (!itemId || s.itemId === itemId));
   },
 
+  /** Staff grading queue: instructor-graded work, plus peer-reviewed work whose reviews disagreed. */
   pendingSubmissions(): Submission[] {
-    return getDb().submissions.filter((s) => s.status === "submitted");
+    return getDb().submissions.filter((s) => s.status === "submitted" && (!catalog.item(s.itemId)?.project?.peerReview || s.needsStaff));
+  },
+
+  /* ---------------- Peer review ---------------- */
+
+  latestSubmission(userId: string, itemId: string): Submission | undefined {
+    return this.submissionsFor(userId, itemId).sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+  },
+
+  /** Next classmate submission to review: fewest reviews first, never your own or one you've reviewed. */
+  reviewQueue(userId: string, itemId: string): { next: Submission | null; available: number } {
+    const item = catalog.item(itemId);
+    if (!item?.project?.peerReview) return { next: null, available: 0 };
+    if (!this.latestSubmission(userId, itemId)) return { next: null, available: 0 };
+    const db = getDb();
+    const latestByAuthor = new Map<string, Submission>();
+    for (const s of db.submissions.filter((x) => x.itemId === itemId && x.userId !== userId)) {
+      const cur = latestByAuthor.get(s.userId);
+      if (!cur || s.createdAt > cur.createdAt) latestByAuthor.set(s.userId, s);
+    }
+    const reviewedAuthors = new Set(db.peerReviews.filter((r) => r.reviewerId === userId && r.itemId === itemId).map((r) => db.submissions.find((s) => s.id === r.submissionId)?.userId));
+    const candidates = [...latestByAuthor.values()]
+      .filter((s) => !reviewedAuthors.has(s.userId))
+      .map((s) => ({ s, n: db.peerReviews.filter((r) => r.submissionId === s.id).length }))
+      .sort((a, b) => a.n - b.n || a.s.createdAt.localeCompare(b.s.createdAt));
+    return { next: candidates[0]?.s ?? null, available: candidates.length };
+  },
+
+  submitPeerReview(input: { reviewerId: string; submissionId: string; scores: Record<string, number>; comment: string }) {
+    const db = getDb();
+    const sub = db.submissions.find((s) => s.id === input.submissionId);
+    if (!sub) throw new PlatformError("not_found", "Submission not found", 404);
+    const item = catalog.item(sub.itemId);
+    if (!item?.project?.peerReview) throw new PlatformError("not_peer_reviewed", "This project isn't peer reviewed.");
+    if (sub.userId === input.reviewerId) throw new PlatformError("own_submission", "You can't review your own work.");
+    if (!entitlements.check(input.reviewerId, "item.graded", item.courseId).allow) throw new PlatformError("needs_upgrade", "Peer review needs full access.", 403);
+    if (!this.latestSubmission(input.reviewerId, item.id)) throw new PlatformError("submit_first", "Submit your own project before reviewing classmates.");
+    if (db.peerReviews.some((r) => r.reviewerId === input.reviewerId && db.submissions.find((s) => s.id === r.submissionId)?.userId === sub.userId && r.itemId === item.id)) {
+      throw new PlatformError("already_reviewed", "You've already reviewed this classmate's work.", 409);
+    }
+    const scores: Record<string, number> = {};
+    let total = 0;
+    for (const c of item.project.rubric) {
+      const v = Math.round(Number(input.scores[c.criterion]));
+      if (!Number.isFinite(v) || v < 0 || v > c.points) throw new PlatformError("invalid_score", `Score "${c.criterion}" from 0 to ${c.points}.`);
+      scores[c.criterion] = v;
+      total += v;
+    }
+    const comment = input.comment.trim();
+    if (comment.length < 20) throw new PlatformError("comment_required", "Add at least a sentence of feedback (20 characters or more).");
+    const max = item.project.rubric.reduce((a, c) => a + c.points, 0);
+    const review = { id: newId("prv"), submissionId: sub.id, itemId: item.id, reviewerId: input.reviewerId, scores, total, max, comment, createdAt: nowIso() };
+    db.peerReviews.push(review);
+    publish("lms.peer_review.created", "lms", `user/${input.reviewerId}`, { reviewerId: input.reviewerId, submissionId: sub.id, itemId: item.id });
+    this.finalizePeerGrade(sub);
+    const own = this.latestSubmission(input.reviewerId, item.id);
+    if (own) this.finalizePeerGrade(own);
+    save();
+    return review;
+  },
+
+  /**
+   * A peer grade posts once the work has `required` reviews and its author has given
+   * `required` reviews. Calibration: if reviewers disagree by more than 25% of the
+   * maximum, course staff grade it instead.
+   */
+  finalizePeerGrade(sub: Submission): void {
+    const item = catalog.item(sub.itemId);
+    const req = item?.project?.peerReview?.required;
+    if (!item || !req || sub.status === "graded" || sub.needsStaff) return;
+    if (this.latestSubmission(sub.userId, sub.itemId)?.id !== sub.id) return;
+    const db = getDb();
+    const received = db.peerReviews.filter((r) => r.submissionId === sub.id);
+    const given = db.peerReviews.filter((r) => r.reviewerId === sub.userId && r.itemId === sub.itemId).length;
+    if (received.length < req || given < req) return;
+    const max = received[0].max;
+    const totals = received.map((r) => r.total);
+    if (Math.max(...totals) - Math.min(...totals) > 0.25 * max) {
+      sub.needsStaff = true;
+      publish("lms.peer_review.disputed", "lms", `user/${sub.userId}`, { userId: sub.userId, submissionId: sub.id, itemId: sub.itemId });
+      save();
+      return;
+    }
+    const score = Math.round(totals.reduce((a, b) => a + b, 0) / totals.length);
+    sub.status = "graded";
+    sub.score = score;
+    sub.max = max;
+    sub.feedback = received.map((r, i) => `Reviewer ${i + 1}: ${r.comment}`).join("\n");
+    this.postGrade({ userId: sub.userId, itemId: sub.itemId, score, max, source: "peer", feedback: sub.feedback });
+  },
+
+  peerStatus(userId: string, itemId: string) {
+    const item = catalog.item(itemId);
+    const required = item?.project?.peerReview?.required ?? 0;
+    const db = getDb();
+    const own = this.latestSubmission(userId, itemId);
+    const received = own ? db.peerReviews.filter((r) => r.submissionId === own.id) : [];
+    return {
+      required,
+      given: db.peerReviews.filter((r) => r.reviewerId === userId && r.itemId === itemId).length,
+      received: received.map((r) => ({ total: r.total, max: r.max, comment: r.comment, scores: r.scores })),
+      needsStaff: !!own?.needsStaff,
+    };
+  },
+
+  peerReviewsOf(submissionId: string) {
+    return getDb().peerReviews.filter((r) => r.submissionId === submissionId);
   },
 
   gradeSubmission(submissionId: string, score: number, max: number, feedback: string): Submission {
@@ -227,6 +334,7 @@ export const lms = {
     s.score = score;
     s.max = max;
     s.feedback = feedback;
+    s.needsStaff = false;
     this.postGrade({ userId: s.userId, itemId: s.itemId, score, max, source: "instructor", feedback });
     return s;
   },

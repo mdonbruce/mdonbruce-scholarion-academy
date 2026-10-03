@@ -12,9 +12,10 @@ import { renderToStaticMarkup } from "react-dom/server";
 import * as V from "../src/bff/views";
 import { catalog, commerce, ensurePlatform, identity, lms } from "../src/platform";
 import { getDb } from "../src/platform/store";
-import { AdminHomeView, AdminClaimsView } from "../src/ui/views/admin";
+import { AdminHomeView, AdminClaimsView, AdminModerationView } from "../src/ui/views/admin";
+import { OrgView } from "../src/ui/views/teams";
 import { AccountView, CourseHomeView, CredentialsView, DashboardView, GradebookView, ItemView, LiveView, ModuleView } from "../src/ui/views/learner";
-import { CheckoutView, ExploreView, HomeView, LoginView, PlusView, ProductView, ProgramsView, VerifyView } from "../src/ui/views/public";
+import { CheckoutView, ExploreView, HomeView, LoginView, PlusView, ProductView, ProgramsView, TeamsView, VerifyView } from "../src/ui/views/public";
 
 process.env.CLOUDLAB_LOCAL_RUNNER = "1";
 ensurePlatform();
@@ -34,6 +35,9 @@ for (const i of catalog.items("prd_agentic_foundations")) {
   if (i.graded) lms.postGrade({ userId: amara.id, itemId: i.id, score: 3, max: 3, source: "quiz" });
 }
 const badge = getDb().credentials.find((c) => c.userId === amara.id)!;
+// Amara submits the peer-reviewed Module 5 project so the review form shows.
+lms.submitProject(amara.id, "itm_cop1047c_m5_project", "Records in a dict, four functions, a search and input validation. Short PDF report attached.", "amara_records.py");
+const orgAdmin = identity.getUser("usr_orgadmin")!;
 const checkout = commerce.createCheckout({ userId: "usr_tunde", plan: "plus_monthly", productId: null, idempotencyKey: "preview" });
 
 const ROUTES: Record<string, string> = {
@@ -58,6 +62,10 @@ const ROUTES: Record<string, string> = {
   "/admin": "admin.html",
   "/admin/claims": "claims.html",
   [`/checkout/${checkout.id}`]: "checkout.html",
+  "/org/org_brightpath": "org.html",
+  "/teams": "teams.html",
+  "/app/course/prd_cop1047c/item/itm_cop1047c_m5_discussion": "discussion.html",
+  "/admin/moderation": "moderation.html",
 };
 
 const pages: [string, string, ReactElement][] = [
@@ -81,6 +89,10 @@ const pages: [string, string, ReactElement][] = [
   ["verify.html", "Verification", <VerifyView viewer={null} vm={V.verifyVM(badge.id)} />],
   ["admin.html", "Staff & admin", <AdminHomeView viewer={{ id: "usr_admin", name: "Platform Admin", roles: ["platform_admin"] }} vm={V.adminVM()} flash={{}} />],
   ["claims.html", "Claims checker", <AdminClaimsView viewer={{ id: "usr_admin", name: "Platform Admin", roles: ["platform_admin"] }} vm={V.claimsVM("Earn an accredited degree with transferable college credit. Graduates earn $95,000 per year. Developed with Lakeside University.")} />],
+  ["org.html", "Organization dashboard", <OrgView viewer={V.viewerOf(orgAdmin)!} vm={V.orgVM("org_brightpath", orgAdmin.id)} flash={{}} origin="http://localhost:3000" />],
+  ["teams.html", "Scholarion for Teams", <TeamsView viewer={V.viewerOf(orgAdmin)} flash={{}} quote={V.teamsQuote(10)} />],
+  ["discussion.html", "Module 5 discussion", <ItemView viewer={viewer} vm={V.itemVM(amara.id, "prd_cop1047c", "itm_cop1047c_m5_discussion")!} flash={{}} />],
+  ["moderation.html", "Moderation", <AdminModerationView viewer={{ id: "usr_admin", name: "Platform Admin", roles: ["platform_admin"] }} vm={V.moderationVM()} flash={{}} />],
   ["checkout.html", "Sandbox checkout", <CheckoutView viewer={{ id: "usr_tunde", name: "Tunde Bello", roles: ["learner"] }} vm={V.checkoutVM(checkout.id, "usr_tunde")!} />],
 ];
 

@@ -25,6 +25,22 @@ export function DashboardView({ viewer, vm, flash }: { viewer: V; vm: ReturnType
       <Flash {...flash} />
       <h1 className="page-title">{greeting(viewer.name)}</h1>
       <p className="muted">Keep going. Your goals are within reach.</p>
+      {vm.ssoOffer && (
+        <div className="notice notice-info row between">
+          <span>
+            <strong>{vm.ssoOffer.name}</strong> uses Scholarion. Your @{vm.ssoOffer.domain} address lets you take a seat with organization sign-in.
+          </span>
+          <form method="post" action={`/api/v1/teams/orgs/${vm.ssoOffer.id}/sso-join`}>
+            <input type="hidden" name="back" value="/app" />
+            <button className="btn btn-primary btn-sm">Sign in with {vm.ssoOffer.name}</button>
+          </form>
+        </div>
+      )}
+      {vm.orgs.length > 0 && (
+        <p className="small muted" style={{ marginTop: -6 }}>
+          Learning with {vm.orgs.map((o) => o.name).join(", ")}
+        </p>
+      )}
       <div className="grid g4" style={{ margin: "18px 0 26px" }}>
         <Stat icon="book" value={vm.stats.activeCourses} label="Active courses" />
         <Stat icon="calendar" value={vm.stats.assignmentsDue} label="Assignments due" />
@@ -487,7 +503,7 @@ export function ItemView({ viewer, vm, flash, retake }: { viewer: V; vm: NonNull
                 </div>
               </div>
             </div>
-            <StatusBadge status={vm.best ? "Graded" : vm.status === "completed" ? "Graded" : vm.status === "started" ? "In Progress" : "Not Started"} />
+            <StatusBadge status={vm.best ? "Graded" : vm.status === "completed" ? (i.graded ? "Submitted" : "Completed") : vm.status === "started" ? "In Progress" : "Not Started"} />
           </div>
 
           {vm.locked && !labReadOnly ? (
@@ -521,10 +537,7 @@ export function ItemView({ viewer, vm, flash, retake }: { viewer: V; vm: NonNull
               <article className="panel" style={{ whiteSpace: "pre-line" }}>
                 {i.body}
               </article>
-              {i.kind === "discussion" && (
-                <p className="small muted">Course discussion forums open in Phase 3 (moderated). For now, share your reply with course staff through the AI Tutor's “Ask an instructor”.</p>
-              )}
-              {completeForm}
+              {i.kind === "discussion" ? <DiscussionPanel itemId={i.id} threads={vm.threads} back={back} /> : completeForm}
             </>
           )}
           <div className="row between" style={{ marginTop: 8 }}>
@@ -589,9 +602,16 @@ function ProjectPanel({ vm, back }: { vm: NonNullable<ReturnType<typeof itemVM>>
       </div>
       {last && (
         <div className={`notice ${last.status === "graded" ? "notice-ok" : "notice-info"}`}>
-          Last submission {fmtDate(last.createdAt)} — {last.status === "graded" ? `graded ${last.score}/${last.max}. ${last.feedback ?? ""}` : "waiting for course staff to grade it."}
+          Last submission {fmtDate(last.createdAt)} —{" "}
+          {last.status === "graded"
+            ? `graded ${last.score}/${last.max}${vm.peer ? " by peer review" : ""}.`
+            : vm.peer && !vm.peer.needsStaff
+              ? "waiting for peer reviews."
+              : "waiting for course staff to grade it."}
+          {last.status === "graded" && last.feedback && <div className="small" style={{ whiteSpace: "pre-line", marginTop: 6 }}>{last.feedback}</div>}
         </div>
       )}
+      {vm.peer && <PeerPanel peer={vm.peer} submitted={!!last} back={back} />}
       <form method="post" action="/api/v1/lms/submissions" className="panel">
         <h2 style={{ fontFamily: "var(--font-sans)", fontSize: "1.1rem" }}>Submission</h2>
         <input type="hidden" name="itemId" value={vm.item.id} />
@@ -606,7 +626,8 @@ function ProjectPanel({ vm, back }: { vm: NonNullable<ReturnType<typeof itemVM>>
           <label htmlFor="text">Notes for the grader</label>
           <textarea id="text" name="text" required minLength={20} placeholder="What you built, how to run it, anything the grader should know." />
         </div>
-        <button className="btn btn-primary">Submit project</button>
+        <button className="btn btn-primary">{last ? "Submit a new version" : "Submit project"}</button>
+        {last && vm.peer && <p className="tiny muted" style={{ marginTop: 8 }}>A new version starts a fresh round of peer review.</p>}
       </form>
     </div>
   );
@@ -1164,5 +1185,170 @@ export function ResourcesView({ viewer, course, labs }: { viewer: V; course: Pro
         </section>
       )}
     </AppShell>
+  );
+}
+
+/* ======================= Peer review ======================= */
+
+function PeerPanel({ peer, submitted, back }: { peer: NonNullable<NonNullable<ReturnType<typeof itemVM>>["peer"]>; submitted: boolean; back: string }) {
+  const h = { fontFamily: "var(--font-sans)", fontSize: "1.1rem" } as const;
+  return (
+    <section className="panel stack" aria-labelledby="peer-h">
+      <h2 id="peer-h" style={h}>
+        Peer review
+      </h2>
+      <p className="small muted" style={{ margin: 0 }}>
+        This project is graded by classmates. Your grade posts when {peer.required} classmates have reviewed your work and you have reviewed {peer.required}. Reviews are anonymous. If reviewers disagree a lot, course staff grade it instead.
+      </p>
+      <div className="grid g2" style={{ ["--gap" as string]: "12px" }}>
+        <div className="card card-pad small">
+          <strong>Reviews you've given</strong>
+          <div style={{ fontSize: "1.4rem", fontWeight: 700 }}>
+            {Math.min(peer.given, peer.required)}/{peer.required}
+          </div>
+        </div>
+        <div className="card card-pad small">
+          <strong>Reviews you've received</strong>
+          <div style={{ fontSize: "1.4rem", fontWeight: 700 }}>
+            {Math.min(peer.received.length, peer.required)}/{peer.required}
+          </div>
+        </div>
+      </div>
+      {peer.needsStaff && <div className="notice notice-warn small">Your reviewers disagreed, so course staff will grade your project.</div>}
+      {peer.received.length > 0 && (
+        <details className="acc">
+          <summary>Feedback from classmates ({peer.received.length})</summary>
+          <div>
+            {peer.received.map((r, n) => (
+              <p key={n} className="small">
+                <strong>
+                  Reviewer {n + 1}: {r.total}/{r.max}.
+                </strong>{" "}
+                {r.comment}
+              </p>
+            ))}
+          </div>
+        </details>
+      )}
+      {!submitted ? (
+        <p className="small" style={{ margin: 0 }}>
+          Submit your project first. Then you can review classmates' work.
+        </p>
+      ) : peer.next ? (
+        <form method="post" action="/api/v1/lms/peer-reviews" className="card card-pad stack" style={{ ["--gap" as string]: "10px" }}>
+          <input type="hidden" name="submissionId" value={peer.next.id} />
+          <input type="hidden" name="back" value={back} />
+          <div>
+            <strong style={{ display: "block" }}>Review a classmate's project</strong>
+            <span className="tiny muted">
+            {peer.available} submission{peer.available === 1 ? "" : "s"} waiting · submitted {fmtDate(peer.next.createdAt)}
+              {peer.next.fileName ? ` · ${peer.next.fileName}` : ""}
+            </span>
+          </div>
+          <blockquote className="small" style={{ margin: 0, padding: "10px 12px", background: "var(--surface-2)", borderRadius: 6, whiteSpace: "pre-line" }}>
+            {peer.next.text}
+          </blockquote>
+          <div className="grid g2" style={{ ["--gap" as string]: "10px" }}>
+            {peer.rubric.map((c) => (
+              <div key={c.criterion}>
+                <label htmlFor={`score-${c.criterion}`} className="small" style={{ margin: 0 }}>
+                  {c.criterion} <span className="hint">(0–{c.points})</span>
+                </label>
+                <input id={`score-${c.criterion}`} name={`score:${c.criterion}`} type="number" min={0} max={c.points} required />
+              </div>
+            ))}
+          </div>
+          <div>
+            <label htmlFor="peer-comment" className="small" style={{ margin: 0 }}>
+              Feedback for your classmate
+            </label>
+            <textarea id="peer-comment" name="comment" required minLength={20} placeholder="One thing that works well, and one specific suggestion." style={{ minHeight: 80 }} />
+          </div>
+          <div>
+            <button className="btn btn-primary btn-sm">Submit review</button>
+          </div>
+        </form>
+      ) : (
+        <p className="small" style={{ margin: 0 }}>
+          {peer.given >= peer.required ? "You've given your reviews. Thank you!" : "No classmate submissions are waiting for review right now. Check back later."}
+        </p>
+      )}
+    </section>
+  );
+}
+
+/* ======================= Discussion ======================= */
+
+function DiscussionPanel({ itemId, threads, back }: { itemId: string; threads: NonNullable<ReturnType<typeof itemVM>>["threads"]; back: string }) {
+  const h = { fontFamily: "var(--font-sans)", fontSize: "1.1rem" } as const;
+  const Post = ({ p, reply }: { p: (typeof threads)[number] | (typeof threads)[number]["replies"][number]; reply?: boolean }) => (
+    <article style={reply ? { borderLeft: "3px solid var(--border)", paddingLeft: 12, marginTop: 10 } : undefined}>
+      <div className="row between">
+        <span className="small">
+          <strong>{p.author}</strong> {p.authorRole === "Course staff" && <span className="badge badge-blue">Course staff</span>}
+          <span className="tiny muted"> · {fmtDateTime(p.createdAt)}</span>
+        </span>
+        {!p.mine && !p.hidden && (
+          <form method="post" action={`/api/v1/community/posts/${p.id}/report`}>
+            <input type="hidden" name="back" value={back} />
+            {p.reportedByMe ? (
+              <span className="tiny muted">Reported</span>
+            ) : (
+              <button className="linkish tiny">Report</button>
+            )}
+          </form>
+        )}
+      </div>
+      {p.hidden ? <p className="small muted" style={{ margin: "6px 0 0", fontStyle: "italic" }}>This post was removed by course staff.</p> : <p className="small" style={{ margin: "6px 0 0", whiteSpace: "pre-line" }}>{p.body}</p>}
+    </article>
+  );
+  return (
+    <section className="stack" aria-labelledby="disc-h">
+      <h2 id="disc-h" style={h}>
+        Join the conversation
+      </h2>
+      <form method="post" action="/api/v1/community/posts" className="panel stack" style={{ ["--gap" as string]: "8px" }}>
+        <input type="hidden" name="itemId" value={itemId} />
+        <input type="hidden" name="back" value={back} />
+        <label htmlFor="new-post" className="small" style={{ margin: 0 }}>
+          Add your post
+        </label>
+        <textarea id="new-post" name="body" required minLength={2} maxLength={5000} style={{ minHeight: 90 }} />
+        <div className="row between">
+          <span className="tiny muted">Posting completes this item. Be kind; course staff moderate this discussion.</span>
+          <button className="btn btn-primary btn-sm">Post</button>
+        </div>
+      </form>
+      {threads.length === 0 && <p className="small muted">No posts yet. Start the conversation.</p>}
+      {threads.map((t) => (
+        <div key={t.id} className="card card-pad">
+          <Post p={t} />
+          {t.replies.map((r) => (
+            <div key={r.id} style={{ marginLeft: 20 }}>
+              <Post p={r} reply />
+            </div>
+          ))}
+          {!t.hidden && (
+            <details style={{ marginTop: 8, marginLeft: 20 }}>
+              <summary className="small" style={{ cursor: "pointer", color: "var(--primary)" }}>
+                Reply
+              </summary>
+              <form method="post" action="/api/v1/community/posts" className="stack" style={{ ["--gap" as string]: "6px", marginTop: 6 }}>
+                <input type="hidden" name="itemId" value={itemId} />
+                <input type="hidden" name="parentId" value={t.id} />
+                <input type="hidden" name="back" value={back} />
+                <label htmlFor={`reply-${t.id}`} className="sr-only">
+                  Reply to {t.author}
+                </label>
+                <textarea id={`reply-${t.id}`} name="body" required minLength={2} style={{ minHeight: 60 }} />
+                <div>
+                  <button className="btn btn-outline btn-sm">Post reply</button>
+                </div>
+              </form>
+            </details>
+          )}
+        </div>
+      ))}
+    </section>
   );
 }

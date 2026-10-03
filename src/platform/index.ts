@@ -12,6 +12,8 @@ import { seed } from "./seed";
 import { getDb, isSeeded, loadPersisted, markSeeded, save, setDb } from "./store";
 import { studio } from "./studio";
 import { tutor } from "./tutor";
+import { teams } from "./teams";
+import { community } from "./community";
 
 /**
  * Platform façade. In production each export is a typed HTTP/gRPC client to the
@@ -73,7 +75,7 @@ export function tickAll() {
   return { commerce: commerce.tick(), lms: lms.tick(), live: live.tick(), labsStopped: cloudlab.tick() };
 }
 
-export { catalog, cloudlab, commerce, credentials, cx, entitlements, identity, live, lms, studio, tutor };
+export { catalog, cloudlab, commerce, community, credentials, cx, entitlements, identity, live, lms, studio, teams, tutor };
 export { capabilities } from "./status";
 export { checkClaims, partners } from "./partners";
 export { publicQuiz } from "./lms";

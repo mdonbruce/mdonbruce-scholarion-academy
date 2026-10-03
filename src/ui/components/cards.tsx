@@ -82,6 +82,7 @@ const STATUS_CLASS: Record<string, string> = {
   PLANNED: "",
   Graded: "badge-green",
   Submitted: "badge-blue",
+  Completed: "badge-green",
   "In Progress": "badge-amber",
   "Not Started": "",
   Locked: "",

@@ -3,6 +3,7 @@ import { hashPassword } from "../identity";
 import { live } from "../live";
 import { emptyDb, getDb, setDb } from "../store";
 import { studio } from "../studio";
+import { teams } from "../teams";
 import type { Entitlement, HelpArticle, User } from "../types";
 import { CERT_PY, COURSE_AI, COURSE_DB, COURSE_PY, PATHWAY, PRODUCTS, buildContent } from "./catalog-data";
 
@@ -16,6 +17,10 @@ export const DEMO = {
   admin: { email: "admin@demo.scholarion.test", password: "ScholarionAdmin1", name: "Platform Admin" },
   instructor: { email: "faculty@demo.scholarion.test", password: "ScholarionFaculty1", name: "Course Staff" },
   visitor: { email: "tunde@demo.scholarion.test", password: "LearnEarnBuild2", name: "Tunde Bello" },
+  orgAdmin: { email: "orgadmin@demo.scholarion.test", password: "ScholarionTeams1", name: "Grace Okafor" },
+  orgLearner: { email: "kemi@brightpath.example", password: "LearnEarnBuild3", name: "Kemi Adeyemi" },
+  /** Signs in to Brightpath through organization sign-in (simulated SSO): same email domain, not yet a member. */
+  ssoLearner: { email: "chidi@brightpath.example", password: "LearnEarnBuild4", name: "Chidi Nwosu" },
 };
 
 const HELP: HelpArticle[] = [
@@ -127,6 +132,49 @@ export function seed(): void {
     o.approvedBy = "usr_faculty";
   }
   studio.generate(COURSE_PY, 6);
+
+  /* ---------- Teams: two organizations that must never see each other ---------- */
+  db.users.push(
+    user("usr_orgadmin", DEMO.orgAdmin, ["learner"]),
+    user("usr_kemi", DEMO.orgLearner, ["learner"]),
+    user("usr_chidi", DEMO.ssoLearner, ["learner"]),
+    user("usr_rbadmin", { email: "ops-admin@riverbend.example", password: "RiverbendAdmin1", name: "Riverbend Admin" }, ["learner"]),
+    user("usr_dayo", { email: "dayo@riverbend.example", password: "RiverbendLearn1", name: "Dayo Musa" }, ["learner"]),
+    user("usr_ngozi", { email: "ngozi@demo.scholarion.test", password: "LearnEarnBuild5", name: "Ngozi Eze" }, ["learner"]),
+    user("usr_spam", { email: "deals4u@demo.scholarion.test", password: "NotARealLearner1", name: "Unverified account" }, ["learner"]),
+  );
+  const brightpath = teams.purchase({ id: "org_brightpath", adminId: "usr_orgadmin", name: "Brightpath Health (demo)", seats: 10, domain: "brightpath.example" });
+  teams.assignProgram(brightpath.id, "usr_orgadmin", CERT_PY);
+  teams.assignProgram(brightpath.id, "usr_orgadmin", "prd_agentic_foundations");
+  teams.addMember(brightpath, db.users.find((u) => u.id === "usr_kemi")!, "sso");
+  teams.invite(brightpath.id, "usr_orgadmin", "new.hire@brightpath.example");
+  const riverbend = teams.purchase({ id: "org_riverbend", adminId: "usr_rbadmin", name: "Riverbend Logistics (demo)", seats: 5, domain: "riverbend.example" });
+  teams.assignProgram(riverbend.id, "usr_rbadmin", COURSE_DB);
+  teams.addMember(riverbend, db.users.find((u) => u.id === "usr_dayo")!, "sso");
+  // Kemi is partway through Python.
+  for (const i of catalog.items(COURSE_PY).filter((x) => x.moduleNo <= 2 && !x.graded)) db.progress.push({ userId: "usr_kemi", itemId: i.id, status: "completed", updatedAt: "2026-09-30T18:00:00.000Z" });
+
+  /* ---------- Peer review: classmates who submitted the Module 5 mini project ---------- */
+  ent({ userId: "usr_ngozi", resource: { kind: "plus", id: "plus" }, level: "full", source: "plus", sourceRef: "sub_seed_ngozi", validFrom: "2026-09-01T00:00:00.000Z", validTo: "2027-09-01T00:00:00.000Z" });
+  db.enrollments.push({ id: "enr_seed_ngozi", userId: "usr_ngozi", productId: COURSE_PY, courseId: COURSE_PY, level: "full", createdAt: "2026-09-01T14:00:00.000Z", deadlineAnchor: "2026-09-01T14:00:00.000Z" });
+  db.submissions.push(
+    { id: "sbm_seed_kemi_m5", userId: "usr_kemi", itemId: "itm_cop1047c_m5_project", text: "patients.py stores records in a dict keyed by patient id. Functions: add_patient, calculate_age, format_name, search_by_last_name and a menu loop. Input validation rejects birth years in the future and blank names. Report attached as PDF.", fileName: "patients.py", createdAt: "2026-10-01T15:00:00.000Z", status: "submitted" },
+    { id: "sbm_seed_ngozi_m5", userId: "usr_ngozi", itemId: "itm_cop1047c_m5_project", text: "Records live in a list of dictionaries. Five functions plus a recursive function that totals visits across nested department folders. Validation uses try/except around int(). Includes a short PDF report with sample runs.", fileName: "records_system.py", createdAt: "2026-10-02T13:00:00.000Z", status: "submitted" },
+  );
+  db.peerReviews.push(
+    { id: "prv_seed_1", submissionId: "sbm_seed_ngozi_m5", itemId: "itm_cop1047c_m5_project", reviewerId: "usr_kemi", scores: { Correctness: 18, "Use of functions and structure": 14, "Validation and error handling": 8, "Report clarity": 4 }, total: 44, max: 50, comment: "Nice use of recursion for the department folders. The search could return all matches, not just the first.", createdAt: "2026-10-02T16:00:00.000Z" },
+    { id: "prv_seed_2", submissionId: "sbm_seed_kemi_m5", itemId: "itm_cop1047c_m5_project", reviewerId: "usr_ngozi", scores: { Correctness: 17, "Use of functions and structure": 13, "Validation and error handling": 9, "Report clarity": 4 }, total: 43, max: 50, comment: "Clear functions and good validation on birth year. Consider splitting the menu loop into its own function.", createdAt: "2026-10-02T17:00:00.000Z" },
+  );
+
+  /* ---------- Course discussions ---------- */
+  const post = (id: string, itemId: string, courseId: string, userId: string, body: string, createdAt: string, parentId: string | null = null, reports: string[] = []) =>
+    db.posts.push({ id, itemId, courseId, userId, parentId, body, createdAt, reports });
+  post("pst_seed_1", "itm_cop1047c_m5_discussion", COURSE_PY, "usr_ngozi", "At the clinic where I volunteer, staff retype the same patient name formatting rules in three spreadsheets. A single format_name function would remove a lot of small errors.", "2026-10-01T14:00:00.000Z");
+  post("pst_seed_2", "itm_cop1047c_m5_discussion", COURSE_PY, "usr_kemi", "Same at my hospital. We also calculate age in two different ways depending on the form, which is how mismatches happen.", "2026-10-01T16:30:00.000Z", "pst_seed_1");
+  post("pst_seed_3", "itm_cop1047c_m5_discussion", COURSE_PY, "usr_faculty", "Good examples. Notice that both are about one rule living in one place — that's the main argument for functions. Try to name the inputs and outputs before you write the body.", "2026-10-01T18:00:00.000Z", "pst_seed_1");
+  post("pst_seed_4", "itm_cop1047c_m5_discussion", COURSE_PY, "usr_amara", "Recursion still feels like magic to me. Is there a simple way to picture the base case?", "2026-10-02T09:00:00.000Z");
+  post("pst_seed_5", "itm_cop1047c_m5_discussion", COURSE_PY, "usr_spam", "Selling exam answers, message me", "2026-10-02T10:00:00.000Z", null, ["usr_ngozi", "usr_amara"]);
+  post("pst_seed_6", "itm_cai4505c_m6_discussion", COURSE_AI, "usr_amara", "Automated inference in triage tools is only as fair as the rules we encode. Who reviews the knowledge base when guidelines change?", "2026-09-29T15:00:00.000Z");
 
   // Seeding must not leave events or emails behind.
   db.events = [];

@@ -4,6 +4,8 @@ import { fmtDate, fmtDateTime, ProductCard, TYPE_LABEL } from "../components/car
 import { Flash, PublicPage } from "../components/chrome";
 import { EnrollModal } from "../components/client/EnrollModal";
 import { Icon, KIND_ICON } from "../components/icons";
+import { BuySeatsPanel } from "./teams";
+import type { teamsQuote } from "@/bff/views";
 
 type FlashProps = { notice?: string; error?: string };
 const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
@@ -804,7 +806,7 @@ export function AidApplyView({ viewer, vm, flash }: { viewer: Viewer; vm: Return
   );
 }
 
-export function TeamsView({ viewer, flash, partner }: { viewer: Viewer; flash: FlashProps; partner?: boolean }) {
+export function TeamsView({ viewer, flash, partner, quote }: { viewer: Viewer; flash: FlashProps; partner?: boolean; quote: ReturnType<typeof teamsQuote> }) {
   return (
     <PublicPage viewer={viewer} current="/teams">
       <div className="container section grid g2" style={{ alignItems: "start" }}>
@@ -814,15 +816,23 @@ export function TeamsView({ viewer, flash, partner }: { viewer: Viewer; flash: F
           <ul className="stack">
             {(partner
               ? ["Co-develop programs under a signed agreement", "Your name and logo appear only once the agreement is recorded", "Shared curriculum and quality review"]
-              : ["Buy seats and assign curated academies", "SSO and SCIM provisioning", "Progress, completions and skills reporting", "Organization data isolation"]
+              : ["Buy seats and choose the programs your people get", "Invite by email, or let anyone with your email domain sign in and take a seat", "See progress, completions, credentials and skills; export to CSV", "Your organization's data is never visible to other organizations"]
             ).map((x) => (
               <li key={x}>{x}</li>
             ))}
           </ul>
-          <p className="small muted">Team plans are rolling out in Phase 4. Requests go to our HavenConnect sales queue.</p>
+          {!partner && (
+            <p className="small muted">Want a walkthrough first, or more than 5,000 seats? Request a demo and our team will contact you. SAML/OIDC single sign-on and SCIM provisioning are on the roadmap.</p>
+          )}
+          {!partner && (
+            <div style={{ marginTop: 20 }}>
+              <BuySeatsPanel signedIn={!!viewer} quote={quote} error={flash.error} />
+            </div>
+          )}
         </div>
         <form method="post" action="/api/v1/cx/leads" className="panel">
-          <Flash {...flash} />
+          {partner ? <Flash {...flash} /> : flash.notice && <Flash notice={flash.notice} />}
+          <h2 style={{ fontFamily: "var(--font-sans)", fontSize: "1.1rem" }}>{partner ? "Contact partnerships" : "Request a demo"}</h2>
           <input type="hidden" name="kind" value={partner ? "partner" : "teams_demo"} />
           <input type="hidden" name="back" value={partner ? "/teams?kind=partner" : "/teams"} />
           <div className="field">

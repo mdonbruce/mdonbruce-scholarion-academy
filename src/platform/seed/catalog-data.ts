@@ -839,6 +839,9 @@ export function buildContent(): { modules: Module[]; items: Item[] } {
   };
 
   const items = [...py.items, ...ai.items, ...db.items, ...ag.items, gpRag, gpPatient];
+  // Module 5 mini project is peer reviewed: two reviews received, two given.
+  const m5 = items.find((i) => i.id === "itm_cop1047c_m5_project");
+  if (m5?.project) m5.project.peerReview = { required: 2 };
   for (const c of [COURSE_PY, COURSE_AI, COURSE_DB, COURSE_AGENTIC]) normaliseWeights(items, c);
   return { modules: [...py.modules, ...ai.modules, ...db.modules, ...ag.modules], items };
 }

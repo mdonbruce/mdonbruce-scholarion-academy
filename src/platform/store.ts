@@ -14,6 +14,11 @@ import type {
   Item,
   LabSession,
   Lead,
+  Organization,
+  OrgInvite,
+  OrgMember,
+  PeerReview,
+  Post,
   LiveSession,
   Module,
   Order,
@@ -61,6 +66,13 @@ export interface Db {
   attempts: Attempt[];
   submissions: Submission[];
   grades: GradeRecord[];
+  peerReviews: PeerReview[];
+  // Teams
+  organizations: Organization[];
+  orgMembers: OrgMember[];
+  orgInvites: OrgInvite[];
+  // Community
+  posts: Post[];
   // Cloud Lab
   labSessions: LabSession[];
   // AI Tutor
@@ -85,7 +97,7 @@ export interface Db {
   processed: string[]; // consumer:eventId pairs already handled (idempotency)
 }
 
-export const DB_VERSION = 1;
+export const DB_VERSION = 2;
 
 export function emptyDb(): Db {
   return {
@@ -108,6 +120,11 @@ export function emptyDb(): Db {
     attempts: [],
     submissions: [],
     grades: [],
+    peerReviews: [],
+    organizations: [],
+    orgMembers: [],
+    orgInvites: [],
+    posts: [],
     labSessions: [],
     tutorUsage: [],
     credentials: [],

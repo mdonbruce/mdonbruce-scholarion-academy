@@ -23,6 +23,10 @@ export const commerceConfig = {
   get refundDays() {
     return num("REFUND_DAYS", 14);
   },
+  /** Scholarion for Teams: price per seat per year (placeholder). */
+  get seatAnnual() {
+    return num("PRICE_SEAT_ANNUAL", 300);
+  },
   get trialReminderDays() {
     return num("TRIAL_REMINDER_DAYS", 2);
   },

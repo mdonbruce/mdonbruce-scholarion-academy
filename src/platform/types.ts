@@ -94,7 +94,14 @@ export interface Item {
   video?: { src: string | null; durationSec: number; captions: string[]; transcript: string };
   quiz?: { timeLimitMinutes: number; passPercent: number; questions: QuizQuestion[] };
   lab?: LabSpec;
-  project?: { scenario: string; deliverables: string[]; rubric: { criterion: string; points: number }[]; milestones?: { title: string; due: ISODate }[] };
+  project?: {
+    scenario: string;
+    deliverables: string[];
+    rubric: { criterion: string; points: number }[];
+    milestones?: { title: string; due: ISODate }[];
+    /** Peer-reviewed: each submission needs `required` reviews and each author gives `required`. */
+    peerReview?: { required: number };
+  };
   dueOffsetDays?: number; // suggested deadline relative to enrollment
 }
 
@@ -315,6 +322,8 @@ export interface Submission {
   score?: number;
   max?: number;
   feedback?: string;
+  /** Peer reviews disagreed beyond the calibration tolerance; course staff decide. */
+  needsStaff?: boolean;
 }
 
 export interface GradeRecord {
@@ -322,9 +331,21 @@ export interface GradeRecord {
   itemId: ID;
   score: number;
   max: number;
-  source: "quiz" | "lab" | "instructor" | "attendance";
+  source: "quiz" | "lab" | "instructor" | "attendance" | "peer";
   feedback?: string;
   postedAt: ISODate;
+}
+
+export interface PeerReview {
+  id: ID;
+  submissionId: ID;
+  itemId: ID;
+  reviewerId: ID;
+  scores: Record<string, number>; // criterion → points
+  total: number;
+  max: number;
+  comment: string;
+  createdAt: ISODate;
 }
 
 /* ---------- Cloud Lab ---------- */
@@ -466,6 +487,52 @@ export interface AttendanceRecord {
   sessionId: ID;
   minutes: number;
   recordedAt: ISODate;
+}
+
+/* ---------- Teams & organizations ---------- */
+
+export interface Organization {
+  id: ID; // also the tenant id
+  name: string;
+  domain: string | null; // email domain for organization sign-in (SSO)
+  ssoEnabled: boolean;
+  seats: number;
+  adminIds: ID[];
+  programIds: ID[]; // the organization's curated academy
+  createdAt: ISODate;
+}
+
+export interface OrgMember {
+  orgId: ID;
+  userId: ID;
+  status: "active" | "revoked";
+  via: "invite" | "sso" | "admin";
+  joinedAt: ISODate;
+  revokedAt?: ISODate;
+}
+
+export interface OrgInvite {
+  token: string;
+  orgId: ID;
+  email: string;
+  createdAt: ISODate;
+  acceptedAt?: ISODate;
+  revokedAt?: ISODate;
+}
+
+/* ---------- Community ---------- */
+
+export interface Post {
+  id: ID;
+  courseId: ID;
+  itemId: ID;
+  userId: ID;
+  parentId: ID | null;
+  body: string;
+  createdAt: ISODate;
+  reports: ID[]; // user ids who reported it
+  hiddenAt?: ISODate;
+  hiddenBy?: ID;
 }
 
 /* ---------- Partner Registry ---------- */

@@ -284,7 +284,7 @@ CREATE TABLE lms.grades (
   item_id   text NOT NULL,
   score     numeric(7,2) NOT NULL,
   max       numeric(7,2) NOT NULL CHECK (max > 0),
-  source    text NOT NULL CHECK (source IN ('quiz','lab','instructor','attendance')),
+  source    text NOT NULL CHECK (source IN ('quiz','lab','instructor','attendance','peer')),
   feedback  text,
   posted_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (user_id, item_id)
@@ -300,6 +300,98 @@ CREATE POLICY tenant_isolation ON lms.progress    USING (tenant_id = app_tenant(
 CREATE POLICY tenant_isolation ON lms.attempts    USING (tenant_id = app_tenant());
 CREATE POLICY tenant_isolation ON lms.submissions USING (tenant_id = app_tenant());
 CREATE POLICY tenant_isolation ON lms.grades      USING (tenant_id = app_tenant());
+
+CREATE TABLE lms.peer_reviews (
+  id            text PRIMARY KEY,
+  submission_id text NOT NULL REFERENCES lms.submissions(id) ON DELETE CASCADE,
+  item_id       text NOT NULL,
+  reviewer_id   text NOT NULL,
+  tenant_id     text NOT NULL,
+  scores        jsonb NOT NULL,   -- criterion → points
+  total         int NOT NULL,
+  max           int NOT NULL CHECK (max > 0),
+  comment       text NOT NULL CHECK (length(comment) >= 20),
+  created_at    timestamptz NOT NULL DEFAULT now()
+);
+-- one review per reviewer per classmate per item is enforced in the service (latest submission may change)
+CREATE INDEX ON lms.peer_reviews (submission_id);
+ALTER TABLE lms.submissions ADD COLUMN needs_staff boolean NOT NULL DEFAULT false;
+ALTER TABLE lms.peer_reviews ENABLE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON lms.peer_reviews USING (tenant_id = app_tenant());
+
+/* ======================= teams ======================= */
+CREATE SCHEMA IF NOT EXISTS teams;
+
+CREATE TABLE teams.organizations (
+  id          text PRIMARY KEY REFERENCES identity.tenants(id),
+  name        text NOT NULL,
+  domain      citext UNIQUE,              -- organization sign-in domain
+  sso_enabled boolean NOT NULL DEFAULT false,
+  seats       int NOT NULL CHECK (seats BETWEEN 1 AND 5000),
+  created_at  timestamptz NOT NULL DEFAULT now(),
+  CHECK (NOT sso_enabled OR domain IS NOT NULL)
+);
+
+CREATE TABLE teams.admins (
+  org_id  text NOT NULL REFERENCES teams.organizations(id) ON DELETE CASCADE,
+  user_id text NOT NULL REFERENCES identity.users(id),
+  PRIMARY KEY (org_id, user_id)
+);
+
+CREATE TABLE teams.programs (
+  org_id     text NOT NULL REFERENCES teams.organizations(id) ON DELETE CASCADE,
+  product_id text NOT NULL REFERENCES catalog.products(id),
+  PRIMARY KEY (org_id, product_id)
+);
+
+CREATE TABLE teams.members (
+  org_id     text NOT NULL REFERENCES teams.organizations(id) ON DELETE CASCADE,
+  user_id    text NOT NULL REFERENCES identity.users(id),
+  status     text NOT NULL CHECK (status IN ('active','revoked')),
+  via        text NOT NULL CHECK (via IN ('invite','sso','admin')),
+  joined_at  timestamptz NOT NULL DEFAULT now(),
+  revoked_at timestamptz,
+  PRIMARY KEY (org_id, user_id)
+);
+
+CREATE TABLE teams.invites (
+  token       text PRIMARY KEY,
+  org_id      text NOT NULL REFERENCES teams.organizations(id) ON DELETE CASCADE,
+  email       citext NOT NULL,
+  created_at  timestamptz NOT NULL DEFAULT now(),
+  accepted_at timestamptz,
+  revoked_at  timestamptz
+);
+
+ALTER TABLE teams.members  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE teams.invites  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE teams.programs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON teams.members  USING (org_id = app_tenant());
+CREATE POLICY tenant_isolation ON teams.invites  USING (org_id = app_tenant());
+CREATE POLICY tenant_isolation ON teams.programs USING (org_id = app_tenant());
+
+/* ======================= community ======================= */
+CREATE SCHEMA IF NOT EXISTS community;
+
+CREATE TABLE community.posts (
+  id         text PRIMARY KEY,
+  course_id  text NOT NULL,
+  item_id    text NOT NULL,
+  user_id    text NOT NULL REFERENCES identity.users(id),
+  parent_id  text REFERENCES community.posts(id) ON DELETE CASCADE,
+  body       text NOT NULL CHECK (length(body) BETWEEN 2 AND 5000),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  hidden_at  timestamptz,
+  hidden_by  text
+);
+CREATE INDEX ON community.posts (item_id, created_at);
+
+CREATE TABLE community.reports (
+  post_id     text NOT NULL REFERENCES community.posts(id) ON DELETE CASCADE,
+  reporter_id text NOT NULL REFERENCES identity.users(id),
+  created_at  timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (post_id, reporter_id)
+);
 
 /* ======================= cloud lab ======================= */
 CREATE SCHEMA IF NOT EXISTS cloudlab;

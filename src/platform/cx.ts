@@ -122,5 +122,21 @@ export function registerHavenRoute(): void {
     const i = catalog.item(e.data.itemId as string);
     email(e, "deadline", `Due soon: ${i?.title}`, `"${i?.title}" is due ${fmtDate(e.data.due)}. Need more time? You can reset your deadlines without penalty from the course page.`);
   });
+  subscribe("havenroute", "org.invited", (e) => {
+    const db = getDb();
+    const inv = db.orgInvites.find((i) => i.token === e.data.inviteToken);
+    const o = inv && db.organizations.find((x) => x.id === inv.orgId);
+    if (!inv || !o) return;
+    db.outbox.push({ id: newId("eml"), to: inv.email, template: "org_invite", subject: `${o.name} invited you to Scholarion Academy`, body: `Hello,\n\n${o.name} has given you a seat on Scholarion Academy. Accept your invitation here: ${publicUrl()}/join/${inv.token}\n\nSign in or create an account with ${inv.email}.\n\n— Scholarion Academy`, eventId: e.id, createdAt: nowIso() });
+    save();
+  });
+  subscribe("havenroute", "org.member.joined", (e) => {
+    const o = getDb().organizations.find((x) => x.id === e.data.orgId);
+    email(e, "org_joined", `You're in: ${o?.name ?? "your organization"} on Scholarion`, `You now have access to your organization's programs. They're on your dashboard: ${publicUrl()}/app`);
+  });
+  subscribe("havenroute", "lms.peer_review.disputed", (e) => {
+    const i = catalog.item(e.data.itemId as string);
+    email(e, "peer_disputed", `Your project is with course staff: ${i?.title}`, "Your classmates' reviews didn't agree closely enough, so a member of course staff will grade your project. You'll get an email when it's done.");
+  });
   subscribe("havenroute", "live.session.reminder", (e) => email(e, "live_reminder", "Your live session starts soon", `Your session "${e.data.title}" starts ${fmtDate(e.data.startsAt)}. Join from your dashboard 10 minutes before the start.`));
 }
