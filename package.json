@@ -15,7 +15,8 @@
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
     "preview:render": "tsx --tsconfig tsconfig.scripts.json scripts/render-preview.tsx",
-    "db:reset": "tsx scripts/reset-data.ts"
+    "db:reset": "tsx scripts/reset-data.ts",
+    "smoke": "node scripts/smoke.mjs"
   },
   "dependencies": {
     "next": "^15.5.0",

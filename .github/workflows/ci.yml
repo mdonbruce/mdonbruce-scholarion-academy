@@ -37,10 +37,20 @@ jobs:
           set -o pipefail
           npm run build 2>&1 | tee build.log
 
+      - name: Smoke test (next start)
+        env:
+          CLOUDLAB_LOCAL_RUNNER: "1"
+          SCHOLARION_PUBLIC_URL: http://localhost:3000
+        run: |
+          set -o pipefail
+          (npm run start -- -p 3000 > server.log 2>&1 &)
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://localhost:3000/robots.txt && break; sleep 1; done
+          node scripts/smoke.mjs 2>&1 | tee smoke.log || (echo "--- server log ---" >> smoke.log; tail -n 60 server.log >> smoke.log; exit 1)
+
       - name: Report failure output
         if: failure()
         run: |
-          for f in install test build; do
+          for f in install test build smoke; do
             [ -f "$f.log" ] || continue
             tail -n 80 "$f.log" | sed 's/\x1b\[[0-9;]*m//g' > tail.txt
             msg=$(python3 -c "import sys;print(open('tail.txt').read().replace('%','%25').replace('\r','').replace('\n','%0A'))")
