@@ -1,3 +1,4 @@
+import { ReviewsSection, Stars } from "../components/reviews";
 import type { aidApplyVM, checkoutVM, exploreVM, homeVM, pathwayVM, productVM, verifyVM, Viewer } from "@/bff/views";
 import type { HelpArticle, Product } from "@/platform/types";
 import { fmtDate, fmtDateTime, ProductCard, TYPE_LABEL } from "../components/cards";
@@ -337,6 +338,14 @@ export function ProductView({ viewer, vm, flash, openEnroll }: { viewer: Viewer;
             {p.code && <span className="badge">{p.code}</span>}
             {p.freeToAudit && <span className="badge badge-green">Free to audit</span>}
             {p.plusEligible && <span className="badge badge-blue">Included in Plus</span>}
+            {vm.reviews.summary.count > 0 && (
+              <a href="#reviews" className="row" style={{ ["--gap" as string]: "6px", color: "#fff", alignItems: "center" }}>
+                <Stars rating={vm.reviews.summary.average!} size=".95rem" />
+                <span className="small">
+                  {vm.reviews.summary.average!.toFixed(1)} ({vm.reviews.summary.count} verified review{vm.reviews.summary.count === 1 ? "" : "s"})
+                </span>
+              </a>
+            )}
           </div>
           <h1 style={{ fontSize: "clamp(2rem,4vw,2.8rem)", margin: "12px 0 6px" }}>{p.title}</h1>
           <p style={{ fontSize: "1.1rem" }}>{p.tagline}</p>
@@ -505,6 +514,7 @@ export function ProductView({ viewer, vm, flash, openEnroll }: { viewer: Viewer;
                 ))}
               </ul>
             </section>
+            <ReviewsSection vm={vm.reviews} slug={p.slug} productId={p.id} signedIn={!!viewer} />
             <section>
               <h2 className="section-title">FAQ</h2>
               {p.faq.map((f) => (

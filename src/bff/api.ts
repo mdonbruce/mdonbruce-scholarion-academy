@@ -1,4 +1,5 @@
 import QR from "./qr";
+import { certificatePdf } from "./certificate-pdf";
 import {
   capabilities,
   catalog,
@@ -11,6 +12,7 @@ import {
   getDb,
   identity,
   privacy,
+  reviews,
   live,
   lms,
   publicUser,
@@ -327,7 +329,57 @@ on("GET", "credentials/:id/qr", async (c) => {
   const svg = await QR.svg(credentials.verifyUrl(c.params.id));
   return new Response(svg, { headers: { "content-type": "image/svg+xml", "cache-control": "public, max-age=86400" } });
 });
+on("GET", "credentials/:id/pdf", async (c) => {
+  const cred = credentials.get(c.params.id);
+  // The PDF is for the holder (and staff); employers use the public verification page.
+  if (!cred || (cred.userId !== c.user!.id && !identity.hasRole(c.user!, "support_agent"))) throw new PlatformError("not_found", "Credential not found", 404);
+  if (cred.revokedAt) throw new PlatformError("revoked", "This credential was revoked, so there's no certificate to download.", 410);
+  const product = catalog.get(cred.productId);
+  const pdf = await certificatePdf({
+    id: cred.id,
+    holderName: cred.holderName,
+    title: cred.title,
+    programTitle: product?.title ?? cred.title,
+    kind: product?.credential.kind === "badge" ? "badge" : "certificate",
+    issuedAt: cred.issuedAt,
+    verifyUrl: credentials.verifyUrl(cred.id),
+    hours: product?.hours,
+  });
+  const file = `scholarion-${(product?.slug ?? cred.id).slice(0, 60)}-${cred.id}.pdf`;
+  return new Response(new Uint8Array(pdf), { headers: { "content-type": "application/pdf", "content-disposition": `attachment; filename="${file}"`, "cache-control": "private, no-store" } });
+}, "user");
 on("GET", "credentials/issuer-key", () => json(credentials.publicJwk()));
+
+/* ---------------- Verified reviews ---------------- */
+
+const productPath = (productId: string) => `/learn/${catalog.get(productId)?.slug ?? ""}`;
+on("GET", "catalog/products/:slug/reviews", (c) => {
+  const p = catalog.get(c.params.slug);
+  if (!p) throw new PlatformError("not_found", "Program not found", 404);
+  const q = new URL(c.req.url).searchParams.get("sort") ?? "";
+  const sort = (["recent", "highest", "lowest"].includes(q) ? q : "recent") as "recent" | "highest" | "lowest";
+  return json({ summary: reviews.summary(p.id), reviews: reviews.forProduct(p.id, c.user?.id ?? null, sort) });
+});
+on("POST", "reviews", (c) => {
+  const r = reviews.submit(c.user!.id, { productId: c.data.productId ?? "", rating: Number(c.data.rating), title: c.data.title ?? "", body: c.data.body ?? "" });
+  const notice = r.status === "published" ? "Thanks — your review is live." : "Thanks — your review will appear after a quick check by our team.";
+  return redirect(withQuery(productPath(r.productId), { notice }) + "#reviews");
+}, "user");
+on("POST", "reviews/:id/delete", (c) => {
+  const r = getDb().reviews.find((x) => x.id === c.params.id);
+  reviews.remove(c.user!.id, c.params.id);
+  return redirect(withQuery(back(c, r ? productPath(r.productId) : "/app"), { notice: "Your review was removed." }));
+}, "user");
+on("POST", "reviews/:id/report", (c) => {
+  const r = reviews.report(c.params.id, c.user!.id);
+  return redirect(withQuery(back(c, productPath(r.productId)), { notice: "Thanks — our team will take a look." }));
+}, "user");
+on("POST", "admin/reviews/:id/:action", (c) => {
+  const action = c.params.action as "publish" | "hide";
+  if (!["publish", "hide"].includes(action)) throw new PlatformError("not_found", "Unknown action", 404);
+  reviews.moderate(c.params.id, c.user!.id, action, c.data.note);
+  return redirect(withQuery(back(c, "/admin/moderation"), { notice: action === "publish" ? "Review published." : "Review hidden." }));
+}, "staff");
 
 /* ---------------- HavenConnect ---------------- */
 

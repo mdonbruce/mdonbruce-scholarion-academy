@@ -609,3 +609,25 @@ export interface CloudEvent<T = Record<string, unknown>> {
 }
 
 export type CapabilityStatus = "LIVE" | "CONNECTED" | "SIMULATED" | "DISABLED" | "PLANNED";
+
+/* ---------- Verified learner reviews ---------- */
+
+export type ReviewStatus = "published" | "pending" | "hidden";
+
+/** Only learners holding a valid credential for the product can review it. */
+export interface Review {
+  id: ID;
+  userId: ID;
+  productId: ID;
+  credentialId: ID;
+  rating: 1 | 2 | 3 | 4 | 5;
+  title: string;
+  body: string;
+  status: ReviewStatus;
+  /** Why it is pending or hidden (auto-hold reason or moderator note). */
+  moderationNote?: string;
+  reports: ID[];
+  createdAt: ISODate;
+  updatedAt?: ISODate;
+  moderatedBy?: ID;
+}

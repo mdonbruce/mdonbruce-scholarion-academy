@@ -461,11 +461,46 @@ export function AdminClaimsView({ viewer, vm }: { viewer: V; vm: ReturnType<type
 
 export function AdminModerationView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<typeof moderationVM>; flash: FlashProps }) {
   return (
-    <Shell viewer={viewer} current="/admin/moderation" title="Discussion moderation" flash={flash}>
+    <Shell viewer={viewer} current="/admin/moderation" title="Moderation" flash={flash}>
+      <h2 style={{ fontFamily: "var(--font-sans)", fontSize: "1.1rem" }}>Learner reviews on hold ({vm.reviews.length})</h2>
+      <p className="small muted">Reviews with links, contact details or claims the claims checker flags wait here, as do reviews three learners reported. Only credential holders can write reviews.</p>
+      {vm.reviews.length === 0 && <div className="panel muted">No reviews waiting.</div>}
+      <div className="stack" style={{ marginBottom: 28 }}>
+        {vm.reviews.map((r) => (
+          <section key={r.id} className="card card-pad">
+            <div className="row between">
+              <span className="small">
+                <strong>{r.author}</strong> on {r.productTitle} · {fmtDateTime(r.updatedAt ?? r.createdAt)}
+              </span>
+              <span className="row" style={{ ["--gap" as string]: "6px" }}>
+                <span className="badge" aria-label={`${r.rating} out of 5 stars`}>{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</span>
+                {r.moderationNote && <span className="badge badge-amber">{r.moderationNote}</span>}
+              </span>
+            </div>
+            <p className="small" style={{ margin: "8px 0 2px" }}>
+              <strong>{r.title}</strong>
+            </p>
+            <p className="small" style={{ margin: "0 0 8px", whiteSpace: "pre-wrap" }}>
+              {r.body}
+            </p>
+            <div className="row">
+              <form method="post" action={`/api/v1/admin/reviews/${r.id}/publish`}>
+                <button className="btn btn-primary btn-sm">Publish</button>
+              </form>
+              <form method="post" action={`/api/v1/admin/reviews/${r.id}/hide`} className="row" style={{ ["--gap" as string]: "6px" }}>
+                <label className="sr-only" htmlFor={`note-${r.id}`}>Reason for removing</label>
+                <input id={`note-${r.id}`} name="note" placeholder="Reason (shown to staff)" style={{ maxWidth: 220 }} />
+                <button className="btn btn-danger btn-sm">Remove</button>
+              </form>
+            </div>
+          </section>
+        ))}
+      </div>
+      <h2 style={{ fontFamily: "var(--font-sans)", fontSize: "1.1rem" }}>Discussions ({vm.posts.length})</h2>
       <p className="small muted">Posts learners reported, and posts staff have hidden. Hidden posts show as removed to learners.</p>
-      {vm.length === 0 && <div className="panel muted">Nothing to review.</div>}
+      {vm.posts.length === 0 && <div className="panel muted">Nothing to review.</div>}
       <div className="stack">
-        {vm.map((p) => (
+        {vm.posts.map((p) => (
           <section key={p.id} className="card card-pad">
             <div className="row between">
               <span className="small">

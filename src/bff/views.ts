@@ -17,6 +17,7 @@ import {
   publicQuiz,
   admissions,
   community,
+  reviews,
   studio,
   teams,
   type Item,
@@ -88,6 +89,12 @@ export function productVM(slug: string, userId: string | null) {
     edges: getDb().pathway.filter((e) => e.from === product.id || e.to === product.id),
     sessions: product.format === "live" ? getDb().liveSessions.filter((s) => s.productId === product.id).slice(0, 7) : [],
     hours: product.hours,
+    reviews: {
+      summary: reviews.summary(product.id),
+      list: reviews.forProduct(product.id, userId).slice(0, 20),
+      canReview: !!userId && !!reviews.eligibility(userId, product.id),
+      mine: userId ? reviews.mine(userId, product.id) ?? null : null,
+    },
   };
 }
 
@@ -396,7 +403,7 @@ export function aidApplyVM(slug: string) {
 
 export function moderationVM() {
   ensurePlatform();
-  return community.queue();
+  return { posts: community.queue(), reviews: reviews.queue() };
 }
 
 export function orgVM(orgId: string, userId: string) {

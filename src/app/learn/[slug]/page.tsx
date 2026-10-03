@@ -18,9 +18,21 @@ export default async function Page({ params, searchParams }: P) {
   const vm = productVM(slug, user?.id ?? null);
   if (!vm) notFound();
   const p = vm.product;
-  // schema.org Course / FAQ structured data (no ratings until real reviews exist).
+  // schema.org Course / FAQ structured data. Ratings appear only from published, verified reviews.
+  const rs = vm.reviews.summary;
   const jsonLd = [
-    { "@context": "https://schema.org", "@type": "Course", name: p.title, description: p.description, courseCode: p.code, provider: { "@type": "Organization", name: "Scholarion Academy" }, educationalCredentialAwarded: p.credential.title, inLanguage: "en", isAccessibleForFree: p.freeToAudit },
+    {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      name: p.title,
+      description: p.description,
+      courseCode: p.code,
+      provider: { "@type": "Organization", name: "Scholarion Academy" },
+      educationalCredentialAwarded: p.credential.title,
+      inLanguage: "en",
+      isAccessibleForFree: p.freeToAudit,
+      ...(rs.count > 0 ? { aggregateRating: { "@type": "AggregateRating", ratingValue: rs.average, reviewCount: rs.count, bestRating: 5, worstRating: 1 } } : {}),
+    },
     { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: p.faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) },
   ];
   return (

@@ -595,6 +595,25 @@ CREATE TABLE live.applications (
 -- At most one open application per learner per program.
 CREATE UNIQUE INDEX ON live.applications (user_id, product_id) WHERE status IN ('submitted','accepted','waitlisted','reserved');
 
+-- Verified learner reviews: only holders of a valid credential for the product.
+CREATE TABLE credentials.reviews (
+  id              text PRIMARY KEY,
+  user_id         text NOT NULL REFERENCES identity.users(id) ON DELETE CASCADE,
+  product_id      text NOT NULL,
+  credential_id   text NOT NULL REFERENCES credentials.issued(id),
+  rating          smallint NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  title           text NOT NULL CHECK (length(title) BETWEEN 3 AND 100),
+  body            text NOT NULL CHECK (length(body) BETWEEN 30 AND 2000),
+  status          text NOT NULL CHECK (status IN ('published','pending','hidden')),
+  moderation_note text,
+  moderated_by    text REFERENCES identity.users(id),
+  reports         text[] NOT NULL DEFAULT '{}',
+  created_at      timestamptz NOT NULL DEFAULT now(),
+  updated_at      timestamptz,
+  UNIQUE (user_id, product_id)
+);
+CREATE INDEX ON credentials.reviews (product_id, status);
+
 /* ======================= event log ======================= */
 CREATE SCHEMA IF NOT EXISTS events;
 

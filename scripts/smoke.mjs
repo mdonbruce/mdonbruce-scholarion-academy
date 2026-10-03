@@ -128,6 +128,39 @@ await expect("join via org sign-in", "/api/v1/teams/orgs/org_brightpath/sso-join
 await expect("seat gives lab access", "/app/course/prd_cop1047c/item/itm_cop1047c_m1_lab", 200, { cookie: chidi });
 await expect("bad invite link", "/join/not-a-token", 200);
 
+// Graduate: certificate PDF and a verified review.
+const grad = await signIn("ngozi@demo.scholarion.test", "LearnEarnBuild5");
+const creds = await expect("graduate credentials", "/app/credentials", 200, { cookie: grad });
+const credId = (creds.text.match(/\/api\/v1\/credentials\/(crd_[\w-]+)\/pdf/) ?? [])[1];
+const pdf = credId ? await req(`/api/v1/credentials/${credId}/pdf`, { cookie: grad }) : null;
+const pdfHead = pdf && pdf.status === 200 ? Buffer.from(await pdf.arrayBuffer()).subarray(0, 5).toString() : "";
+if (pdfHead !== "%PDF-") {
+  failures++;
+  console.log(`FAIL certificate PDF (${pdf?.status ?? "no link"})`);
+} else console.log("ok   200 certificate PDF");
+if (credId) await expect("PDF is private to the holder", `/api/v1/credentials/${credId}/pdf`, 404, { cookie: learner });
+await expect("post verified review", "/api/v1/reviews", 303, { method: "POST", cookie: grad, form: { productId: "prd_agentic_foundations", rating: "4", title: "Practical labs", body: "The agent loop and tool-calling labs were clear and hands-on. I wanted more on evaluation." } });
+const prod = await expect("product shows review", "/learn/agentic-ai-foundations", 200);
+if (!/Practical labs/.test(prod.text) || !/AggregateRating/.test(prod.text)) {
+  failures++;
+  console.log("FAIL product page is missing the review or its rating data");
+}
+await expect("non-holder cannot review", "/api/v1/reviews", 303, { method: "POST", cookie: learner, form: { productId: "prd_agentic_foundations", rating: "5", title: "Nope", body: "I have not earned this credential so this must be refused." } });
+const reviewsJson = await (await req("/api/v1/catalog/products/agentic-ai-foundations/reviews")).json();
+if (reviewsJson.summary?.count !== 1) {
+  failures++;
+  console.log(`FAIL reviews API count ${reviewsJson.summary?.count}`);
+} else console.log("ok   200 reviews API");
+
+// Live admissions: apply as Tunde.
+const tunde = await signIn("tunde@demo.scholarion.test", "LearnEarnBuild2");
+await expect("apply to live program", "/api/v1/live/applications", 303, { method: "POST", cookie: tunde, form: { productId: "prd_p26", experience: "Two years building Python data pipelines and a small LangChain prototype at work.", motivation: "I want to design a production agent with evaluation and guardrails for our support team." } });
+const app = await expect("application status", "/learn/26-agentic-ai-systems-design-7-week-live-intensive/apply", 200, { cookie: tunde });
+if (!/In review/.test(app.text)) {
+  failures++;
+  console.log("FAIL application not shown as in review");
+}
+
 const admin = await signIn("admin@demo.scholarion.test", "ScholarionAdmin1");
 for (const p of ADMIN) await expect("admin", p, 200, { cookie: admin });
 const status = await (await req("/api/v1/status")).json();

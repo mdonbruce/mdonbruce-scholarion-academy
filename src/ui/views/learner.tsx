@@ -763,8 +763,13 @@ export function CredentialsView({ viewer, vm }: { viewer: V; vm: ReturnType<type
                 <a className="btn btn-primary btn-sm" href={c.linkedIn} target="_blank" rel="noopener noreferrer">
                   Share on LinkedIn
                 </a>
-                <a className="btn btn-outline btn-sm" href={`/verify/${c.id}?print=1`}>
-                  Download certificate
+                {!c.revokedAt && (
+                  <a className="btn btn-outline btn-sm" href={`/api/v1/credentials/${c.id}/pdf`} download>
+                    Download PDF
+                  </a>
+                )}
+                <a className="btn btn-ghost btn-sm" href={`/verify/${c.id}?print=1`}>
+                  Print view
                 </a>
                 <a className="btn btn-ghost btn-sm" href={`/api/v1/credentials/${c.id}/vc`}>
                   Wallet file (VC JSON)
@@ -772,6 +777,11 @@ export function CredentialsView({ viewer, vm }: { viewer: V; vm: ReturnType<type
                 <a className="btn btn-ghost btn-sm" href={`mailto:?subject=${encodeURIComponent("My Scholarion credential")}&body=${encodeURIComponent(c.verifyUrl)}`}>
                   Email copy
                 </a>
+                {!c.revokedAt && c.product && (
+                  <a className="btn btn-ghost btn-sm" href={`/learn/${c.product.slug}#reviews`}>
+                    Review this program
+                  </a>
+                )}
               </div>
               <p className="tiny muted" style={{ marginTop: 8 }}>
                 Verify: <a href={c.verifyUrl}>{c.verifyUrl}</a>

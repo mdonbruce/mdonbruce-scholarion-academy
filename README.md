@@ -28,6 +28,7 @@ npm run build          # production build (type-checks)
 | Organization admin, Brightpath Health (demo) | `orgadmin@demo.scholarion.test` | `ScholarionTeams1` |
 | Brightpath learner (joined by organization sign-in) | `kemi@brightpath.example` | `LearnEarnBuild3` |
 | Not yet a member — sees "Sign in with Brightpath" | `chidi@brightpath.example` | `LearnEarnBuild4` |
+| Graduate holding the Agentic AI Foundations badge (certificate PDF, verified review) | `ngozi@demo.scholarion.test` | `LearnEarnBuild5` |
 
 State persists to `.data/db.json` when `SCHOLARION_PERSIST=1`. Run `npm run db:reset` to start fresh.
 
@@ -44,7 +45,8 @@ State persists to `.data/db.json` when `SCHOLARION_PERSIST=1`. Run `npm run db:r
 9. **Discussions:** post and reply on the Module 5 discussion; report a post; hide it under *Staff → Moderation*.
 10. **Live admissions:** as Tunde, open the #15 live program and choose *Apply*. As admin, accept it under *Staff → Admissions*. Back as Tunde, reserve the seat in full or in 3 monthly installments; onboarding then appears in *Live Sessions*. Advance the sandbox clock to see each installment charged.
 11. **Security & privacy:** open *Security & Privacy* to turn on two-step sign-in, change your password, sign out everywhere, download your data as JSON, or delete your account. *Forgot password?* on the sign-in page emails a one-hour reset link (in the sandbox, open it from the HavenRoute outbox on the *Staff* home page). With `NODE_ENV=production` (or `REQUIRE_ADMIN_MFA=1`), platform admins must turn on two-step sign-in before any staff tool opens.
-12. **Claims checker:** *Staff → Claims checker* blocks degree, credit, salary and unregistered-partner claims. `/degrees` returns 404.
+12. **Verified reviews and certificate PDF:** sign in as Ngozi (the graduate). *Credentials* has *Download PDF* (a printable certificate with a QR code to the verification page) and *Review this program*. Reviews come only from credential holders; links, contact details or flagged claims hold a review for *Staff → Moderation*. The product page shows the rating, and its structured data includes it, only once real reviews exist.
+13. **Claims checker:** *Staff → Claims checker* blocks degree, credit, salary and unregistered-partner claims. `/degrees` returns 404.
 
 ## Architecture
 

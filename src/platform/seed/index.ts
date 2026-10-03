@@ -1,11 +1,12 @@
 import { catalog } from "../catalog";
 import { hashPassword } from "../identity";
 import { live } from "../live";
+import { lms } from "../lms";
 import { emptyDb, getDb, setDb } from "../store";
 import { studio } from "../studio";
 import { teams } from "../teams";
 import type { Entitlement, HelpArticle, User } from "../types";
-import { CERT_PY, COURSE_AI, COURSE_DB, COURSE_PY, PATHWAY, PRODUCTS, buildContent } from "./catalog-data";
+import { CERT_PY, COURSE_AGENTIC, COURSE_AI, COURSE_DB, COURSE_PY, PATHWAY, PRODUCTS, buildContent } from "./catalog-data";
 
 /**
  * Demo state for local development and the preview. Demo accounts are documented in
@@ -24,6 +25,8 @@ export const DEMO = {
   orgLearner: { email: "kemi@brightpath.example", password: "LearnEarnBuild3", name: "Kemi Adeyemi" },
   /** Signs in to Brightpath through organization sign-in (simulated SSO): same email domain, not yet a member. */
   ssoLearner: { email: "chidi@brightpath.example", password: "LearnEarnBuild4", name: "Chidi Nwosu" },
+  /** Holds the Agentic AI Foundations badge: can download the certificate PDF and write a verified review. */
+  graduate: { email: "ngozi@demo.scholarion.test", password: "LearnEarnBuild5", name: "Ngozi Eze" },
 };
 
 const HELP: HelpArticle[] = [
@@ -187,6 +190,15 @@ export function seed(): void {
   post("pst_seed_4", "itm_cop1047c_m5_discussion", COURSE_PY, "usr_amara", "Recursion still feels like magic to me. Is there a simple way to picture the base case?", "2026-10-02T09:00:00.000Z");
   post("pst_seed_5", "itm_cop1047c_m5_discussion", COURSE_PY, "usr_spam", "Selling exam answers, message me", "2026-10-02T10:00:00.000Z", null, ["usr_ngozi", "usr_amara"]);
   post("pst_seed_6", "itm_cai4505c_m6_discussion", COURSE_AI, "usr_amara", "Automated inference in triage tools is only as fair as the rules we encode. Who reviews the knowledge base when guidelines change?", "2026-09-29T15:00:00.000Z");
+
+  /* ---------- A credential holder (sandbox): Ngozi finished Agentic AI Foundations ---------- */
+  // Goes through the real grade → course.passed → credential path, so the record is consistent.
+  // No reviews are seeded: reviews on the site come only from real credential holders.
+  db.enrollments.push({ id: "enr_seed_ngozi_agf", userId: "usr_ngozi", productId: COURSE_AGENTIC, courseId: COURSE_AGENTIC, level: "full", createdAt: "2026-09-01T14:00:00.000Z", deadlineAnchor: "2026-09-01T14:00:00.000Z" });
+  for (const i of catalog.items(COURSE_AGENTIC)) {
+    db.progress.push({ userId: "usr_ngozi", itemId: i.id, status: "completed", updatedAt: "2026-09-28T18:00:00.000Z" });
+    if (i.graded) lms.postGrade({ userId: "usr_ngozi", itemId: i.id, score: 9, max: 10, source: i.kind === "quiz" ? "quiz" : "instructor" });
+  }
 
   // Seeding must not leave events or emails behind.
   db.events = [];

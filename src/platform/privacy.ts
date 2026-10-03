@@ -30,7 +30,7 @@ export const privacy = {
       grades: mine(db.grades),
       labWork: mine(db.labSessions).map((l) => ({ itemId: l.itemId, code: l.code, lastActiveAt: l.lastActiveAt })),
       discussionPosts: mine(db.posts).map((p) => ({ id: p.id, itemId: p.itemId, body: p.body, createdAt: p.createdAt })),
-      reviews: (db as unknown as { reviews?: { userId: string }[] }).reviews?.filter((r) => r.userId === userId) ?? [],
+      reviews: mine(db.reviews).map((r) => ({ productId: r.productId, rating: r.rating, title: r.title, body: r.body, status: r.status, createdAt: r.createdAt })),
       credentials: mine(db.credentials).map((c) => ({ id: c.id, title: c.title, issuedAt: c.issuedAt, revokedAt: c.revokedAt ?? null, verifiableCredential: c.vc })),
       orders: mine(db.orders),
       subscriptions: mine(db.subscriptions),
@@ -101,12 +101,7 @@ export const privacy = {
       p.hiddenAt = p.hiddenAt ?? t;
       p.userId = "deleted";
     }
-    const reviews = (db as unknown as { reviews?: { userId: string; body: string; status: string }[] }).reviews;
-    if (reviews) for (const r of reviews) if (r.userId === userId) {
-      r.body = "[deleted]";
-      r.status = "hidden";
-      r.userId = "deleted";
-    }
+    db.reviews = drop(db.reviews);
     for (const tk of db.tickets) if (tk.userId === userId) {
       tk.userId = null;
       tk.body = "[deleted]";

@@ -16,6 +16,7 @@ import { teams } from "./teams";
 import { community } from "./community";
 import { admissions } from "./admissions";
 import { privacy } from "./privacy";
+import { reviews } from "./reviews";
 
 /**
  * Platform façade. In production each export is a typed HTTP/gRPC client to the
@@ -54,6 +55,7 @@ function wireConsumers(): void {
   });
   // Studio → AI Tutor: re-index happens on read in the stand-in; log the hook for parity.
   subscribe("tutor-indexer", "studio.output.published", () => undefined);
+  subscribe("reviews", "credential.revoked", (e) => reviews.onCredentialRevoked(String(e.data.credentialId)));
   registerHavenRoute();
 }
 
@@ -77,7 +79,7 @@ export function tickAll() {
   return { commerce: commerce.tick(), lms: lms.tick(), live: live.tick(), labsStopped: cloudlab.tick() };
 }
 
-export { admissions, privacy, catalog, cloudlab, commerce, community, credentials, cx, entitlements, identity, live, lms, studio, teams, tutor };
+export { admissions, privacy, reviews, catalog, cloudlab, commerce, community, credentials, cx, entitlements, identity, live, lms, studio, teams, tutor };
 export { capabilities } from "./status";
 export { checkClaims, partners } from "./partners";
 export { publicQuiz } from "./lms";
