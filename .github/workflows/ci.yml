@@ -46,6 +46,7 @@ jobs:
           (npm run start -- -p 3000 > server.log 2>&1 &)
           for i in $(seq 1 30); do curl -sf -o /dev/null http://localhost:3000/robots.txt && break; sleep 1; done
           node scripts/smoke.mjs 2>&1 | tee smoke.log || (echo "--- server log ---" >> smoke.log; tail -n 60 server.log >> smoke.log; exit 1)
+          echo "::notice title=Smoke test::$(grep -c '^ok' smoke.log) checks passed, $(grep -c '^FAIL' smoke.log) failed. $(grep '^status board' smoke.log)"
 
       - name: Report failure output
         if: failure()
