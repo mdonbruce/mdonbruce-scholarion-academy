@@ -37,7 +37,7 @@ const badge = getDb().credentials.find((c) => c.userId === amara.id)!;
 const checkout = commerce.createCheckout({ userId: "usr_tunde", plan: "plus_monthly", productId: null, idempotencyKey: "preview" });
 
 const ROUTES: Record<string, string> = {
-  "/": "index.html",
+  "/": "home.html",
   "/explore": "explore.html",
   "/programs": "programs.html",
   "/plus": "plus.html",
@@ -61,7 +61,7 @@ const ROUTES: Record<string, string> = {
 };
 
 const pages: [string, string, ReactElement][] = [
-  ["index.html", "Home", <HomeView viewer={null} vm={V.homeVM()} />],
+  ["home.html", "Home", <HomeView viewer={null} vm={V.homeVM()} />],
   ["explore.html", "Explore", <ExploreView viewer={null} vm={V.exploreVM({ q: "agentic ai", free: "1" })} />],
   ["programs.html", "How the programs stack", <ProgramsView viewer={null} vm={V.pathwayVM()} />],
   ["plus.html", "Scholarion Plus", <PlusView viewer={null} plans={V.homeVM().plans} />],
