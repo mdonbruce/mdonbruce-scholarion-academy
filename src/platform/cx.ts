@@ -153,7 +153,7 @@ function email(evt: CloudEvent, template: string, subject: string, body: string)
   const db = getDb();
   db.outbox.push({ id: newId("eml"), to: user.email, template, subject, body: `Hi ${user.name.split(" ")[0]},\n\n${body}\n\n— Scholarion Academy`, eventId: evt.id, createdAt: nowIso() });
   if (!EMAIL_ONLY.has(template)) {
-    db.notices.push({ id: newId("ntc"), userId: user.id, kind: template, title: subject, body: body.replace(/https?:\/\/\S+/g, "").replace(/\n{3,}/g, "\n\n").trim(), href: noticeHref(template, evt.data), createdAt: nowIso() });
+    db.notices.push({ id: newId("ntc"), userId: user.id, kind: template, title: subject, body: body.replace(/:?\s*https?:\/\/\S+/g, ".").replace(/\.{2,}/g, ".").replace(/\s+\./g, ".").replace(/\n{3,}/g, "\n\n").trim(), href: noticeHref(template, evt.data), createdAt: nowIso() });
     if (db.notices.length > 5000) db.notices.splice(0, db.notices.length - 5000);
   }
   save();

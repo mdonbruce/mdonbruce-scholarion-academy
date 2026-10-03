@@ -10,9 +10,14 @@ import path from "node:path";
 import type { ReactElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as V from "../src/bff/views";
-import { catalog, commerce, ensurePlatform, identity, lms } from "../src/platform";
+import { authoring, catalog, commerce, ensurePlatform, identity, lms } from "../src/platform";
 import { getDb } from "../src/platform/store";
-import { AdminHomeView, AdminClaimsView, AdminModerationView } from "../src/ui/views/admin";
+import { AdminHomeView, AdminClaimsView, AdminCourseReviewsView, AdminModerationView } from "../src/ui/views/admin";
+import { SecurityView } from "../src/ui/views/account";
+import { ApplyView } from "../src/ui/views/admissions";
+import { ArticleView, HubView } from "../src/ui/views/content";
+import { TeachCourseView, TeachItemView } from "../src/ui/views/teach";
+import { NotificationsView } from "../src/ui/views/learner";
 import { OrgView } from "../src/ui/views/teams";
 import { AccountView, CourseHomeView, CredentialsView, DashboardView, GradebookView, ItemView, LiveView, ModuleView } from "../src/ui/views/learner";
 import { CheckoutView, ExploreView, HomeView, LoginView, PlusView, ProductView, ProgramsView, TeamsView, VerifyView } from "../src/ui/views/public";
@@ -40,6 +45,22 @@ lms.submitProject(amara.id, "itm_cop1047c_m5_project", "Records in a dict, four 
 const orgAdmin = identity.getUser("usr_orgadmin")!;
 const checkout = commerce.createCheckout({ userId: "usr_tunde", plan: "plus_monthly", productId: null, idempotencyKey: "preview" });
 
+// Course builder: the instructor drafts a short course (quiz still needs questions, so the checklist shows).
+const fac = identity.getUser("usr_faculty")!;
+const draft = authoring.createCourse(fac.id, { title: "Prompt Design Basics", level: "Beginner", skills: "Prompt engineering, LLM evaluation" });
+authoring.updateCourse(fac.id, draft.id, { tagline: "Write prompts that work the first time", description: "A short, hands-on course on structuring prompts, giving examples and checking model output before you rely on it at work.", whatYoullLearn: "Structure a prompt\nUse examples well\nCheck output before relying on it" });
+authoring.addModule(fac.id, draft.id, { title: "Prompt structure", overview: "Roles, context, format and examples." });
+const rd = authoring.addItem(fac.id, draft.id, 1, "reading", "Anatomy of a prompt");
+authoring.updateItem(fac.id, rd.id, { body: "A good prompt states the task, the context, the format you want back and one example of a good answer." });
+const vid = authoring.addItem(fac.id, draft.id, 1, "video", "Walkthrough: rewriting a vague prompt");
+authoring.updateItem(fac.id, vid.id, { src: "https://media.example/walkthrough.mp4", captions: "en, es, fr", transcript: "In this walkthrough we take a vague one-line prompt and rewrite it step by step into a structured one." });
+const qz = authoring.addItem(fac.id, draft.id, 1, "quiz", "Check your understanding");
+authoring.addQuestion(fac.id, qz.id, { prompt: "Which part of a prompt tells the model how to shape its answer?", options: "The format instruction\nThe greeting\nThe model name", answer: "1", explanation: "The format instruction sets the structure of the answer." });
+// Ngozi (graduate) sees the verified-review form on Agentic AI Foundations.
+const ngozi = identity.getUser("usr_ngozi")!;
+// Tunde's live application (#15) is in review.
+const tunde = identity.getUser("usr_tunde")!;
+
 const ROUTES: Record<string, string> = {
   "/": "home.html",
   "/explore": "explore.html",
@@ -66,6 +87,14 @@ const ROUTES: Record<string, string> = {
   "/teams": "teams.html",
   "/app/course/prd_cop1047c/item/itm_cop1047c_m5_discussion": "discussion.html",
   "/admin/moderation": "moderation.html",
+  "/learn/15-advanced-certificate-in-agentic-ai-engineering-weekend-intensive/apply": "apply.html",
+  "/app/security": "security.html",
+  "/app/notifications": "notifications.html",
+  [`/teach/${draft.id}`]: "teach-course.html",
+  [`/teach/${draft.id}/item/${qz.id}`]: "teach-quiz.html",
+  "/hubs/agentic-ai": "hub.html",
+  "/blog/how-to-choose-your-first-ai-course": "article.html",
+  "/learn/agentic-ai-foundations": "reviews.html",
 };
 
 const pages: [string, string, ReactElement][] = [
@@ -93,6 +122,14 @@ const pages: [string, string, ReactElement][] = [
   ["teams.html", "Scholarion for Teams", <TeamsView viewer={V.viewerOf(orgAdmin)} flash={{}} quote={V.teamsQuote(10)} />],
   ["discussion.html", "Module 5 discussion", <ItemView viewer={viewer} vm={V.itemVM(amara.id, "prd_cop1047c", "itm_cop1047c_m5_discussion")!} flash={{}} />],
   ["moderation.html", "Moderation", <AdminModerationView viewer={{ id: "usr_admin", name: "Platform Admin", roles: ["platform_admin"] }} vm={V.moderationVM()} flash={{}} />],
+  ["apply.html", "Live program application", <ApplyView viewer={V.viewerOf(tunde)} vm={V.applyVM("15-advanced-certificate-in-agentic-ai-engineering-weekend-intensive", tunde.id)!} flash={{}} />],
+  ["security.html", "Security & privacy", <SecurityView viewer={viewer} vm={{ email: amara.email, emailVerified: true, mfaEnabled: false, mfaEnabledAt: null, setup: null, sessions: [{ createdAt: new Date().toISOString(), current: true }], required: false, passwordChangedAt: null }} flash={{}} />],
+  ["notifications.html", "Notifications", <NotificationsView viewer={V.viewerOf(amara)!} notices={V.notificationsVM(amara)} />],
+  ["teach-course.html", "Course builder", <TeachCourseView viewer={V.viewerOf(fac)!} vm={V.teachCourseVM(fac.id, draft.id)!} flash={{}} />],
+  ["teach-quiz.html", "Quiz builder", <TeachItemView viewer={V.viewerOf(fac)!} vm={V.teachItemVM(fac.id, qz.id)!} flash={{}} />],
+  ["hub.html", "Agentic AI topic hub", <HubView viewer={null} vm={V.hubVM("agentic-ai")!} />],
+  ["article.html", "Blog article", <ArticleView viewer={null} vm={V.articleVM("how-to-choose-your-first-ai-course")!} />],
+  ["reviews.html", "Verified reviews", <ProductView viewer={V.viewerOf(ngozi)} vm={V.productVM("agentic-ai-foundations", ngozi.id)!} flash={{}} />],
   ["checkout.html", "Sandbox checkout", <CheckoutView viewer={{ id: "usr_tunde", name: "Tunde Bello", roles: ["learner"] }} vm={V.checkoutVM(checkout.id, "usr_tunde")!} />],
 ];
 

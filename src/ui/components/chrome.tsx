@@ -158,6 +158,20 @@ export function PublicHeader({ viewer, current }: { viewer: Viewer | null; curre
               </>
             )}
           </div>
+          <details className="mobile-menu">
+            <summary aria-label={t("nav.explore")}>☰</summary>
+            <nav aria-label="Menu">
+              <a href="/explore">{t("foot.catalog")}</a>
+              <a href="/hubs">{t("nav.topics")}</a>
+              <a href="/programs">{t("nav.programs")}</a>
+              <a href="/plus">{t("nav.plus")}</a>
+              <a href="/pricing">{t("nav.pricing")}</a>
+              <a href="/teams">{t("nav.teams")}</a>
+              <a href="/blog">{t("nav.blog")}</a>
+              <a href="/help">{t("util.support")}</a>
+              {!viewer && <a href="/login">{t("hdr.signin")}</a>}
+            </nav>
+          </details>
         </div>
       </header>
     </>

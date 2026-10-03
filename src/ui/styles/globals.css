@@ -630,7 +630,7 @@ details.acc > div {
   flex: 1;
   min-width: 0;
 }
-@media (max-width: 1240px) {
+@media (max-width: 1360px) {
   .header-search {
     display: none;
   }
@@ -918,6 +918,7 @@ details.acc > div {
   font-size: 0.82rem;
 }
 .rail {
+  position: relative; /* clips absolutely positioned card art inside the scroller */
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(240px, 1fr);
@@ -1585,4 +1586,160 @@ details.acc > div {
 .compare-table th,
 .compare-table td {
   vertical-align: top;
+}
+
+/* Small-screen menu (no JavaScript) */
+.mobile-menu {
+  display: none;
+  position: relative;
+}
+.mobile-menu > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  font-weight: 700;
+}
+.mobile-menu > summary::-webkit-details-marker {
+  display: none;
+}
+.mobile-menu > nav {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 60;
+  display: grid;
+  min-width: 240px;
+  padding: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 32px rgba(11, 31, 77, 0.16);
+}
+.mobile-menu > nav a {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+.mobile-menu > nav a:hover {
+  background: var(--surface-2);
+}
+@media (max-width: 1020px) {
+  .mobile-menu {
+    display: block;
+  }
+}
+
+/* Phones: keep the header inside the viewport */
+@media (max-width: 640px) {
+  .utility .container > span:first-child {
+    display: none;
+  }
+  .utility nav {
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    font-size: 0.78rem;
+  }
+  .brand-word span {
+    display: none;
+  }
+  .site-header .container {
+    gap: 8px;
+  }
+  .header-actions {
+    gap: 6px;
+  }
+  .header-actions .btn-outline {
+    display: none;
+  }
+}
+.app > div,
+.main {
+  min-width: 0;
+}
+@media (max-width: 640px) {
+  .header-actions .btn,
+  .mobile-menu > summary {
+    padding: 6px 10px;
+  }
+  .site-header .brand img {
+    width: 44px;
+    height: auto;
+  }
+  .topbar {
+    gap: 8px;
+  }
+  .topbar .search {
+    display: none;
+  }
+  .topbar > .row {
+    gap: 8px !important;
+  }
+  .userchip > span:not(.avatar) {
+    display: none;
+  }
+}
+@media (max-width: 640px) {
+  .certificate,
+  .card.tutor {
+    max-width: 100%;
+    min-width: 0;
+  }
+  .stack,
+  .two-col > *,
+  .with-aside > * {
+    min-width: 0;
+  }
+}
+@media (max-width: 640px) {
+  .main .row {
+    flex-wrap: wrap;
+  }
+  .main p,
+  .main li,
+  .main a {
+    overflow-wrap: anywhere;
+  }
+  .main details.acc,
+  .main .card {
+    max-width: 100%;
+  }
+}
+@media (max-width: 640px) {
+  .course-banner {
+    flex-wrap: wrap;
+  }
+  .main section,
+  .main .grid > *,
+  .main [class*="g2"] > *,
+  .main [class*="g3"] > *,
+  .main .two-col > * {
+    min-width: 0;
+  }
+}
+@media (max-width: 900px) {
+  /* Some screens set column widths inline; stack them on small screens. */
+  .two-col,
+  .with-aside {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+@media (max-width: 640px) {
+  /* App navigation becomes one swipeable row on phones. */
+  .sidebar {
+    padding: 10px 12px 6px;
+  }
+  .sidenav {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding-bottom: 6px;
+  }
+  .sidenav li {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
 }
