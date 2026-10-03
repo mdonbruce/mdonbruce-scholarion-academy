@@ -85,7 +85,7 @@ function execute(code: string, mode: "run" | "grade", tests: unknown[] = []): { 
       timeout: RUN_TIMEOUT_MS,
       encoding: "utf8",
       maxBuffer: 256 * 1024,
-      env: runnerEnv(),
+      env: runnerEnv() as NodeJS.ProcessEnv,
       windowsHide: true,
     });
     if (res.error && (res.error as NodeJS.ErrnoException).code === "ENOENT") {
