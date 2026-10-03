@@ -1,0 +1,38 @@
+{
+  "name": "scholarion-academy",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Scholarion Academy website, learner app and BFF, wired to Scholarion platform services (local mocks until each real service is CONNECTED).",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "preview:render": "tsx --tsconfig tsconfig.scripts.json scripts/render-preview.tsx",
+    "db:reset": "tsx scripts/reset-data.ts"
+  },
+  "dependencies": {
+    "next": "^15.5.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.2.0",
+    "@types/node": "^22.10.0",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "eslint": "^9.20.0",
+    "eslint-config-next": "^15.5.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
