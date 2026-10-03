@@ -93,7 +93,7 @@ if (csv.status !== 200 || !/kemi@brightpath\.example/.test(await csv.text())) {
 await expect("teams page", "/teams", 200, { cookie: orgAdmin });
 const chidi = await signIn("chidi@brightpath.example", "LearnEarnBuild4");
 const dash = await expect("sso offer on dashboard", "/app", 200, { cookie: chidi });
-if (!/Sign in with Brightpath/.test(dash.text)) {
+if (!/Sign in with (<!-- -->)?Brightpath/.test(dash.text)) {
   failures++;
   console.log("FAIL dashboard has no organization sign-in offer");
 }
