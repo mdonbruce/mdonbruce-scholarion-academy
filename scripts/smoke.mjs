@@ -64,11 +64,11 @@ async function signIn(email, password) {
   return c.split(";")[0];
 }
 
-const PUBLIC = ["/", "/explore", "/explore?q=agentic%20ai&free=1&level=Beginner", "/explore?q=pythn", "/programs", "/plus", "/pricing", "/financial-aid", "/teams", "/teams?kind=partner", "/help", "/help?q=cancel", "/verify", "/login", "/signup", "/learn/python-programming-cop1047c", "/learn/agentic-ai-foundations", "/learn/26-agentic-ai-systems-design-7-week-live-intensive", "/learn/17-generative-ai-professional-pathway", "/forgot-password", "/learn/26-agentic-ai-systems-design-7-week-live-intensive/apply", "/robots.txt", "/sitemap.xml", "/api/v1/status", "/api/v1/catalog/products?q=llm"];
+const PUBLIC = ["/", "/explore", "/explore?q=agentic%20ai&free=1&level=Beginner", "/explore?q=pythn", "/programs", "/plus", "/pricing", "/financial-aid", "/teams", "/teams?kind=partner", "/help", "/help?q=cancel", "/verify", "/login", "/signup", "/learn/python-programming-cop1047c", "/learn/agentic-ai-foundations", "/learn/26-agentic-ai-systems-design-7-week-live-intensive", "/learn/17-generative-ai-professional-pathway", "/forgot-password", "/hubs", "/hubs/agentic-ai", "/hubs/generative-ai", "/hubs/python-and-data", "/hubs/ai-for-leaders", "/blog", "/blog?tag=credentials", "/blog/how-to-choose-your-first-ai-course", "/offline", "/manifest.webmanifest", "/sw.js", "/learn/26-agentic-ai-systems-design-7-week-live-intensive/apply", "/robots.txt", "/sitemap.xml", "/api/v1/status", "/api/v1/catalog/products?q=llm"];
 
 const LEARNER = ["/app", "/app/courses", "/app/calendar", "/app/live", "/app/grades", "/app/credentials", "/app/tutor", "/app/proctoring", "/app/account", "/app/security", "/learn/26-agentic-ai-systems-design-7-week-live-intensive/apply", "/app/notifications", "/app/onboarding", "/app/course/prd_cop1047c", "/app/course/prd_cop1047c/modules", "/app/course/prd_cop1047c/module/5", "/app/course/prd_cop1047c/grades", "/app/course/prd_cop1047c/resources", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_lesson", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_reading", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_lab", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_quiz", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_project", "/app/course/prd_cop1047c/item/itm_cop1047c_capstone", "/app/course/prd_cai4505c/module/6", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_discussion", "/app/course/prd_cai4505c/item/itm_cai4505c_m6_discussion", "/financial-aid/apply?product=16-certificate-in-agentic-ai-for-developers"];
 
-const ADMIN = ["/admin", "/admin/admissions", "/admin/course-reviews", "/teach", "/app/security", "/admin/moderation", "/admin/aid", "/admin/grading", "/admin/studio", "/admin/live", "/admin/support", "/admin/claims?text=accredited%20degree"];
+const ADMIN = ["/admin", "/admin/admissions", "/admin/course-reviews", "/teach", "/admin/blog", "/admin/blog/art_seed_audit", "/app/security", "/admin/moderation", "/admin/aid", "/admin/grading", "/admin/studio", "/admin/live", "/admin/support", "/admin/claims?text=accredited%20degree"];
 
 console.log(`Smoke testing ${BASE}`);
 for (const p of PUBLIC) await expect("public", p, 200);
@@ -175,6 +175,27 @@ if (created.status !== 303 || !/^\/teach\/prd_/.test(draftPath)) {
   await expect("draft is not public", "/learn/smoke-test-course", 404);
 }
 await expect("learner can't open Teach", "/teach", 307, { cookie: learner });
+
+// Hubs, blog, PWA and notifications.
+await expect("unknown hub", "/hubs/nope", 404);
+await expect("unknown article", "/blog/nope", 404);
+const man = await (await req("/manifest.webmanifest")).json().catch(() => ({}));
+if (man.display !== "standalone" || !(man.icons ?? []).length) {
+  failures++;
+  console.log("FAIL web app manifest");
+} else console.log("ok   200 manifest is installable");
+const hubPage = await expect("hub compare table", "/hubs/agentic-ai", 200);
+if (!/Compare/.test(hubPage.text) || !/FAQPage/.test(hubPage.text)) {
+  failures++;
+  console.log("FAIL hub page is missing the comparison or FAQ data");
+}
+await expect("staff create article", "/api/v1/admin/blog", 303, { method: "POST", cookie: admin, form: { title: "Smoke test article title", summary: "A smoke test article that only exists to check the editor works.", body: "This is a smoke test sentence for the blog editor. ".repeat(12) } });
+await expect("mark notifications read", "/api/v1/me/notifications/read-all", 303, { method: "POST", cookie: learner });
+const notes = await (await req("/api/v1/me/notifications", { cookie: learner })).json();
+if (notes.unread !== 0) {
+  failures++;
+  console.log(`FAIL unread after mark-all ${notes.unread}`);
+} else console.log("ok   200 notifications read state");
 
 const status = await (await req("/api/v1/status")).json();
 console.log(`status board: ${status.capabilities.map((c) => `${c.key}=${c.status}`).join(", ")}`);

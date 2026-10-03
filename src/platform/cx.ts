@@ -75,6 +75,37 @@ export const cx = {
     return [...getDb().leads].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   },
 
+  notices(userId: string, limit = 50) {
+    return getDb()
+      .notices.filter((n) => n.userId === userId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .slice(0, limit);
+  },
+
+  unreadCount(userId: string): number {
+    return getDb().notices.filter((n) => n.userId === userId && !n.readAt).length;
+  },
+
+  /** Marks one notice read and returns where it points. */
+  openNotice(userId: string, id: string): string {
+    const n = getDb().notices.find((x) => x.id === id && x.userId === userId);
+    if (!n) throw new PlatformError("not_found", "Notification not found", 404);
+    n.readAt = n.readAt ?? nowIso();
+    save();
+    return n.href;
+  },
+
+  markAllRead(userId: string): number {
+    const t = nowIso();
+    let n = 0;
+    for (const x of getDb().notices) if (x.userId === userId && !x.readAt) {
+      x.readAt = t;
+      n++;
+    }
+    save();
+    return n;
+  },
+
   outbox(userEmail?: string): OutboxEmail[] {
     return getDb()
       .outbox.filter((e) => !userEmail || e.to === userEmail)
@@ -86,11 +117,45 @@ export const cx = {
 
 const fmtDate = (iso: unknown) => (typeof iso === "string" ? new Date(iso).toLocaleDateString("en-US", { dateStyle: "long", timeZone: "America/New_York" }) : "");
 
+/** Templates that carry one-time secrets stay out of the in-app inbox. */
+const EMAIL_ONLY = new Set(["verify_email", "password_reset"]);
+
+function noticeHref(template: string, data: Record<string, unknown>): string {
+  const slug = typeof data.productId === "string" ? catalog.get(data.productId)?.slug : undefined;
+  const map: Record<string, string> = {
+    receipt: "/app/account",
+    renewal_receipt: "/app/account",
+    refund: "/app/account",
+    cancellation: "/app/account",
+    trial_started: "/app/account",
+    trial_ending: "/app/account",
+    credential_issued: "/app/credentials",
+    deadline: "/app/calendar",
+    live_reminder: "/app/live",
+    seat_reserved: "/app/live",
+    peer_disputed: "/app/grades",
+    mfa_enabled: "/app/security",
+    mfa_disabled: "/app/security",
+    password_changed: "/app/security",
+    aid_decision: slug ? `/learn/${slug}` : "/app",
+    application_received: slug ? `/learn/${slug}/apply` : "/app/live",
+    application_decision: slug ? `/learn/${slug}/apply` : "/app/live",
+    course_published: typeof data.productId === "string" ? `/teach/${data.productId}` : "/teach",
+    course_changes: typeof data.productId === "string" ? `/teach/${data.productId}` : "/teach",
+  };
+  return map[template] ?? "/app";
+}
+
 function email(evt: CloudEvent, template: string, subject: string, body: string) {
   const userId = evt.data.userId as string | undefined;
   const user = userId ? identity.getUser(userId) : undefined;
   if (!user) return;
-  getDb().outbox.push({ id: newId("eml"), to: user.email, template, subject, body: `Hi ${user.name.split(" ")[0]},\n\n${body}\n\n— Scholarion Academy`, eventId: evt.id, createdAt: nowIso() });
+  const db = getDb();
+  db.outbox.push({ id: newId("eml"), to: user.email, template, subject, body: `Hi ${user.name.split(" ")[0]},\n\n${body}\n\n— Scholarion Academy`, eventId: evt.id, createdAt: nowIso() });
+  if (!EMAIL_ONLY.has(template)) {
+    db.notices.push({ id: newId("ntc"), userId: user.id, kind: template, title: subject, body: body.replace(/https?:\/\/\S+/g, "").replace(/\n{3,}/g, "\n\n").trim(), href: noticeHref(template, evt.data), createdAt: nowIso() });
+    if (db.notices.length > 5000) db.notices.splice(0, db.notices.length - 5000);
+  }
   save();
 }
 

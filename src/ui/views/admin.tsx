@@ -25,6 +25,7 @@ function AdminTabs({ current }: { current: string }) {
       {t("/admin/live", "Live sessions")}
       {t("/admin/support", "Support & leads")}
       {t("/admin/claims", "Claims checker")}
+      {t("/admin/blog", "Blog")}
     </nav>
   );
 }

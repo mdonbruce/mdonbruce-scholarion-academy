@@ -646,3 +646,38 @@ export interface Review {
   updatedAt?: ISODate;
   moderatedBy?: ID;
 }
+
+/* ---------- In-app notifications ---------- */
+
+/** Mirrors HavenRoute emails in the app (without one-time links). */
+export interface Notice {
+  id: ID;
+  userId: ID;
+  kind: string; // email template
+  title: string;
+  body: string;
+  href: string;
+  createdAt: ISODate;
+  readAt?: ISODate;
+}
+
+/* ---------- Editorial blog ---------- */
+
+export interface Article {
+  id: ID;
+  slug: string;
+  title: string;
+  summary: string;
+  /** Plain text with light formatting: blank-line paragraphs, "## " headings, "- " lists, [text](url) links. */
+  body: string;
+  tags: string[];
+  hubSlugs: string[];
+  /** https links cited for any figures in the article. */
+  sources: string[];
+  status: "draft" | "published";
+  authorId: ID;
+  authorName: string;
+  createdAt: ISODate;
+  updatedAt?: ISODate;
+  publishedAt?: ISODate;
+}

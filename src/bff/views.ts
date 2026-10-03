@@ -20,6 +20,7 @@ import {
   reviews,
   authoring,
   cloudlab,
+  content,
   studio,
   teams,
   type Item,
@@ -34,8 +35,8 @@ import { sha256 } from "@/platform/util";
  * plain data to views; nothing here leaks answers, other learners' data or PII.
  */
 
-export type Viewer = { id: string; name: string; roles: string[]; orgAdminOf?: string } | null;
-export const viewerOf = (u: User | null): Viewer => (u ? { id: u.id, name: u.name, roles: u.roles, orgAdminOf: teams.adminOf(u.id)[0]?.id } : null);
+export type Viewer = { id: string; name: string; roles: string[]; orgAdminOf?: string; unread?: number } | null;
+export const viewerOf = (u: User | null): Viewer => (u ? { id: u.id, name: u.name, roles: u.roles, orgAdminOf: teams.adminOf(u.id)[0]?.id, unread: cx.unreadCount(u.id) } : null);
 
 export function homeVM() {
   ensurePlatform();
@@ -336,7 +337,7 @@ export function calendarVM(userId: string) {
 
 export function notificationsVM(user: User) {
   ensurePlatform();
-  return cx.outbox(user.email).slice(0, 50);
+  return cx.notices(user.id, 100);
 }
 
 export function adminVM() {
@@ -477,4 +478,47 @@ export function teachAnalyticsVM(userId: string, courseId: string) {
 export function courseReviewsVM(reviewerId: string) {
   ensurePlatform();
   return authoring.reviewQueue().map((p) => ({ ...authoring.outline(reviewerId, p.id), checklist: authoring.checklist(reviewerId, p.id), authors: (p.authorIds ?? []).map((id) => getDb().users.find((u) => u.id === id)?.name ?? "Former instructor") }));
+}
+
+/* ---------------- Hubs & blog ---------------- */
+
+export function hubsVM() {
+  ensurePlatform();
+  return content.hubs().map((h) => ({ slug: h.slug, title: h.title, headline: h.headline, count: catalog.all().filter(h.match).length }));
+}
+
+export function hubVM(slug: string) {
+  ensurePlatform();
+  const r = content.hub(slug);
+  if (!r) return null;
+  const { match: _m, ...hub } = r.hub;
+  void _m;
+  return { ...r, hub };
+}
+
+export function blogVM(tag?: string) {
+  ensurePlatform();
+  const all = content.articles();
+  return { articles: (tag ? all.filter((a) => a.tags.includes(tag)) : all).map((a) => ({ ...a, minutes: content.readingMinutes(a) })), tags: [...new Set(all.flatMap((a) => a.tags))].sort(), tag: tag ?? null };
+}
+
+export function articleVM(slug: string) {
+  ensurePlatform();
+  const a = content.article(slug);
+  if (!a) return null;
+  const hubs = content.hubs().filter((h) => a.hubSlugs.includes(h.slug)).map((h) => ({ slug: h.slug, title: h.title }));
+  const more = content.articles().filter((x) => x.id !== a.id).slice(0, 3);
+  return { article: a, minutes: content.readingMinutes(a), hubs, more };
+}
+
+export function adminBlogVM() {
+  ensurePlatform();
+  return content.allArticles().map((a) => ({ ...a, issues: content.checkArticle(a).length }));
+}
+
+export function adminArticleVM(id: string) {
+  ensurePlatform();
+  const a = content.draft(id);
+  if (!a) return null;
+  return { article: a, issues: content.checkArticle(a), hubs: content.hubs().map((h) => ({ slug: h.slug, title: h.title })) };
 }

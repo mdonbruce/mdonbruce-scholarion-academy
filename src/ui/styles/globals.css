@@ -1544,3 +1544,45 @@ details.acc > div {
 .dark-brand .brand-word span {
   color: #c9d4f0;
 }
+
+/* Notification bell */
+.bell {
+  position: relative;
+}
+.bell-count {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--red-600, #c62828);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+/* Article body */
+.prose {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  max-width: 70ch;
+}
+.prose h2 {
+  font-family: var(--font-sans);
+  font-size: 1.3rem;
+  margin: 1.6em 0 0.4em;
+}
+.prose ul {
+  padding-left: 1.2em;
+}
+.prose li {
+  margin: 0.25em 0;
+}
+.compare-table th,
+.compare-table td {
+  vertical-align: top;
+}

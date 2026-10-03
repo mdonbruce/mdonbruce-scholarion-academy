@@ -614,6 +614,56 @@ CREATE TABLE credentials.reviews (
 );
 CREATE INDEX ON credentials.reviews (product_id, status);
 
+-- In-app notifications (mirror of HavenRoute emails, never with one-time links).
+CREATE TABLE cx.notices (
+  id         text PRIMARY KEY,
+  user_id    text NOT NULL REFERENCES identity.users(id) ON DELETE CASCADE,
+  kind       text NOT NULL,
+  title      text NOT NULL,
+  body       text NOT NULL,
+  href       text NOT NULL CHECK (href LIKE '/%'),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  read_at    timestamptz
+);
+CREATE INDEX ON cx.notices (user_id, created_at DESC);
+CREATE INDEX ON cx.notices (user_id) WHERE read_at IS NULL;
+
+-- Editorial blog. Publishing requires a clean claims check.
+CREATE SCHEMA IF NOT EXISTS content;
+CREATE TABLE content.articles (
+  id           text PRIMARY KEY,
+  slug         text NOT NULL UNIQUE,
+  title        text NOT NULL,
+  summary      text NOT NULL CHECK (length(summary) BETWEEN 30 AND 300),
+  body         text NOT NULL,
+  tags         text[] NOT NULL DEFAULT '{}',
+  hub_slugs    text[] NOT NULL DEFAULT '{}',
+  sources      text[] NOT NULL DEFAULT '{}',
+  status       text NOT NULL CHECK (status IN ('draft','published')),
+  author_id    text NOT NULL REFERENCES identity.users(id),
+  author_name  text NOT NULL,
+  created_at   timestamptz NOT NULL DEFAULT now(),
+  updated_at   timestamptz,
+  published_at timestamptz
+);
+
+-- Instructor-built courses: authorship and the publish review.
+CREATE TABLE catalog.course_authors (
+  product_id text NOT NULL REFERENCES catalog.products(id) ON DELETE CASCADE,
+  user_id    text NOT NULL REFERENCES identity.users(id),
+  PRIMARY KEY (product_id, user_id)
+);
+CREATE TABLE catalog.course_reviews (
+  product_id   text PRIMARY KEY REFERENCES catalog.products(id) ON DELETE CASCADE,
+  state        text NOT NULL CHECK (state IN ('submitted','changes_requested','approved')),
+  submitted_at timestamptz NOT NULL,
+  submitted_by text NOT NULL REFERENCES identity.users(id),
+  decided_at   timestamptz,
+  decided_by   text REFERENCES identity.users(id),
+  note         text,
+  CHECK (decided_by IS NULL OR decided_by <> submitted_by)
+);
+
 /* ======================= event log ======================= */
 CREATE SCHEMA IF NOT EXISTS events;
 

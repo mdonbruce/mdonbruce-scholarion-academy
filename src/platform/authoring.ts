@@ -437,7 +437,7 @@ export const authoring = {
     if (!identity.hasRole(r, "reviewer")) throw new PlatformError("forbidden", "Only reviewers can approve courses.", 403);
     const p = getDb().products.find((x) => x.id === courseId);
     if (!p || p.review?.state !== "submitted") throw new PlatformError("not_found", "Course isn't waiting for review", 404);
-    if (p.authorIds?.includes(reviewerId) && !r.roles.includes("platform_admin")) throw new PlatformError("own_course", "Someone else has to review your course.", 403);
+    if (p.authorIds?.includes(reviewerId) || p.review.submittedBy === reviewerId) throw new PlatformError("own_course", "Someone else has to review your course.", 403);
     if (decision === "changes" && !(note ?? "").trim()) throw new PlatformError("note_required", "Tell the author what to change.");
     if (decision === "approve") {
       const issues = this.checklist(reviewerId, courseId);

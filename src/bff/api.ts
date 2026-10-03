@@ -14,6 +14,7 @@ import {
   privacy,
   reviews,
   authoring,
+  content,
   live,
   lms,
   publicUser,
@@ -105,6 +106,9 @@ on("POST", "me/sessions/revoke-all", (c) => {
   identity.signOutEverywhere(c.user!.id);
   return redirectWithCookies(withQuery("/login", { notice: "Signed out on every device." }), [sessionCookie("", 0)]);
 }, "user");
+on("GET", "me/notifications", (c) => json({ unread: cx.unreadCount(c.user!.id), notifications: cx.notices(c.user!.id) }), "user");
+on("POST", "me/notifications/read-all", (c) => (cx.markAllRead(c.user!.id), redirect(withQuery("/app/notifications", { notice: "All caught up." }))), "user");
+on("POST", "me/notifications/:id/open", (c) => redirect(safeRedirect(cx.openNotice(c.user!.id, c.params.id), "/app")), "user");
 on("GET", "me/export", (c) => {
   const data = privacy.exportData(c.user!.id);
   return new Response(JSON.stringify(data, null, 2), { headers: { "content-type": "application/json; charset=utf-8", "content-disposition": `attachment; filename="scholarion-my-data-${new Date().toISOString().slice(0, 10)}.json"`, "cache-control": "no-store" } });
@@ -408,6 +412,25 @@ on("POST", "admin/course-reviews/:id/:decision", (c) => {
   const p = authoring.decide(c.user!.id, c.params.id, d, c.data.note);
   return redirect(withQuery("/admin/course-reviews", { notice: d === "approve" ? `${p.title} is published.` : "Changes requested. The author has been emailed." }));
 }, "reviewer");
+
+/* ---------------- Blog (staff) ---------------- */
+
+on("POST", "admin/blog", (c) => {
+  const hubs = Object.keys(c.data).filter((k) => k.startsWith("hub_") && c.data[k] === "on").map((k) => k.slice(4));
+  try {
+    const a = content.saveArticle(c.user!.id, { id: c.data.id || undefined, title: c.data.title ?? "", summary: c.data.summary ?? "", body: c.data.body ?? "", tags: c.data.tags, hubs, sources: c.data.sources });
+    return redirect(withQuery(`/admin/blog/${a.id}`, { notice: c.data.id ? "Saved." : "Draft created." }));
+  } catch (err) {
+    if (err instanceof PlatformError && err.code === "claims" && c.data.id) return redirect(withQuery(`/admin/blog/${c.data.id}`, { error: err.message }));
+    throw err;
+  }
+}, "staff");
+on("POST", "admin/blog/:id/publish", (c) => {
+  const a = content.publishArticle(c.user!.id, c.params.id);
+  return redirect(withQuery(`/admin/blog/${a.id}`, { notice: "Published." }));
+}, "staff");
+on("POST", "admin/blog/:id/unpublish", (c) => (content.unpublishArticle(c.user!.id, c.params.id), redirect(withQuery(`/admin/blog/${c.params.id}`, { notice: "Moved back to draft." }))), "staff");
+on("GET", "content/articles", () => json({ articles: content.articles().map(({ body: _b, authorId: _a, ...a }) => (void _b, void _a, a)) }));
 
 /* ---------------- Verified reviews ---------------- */
 

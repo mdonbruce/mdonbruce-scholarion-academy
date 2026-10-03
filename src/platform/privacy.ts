@@ -39,6 +39,7 @@ export const privacy = {
       liveAttendance: mine(db.attendance),
       organizations: teams.membershipsOf(userId).map((m) => ({ organization: m.org.name, via: m.member.via, joinedAt: m.member.joinedAt })),
       supportTickets: db.tickets.filter((t) => t.userId === userId).map((t) => ({ subject: t.subject, body: t.body, createdAt: t.createdAt, status: t.status })),
+      notifications: mine(db.notices).map((n) => ({ title: n.title, createdAt: n.createdAt, readAt: n.readAt ?? null })),
       emailsSent: db.outbox.filter((e) => e.to === u.email).map((e) => ({ subject: e.subject, createdAt: e.createdAt })),
     };
   },
@@ -110,6 +111,7 @@ export const privacy = {
     db.outbox = db.outbox.filter((e) => e.to !== email);
     db.authTokens = drop(db.authTokens);
     db.sessions = drop(db.sessions);
+    db.notices = drop(db.notices);
 
     // Tombstone the account.
     u.deletedAt = t;

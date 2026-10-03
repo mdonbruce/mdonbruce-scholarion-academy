@@ -10,6 +10,7 @@ export interface Viewer {
   name: string;
   roles: string[];
   orgAdminOf?: string;
+  unread?: number;
 }
 
 export function Brand({ compact = false, href = "/" }: { compact?: boolean; href?: string }) {
@@ -31,11 +32,11 @@ const EXPLORE = {
     ["Learn for free", "/explore?free=1"],
     ["Live programs", "/explore?format=live"],
   ],
-  Subjects: [
-    ["Agentic AI", "/explore?q=agentic"],
-    ["Python", "/explore?q=python"],
-    ["Data science", "/explore?q=data"],
-    ["Databases & SQL", "/explore?q=sql"],
+  Topics: [
+    ["Agentic AI", "/hubs/agentic-ai"],
+    ["Generative AI & LLMs", "/hubs/generative-ai"],
+    ["Python, data & databases", "/hubs/python-and-data"],
+    ["AI for business & leaders", "/hubs/ai-for-leaders"],
   ],
   "Product types": [
     ["Courses", "/explore?type=course"],
@@ -93,6 +94,7 @@ export function PublicHeader({ viewer, current }: { viewer: Viewer | null; curre
             {nav("/plus", "Scholarion Plus")}
             {nav("/pricing", "Pricing")}
             {nav("/teams", "For Teams")}
+            {nav("/blog", "Blog")}
           </nav>
           <div className="header-search" style={{ width: 240 }}>
             <SearchBox placeholder="What do you want to learn?" />
@@ -145,6 +147,8 @@ export function Footer() {
           {col("Learn", [
             ["Explore catalog", "/explore"],
             ["How the programs stack", "/programs"],
+            ["Topics", "/hubs"],
+            ["Blog", "/blog"],
             ["Scholarion Plus", "/plus"],
             ["Financial aid", "/financial-aid"],
           ])}
@@ -273,8 +277,13 @@ export function AppShell({ viewer, current, children }: { viewer: Viewer; curren
             <SearchBox placeholder="Search courses, content, or help…" />
           </div>
           <div className="row" style={{ marginLeft: "auto", gap: 16 }}>
-            <a href="/app/notifications" className="btn btn-ghost btn-sm" aria-label="Notifications">
+            <a href="/app/notifications" className="btn btn-ghost btn-sm bell" aria-label={viewer.unread ? `Notifications, ${viewer.unread} unread` : "Notifications"}>
               <Icon name="bell" size={18} />
+              {!!viewer.unread && (
+                <span className="bell-count" aria-hidden="true">
+                  {viewer.unread > 99 ? "99+" : viewer.unread}
+                </span>
+              )}
             </a>
             <div className="userchip">
               <span className="avatar" aria-hidden="true">

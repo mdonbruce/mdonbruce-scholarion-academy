@@ -6,6 +6,7 @@ import { emptyDb, getDb, setDb } from "../store";
 import { studio } from "../studio";
 import { teams } from "../teams";
 import type { Entitlement, HelpArticle, User } from "../types";
+import { ARTICLES } from "./articles";
 import { CERT_PY, COURSE_AGENTIC, COURSE_AI, COURSE_DB, COURSE_PY, PATHWAY, PRODUCTS, buildContent } from "./catalog-data";
 
 /**
@@ -191,6 +192,8 @@ export function seed(): void {
   post("pst_seed_5", "itm_cop1047c_m5_discussion", COURSE_PY, "usr_spam", "Selling exam answers, message me", "2026-10-02T10:00:00.000Z", null, ["usr_ngozi", "usr_amara"]);
   post("pst_seed_6", "itm_cai4505c_m6_discussion", COURSE_AI, "usr_amara", "Automated inference in triage tools is only as fair as the rules we encode. Who reviews the knowledge base when guidelines change?", "2026-09-29T15:00:00.000Z");
 
+  db.articles.push(...ARTICLES.map((a) => ({ ...a, authorId: "usr_admin" })));
+
   /* ---------- A credential holder (sandbox): Ngozi finished Agentic AI Foundations ---------- */
   // Goes through the real grade → course.passed → credential path, so the record is consistent.
   // No reviews are seeded: reviews on the site come only from real credential holders.
@@ -204,4 +207,5 @@ export function seed(): void {
   db.events = [];
   db.processed = [];
   db.outbox = [];
+  db.notices = [];
 }

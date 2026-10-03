@@ -47,7 +47,8 @@ State persists to `.data/db.json` when `SCHOLARION_PERSIST=1`. Run `npm run db:r
 11. **Security & privacy:** open *Security & Privacy* to turn on two-step sign-in, change your password, sign out everywhere, download your data as JSON, or delete your account. *Forgot password?* on the sign-in page emails a one-hour reset link (in the sandbox, open it from the HavenRoute outbox on the *Staff* home page). With `NODE_ENV=production` (or `REQUIRE_ADMIN_MFA=1`), platform admins must turn on two-step sign-in before any staff tool opens.
 12. **Verified reviews and certificate PDF:** sign in as Ngozi (the graduate). *Credentials* has *Download PDF* (a printable certificate with a QR code to the verification page) and *Review this program*. Reviews come only from credential holders; links, contact details or flagged claims hold a review for *Staff → Moderation*. The product page shows the rating, and its structured data includes it, only once real reviews exist.
 13. **Course builder:** as the instructor (or admin), open *Teach*, create a draft, add a module and items (reading, captioned video, quiz, lab with tests and a reference solution, project rubric). The checklist on the right lists everything blocking publication, including uncaptioned videos, short quizzes, labs whose reference solution fails its tests, and any credit, salary, outcome or institution claim. Submit for review; a reviewer approves under *Staff → Course reviews* and the course goes live. *Analytics* then shows completion per item and per-question difficulty.
-14. **Claims checker:** *Staff → Claims checker* blocks degree, credit, salary and unregistered-partner claims. `/degrees` returns 404.
+14. **Topics, blog and the app:** *Explore → Topics* opens the four hubs (programs, a comparison table, where to start, FAQ). The *Blog* has three editorial articles; staff write and publish under *Staff → Blog*, where the claims checker blocks credit, outcome and partner claims and requires sources for any figures. In a production build the site is installable (manifest, icons, service worker with an offline page; pages are never cached). The bell shows unread notifications; open one to mark it read.
+15. **Claims checker:** *Staff → Claims checker* blocks degree, credit, salary and unregistered-partner claims. `/degrees` returns 404.
 
 ## Architecture
 
@@ -110,6 +111,8 @@ docs/               Integration notes and ADRs
 | Account security & privacy | 1 | SIMULATED (email via HavenRoute outbox) |
 | Instructor course builder | 3 | SIMULATED |
 | Verified reviews & certificate PDF | 3 | SIMULATED |
+| Topic hubs & blog | 2 | SIMULATED |
+| Installable app & notifications | 2 | SIMULATED (Web Push planned) |
 | Partner Registry features | 5+ | PLANNED |
 | Degrees | 5+ | PLANNED |
 

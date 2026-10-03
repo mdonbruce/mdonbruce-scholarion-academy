@@ -35,7 +35,7 @@ import type {
   Subscription,
   Tenant,
   Ticket,
-  User, Review } from "./types";
+  User, Review, Notice, Article } from "./types";
 
 /**
  * In-process stand-in for the platform services' own databases.
@@ -96,6 +96,8 @@ export interface Db {
   applications: LiveApplication[];
   // Reviews (credential holders only)
   reviews: Review[];
+  notices: Notice[];
+  articles: Article[];
   // Partner Registry
   partners: Partner[];
   // Event bus log
@@ -103,7 +105,7 @@ export interface Db {
   processed: string[]; // consumer:eventId pairs already handled (idempotency)
 }
 
-export const DB_VERSION = 4;
+export const DB_VERSION = 5;
 
 export function emptyDb(): Db {
   return {
@@ -146,6 +148,8 @@ export function emptyDb(): Db {
     attendance: [],
     applications: [],
     reviews: [],
+    notices: [],
+    articles: [],
     partners: [],
     events: [],
     processed: [],

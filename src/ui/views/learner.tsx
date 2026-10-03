@@ -1,5 +1,5 @@
 import type { accountVM, calendarVM, courseHomeVM, credentialsVM, dashboardVM, gradebookVM, gradesOverviewVM, itemVM, liveVM, moduleVM, Viewer } from "@/bff/views";
-import type { OutboxEmail, Product } from "@/platform/types";
+import type { Notice, Product } from "@/platform/types";
 import { fmtDate, fmtDateTime, Progress, Stat, StatusBadge } from "../components/cards";
 import { AppShell, Crumbs, Flash } from "../components/chrome";
 import { LabWorkspace } from "../components/client/LabWorkspace";
@@ -1075,25 +1075,40 @@ export function CalendarView({ viewer, vm }: { viewer: V; vm: ReturnType<typeof 
   );
 }
 
-export function NotificationsView({ viewer, emails }: { viewer: V; emails: OutboxEmail[] }) {
+export function NotificationsView({ viewer, notices, flash }: { viewer: V; notices: Notice[]; flash?: FlashProps }) {
+  const unread = notices.filter((n) => !n.readAt).length;
   return (
     <AppShell viewer={viewer} current="/app/notifications">
-      <h1 className="page-title">Notifications</h1>
-      <p className="muted small">Messages sent to you by email through HavenRoute (simulated — shown here instead of being delivered).</p>
-      <div className="stack">
-        {emails.length === 0 && <div className="panel muted">No notifications yet.</div>}
-        {emails.map((e) => (
-          <details key={e.id} className="acc">
-            <summary>
-              <span>{e.subject}</span>
-              <span className="tiny muted">{fmtDateTime(e.createdAt)}</span>
-            </summary>
-            <div className="small" style={{ whiteSpace: "pre-line" }}>
-              {e.body}
-            </div>
-          </details>
-        ))}
+      <div className="row between" style={{ flexWrap: "wrap" }}>
+        <h1 className="page-title">Notifications</h1>
+        {unread > 0 && (
+          <form method="post" action="/api/v1/me/notifications/read-all">
+            <button className="btn btn-outline btn-sm">Mark all as read</button>
+          </form>
+        )}
       </div>
+      {flash && <Flash {...flash} />}
+      <p className="muted small">Receipts, deadlines, decisions and credential news. Each also goes to your email; sign-in links are only ever emailed.</p>
+      {notices.length === 0 && <div className="panel muted">No notifications yet.</div>}
+      <ul className="stack" style={{ listStyle: "none", padding: 0 }}>
+        {notices.map((n) => (
+          <li key={n.id} className="card card-pad" style={n.readAt ? undefined : { borderLeft: "4px solid var(--primary)" }}>
+            <div className="row between" style={{ flexWrap: "wrap" }}>
+              <strong className="small">
+                {!n.readAt && <span className="sr-only">Unread: </span>}
+                {n.title}
+              </strong>
+              <span className="tiny muted">{fmtDateTime(n.createdAt)}</span>
+            </div>
+            <p className="small" style={{ whiteSpace: "pre-line", margin: "6px 0" }}>
+              {n.body}
+            </p>
+            <form method="post" action={`/api/v1/me/notifications/${n.id}/open`}>
+              <button className="btn btn-ghost btn-sm">{n.readAt ? "Open" : "Open and mark read"}</button>
+            </form>
+          </li>
+        ))}
+      </ul>
     </AppShell>
   );
 }
