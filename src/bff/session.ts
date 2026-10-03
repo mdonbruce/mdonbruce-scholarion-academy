@@ -21,5 +21,6 @@ export async function requireUser(next: string): Promise<User> {
 export async function requireRole(next: string, ...roles: Parameters<typeof identity.hasRole>[1][]): Promise<User> {
   const u = await requireUser(next);
   if (!identity.hasRole(u, ...roles)) redirect("/app");
+  if (identity.needsMfaSetup(u)) redirect("/app/security?required=1");
   return u;
 }

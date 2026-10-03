@@ -16,5 +16,5 @@ export default async function Page({ searchParams }: { searchParams: SP }) {
     { label: "Admin", ...DEMO.admin },
     { label: "Auditing learner", ...DEMO.visitor },
   ];
-  return <LoginView next={next} error={one(sp.error)} demo={demo} />;
+  return <LoginView next={next} error={one(sp.error)} notice={one(sp.notice)} demo={demo} />;
 }

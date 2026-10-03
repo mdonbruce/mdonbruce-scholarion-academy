@@ -2,7 +2,7 @@
 
 The public website, learner app and BFF for **Scholarion Academy** — "Learn. Earn. Build Your Future." Built on the Scholarion platform per the *Master Build Prompt* and the *Platform Integration Spec*.
 
-This is the **Phase 1 + integrations** build, plus Scholarion for Teams, course discussions and peer review. Phase 1 screens are complete. All nine platform connections — Catalog & Pathways, Commerce, LMS, Cloud Lab, AI Tutor, Credentials, Studio, HavenConnect/HavenRoute, and the Zoom/Webex live engine — are wired end to end against in-process stand-ins. Every stand-in reports **SIMULATED** on the status board until its real service is connected.
+This is the **Phase 1 + integrations** build, plus Scholarion for Teams, course discussions, peer review, live program admissions with payment plans, and account security & privacy (email confirmation, password reset, two-step sign-in, data export and account deletion). Phase 1 screens are complete. All nine platform connections — Catalog & Pathways, Commerce, LMS, Cloud Lab, AI Tutor, Credentials, Studio, HavenConnect/HavenRoute, and the Zoom/Webex live engine — are wired end to end against in-process stand-ins. Every stand-in reports **SIMULATED** on the status board until its real service is connected.
 
 ## Run it
 
@@ -22,7 +22,7 @@ npm run build          # production build (type-checks)
 | Role | Email | Password |
 | --- | --- | --- |
 | Learner (Plus annual, live seat in #26, three courses in progress) | `amara@demo.scholarion.test` | `LearnEarnBuild1` |
-| Admin, reviewer, instructor, support | `admin@demo.scholarion.test` | `ScholarionAdmin1` |
+| Admin, reviewer, instructor, support (two-step sign-in on; the development sign-in page shows the current code, or add key `JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP` to an authenticator app) | `admin@demo.scholarion.test` | `ScholarionAdmin1` |
 | Instructor | `faculty@demo.scholarion.test` | `ScholarionFaculty1` |
 | Auditing learner with an aid application in review | `tunde@demo.scholarion.test` | `LearnEarnBuild2` |
 | Organization admin, Brightpath Health (demo) | `orgadmin@demo.scholarion.test` | `ScholarionTeams1` |
@@ -42,7 +42,9 @@ State persists to `.data/db.json` when `SCHOLARION_PERSIST=1`. Run `npm run db:r
 7. **Teams:** sign in as the organization admin and open *My Organization*: seats, the curated academy, progress per person, invitations, organization sign-in and CSV export. Sign in as Chidi to join with organization sign-in. The Riverbend Logistics organization is never visible to Brightpath.
 8. **Peer review:** as Amara, submit the Module 5 mini project, then review the two waiting classmates. Grades post when two reviews are received and two given; if reviewers disagree by more than 25% of the maximum, the project goes to *Staff → Grading*.
 9. **Discussions:** post and reply on the Module 5 discussion; report a post; hide it under *Staff → Moderation*.
-10. **Claims checker:** *Staff → Claims checker* blocks degree, credit, salary and unregistered-partner claims. `/degrees` returns 404.
+10. **Live admissions:** as Tunde, open the #15 live program and choose *Apply*. As admin, accept it under *Staff → Admissions*. Back as Tunde, reserve the seat in full or in 3 monthly installments; onboarding then appears in *Live Sessions*. Advance the sandbox clock to see each installment charged.
+11. **Security & privacy:** open *Security & Privacy* to turn on two-step sign-in, change your password, sign out everywhere, download your data as JSON, or delete your account. *Forgot password?* on the sign-in page emails a one-hour reset link (in the sandbox, open it from the HavenRoute outbox on the *Staff* home page). With `NODE_ENV=production` (or `REQUIRE_ADMIN_MFA=1`), platform admins must turn on two-step sign-in before any staff tool opens.
+12. **Claims checker:** *Staff → Claims checker* blocks degree, credit, salary and unregistered-partner claims. `/degrees` returns 404.
 
 ## Architecture
 

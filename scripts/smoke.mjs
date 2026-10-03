@@ -3,6 +3,8 @@
  * Loads every page as a visitor, a learner and an admin, and drives the key form flows.
  *   BASE_URL=http://localhost:3000 node scripts/smoke.mjs
  */
+import { createHmac } from "node:crypto";
+
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 let failures = 0;
 
@@ -26,9 +28,34 @@ async function expect(label, path, status, opts) {
   return { r, text };
 }
 
+/** RFC 6238 TOTP for the seeded demo admin (two-step sign-in is on for that account). */
+const DEMO_ADMIN_TOTP_SECRET = "JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP";
+function totp(secret) {
+  const A = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+  let bits = 0, value = 0;
+  const key = [];
+  for (const ch of secret) {
+    value = (value << 5) | A.indexOf(ch);
+    bits += 5;
+    if (bits >= 8) { key.push((value >>> (bits - 8)) & 255); bits -= 8; }
+  }
+  const msg = Buffer.alloc(8);
+  msg.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30000)));
+  const h = createHmac("sha1", Buffer.from(key)).update(msg).digest();
+  const o = h[h.length - 1] & 0xf;
+  return String((((h[o] & 0x7f) << 24) | (h[o + 1] << 16) | (h[o + 2] << 8) | h[o + 3]) % 1e6).padStart(6, "0");
+}
+
 async function signIn(email, password) {
-  const r = await req("/api/v1/auth/signin", { method: "POST", form: { email, password, redirect: "/app" } });
-  const c = r.headers.get("set-cookie");
+  let r = await req("/api/v1/auth/signin", { method: "POST", form: { email, password, redirect: "/app" } });
+  if (r.status === 303 && (r.headers.get("location") ?? "").includes("/login/mfa")) {
+    const pending = r.headers.getSetCookie().find((x) => x.startsWith("sch_mfa="));
+    await expect("two-step sign-in page", "/login/mfa", 200, { cookie: pending?.split(";")[0] });
+    r = await req("/api/v1/auth/mfa", { method: "POST", cookie: pending?.split(";")[0], form: { code: totp(DEMO_ADMIN_TOTP_SECRET) } });
+    if (r.status !== 303) failures++;
+    console.log(`${r.status === 303 ? "ok  " : "FAIL"} ${r.status} admin two-step code accepted`);
+  }
+  const c = r.headers.getSetCookie().find((x) => !x.startsWith("sch_mfa="));
   if (r.status !== 303 || !c) {
     failures++;
     console.log(`FAIL sign in ${email} (${r.status})`);
@@ -37,11 +64,11 @@ async function signIn(email, password) {
   return c.split(";")[0];
 }
 
-const PUBLIC = ["/", "/explore", "/explore?q=agentic%20ai&free=1&level=Beginner", "/explore?q=pythn", "/programs", "/plus", "/pricing", "/financial-aid", "/teams", "/teams?kind=partner", "/help", "/help?q=cancel", "/verify", "/login", "/signup", "/learn/python-programming-cop1047c", "/learn/agentic-ai-foundations", "/learn/26-agentic-ai-systems-design-7-week-live-intensive", "/learn/17-generative-ai-professional-pathway", "/robots.txt", "/sitemap.xml", "/api/v1/status", "/api/v1/catalog/products?q=llm"];
+const PUBLIC = ["/", "/explore", "/explore?q=agentic%20ai&free=1&level=Beginner", "/explore?q=pythn", "/programs", "/plus", "/pricing", "/financial-aid", "/teams", "/teams?kind=partner", "/help", "/help?q=cancel", "/verify", "/login", "/signup", "/learn/python-programming-cop1047c", "/learn/agentic-ai-foundations", "/learn/26-agentic-ai-systems-design-7-week-live-intensive", "/learn/17-generative-ai-professional-pathway", "/forgot-password", "/learn/26-agentic-ai-systems-design-7-week-live-intensive/apply", "/robots.txt", "/sitemap.xml", "/api/v1/status", "/api/v1/catalog/products?q=llm"];
 
-const LEARNER = ["/app", "/app/courses", "/app/calendar", "/app/live", "/app/grades", "/app/credentials", "/app/tutor", "/app/proctoring", "/app/account", "/app/notifications", "/app/onboarding", "/app/course/prd_cop1047c", "/app/course/prd_cop1047c/modules", "/app/course/prd_cop1047c/module/5", "/app/course/prd_cop1047c/grades", "/app/course/prd_cop1047c/resources", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_lesson", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_reading", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_lab", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_quiz", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_project", "/app/course/prd_cop1047c/item/itm_cop1047c_capstone", "/app/course/prd_cai4505c/module/6", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_discussion", "/app/course/prd_cai4505c/item/itm_cai4505c_m6_discussion", "/financial-aid/apply?product=16-certificate-in-agentic-ai-for-developers"];
+const LEARNER = ["/app", "/app/courses", "/app/calendar", "/app/live", "/app/grades", "/app/credentials", "/app/tutor", "/app/proctoring", "/app/account", "/app/security", "/learn/26-agentic-ai-systems-design-7-week-live-intensive/apply", "/app/notifications", "/app/onboarding", "/app/course/prd_cop1047c", "/app/course/prd_cop1047c/modules", "/app/course/prd_cop1047c/module/5", "/app/course/prd_cop1047c/grades", "/app/course/prd_cop1047c/resources", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_lesson", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_reading", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_lab", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_quiz", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_project", "/app/course/prd_cop1047c/item/itm_cop1047c_capstone", "/app/course/prd_cai4505c/module/6", "/app/course/prd_cop1047c/item/itm_cop1047c_m5_discussion", "/app/course/prd_cai4505c/item/itm_cai4505c_m6_discussion", "/financial-aid/apply?product=16-certificate-in-agentic-ai-for-developers"];
 
-const ADMIN = ["/admin", "/admin/moderation", "/admin/aid", "/admin/grading", "/admin/studio", "/admin/live", "/admin/support", "/admin/claims?text=accredited%20degree"];
+const ADMIN = ["/admin", "/admin/admissions", "/app/security", "/admin/moderation", "/admin/aid", "/admin/grading", "/admin/studio", "/admin/live", "/admin/support", "/admin/claims?text=accredited%20degree"];
 
 console.log(`Smoke testing ${BASE}`);
 for (const p of PUBLIC) await expect("public", p, 200);

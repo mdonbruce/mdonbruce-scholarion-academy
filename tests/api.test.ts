@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { beforeEach, describe, it } from "node:test";
 import { handleApi } from "../src/bff/api";
+import { totp } from "../src/platform/totp";
+import { DEMO_ADMIN_TOTP_SECRET } from "../src/platform/seed";
 import { fresh } from "./helpers";
 
 /** BFF router tests over real Request/Response objects (no Next.js needed). */
@@ -23,9 +25,15 @@ async function call(method: string, path: string, opts: { form?: Record<string, 
 }
 
 async function signIn(email = "amara@demo.scholarion.test", password = "LearnEarnBuild1") {
-  const res = await call("POST", "auth/signin", { form: { email, password } });
+  let res = await call("POST", "auth/signin", { form: { email, password } });
   assert.equal(res.status, 303);
-  const cookie = res.headers.get("set-cookie")!;
+  if (res.headers.get("location")?.includes("/login/mfa")) {
+    // Two-step sign-in (the demo admin has it on).
+    const pending = res.headers.getSetCookie().find((c) => c.startsWith("sch_mfa="))!.split(";")[0];
+    res = await call("POST", "auth/mfa", { form: { code: totp(DEMO_ADMIN_TOTP_SECRET) }, cookie: pending });
+    assert.equal(res.status, 303);
+  }
+  const cookie = res.headers.getSetCookie().find((c) => !c.startsWith("sch_mfa="))!;
   assert.match(cookie, /HttpOnly/);
   assert.match(cookie, /SameSite=Lax/);
   return cookie.split(";")[0];
@@ -97,5 +105,30 @@ describe("BFF router", () => {
   it("verifies credentials publicly", async () => {
     const r = await call("GET", "credentials/verify/crd_missing");
     assert.equal(((await r.json()) as { status: string }).status, "not_found");
+  });
+  it("runs two-step sign-in with a SameSite=Strict pending cookie", async () => {
+    const r = await call("POST", "auth/signin", { form: { email: "admin@demo.scholarion.test", password: "ScholarionAdmin1", redirect: "/admin" } });
+    assert.equal(r.status, 303);
+    assert.match(r.headers.get("location")!, /\/login\/mfa/);
+    const pending = r.headers.getSetCookie().find((c) => c.startsWith("sch_mfa="))!;
+    assert.match(pending, /SameSite=Strict/);
+    assert.ok(!r.headers.getSetCookie().some((c) => c.startsWith("sch_session=") && !/Max-Age=0/.test(c)));
+    const bad = await call("POST", "auth/mfa", { form: { code: "000000" }, cookie: pending.split(";")[0] });
+    assert.notEqual(bad.headers.getSetCookie().some((c) => /sch_session=[^;]+/.test(c) && !/Max-Age=0/.test(c)), true);
+    const ok = await call("POST", "auth/mfa", { form: { code: totp(DEMO_ADMIN_TOTP_SECRET) }, cookie: pending.split(";")[0] });
+    assert.equal(ok.status, 303);
+    assert.equal(new URL(ok.headers.get("location")!, BASE).pathname, "/admin");
+  });
+
+  it("downloads my data and deletes my account", async () => {
+    const cookie = await signIn();
+    const ex = await call("GET", "me/export", { cookie });
+    assert.equal(ex.status, 200);
+    assert.match(ex.headers.get("content-disposition")!, /attachment/);
+    assert.equal(((await ex.json()) as { account: { email: string } }).account.email, "amara@demo.scholarion.test");
+    assert.notEqual((await call("GET", "me/export")).status, 200);
+    const del = await call("POST", "me/delete", { form: { password: "LearnEarnBuild1", confirm: "DELETE" }, cookie });
+    assert.equal(del.status, 303);
+    assert.notEqual((await call("GET", "me/export", { cookie })).status, 200);
   });
 });

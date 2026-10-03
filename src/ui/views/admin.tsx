@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { adminVM, aidQueueVM, claimsVM, gradingVM, liveAdminVM, moderationVM, studioVM, supportVM, Viewer } from "@/bff/views";
+import type { adminVM, admissionsVM, aidQueueVM, claimsVM, gradingVM, liveAdminVM, moderationVM, studioVM, supportVM, Viewer } from "@/bff/views";
 import { fmtDateTime, StatusBadge } from "../components/cards";
 import { AppShell, Flash } from "../components/chrome";
 
@@ -16,6 +16,7 @@ function AdminTabs({ current }: { current: string }) {
     <nav className="tabs" aria-label="Admin sections">
       {t("/admin", "Status & events")}
       {t("/admin/aid", "Financial aid")}
+      {t("/admin/admissions", "Admissions")}
       {t("/admin/grading", "Grading")}
       {t("/admin/studio", "Studio review")}
       {t("/admin/moderation", "Moderation")}
@@ -142,6 +143,12 @@ export function AdminHomeView({ viewer, vm, flash }: { viewer: V; vm: ReturnType
                       <div className="tiny muted">
                         to {m.to} · {m.template}
                       </div>
+                      {vm.showEmailBodies && (
+                        <details className="tiny">
+                          <summary>Show email (sandbox)</summary>
+                          <pre style={{ whiteSpace: "pre-wrap", margin: "4px 0 0" }}>{m.body}</pre>
+                        </details>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -491,6 +498,54 @@ export function AdminModerationView({ viewer, vm, flash }: { viewer: V; vm: Retu
                 Open discussion
               </a>
             </div>
+          </section>
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
+export function AdminAdmissionsView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<typeof admissionsVM>; flash: FlashProps }) {
+  return (
+    <Shell viewer={viewer} current="/admin/admissions" title="Live program admissions" flash={flash}>
+      <p className="small muted">Accepting holds a seat until the applicant reserves it. When a cohort is full, waitlist instead.</p>
+      {vm.length === 0 && <div className="panel muted">No applications waiting.</div>}
+      <div className="stack">
+        {vm.map((a) => (
+          <section key={a.id} className="card card-pad stack" style={{ ["--gap" as string]: "8px" }}>
+            <div className="row between">
+              <span>
+                <strong>{a.applicant}</strong> · {a.product?.code} {a.product?.title} · {a.cohort}
+              </span>
+              <span className="row" style={{ ["--gap" as string]: "6px" }}>
+                <span className={`badge ${a.capacity.free > 0 ? "badge-green" : "badge-red"}`}>
+                  {a.capacity.free} of {a.capacity.total} seats open
+                </span>
+                {a.status === "waitlisted" && <span className="badge badge-amber">Waitlisted</span>}
+              </span>
+            </div>
+            <p className="small" style={{ margin: 0 }}>
+              <strong>Experience:</strong> {a.experience}
+            </p>
+            <p className="small" style={{ margin: 0 }}>
+              <strong>Motivation:</strong> {a.motivation}
+            </p>
+            <span className="tiny muted">Applied {fmtDateTime(a.createdAt)}</span>
+            <form method="post" action={`/api/v1/admin/admissions/${a.id}/decide`} className="row">
+              <label htmlFor={`note-${a.id}`} className="sr-only">
+                Note to applicant
+              </label>
+              <input id={`note-${a.id}`} name="note" type="text" placeholder="Optional note to the applicant" style={{ flex: 1, minWidth: 220 }} />
+              <button className="btn btn-primary btn-sm" name="decision" value="accepted" disabled={a.capacity.free <= 0}>
+                Accept
+              </button>
+              <button className="btn btn-ghost btn-sm" name="decision" value="waitlisted" disabled={a.status === "waitlisted"}>
+                Waitlist
+              </button>
+              <button className="btn btn-danger btn-sm" name="decision" value="declined">
+                Decline
+              </button>
+            </form>
           </section>
         ))}
       </div>

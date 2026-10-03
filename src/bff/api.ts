@@ -10,9 +10,11 @@ import {
   entitlements,
   getDb,
   identity,
+  privacy,
   live,
   lms,
   publicUser,
+  admissions,
   community,
   studio,
   teams,
@@ -24,7 +26,7 @@ import {
   type User,
 } from "@/platform";
 import { DAY, PlatformError } from "@/platform/util";
-import { body, currentUser, errorResponse, json, redirect, safeRedirect, sameOrigin, sessionCookie, withQuery } from "./http";
+import { body, currentUser, errorResponse, json, mfaCookie, readCookie, MFA_COOKIE, redirect, redirectWithCookies, safeRedirect, sameOrigin, sessionCookie, withQuery } from "./http";
 
 /**
  * Academy BFF — the only door the browser uses (Integration Spec §2, rule 1).
@@ -61,9 +63,53 @@ const back = (c: Ctx, fallback: string) => safeRedirect(c.data.redirect || c.dat
 /* ---------------- Auth ---------------- */
 
 on("POST", "auth/signin", (c) => {
-  const s = identity.signIn(c.data.email ?? "", c.data.password ?? "");
-  return redirect(back(c, "/app"), { "set-cookie": sessionCookie(s.token, 14 * 86400) });
+  const next = back(c, "/app");
+  const r = identity.beginSignIn(c.data.email ?? "", c.data.password ?? "", next);
+  if ("mfaToken" in r) return redirectWithCookies(withQuery("/login/mfa", { next }), [mfaCookie(r.mfaToken, 300)]);
+  return redirect(next, { "set-cookie": sessionCookie(r.session.token, 14 * 86400) });
 });
+on("POST", "auth/mfa", (c) => {
+  const r = identity.completeMfa(readCookie(c.req, MFA_COOKIE) ?? "", c.data.code ?? "");
+  return redirectWithCookies(safeRedirect(r.next, "/app"), [sessionCookie(r.session.token, 14 * 86400), mfaCookie("", 0)]);
+});
+on("POST", "auth/forgot", (c) => {
+  identity.requestPasswordReset(c.data.email ?? "");
+  return redirect(withQuery("/forgot-password", { sent: "1" }));
+});
+on("POST", "auth/reset", (c) => {
+  if ((c.data.password ?? "") !== (c.data.confirm ?? "")) throw new PlatformError("mismatch", "The two passwords don't match.");
+  identity.resetPassword(c.data.token ?? "", c.data.password ?? "");
+  return redirect(withQuery("/login", { notice: "Password changed. Sign in with your new password." }));
+});
+on("POST", "auth/verify-email", (c) => {
+  identity.verifyEmail(c.data.token ?? "");
+  return redirect(withQuery(c.user ? "/app" : "/login", { notice: "Email confirmed. Thank you." }));
+});
+
+/* ---------------- Account security & privacy ---------------- */
+
+const SEC = "/app/security";
+on("POST", "me/verification/resend", (c) => (identity.sendVerification(c.user!.id), redirect(withQuery(SEC, { notice: "We've sent a new confirmation link. Check your email." }))), "user");
+on("POST", "me/password", (c) => {
+  if ((c.data.next ?? "") !== (c.data.confirm ?? "")) throw new PlatformError("mismatch", "The two new passwords don't match.");
+  identity.changePassword(c.user!.id, c.data.current ?? "", c.data.next ?? "");
+  return redirect(withQuery(SEC, { notice: "Password changed." }));
+}, "user");
+on("POST", "me/mfa/setup", (c) => (identity.beginMfaSetup(c.user!.id), redirect(withQuery(SEC, { setup: "1" }))), "user");
+on("POST", "me/mfa/confirm", (c) => (identity.confirmMfaSetup(c.user!.id, c.data.code ?? ""), redirect(withQuery(SEC, { notice: "Two-step sign-in is on." }))), "user");
+on("POST", "me/mfa/disable", (c) => (identity.disableMfa(c.user!.id, c.data.password ?? "", c.data.code ?? ""), redirect(withQuery(SEC, { notice: "Two-step sign-in is off." }))), "user");
+on("POST", "me/sessions/revoke-all", (c) => {
+  identity.signOutEverywhere(c.user!.id);
+  return redirectWithCookies(withQuery("/login", { notice: "Signed out on every device." }), [sessionCookie("", 0)]);
+}, "user");
+on("GET", "me/export", (c) => {
+  const data = privacy.exportData(c.user!.id);
+  return new Response(JSON.stringify(data, null, 2), { headers: { "content-type": "application/json; charset=utf-8", "content-disposition": `attachment; filename="scholarion-my-data-${new Date().toISOString().slice(0, 10)}.json"`, "cache-control": "no-store" } });
+}, "user");
+on("POST", "me/delete", (c) => {
+  privacy.deleteAccount(c.user!.id, c.data.password ?? "", c.data.confirm ?? "");
+  return redirectWithCookies(withQuery("/", { notice: "Your account and personal data were deleted." }), [sessionCookie("", 0)]);
+}, "user");
 on("POST", "auth/signup", (c) => {
   const u = identity.signUp({ name: c.data.name ?? "", email: c.data.email ?? "", password: c.data.password ?? "", acceptTerms: c.data.acceptTerms === "on" || c.data.acceptTerms === "true" });
   const s = identity.createSession(u.id, "academy-public");
@@ -210,7 +256,8 @@ on(
     const plan = c.data.plan as PlanCode;
     if (!["program_monthly", "plus_monthly", "plus_annual", "one_time", "live_seat"].includes(plan)) throw new PlatformError("invalid_plan", "Choose a plan.");
     const product = c.data.productId ? catalog.get(c.data.productId) : undefined;
-    const cs = commerce.createCheckout({ userId: c.user!.id, plan, productId: product?.id ?? null, idempotencyKey: c.data.idempotencyKey || `${c.user!.id}:${plan}:${product?.id ?? "plus"}:${new Date().toISOString().slice(0, 13)}` });
+    const installments = plan === "live_seat" && c.data.installments === "3" ? 3 : undefined;
+    const cs = commerce.createCheckout({ userId: c.user!.id, plan, productId: product?.id ?? null, installments, idempotencyKey: c.data.idempotencyKey || `${c.user!.id}:${plan}:${product?.id ?? "plus"}:${installments ?? 1}:${new Date().toISOString().slice(0, 13)}` });
     return redirect(`/checkout/${cs.id}`);
   },
   "user",
@@ -365,6 +412,29 @@ on("POST", "teams/orgs/:id/sso-join", (c) => {
   return redirect(withQuery("/app", { notice: `Signed in with ${o.name}. Your organization's programs are below.` }));
 }, "user");
 
+/* ---------------- Live admissions ---------------- */
+
+on("POST", "live/applications", (c) => {
+  const p = catalog.get(c.data.productId ?? "");
+  if (!p) throw new PlatformError("not_found", "Program not found", 404);
+  admissions.apply({ userId: c.user!.id, productId: p.id, experience: c.data.experience ?? "", motivation: c.data.motivation ?? "" });
+  return redirect(withQuery(`/learn/${p.slug}/apply`, { notice: "Application sent. We'll email you a decision." }));
+}, "user");
+on("POST", "live/applications/:id/withdraw", (c) => {
+  const a = admissions.withdraw(c.params.id, c.user!.id);
+  return redirect(withQuery(`/learn/${catalog.get(a.productId)?.slug}/apply`, { notice: "Application withdrawn." }));
+}, "user");
+on("POST", "live/applications/:id/onboard", (c) => {
+  admissions.onboard(c.params.id, c.user!.id, c.data.ack === "on");
+  return redirect(withQuery("/app/live", { notice: "You're onboarded. See you at the first session." }));
+}, "user");
+on("POST", "admin/admissions/:id/decide", (c) => {
+  const decision = c.data.decision as "accepted" | "waitlisted" | "declined";
+  if (!["accepted", "waitlisted", "declined"].includes(decision)) throw new PlatformError("invalid", "Choose a decision.");
+  admissions.decide(c.params.id, c.user!.id, decision, c.data.note ?? "");
+  return redirect(withQuery("/admin/admissions", { notice: `Applicant ${decision}. They've been emailed.` }));
+}, "reviewer");
+
 /* ---------------- Community & peer review ---------------- */
 
 on("POST", "community/posts", (c) => {
@@ -447,6 +517,10 @@ export async function handleApi(req: Request, path: string): Promise<Response> {
       }
       const need = { user: [], staff: ["instructor"], reviewer: ["reviewer"], admin: ["platform_admin"] }[route.auth] as never[];
       if (need.length && !identity.hasRole(ctx.user, ...need)) return json({ error: { code: "forbidden", message: "You don't have access to this." } }, 403);
+      if (need.length && identity.needsMfaSetup(ctx.user)) {
+        if (method !== "GET" && (data.redirect || data.back || !req.headers.get("content-type")?.includes("json"))) return redirect(withQuery("/app/security", { required: "1" }));
+        return json({ error: { code: "mfa_required", message: "Turn on two-step sign-in to use admin tools." } }, 403);
+      }
     }
     return await route.handler(ctx);
   } catch (err) {

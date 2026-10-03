@@ -1,4 +1,5 @@
 import { publish } from "./bus";
+import { admissions } from "./admissions";
 import { catalog } from "./catalog";
 import { commerceConfig, money } from "./config";
 import { entitlements } from "./entitlements";
@@ -55,7 +56,7 @@ export const commerce = {
         interval: "once",
         includes: ["All live sessions for your cohort", "Mentor Q&A", "Recordings with captions", "Certificate on completion"],
         excludes: ["Not included in Scholarion Plus"],
-        renewalTerms: "One-time payment after acceptance. Installments available on request.",
+        renewalTerms: `Apply first. If you're accepted, pay in full or in 3 monthly installments of ${money(Math.ceil((c.oneTime(p.type, p.hours) / 3) * 100) / 100)}. Cohort of ${p.livePlan?.capacity ?? "limited"} seats.`,
         placeholder: true,
       });
     } else if (p.type === "guided_project" || p.type === "course") {
@@ -130,7 +131,7 @@ export const commerce = {
   },
 
   /** POST /v1/commerce/checkout-sessions (idempotent). */
-  createCheckout(input: { userId: string; plan: PlanCode; productId: string | null; idempotencyKey: string }): CheckoutSession {
+  createCheckout(input: { userId: string; plan: PlanCode; productId: string | null; idempotencyKey: string; installments?: number }): CheckoutSession {
     const db = getDb();
     const existing = db.checkouts.find((c) => c.idempotencyKey === input.idempotencyKey && c.userId === input.userId);
     if (existing) return existing;
@@ -142,12 +143,20 @@ export const commerce = {
     if (input.plan.startsWith("plus") && db.subscriptions.some((s) => s.userId === input.userId && s.plan.startsWith("plus") && (s.status === "active" || s.status === "trialing"))) {
       throw new PlatformError("already_subscribed", "You already have Scholarion Plus.", 409);
     }
+    let installments: number | undefined;
+    if (input.plan === "live_seat") {
+      if (!admissions.canReserve(input.userId, product!.id)) {
+        throw new PlatformError("apply_first", "Live seats are reserved after your application is accepted. Apply from the program page.", 403);
+      }
+      installments = input.installments === 3 ? 3 : 1;
+    }
     const start = nowIso();
     const hadTrial = db.subscriptions.some((s) => s.userId === input.userId && s.trialEnd);
     const trialEndsAt = input.plan === "plus_monthly" && !hadTrial ? addDays(start, c.trialDays) : null;
     const amount =
       input.plan === "plus_monthly" ? c.plusMonthly : input.plan === "plus_annual" ? c.plusAnnual : input.plan === "program_monthly" ? c.programMonthly : c.oneTime(product!.type, product!.hours);
-    const renewsAt = input.plan === "one_time" || input.plan === "live_seat" ? null : trialEndsAt ?? periodEnd(start, input.plan);
+    const installmentAmount = installments && installments > 1 ? Math.ceil((amount / installments) * 100) / 100 : undefined;
+    const renewsAt = input.plan === "one_time" || (input.plan === "live_seat" && !installmentAmount) ? null : installmentAmount ? addDays(start, 30) : trialEndsAt ?? periodEnd(start, input.plan);
     const session: CheckoutSession = {
       id: newId("cs"),
       userId: input.userId,
@@ -164,6 +173,8 @@ export const commerce = {
             ? `Refunds within ${c.refundDays} days if you have not completed graded work.`
             : "Monthly payments are not refunded; cancel any time and keep access to the end of the month.",
       status: "open",
+      installments,
+      installmentAmount,
       idempotencyKey: input.idempotencyKey,
       createdAt: start,
     };
@@ -186,12 +197,32 @@ export const commerce = {
     const product = cs.productId ? catalog.get(cs.productId) : undefined;
     const t = nowIso();
     const orderId = newId("ord");
-    const charged = cs.trialEndsAt ? 0 : cs.amount;
-    db.orders.push({ id: orderId, userId, sessionId: cs.id, amount: charged, currency: cs.currency, description: planLabel(cs.plan, product) + (cs.trialEndsAt ? " (free trial)" : ""), status: "paid", createdAt: t });
+    const charged = cs.trialEndsAt ? 0 : cs.installmentAmount ?? cs.amount;
+    const suffix = cs.trialEndsAt ? " (free trial)" : cs.installmentAmount ? ` (installment 1 of ${cs.installments})` : "";
+    db.orders.push({ id: orderId, userId, sessionId: cs.id, amount: charged, currency: cs.currency, description: planLabel(cs.plan, product) + suffix, status: "paid", createdAt: t });
 
     let subscription: Subscription | undefined;
     if (cs.plan === "one_time" || cs.plan === "live_seat") {
       entitlements.grant({ userId, resource: { kind: "product", id: cs.productId! }, level: cs.plan === "live_seat" ? "live_seat" : "full", source: "purchase", sourceRef: orderId });
+      if (cs.plan === "live_seat" && cs.installmentAmount && cs.installments) {
+        subscription = {
+          id: cs.id.replace("cs_", "sub_"),
+          userId,
+          plan: "live_seat",
+          productId: cs.productId,
+          status: "active",
+          currentPeriodStart: t,
+          currentPeriodEnd: addDays(t, 30),
+          trialEnd: null,
+          cancelAtPeriodEnd: false,
+          amount: cs.installmentAmount,
+          installmentsTotal: cs.installments,
+          installmentsPaid: 1,
+          createdAt: t,
+        };
+        db.subscriptions.push(subscription);
+      }
+      if (cs.plan === "live_seat") admissions.markReserved(userId, cs.productId!, cs.installmentAmount ? "installments" : "full");
       publish("order.paid", "commerce", `user/${userId}`, { userId, orderId, productId: cs.productId, plan: cs.plan, amount: charged });
     } else {
       subscription = {
@@ -313,6 +344,18 @@ export const commerce = {
           publish("subscription.renewed", "commerce", `user/${s.userId}`, { userId: s.userId, subscriptionId: s.id, periodEnd: s.currentPeriodEnd, amount: s.amount });
           r.converted++;
         }
+      } else if (s.status === "active" && s.installmentsTotal && t >= s.currentPeriodEnd) {
+        // Payment plan: charge the next installment; the plan completes after the last one.
+        const n = (s.installmentsPaid ?? 1) + 1;
+        s.installmentsPaid = n;
+        db.orders.push({ id: newId("ord"), userId: s.userId, sessionId: s.id.replace("sub_", "cs_"), amount: s.amount, currency: commerceConfig.currency, description: `${planLabel(s.plan, s.productId ? catalog.get(s.productId) : null)} (installment ${n} of ${s.installmentsTotal})`, status: "paid", createdAt: t });
+        if (n >= s.installmentsTotal) s.status = "completed";
+        else {
+          s.currentPeriodStart = s.currentPeriodEnd;
+          s.currentPeriodEnd = addDays(s.currentPeriodEnd, 30);
+        }
+        publish("order.paid", "commerce", `user/${s.userId}`, { userId: s.userId, subscriptionId: s.id, plan: s.plan, amount: s.amount });
+        r.renewed++;
       } else if (s.status === "active" && t >= s.currentPeriodEnd) {
         s.currentPeriodStart = s.currentPeriodEnd;
         s.currentPeriodEnd = periodEnd(s.currentPeriodStart, s.plan);

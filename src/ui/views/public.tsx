@@ -8,7 +8,7 @@ import { BuySeatsPanel } from "./teams";
 import type { teamsQuote } from "@/bff/views";
 
 type FlashProps = { notice?: string; error?: string };
-const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
+const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: n % 1 ? 2 : 0 }).format(n);
 
 /* ======================= Home ======================= */
 
@@ -991,7 +991,7 @@ export function HelpView({ viewer, articles, q, flash }: { viewer: Viewer; artic
 
 /* ======================= Auth ======================= */
 
-export function LoginView({ next, error, demo }: { next?: string; error?: string; demo: { email: string; password: string; label: string }[] | null }) {
+export function LoginView({ next, error, notice, demo }: { next?: string; error?: string; notice?: string; demo: { email: string; password: string; label: string }[] | null }) {
   return (
     <main id="main" style={{ minHeight: "100vh", display: "grid", placeItems: "center", background: "linear-gradient(135deg,#eef3ff,#f9f6ee)", padding: 16 }}>
       <div className="card card-pad" style={{ width: "min(440px,100%)", padding: 32 }}>
@@ -1006,7 +1006,7 @@ export function LoginView({ next, error, demo }: { next?: string; error?: string
         <p className="small muted" style={{ textAlign: "center" }}>
           Sign in to your Scholarion account
         </p>
-        <Flash error={error} />
+        <Flash error={error} notice={notice} />
         <form method="post" action="/api/v1/auth/signin">
           <input type="hidden" name="redirect" value={next ?? "/app"} />
           <div className="field">
@@ -1018,7 +1018,7 @@ export function LoginView({ next, error, demo }: { next?: string; error?: string
               <label htmlFor="password" style={{ margin: 0 }}>
                 Password
               </label>
-              <a className="small" href="/help?q=password">
+              <a className="small" href="/forgot-password">
                 Forgot password?
               </a>
             </div>
@@ -1106,7 +1106,7 @@ export function SignupView({ next, error }: { next?: string; error?: string }) {
 export function CheckoutView({ viewer, vm }: { viewer: Viewer; vm: NonNullable<ReturnType<typeof checkoutVM>> }) {
   const { cs, product } = vm;
   const title = cs.plan === "plus_monthly" ? "Scholarion Plus — monthly" : cs.plan === "plus_annual" ? "Scholarion Plus — annual" : product?.title ?? "Purchase";
-  const dueToday = cs.trialEndsAt ? 0 : cs.amount;
+  const dueToday = cs.trialEndsAt ? 0 : cs.installmentAmount ?? cs.amount;
   return (
     <PublicPage viewer={viewer}>
       <div className="container section" style={{ maxWidth: 760 }}>
@@ -1134,7 +1134,15 @@ export function CheckoutView({ viewer, vm }: { viewer: Viewer; vm: NonNullable<R
                   <td>{fmtDate(cs.trialEndsAt, { dateStyle: "long" })} — we'll email you before then</td>
                 </tr>
               )}
-              {cs.renewsAt && (
+              {cs.installmentAmount && cs.installments && cs.renewsAt && (
+                <tr>
+                  <th scope="row">Payment plan</th>
+                  <td>
+                    {cs.installments} payments of {money(cs.installmentAmount)}: today, {fmtDate(cs.renewsAt, { dateStyle: "long" })} and {fmtDate(new Date(Date.parse(cs.renewsAt) + 30 * 86400000).toISOString(), { dateStyle: "long" })}
+                  </td>
+                </tr>
+              )}
+              {cs.renewsAt && !cs.installmentAmount && (
                 <tr>
                   <th scope="row">{cs.trialEndsAt ? "First charge" : "Renews"}</th>
                   <td>
@@ -1143,8 +1151,8 @@ export function CheckoutView({ viewer, vm }: { viewer: Viewer; vm: NonNullable<R
                 </tr>
               )}
               <tr>
-                <th scope="row">How to cancel</th>
-                <td>Account → Billing → Cancel. One step, any time.</td>
+                <th scope="row">{cs.plan === "live_seat" ? "Your seat" : "How to cancel"}</th>
+                <td>{cs.plan === "live_seat" ? "Reserved for you as soon as you confirm. Contact support to cancel under the refund policy." : "Account → Billing → Cancel. One step, any time."}</td>
               </tr>
               <tr>
                 <th scope="row">Refunds</th>

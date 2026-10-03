@@ -12,6 +12,9 @@ import { CERT_PY, COURSE_AI, COURSE_DB, COURSE_PY, PATHWAY, PRODUCTS, buildConte
  * the README and shown on the sign-in page only when NODE_ENV !== "production".
  */
 
+/** Demo admin's authenticator secret (development and CI only — add it to an authenticator app to sign in when MFA is enforced). */
+export const DEMO_ADMIN_TOTP_SECRET = "JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP";
+
 export const DEMO = {
   learner: { email: "amara@demo.scholarion.test", password: "LearnEarnBuild1", name: "Amara Chukwu" },
   admin: { email: "admin@demo.scholarion.test", password: "ScholarionAdmin1", name: "Platform Admin" },
@@ -37,7 +40,7 @@ const HELP: HelpArticle[] = [
 ];
 
 function user(id: string, d: { email: string; password: string; name: string }, roles: User["roles"]): User {
-  return { id, email: d.email, name: d.name, passwordHash: hashPassword(d.password), roles, tenantIds: ["academy-public"], createdAt: "2026-08-15T14:00:00.000Z", timezone: "America/New_York" };
+  return { id, email: d.email, name: d.name, passwordHash: hashPassword(d.password), roles, tenantIds: ["academy-public"], createdAt: "2026-08-15T14:00:00.000Z", timezone: "America/New_York", emailVerifiedAt: "2026-08-15T14:05:00.000Z" };
 }
 
 export function seed(): void {
@@ -53,7 +56,10 @@ export function seed(): void {
 
   const amara = user("usr_amara", DEMO.learner, ["learner"]);
   amara.onboarding = { goal: "Start a new career", level: "Beginner", topics: ["Python", "Artificial intelligence"], hoursPerWeek: 8 };
-  db.users.push(amara, user("usr_admin", DEMO.admin, ["platform_admin", "reviewer", "instructor", "support_agent"]), user("usr_faculty", DEMO.instructor, ["instructor"]), user("usr_tunde", DEMO.visitor, ["learner"]));
+  const adminUser = user("usr_admin", DEMO.admin, ["platform_admin", "reviewer", "instructor", "support_agent"]);
+  adminUser.mfaSecret = DEMO_ADMIN_TOTP_SECRET;
+  adminUser.mfaEnabledAt = "2026-08-15T14:10:00.000Z";
+  db.users.push(amara, adminUser, user("usr_faculty", DEMO.instructor, ["instructor"]), user("usr_tunde", DEMO.visitor, ["learner"]));
 
   const ent = (e: Omit<Entitlement, "id" | "tenantId">): void => {
     db.entitlements.push({ id: `ent_seed_${db.entitlements.length + 1}`, tenantId: "academy-public", ...e });
@@ -132,6 +138,12 @@ export function seed(): void {
     o.approvedBy = "usr_faculty";
   }
   studio.generate(COURSE_PY, 6);
+
+  /* ---------- Live admissions ---------- */
+  db.applications.push(
+    { id: "app_seed_amara", userId: amara.id, productId: "prd_p26", cohort: "Fall 2026", experience: "Two years building Python data tools for a clinic; completed Agentic AI Foundations and a RAG guided project.", motivation: "I want to design multi-agent intake and triage assistants with proper human checkpoints for small clinics.", status: "reserved", reviewerId: "usr_admin", decidedAt: "2026-09-12T15:00:00.000Z", reservedAt: "2026-09-15T14:00:00.000Z", paymentPlan: "full", onboardedAt: "2026-09-16T14:00:00.000Z", createdAt: "2026-09-10T15:00:00.000Z" },
+    { id: "app_seed_tunde", userId: "usr_tunde", productId: "prd_p15", cohort: "Winter 2027", experience: "Self-taught developer. I've built two Flask APIs and a small LLM chatbot for a local business, and I'm comfortable with Python and Git.", motivation: "I want production depth — evaluation, observability and deployment — so I can move from prototypes to agents a company can rely on.", status: "submitted", createdAt: "2026-10-01T16:00:00.000Z" },
+  );
 
   /* ---------- Teams: two organizations that must never see each other ---------- */
   db.users.push(

@@ -25,6 +25,16 @@ export function DashboardView({ viewer, vm, flash }: { viewer: V; vm: ReturnType
       <Flash {...flash} />
       <h1 className="page-title">{greeting(viewer.name)}</h1>
       <p className="muted">Keep going. Your goals are within reach.</p>
+      {vm.unverifiedEmail && (
+        <div className="notice notice-warn row between" role="status" style={{ flexWrap: "wrap", gap: 8 }}>
+          <span>
+            Please confirm your email address (<strong>{vm.unverifiedEmail}</strong>). We use it for receipts, credential notices and account recovery.
+          </span>
+          <form method="post" action="/api/v1/me/verification/resend">
+            <button className="btn btn-outline btn-sm">Resend link</button>
+          </form>
+        </div>
+      )}
       {vm.ssoOffer && (
         <div className="notice notice-info row between">
           <span>
@@ -826,8 +836,8 @@ export function CredentialsView({ viewer, vm }: { viewer: V; vm: ReturnType<type
 /* ======================= Account & billing ======================= */
 
 export function AccountView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<typeof accountVM>; flash: FlashProps }) {
-  const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
-  const planName: Record<string, string> = { plus_monthly: "Scholarion Plus — monthly", plus_annual: "Scholarion Plus — annual", program_monthly: "Program subscription" };
+  const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: n % 1 ? 2 : 0 }).format(n);
+  const planName: Record<string, string> = { plus_monthly: "Scholarion Plus — monthly", plus_annual: "Scholarion Plus — annual", program_monthly: "Program subscription", live_seat: "Live seat payment plan" };
   return (
     <AppShell viewer={viewer} current="/app/account">
       <h1 className="page-title">Account & Billing</h1>
@@ -852,7 +862,9 @@ export function AccountView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<t
               <StatusBadge status={s.status === "trialing" ? "Trial" : s.status[0].toUpperCase() + s.status.slice(1)} />
               <div className="small muted">
                 {s.status === "trialing" && s.trialEnd && `Free trial ends ${fmtDate(s.trialEnd, { dateStyle: "long" })}, then ${money(s.amount)}/${s.plan === "plus_annual" ? "year" : "month"}. `}
-                {s.status === "active" && `Renews ${fmtDate(s.currentPeriodEnd, { dateStyle: "long" })} at ${money(s.amount)}. `}
+                {s.status === "active" && s.installmentsTotal && `${s.installmentsPaid} of ${s.installmentsTotal} installments paid. Next ${money(s.amount)} on ${fmtDate(s.currentPeriodEnd, { dateStyle: "long" })}. `}
+                {s.status === "active" && !s.installmentsTotal && `Renews ${fmtDate(s.currentPeriodEnd, { dateStyle: "long" })} at ${money(s.amount)}. `}
+                {s.status === "completed" && "Paid in full. "}
                 {s.status === "canceled" && `Canceled — access until ${fmtDate(s.currentPeriodEnd, { dateStyle: "long" })}. Progress saved. `}
                 {s.status === "paused" && "Paused — progress saved. "}
                 {s.status === "refunded" && "Refunded. "}
@@ -860,12 +872,12 @@ export function AccountView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<t
               </div>
             </div>
             <div className="row">
-              {(s.status === "active" || s.status === "trialing") && (
+              {(s.status === "active" || s.status === "trialing") && !s.installmentsTotal && (
                 <form method="post" action={`/api/v1/commerce/subscriptions/${s.id}/cancel`}>
                   <button className="btn btn-danger btn-sm">Cancel subscription</button>
                 </form>
               )}
-              {s.status === "active" && s.plan !== "plus_annual" && (
+              {s.status === "active" && s.plan !== "plus_annual" && !s.installmentsTotal && (
                 <form method="post" action={`/api/v1/commerce/subscriptions/${s.id}/pause`}>
                   <button className="btn btn-ghost btn-sm">Pause</button>
                 </form>
@@ -946,6 +958,33 @@ export function LiveView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<type
       <h1 className="page-title">Live Sessions</h1>
       <Flash {...flash} />
       <p className="muted">Each session is split into 40-minute segments with its own join link. Links open 10 minutes before each segment. Times in Eastern Time.</p>
+      {vm.applications.map((a) =>
+        a.status === "reserved" && !a.onboardedAt ? (
+          <form key={a.id} method="post" action={`/api/v1/live/applications/${a.id}/onboard`} className="card card-pad stack" style={{ marginBottom: 16, borderLeft: "4px solid var(--accent)", ["--gap" as string]: "8px" }}>
+            <strong>Welcome to {a.product?.title} — finish onboarding</strong>
+            <ul className="small" style={{ margin: 0 }}>
+              <li>Join from a laptop or desktop with a working camera and microphone.</li>
+              <li>Test your Zoom or Webex setup before the first session.</li>
+              <li>Read the pre-work in the program's first module.</li>
+            </ul>
+            <label className="check small">
+              <input type="checkbox" name="ack" required /> I'll follow the cohort guidelines: be on time, keep cameras on for group work, and treat everyone with respect.
+            </label>
+            <div>
+              <button className="btn btn-primary btn-sm">Complete onboarding</button>
+            </div>
+          </form>
+        ) : a.status !== "reserved" && a.status !== "withdrawn" && a.status !== "declined" ? (
+          <div key={a.id} className="notice notice-info row between">
+            <span>
+              Your application to <strong>{a.product?.title}</strong>: {a.status === "submitted" ? "in review" : a.status === "accepted" ? "accepted — reserve your seat" : "waitlisted"}.
+            </span>
+            <a className="btn btn-outline btn-sm" href={`/learn/${a.product?.slug}/apply`}>
+              View
+            </a>
+          </div>
+        ) : null,
+      )}
       {vm.sessions.length === 0 && (
         <div className="panel">
           You don't have a live program seat. <a href="/explore?format=live">Browse live programs</a>

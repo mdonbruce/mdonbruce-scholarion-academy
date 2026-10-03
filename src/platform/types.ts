@@ -27,6 +27,25 @@ export interface User {
   createdAt: ISODate;
   timezone: string;
   onboarding?: { goal: string; level: string; topics: string[]; hoursPerWeek: number };
+  emailVerifiedAt?: ISODate;
+  /** Base32 TOTP secret once multi-factor sign-in is on; `mfaPendingSecret` during setup. */
+  mfaSecret?: string;
+  mfaPendingSecret?: string;
+  mfaEnabledAt?: ISODate;
+  passwordChangedAt?: ISODate;
+  deletedAt?: ISODate;
+  locale?: string;
+  region?: string;
+}
+
+export interface AuthToken {
+  id: ID;
+  hash: string; // sha256 of the secret; the secret itself is only ever emailed
+  userId: ID;
+  kind: "verify_email" | "reset_password" | "mfa_pending";
+  expiresAt: ISODate;
+  usedAt?: ISODate;
+  next?: string;
 }
 
 export interface Session {
@@ -142,7 +161,7 @@ export interface Product {
   educator: string; // "Scholarion Academy" until confirmed instructors are recorded
   partnerIds: ID[]; // must exist in Partner Registry with an active agreement to render
   createdAt: ISODate;
-  livePlan?: { weeks: number; sessionHours: number; segmentMinutes: number; schedule: string };
+  livePlan?: { weeks: number; sessionHours: number; segmentMinutes: number; schedule: string; capacity: number; cohort: string };
   credential: { kind: "certificate" | "badge"; title: string; criteria: string[] };
   faq: { q: string; a: string }[];
 }
@@ -234,6 +253,9 @@ export interface CheckoutSession {
   renewsAt: ISODate | null;
   refundPolicy: string;
   status: "open" | "paid" | "expired";
+  /** Live seats only: number of monthly installments (1 = pay in full). */
+  installments?: number;
+  installmentAmount?: number;
   idempotencyKey: string;
   createdAt: ISODate;
 }
@@ -243,7 +265,10 @@ export interface Subscription {
   userId: ID;
   plan: PlanCode;
   productId: ID | null; // null for Plus
-  status: "trialing" | "active" | "paused" | "canceled" | "expired" | "refunded";
+  status: "trialing" | "active" | "paused" | "canceled" | "expired" | "refunded" | "completed";
+  /** Payment plans (live seats): total and paid installments. */
+  installmentsTotal?: number;
+  installmentsPaid?: number;
   currentPeriodStart: ISODate;
   currentPeriodEnd: ISODate;
   trialEnd: ISODate | null;
@@ -487,6 +512,27 @@ export interface AttendanceRecord {
   sessionId: ID;
   minutes: number;
   recordedAt: ISODate;
+}
+
+/* ---------- Live program admissions ---------- */
+
+export type ApplicationStatus = "submitted" | "accepted" | "waitlisted" | "declined" | "reserved" | "withdrawn";
+
+export interface LiveApplication {
+  id: ID;
+  userId: ID;
+  productId: ID;
+  cohort: string;
+  experience: string;
+  motivation: string;
+  status: ApplicationStatus;
+  reviewerId?: ID;
+  decisionNote?: string;
+  decidedAt?: ISODate;
+  reservedAt?: ISODate;
+  paymentPlan?: "full" | "installments";
+  onboardedAt?: ISODate;
+  createdAt: ISODate;
 }
 
 /* ---------- Teams & organizations ---------- */

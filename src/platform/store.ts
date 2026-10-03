@@ -4,6 +4,7 @@ import type {
   AidApplication,
   Attempt,
   AttendanceRecord,
+  AuthToken,
   CheckoutSession,
   CloudEvent,
   Enrollment,
@@ -14,6 +15,7 @@ import type {
   Item,
   LabSession,
   Lead,
+  LiveApplication,
   Organization,
   OrgInvite,
   OrgMember,
@@ -48,6 +50,8 @@ export interface Db {
   users: User[];
   sessions: Session[];
   tenants: Tenant[];
+  authTokens: AuthToken[];
+  loginFailures: { email: string; at: string }[];
   // Entitlements
   entitlements: Entitlement[];
   // Catalog
@@ -90,6 +94,7 @@ export interface Db {
   // Live engine
   liveSessions: LiveSession[];
   attendance: AttendanceRecord[];
+  applications: LiveApplication[];
   // Partner Registry
   partners: Partner[];
   // Event bus log
@@ -97,7 +102,7 @@ export interface Db {
   processed: string[]; // consumer:eventId pairs already handled (idempotency)
 }
 
-export const DB_VERSION = 2;
+export const DB_VERSION = 3;
 
 export function emptyDb(): Db {
   return {
@@ -106,6 +111,8 @@ export function emptyDb(): Db {
     users: [],
     sessions: [],
     tenants: [],
+    authTokens: [],
+    loginFailures: [],
     entitlements: [],
     products: [],
     modules: [],
@@ -136,6 +143,7 @@ export function emptyDb(): Db {
     help: [],
     liveSessions: [],
     attendance: [],
+    applications: [],
     partners: [],
     events: [],
     processed: [],

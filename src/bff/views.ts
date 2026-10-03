@@ -12,8 +12,10 @@ import {
   live,
   lms,
   nowIso,
+  totp,
   partners,
   publicQuiz,
+  admissions,
   community,
   studio,
   teams,
@@ -22,6 +24,7 @@ import {
   type User,
 } from "@/platform";
 import type { SearchFilters } from "@/platform/catalog";
+import { sha256 } from "@/platform/util";
 
 /**
  * BFF read models: one function per screen. Pages call these on the server and pass
@@ -109,6 +112,7 @@ export function dashboardVM(userId: string) {
     live: live.sessionsFor(userId).filter((s) => s.session.startsAt >= nowIso()).slice(0, 2),
     recommendations: recommendationsFor(userId),
     ssoOffer: sso ? { id: sso.id, name: sso.name, domain: sso.domain } : null,
+    unverifiedEmail: user.emailVerifiedAt ? null : user.email,
     orgs: teams.membershipsOf(userId).map((m) => ({ id: m.org.id, name: m.org.name })),
   };
 }
@@ -272,11 +276,36 @@ export function accountVM(user: User) {
   };
 }
 
+export function applyVM(slug: string, userId: string | null) {
+  ensurePlatform();
+  const product = catalog.get(slug);
+  if (!product || product.format !== "live") return null;
+  const offer = commerce.offers(product.id).find((o) => o.code === "live_seat");
+  const price = offer?.price ?? 0;
+  return {
+    product,
+    application: userId ? admissions.current(userId, product.id) ?? null : null,
+    capacity: admissions.capacity(product.id),
+    price,
+    installment: Math.ceil((price / 3) * 100) / 100,
+    sessions: getDb().liveSessions.filter((s) => s.productId === product.id).slice(0, 3),
+  };
+}
+
+export function admissionsVM() {
+  ensurePlatform();
+  return admissions.queue();
+}
+
 export function liveVM(userId: string) {
   ensurePlatform();
   const sessions = live.sessionsFor(userId);
   const attendance = live.attendanceFor(userId);
-  return { sessions: sessions.map((s) => ({ ...s, attended: attendance.find((a) => a.sessionId === s.session.id)?.minutes ?? null })), now: nowIso() };
+  return {
+    sessions: sessions.map((s) => ({ ...s, attended: attendance.find((a) => a.sessionId === s.session.id)?.minutes ?? null })),
+    applications: admissions.forUser(userId),
+    now: nowIso(),
+  };
 }
 
 export function calendarVM(userId: string) {
@@ -310,6 +339,8 @@ export function adminVM() {
     now: nowIso(),
     events: [...db.events].reverse().slice(0, 40),
     outbox: cx.outbox().slice(0, 20),
+    // Sandbox only: email bodies can hold one-time links, so they are never shown in production.
+    showEmailBodies: process.env.NODE_ENV !== "production",
     counts: { users: db.users.length, enrollments: db.enrollments.length, credentials: db.credentials.length, aidPending: commerce.aidQueue().length, studioDrafts: studio.drafts().length, tickets: db.tickets.filter((t) => t.status === "open").length, reported: community.queue().filter((p) => p.reports.length && !p.hiddenAt).length, submissions: lms.pendingSubmissions().length },
     credentials: db.credentials.slice(-10).reverse().map((c) => ({ id: c.id, title: c.title, holderName: c.holderName, issuedAt: c.issuedAt, revokedAt: c.revokedAt })),
   };
@@ -383,4 +414,14 @@ export function joinVM(token: string) {
 export function teamsQuote(seats = 10) {
   ensurePlatform();
   return teams.quote(seats);
+}
+
+/** Development-only convenience: the current code for a demo account's pending two-step sign-in. */
+export function mfaDemoCode(pendingToken: string): string | null {
+  ensurePlatform();
+  if (process.env.NODE_ENV === "production" || !pendingToken) return null;
+  const t = getDb().authTokens.find((x) => x.hash === sha256(pendingToken) && x.kind === "mfa_pending" && !x.usedAt);
+  const u = t && getDb().users.find((x) => x.id === t.userId);
+  if (!u?.mfaSecret || !u.email.endsWith("@demo.scholarion.test")) return null;
+  return totp(u.mfaSecret);
 }

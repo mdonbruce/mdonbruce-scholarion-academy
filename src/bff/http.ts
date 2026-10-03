@@ -19,6 +19,20 @@ export function sessionCookie(token: string, maxAgeSec: number): string {
   return `${SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAgeSec}${secure}`;
 }
 
+export const MFA_COOKIE = "sch_mfa";
+
+/** Short-lived cookie that carries the pending two-step sign-in between the password and code steps. */
+export function mfaCookie(token: string, maxAgeSec: number): string {
+  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+  return `${MFA_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${maxAgeSec}${secure}`;
+}
+
+export function redirectWithCookies(to: string, cookies: string[]): Response {
+  const h = new Headers({ location: to });
+  for (const c of cookies) h.append("set-cookie", c);
+  return new Response(null, { status: 303, headers: h });
+}
+
 export function currentUser(req: Request): { user: User; token: string } | null {
   const token = readCookie(req, SESSION_COOKIE);
   const r = identity.resolveSession(token);

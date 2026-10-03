@@ -230,6 +230,12 @@ export function AppShell({ viewer, current, children }: { viewer: Viewer; curren
             </a>
           </li>
           <li>
+            <a href="/app/security" aria-current={current === "/app/security" ? "page" : undefined}>
+              <Icon name="lock" size={18} />
+              Security & Privacy
+            </a>
+          </li>
+          <li>
             <a href="/help">
               <Icon name="help" size={18} />
               Help

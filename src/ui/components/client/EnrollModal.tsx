@@ -66,6 +66,10 @@ export function EnrollModal({ productId, slug, offers, signedIn, label = "Enroll
                           <input type="hidden" name="level" value="audit" />
                           <button className="btn btn-outline btn-sm">Audit free</button>
                         </form>
+                      ) : o.code === "live_seat" ? (
+                        <a className="btn btn-primary btn-sm" href={`/learn/${slug}/apply`}>
+                          Apply
+                        </a>
                       ) : o.code === "financial_aid" ? (
                         <a className="btn btn-outline btn-sm" href={`/financial-aid/apply?product=${slug}`}>
                           Apply

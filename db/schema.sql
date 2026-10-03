@@ -25,13 +25,35 @@ CREATE TABLE identity.users (
   email          citext NOT NULL UNIQUE,
   name           text NOT NULL,
   password_hash  text,                 -- null for SSO-only accounts
-  mfa_enabled    boolean NOT NULL DEFAULT false,
-  email_verified boolean NOT NULL DEFAULT false,
+  mfa_secret_enc bytea,                 -- TOTP secret, encrypted with the KMS key; null = two-step off
+  mfa_enabled_at timestamptz,
+  email_verified_at timestamptz,
+  password_changed_at timestamptz,
+  locale         text,
+  region         text,
   timezone       text NOT NULL DEFAULT 'UTC',
   onboarding     jsonb,
   created_at     timestamptz NOT NULL DEFAULT now(),
   deleted_at     timestamptz           -- GDPR/CCPA erasure tombstone
 );
+
+-- One-time secrets for email verification, password reset and the pending second step of sign-in.
+-- Only a SHA-256 hash is stored; the secret itself travels only in the email or a SameSite=Strict cookie.
+CREATE TABLE identity.auth_tokens (
+  id         text PRIMARY KEY,
+  hash       text NOT NULL UNIQUE,
+  user_id    text NOT NULL REFERENCES identity.users(id) ON DELETE CASCADE,
+  kind       text NOT NULL CHECK (kind IN ('verify_email','reset_password','mfa_pending')),
+  next_url   text,
+  expires_at timestamptz NOT NULL,
+  used_at    timestamptz
+);
+
+CREATE TABLE identity.login_failures (
+  email citext NOT NULL,
+  at    timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX ON identity.login_failures (email, at);
 
 CREATE TABLE identity.memberships (
   user_id    text NOT NULL REFERENCES identity.users(id) ON DELETE CASCADE,
@@ -188,7 +210,9 @@ CREATE TABLE commerce.subscriptions (
   user_id              text NOT NULL REFERENCES identity.users(id),
   plan                 text NOT NULL,
   product_id           text,
-  status               text NOT NULL CHECK (status IN ('trialing','active','paused','canceled','expired','refunded')),
+  status               text NOT NULL CHECK (status IN ('trialing','active','paused','canceled','expired','refunded','completed')),
+  installments_total   int,                 -- payment plans (live seats): number of installments
+  installments_paid    int,
   current_period_start timestamptz NOT NULL,
   current_period_end   timestamptz NOT NULL,
   trial_end            timestamptz,
@@ -550,6 +574,26 @@ CREATE TABLE partners.partners (
   approved_by    text NOT NULL,
   CHECK (ends_at > starts_at)
 );
+
+-- Live program admissions: apply → decide → reserve seat → onboard.
+CREATE TABLE live.applications (
+  id           text PRIMARY KEY,
+  user_id      text NOT NULL REFERENCES identity.users(id),
+  product_id   text NOT NULL,
+  cohort       text NOT NULL,
+  experience   text NOT NULL CHECK (length(experience) >= 50),
+  motivation   text NOT NULL CHECK (length(motivation) >= 50),
+  status       text NOT NULL CHECK (status IN ('submitted','accepted','waitlisted','declined','reserved','withdrawn')),
+  reviewer_id  text REFERENCES identity.users(id),
+  decided_at   timestamptz,
+  decision_note text,
+  reserved_at  timestamptz,
+  payment_plan text CHECK (payment_plan IN ('full','installments')),
+  onboarded_at timestamptz,
+  created_at   timestamptz NOT NULL DEFAULT now()
+);
+-- At most one open application per learner per program.
+CREATE UNIQUE INDEX ON live.applications (user_id, product_id) WHERE status IN ('submitted','accepted','waitlisted','reserved');
 
 /* ======================= event log ======================= */
 CREATE SCHEMA IF NOT EXISTS events;

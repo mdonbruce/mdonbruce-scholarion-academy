@@ -14,6 +14,8 @@ import { studio } from "./studio";
 import { tutor } from "./tutor";
 import { teams } from "./teams";
 import { community } from "./community";
+import { admissions } from "./admissions";
+import { privacy } from "./privacy";
 
 /**
  * Platform façade. In production each export is a typed HTTP/gRPC client to the
@@ -75,11 +77,12 @@ export function tickAll() {
   return { commerce: commerce.tick(), lms: lms.tick(), live: live.tick(), labsStopped: cloudlab.tick() };
 }
 
-export { catalog, cloudlab, commerce, community, credentials, cx, entitlements, identity, live, lms, studio, teams, tutor };
+export { admissions, privacy, catalog, cloudlab, commerce, community, credentials, cx, entitlements, identity, live, lms, studio, teams, tutor };
 export { capabilities } from "./status";
 export { checkClaims, partners } from "./partners";
 export { publicQuiz } from "./lms";
 export { DENY_COPY } from "./entitlements";
 export { getDb, now, nowIso } from "./store";
-export { publicUser } from "./identity";
+export { adminMfaRequired, publicUser } from "./identity";
+export { totp } from "./totp";
 export type * from "./types";

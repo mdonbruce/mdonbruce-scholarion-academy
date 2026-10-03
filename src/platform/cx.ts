@@ -138,5 +138,38 @@ export function registerHavenRoute(): void {
     const i = catalog.item(e.data.itemId as string);
     email(e, "peer_disputed", `Your project is with course staff: ${i?.title}`, "Your classmates' reviews didn't agree closely enough, so a member of course staff will grade your project. You'll get an email when it's done.");
   });
+  subscribe("havenroute", "identity.email.verify_requested", (e) =>
+    email(e, "verify_email", "Confirm your email for Scholarion", `Confirm this is your email address so we can send you course updates and certificates:\n${e.data.link}\n\nThe link works for 3 days. If you didn't create an account, ignore this email.`),
+  );
+  subscribe("havenroute", "identity.password.reset_requested", (e) =>
+    email(e, "password_reset", "Reset your Scholarion password", `Use this link within 1 hour to choose a new password:\n${e.data.link}\n\nIf you didn't ask for this, ignore this email — your password stays the same.`),
+  );
+  subscribe("havenroute", "identity.password.changed", (e) =>
+    email(e, "password_changed", "Your Scholarion password was changed", "Your password was just changed and other devices were signed out. If this wasn't you, reset your password now and contact support."),
+  );
+  subscribe("havenroute", "identity.mfa.enabled", (e) => email(e, "mfa_enabled", "Two-step sign-in is on", "Two-step sign-in is now on for your Scholarion account. You'll enter a code from your authenticator app when you sign in."));
+  subscribe("havenroute", "identity.mfa.disabled", (e) => email(e, "mfa_disabled", "Two-step sign-in was turned off", "Two-step sign-in was turned off for your account. If this wasn't you, reset your password and contact support."));
+  subscribe("havenroute", "live.application.submitted", (e) => {
+    const p = catalog.get(e.data.productId as string);
+    email(e, "application_received", `Application received: ${p?.title}`, `Thanks for applying to ${p?.title}. Our admissions team reviews applications in the order they arrive, and we'll email you a decision.`);
+  });
+  subscribe("havenroute", "live.application.decided", (e) => {
+    const p = catalog.get(e.data.productId as string);
+    const d = e.data.decision;
+    email(
+      e,
+      "application_decision",
+      d === "accepted" ? `You're accepted: ${p?.title}` : d === "waitlisted" ? `You're on the waitlist: ${p?.title}` : `Your application: ${p?.title}`,
+      d === "accepted"
+        ? `Congratulations — you've been accepted to the ${p?.livePlan?.cohort} cohort. Reserve your seat (pay in full or in 3 installments): ${publicUrl()}/learn/${p?.slug}/apply`
+        : d === "waitlisted"
+          ? "The cohort is full right now. You're on the waitlist and we'll email you if a seat opens."
+          : "Thank you for applying. We weren't able to offer you a seat in this cohort. You're welcome to apply to a future one.",
+    );
+  });
+  subscribe("havenroute", "live.seat.reserved", (e) => {
+    const p = catalog.get(e.data.productId as string);
+    email(e, "seat_reserved", `Seat reserved: ${p?.title}`, `Your seat is reserved. Finish onboarding and see your session schedule here: ${publicUrl()}/app/live`);
+  });
   subscribe("havenroute", "live.session.reminder", (e) => email(e, "live_reminder", "Your live session starts soon", `Your session "${e.data.title}" starts ${fmtDate(e.data.startsAt)}. Join from your dashboard 10 minutes before the start.`));
 }
