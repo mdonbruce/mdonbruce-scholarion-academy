@@ -63,10 +63,13 @@ function pythonCommand(): string {
 }
 
 /** Minimal environment for learner code. Windows needs SystemRoot/TEMP or Python fails to start. */
-function runnerEnv(): NodeJS.ProcessEnv {
-  const env: NodeJS.ProcessEnv = { PATH: process.env.PATH ?? "/usr/bin:/bin", PYTHONIOENCODING: "utf-8" };
+function runnerEnv(): Record<string, string> {
+  const env: Record<string, string> = { PATH: process.env.PATH ?? "/usr/bin:/bin", PYTHONIOENCODING: "utf-8" };
   if (process.platform === "win32") {
-    for (const k of ["SystemRoot", "SYSTEMROOT", "TEMP", "TMP", "PATHEXT", "COMSPEC"]) if (process.env[k]) env[k] = process.env[k];
+    for (const k of ["SystemRoot", "SYSTEMROOT", "TEMP", "TMP", "PATHEXT", "COMSPEC"]) {
+      const v = process.env[k];
+      if (v) env[k] = v;
+    }
   }
   return env;
 }

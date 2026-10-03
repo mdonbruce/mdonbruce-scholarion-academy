@@ -3,7 +3,6 @@ import type { HelpArticle, Product } from "@/platform/types";
 import { fmtDate, fmtDateTime, ProductCard, TYPE_LABEL } from "../components/cards";
 import { Flash, PublicPage } from "../components/chrome";
 import { EnrollModal } from "../components/client/EnrollModal";
-import { SearchBox } from "../components/client/SearchBox";
 import { Icon, KIND_ICON } from "../components/icons";
 
 type FlashProps = { notice?: string; error?: string };

@@ -2,7 +2,6 @@ import QR from "./qr";
 import {
   capabilities,
   catalog,
-  checkClaims,
   cloudlab,
   commerce,
   credentials,
