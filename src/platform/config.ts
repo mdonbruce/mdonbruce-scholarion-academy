@@ -43,6 +43,6 @@ export function publicUrl(): string {
   return (process.env.SCHOLARION_PUBLIC_URL ?? "http://localhost:3000").replace(/\/$/, "");
 }
 
-export function money(amount: number, currency = commerceConfig.currency): string {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: amount % 1 ? 2 : 0 }).format(amount);
+export function money(amount: number, currency: string = commerceConfig.currency): string {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency, currencyDisplay: "narrowSymbol", minimumFractionDigits: amount % 1 ? 2 : 0, maximumFractionDigits: amount % 1 ? 2 : 0 }).format(amount);
 }

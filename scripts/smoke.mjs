@@ -197,6 +197,28 @@ if (notes.unread !== 0) {
   console.log(`FAIL unread after mark-all ${notes.unread}`);
 } else console.log("ok   200 notifications read state");
 
+// Languages and regional pricing.
+const fr = await expect("French interface, naira prices", "/pricing", 200, { cookie: "sch_locale=fr; sch_region=NG" });
+if (!/Programmes/.test(fr.text) || !/₦/.test(fr.text) || !/<html lang="fr"/.test(fr.text)) {
+  failures++;
+  console.log("FAIL /pricing did not switch to French and NGN");
+}
+const es = await expect("Spanish sign-in", "/login", 200, { cookie: "sch_locale=es" });
+if (!/Iniciar sesión/.test(es.text)) {
+  failures++;
+  console.log("FAIL /login is not in Spanish");
+}
+const pr = await req("/api/v1/prefs", { method: "POST", form: { locale: "es", region: "EU" } });
+if (pr.status !== 303 || !(pr.headers.getSetCookie?.() ?? []).some((c) => c.startsWith("sch_region=EU"))) {
+  failures++;
+  console.log(`FAIL prefs form (${pr.status})`);
+} else console.log("ok   303 language and region saved");
+const offersEu = await (await req("/api/v1/commerce/offers/python-programming-cop1047c?region=EU")).json();
+if (!offersEu.offers?.every((o) => o.currency === "EUR")) {
+  failures++;
+  console.log("FAIL EUR offers");
+} else console.log("ok   200 regional offers");
+
 const status = await (await req("/api/v1/status")).json();
 console.log(`status board: ${status.capabilities.map((c) => `${c.key}=${c.status}`).join(", ")}`);
 

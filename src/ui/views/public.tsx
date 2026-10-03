@@ -1,4 +1,6 @@
 import { ReviewsSection, Stars } from "../components/reviews";
+import { formatMoney } from "@/platform/pricing";
+import { t } from "@/i18n";
 import type { aidApplyVM, checkoutVM, exploreVM, homeVM, pathwayVM, productVM, verifyVM, Viewer } from "@/bff/views";
 import type { HelpArticle, Product } from "@/platform/types";
 import { fmtDate, fmtDateTime, ProductCard, TYPE_LABEL } from "../components/cards";
@@ -9,7 +11,7 @@ import { BuySeatsPanel } from "./teams";
 import type { teamsQuote } from "@/bff/views";
 
 type FlashProps = { notice?: string; error?: string };
-const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: n % 1 ? 2 : 0 }).format(n);
+const money = (n: number, currency = "USD") => formatMoney(n, currency);
 
 /* ======================= Home ======================= */
 
@@ -19,7 +21,7 @@ export function HomeView({ viewer, vm }: { viewer: Viewer; vm: ReturnType<typeof
       <section className="hero" aria-labelledby="hero-title">
         <div className="container">
           <div>
-            <div className="eyebrow">Skills today. Opportunities tomorrow.</div>
+            <div className="eyebrow">{t("home.eyebrow")}</div>
             <h1 id="hero-title">
               Scholarion
               <br />
@@ -28,20 +30,20 @@ export function HomeView({ viewer, vm }: { viewer: Viewer; vm: ReturnType<typeof
             <div className="tag">
               Learn AI. <b>Earn</b> Credentials. Build Your Future.
             </div>
-            <p>Practical, hands-on AI certificate programs designed for learners, professionals and organizations. Gain real skills. Build real solutions. Make a real impact.</p>
+            <p>{t("home.lede")}</p>
             <form className="hero-search" action="/explore" role="search">
               <label htmlFor="hero-q" className="sr-only">
-                What do you want to learn?
+                {t("hdr.search")}
               </label>
-              <input id="hero-q" name="q" type="search" placeholder="What do you want to learn? Try “agentic AI”" />
-              <button className="btn btn-primary">Search</button>
+              <input id="hero-q" name="q" type="search" placeholder={t("home.searchPh")} />
+              <button className="btn btn-primary">{t("home.search")}</button>
             </form>
             <div className="row">
               <a className="btn btn-primary" href="/programs">
-                Explore Programs <Icon name="arrow" size={18} />
+                {t("home.explore")} <Icon name="arrow" size={18} />
               </a>
               <a className="btn btn-on-dark" href="/explore?free=1">
-                Learn for free
+                {t("home.free")}
               </a>
             </div>
             <div className="hero-facts">
@@ -161,7 +163,7 @@ export function HomeView({ viewer, vm }: { viewer: Viewer; vm: ReturnType<typeof
           <span className="badge badge-blue">Scholarion Plus</span>
           <h2 style={{ marginTop: 10 }}>One subscription, every self-paced program</h2>
           <p className="muted">
-            {money(vm.plans.plusMonthly)}/month after a {vm.plans.trialDays}-day free trial, or {money(vm.plans.plusAnnual)}/year. Cancel any time in one step. <span className="tiny">(Sandbox placeholder prices.)</span>
+            {money(vm.plans.plusMonthly, vm.plans.currency)}/month after a {vm.plans.trialDays}-day free trial, or {money(vm.plans.plusAnnual, vm.plans.currency)}/year. Cancel any time in one step. <span className="tiny">(Sandbox placeholder prices.)</span>
           </p>
           <a className="btn btn-primary" href="/plus">
             Learn about Plus
@@ -646,8 +648,8 @@ export function PlusView({ viewer, plans }: { viewer: Viewer; plans: ReturnType<
         <p className="lede">Self-paced courses, professional certificates and guided projects — with graded work, Cloud Lab, the AI Tutor and certificates. Live programs aren't included unless marked.</p>
         <div className="grid g2" style={{ marginTop: 24 }}>
           {[
-            { code: "plus_monthly", name: "Monthly", price: `${money(plans.plusMonthly)}/month`, sub: `${plans.trialDays}-day free trial · reminder ${plans.reminderDays} days before the first charge · cancel any time` },
-            { code: "plus_annual", name: "Annual", price: `${money(plans.plusAnnual)}/year`, sub: `${plans.annualSavings > 0 ? `${money(plans.annualSavings)} less than 12 monthly payments · ` : ""}${plans.refundDays}-day money-back guarantee` },
+            { code: "plus_monthly", name: "Monthly", price: `${money(plans.plusMonthly, plans.currency)}/month`, sub: `${plans.trialDays}-day free trial · reminder ${plans.reminderDays} days before the first charge · cancel any time` },
+            { code: "plus_annual", name: "Annual", price: `${money(plans.plusAnnual, plans.currency)}/year`, sub: `${plans.annualSavings > 0 ? `${money(plans.annualSavings, plans.currency)} less than 12 monthly payments · ` : ""}${plans.refundDays}-day money-back guarantee` },
           ].map((o) => (
             <div key={o.code} className="card card-pad stack">
               <h2 style={{ margin: 0 }}>{o.name}</h2>
@@ -695,9 +697,9 @@ export function PlusView({ viewer, plans }: { viewer: Viewer; plans: ReturnType<
 export function PricingView({ viewer, plans }: { viewer: Viewer; plans: ReturnType<typeof homeVM>["plans"] }) {
   const rows: [string, string, string][] = [
     ["Audit", "Free", "Videos and readings; no graded work, labs, AI Tutor or certificate"],
-    ["Program subscription", `${money(plans.programMonthly)}/month`, "One professional certificate or specialization while subscribed"],
-    ["Scholarion Plus — monthly", `${money(plans.plusMonthly)}/month`, `${plans.trialDays}-day free trial; all Plus-eligible self-paced programs`],
-    ["Scholarion Plus — annual", `${money(plans.plusAnnual)}/year`, `${plans.refundDays}-day money-back guarantee`],
+    ["Program subscription", `${money(plans.programMonthly, plans.currency)}/month`, "One professional certificate or specialization while subscribed"],
+    ["Scholarion Plus — monthly", `${money(plans.plusMonthly, plans.currency)}/month`, `${plans.trialDays}-day free trial; all Plus-eligible self-paced programs`],
+    ["Scholarion Plus — annual", `${money(plans.plusAnnual, plans.currency)}/year`, `${plans.refundDays}-day money-back guarantee`],
     ["One-time purchase", "Varies", "Guided projects, single courses, live program seats"],
     ["Teams", "Per seat", "Contact us for organization pricing"],
     ["Financial aid", "Up to 100% off", "Application reviewed by a person"],
@@ -735,8 +737,8 @@ export function PricingView({ viewer, plans }: { viewer: Viewer; plans: ReturnTy
         <div className="panel" style={{ marginTop: 20 }}>
           <h2 style={{ fontSize: "1.2rem" }}>Monthly vs annual</h2>
           <p className="muted">
-            12 months of Plus monthly costs {money(plans.plusMonthly * 12)}. Annual costs {money(plans.plusAnnual)}
-            {plans.annualSavings > 0 ? ` — ${money(plans.annualSavings)} less.` : "."}
+            12 months of Plus monthly costs {money(plans.plusMonthly * 12, plans.currency)}. Annual costs {money(plans.plusAnnual, plans.currency)}
+            {plans.annualSavings > 0 ? ` — ${money(plans.annualSavings, plans.currency)} less.` : "."}
           </p>
         </div>
       </div>
@@ -1012,32 +1014,32 @@ export function LoginView({ next, error, notice, demo }: { next?: string; error?
           </div>
           <div className="small muted">Learn. Earn. Build Your Future.</div>
         </div>
-        <h1 style={{ fontFamily: "var(--font-sans)", fontSize: "1.4rem", textAlign: "center", margin: "16px 0 4px" }}>Welcome back</h1>
+        <h1 style={{ fontFamily: "var(--font-sans)", fontSize: "1.4rem", textAlign: "center", margin: "16px 0 4px" }}>{t("login.title")}</h1>
         <p className="small muted" style={{ textAlign: "center" }}>
-          Sign in to your Scholarion account
+          {t("login.sub")}
         </p>
         <Flash error={error} notice={notice} />
         <form method="post" action="/api/v1/auth/signin">
           <input type="hidden" name="redirect" value={next ?? "/app"} />
           <div className="field">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">{t("login.email")}</label>
             <input id="email" name="email" type="email" autoComplete="email" required />
           </div>
           <div className="field">
             <div className="row between">
               <label htmlFor="password" style={{ margin: 0 }}>
-                Password
+                {t("login.password")}
               </label>
               <a className="small" href="/forgot-password">
-                Forgot password?
+                {t("login.forgot")}
               </a>
             </div>
             <input id="password" name="password" type="password" autoComplete="current-password" required style={{ marginTop: 6 }} />
           </div>
-          <button className="btn btn-primary btn-block">Sign In</button>
+          <button className="btn btn-primary btn-block">{t("login.submit")}</button>
         </form>
         <p className="small" style={{ textAlign: "center", marginTop: 14 }}>
-          New to Scholarion? <a href={`/signup${next ? `?next=${encodeURIComponent(next)}` : ""}`}>Create an account</a>
+          {t("login.new")} <a href={`/signup${next ? `?next=${encodeURIComponent(next)}` : ""}`}>{t("login.create")}</a>
         </p>
         <div className="small muted" style={{ textAlign: "center", margin: "12px 0" }}>
           or continue with
@@ -1080,31 +1082,31 @@ export function SignupView({ next, error }: { next?: string; error?: string }) {
         <a href="/" className="row" style={{ justifyContent: "center", textDecoration: "none" }}>
           <img src="/brand/scholarion-emblem.png" alt="Scholarion Academy" width={72} height={50} />
         </a>
-        <h1 style={{ fontFamily: "var(--font-sans)", fontSize: "1.4rem", textAlign: "center", margin: "12px 0" }}>Join Scholarion for free</h1>
+        <h1 style={{ fontFamily: "var(--font-sans)", fontSize: "1.4rem", textAlign: "center", margin: "12px 0" }}>{t("signup.title")}</h1>
         <Flash error={error} />
         <form method="post" action="/api/v1/auth/signup">
           <input type="hidden" name="redirect" value={next ?? "/app/onboarding"} />
           <div className="field">
-            <label htmlFor="name">Full name</label>
+            <label htmlFor="name">{t("signup.name")}</label>
             <input id="name" name="name" type="text" autoComplete="name" required />
           </div>
           <div className="field">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">{t("login.email")}</label>
             <input id="email" name="email" type="email" autoComplete="email" required />
           </div>
           <div className="field">
             <label htmlFor="password">
-              Password <span className="hint">(at least 10 characters)</span>
+              {t("signup.password")} <span className="hint">{t("signup.passwordHint")}</span>
             </label>
             <input id="password" name="password" type="password" autoComplete="new-password" minLength={10} required />
           </div>
           <label className="check field small">
             <input type="checkbox" name="acceptTerms" required /> I'm 16 or older and I agree to the <a href="/help">Terms</a> and <a href="/help#privacy">Privacy Policy</a>.
           </label>
-          <button className="btn btn-primary btn-block">Create account</button>
+          <button className="btn btn-primary btn-block">{t("signup.submit")}</button>
         </form>
         <p className="small" style={{ textAlign: "center", marginTop: 14 }}>
-          Already have an account? <a href={`/login${next ? `?next=${encodeURIComponent(next)}` : ""}`}>Sign in</a>
+          {t("signup.have")} <a href={`/login${next ? `?next=${encodeURIComponent(next)}` : ""}`}>{t("signup.signin")}</a>
         </p>
       </div>
     </main>
@@ -1134,7 +1136,7 @@ export function CheckoutView({ viewer, vm }: { viewer: Viewer; vm: NonNullable<R
               <tr>
                 <th scope="row">Price</th>
                 <td className="mono">
-                  {money(cs.amount)}
+                  {money(cs.amount, cs.currency)}
                   {cs.plan === "plus_annual" ? "/year" : cs.plan.endsWith("monthly") ? "/month" : " one-time"}
                 </td>
               </tr>
@@ -1148,7 +1150,7 @@ export function CheckoutView({ viewer, vm }: { viewer: Viewer; vm: NonNullable<R
                 <tr>
                   <th scope="row">Payment plan</th>
                   <td>
-                    {cs.installments} payments of {money(cs.installmentAmount)}: today, {fmtDate(cs.renewsAt, { dateStyle: "long" })} and {fmtDate(new Date(Date.parse(cs.renewsAt) + 30 * 86400000).toISOString(), { dateStyle: "long" })}
+                    {cs.installments} payments of {money(cs.installmentAmount, cs.currency)}: today, {fmtDate(cs.renewsAt, { dateStyle: "long" })} and {fmtDate(new Date(Date.parse(cs.renewsAt) + 30 * 86400000).toISOString(), { dateStyle: "long" })}
                   </td>
                 </tr>
               )}
@@ -1156,7 +1158,7 @@ export function CheckoutView({ viewer, vm }: { viewer: Viewer; vm: NonNullable<R
                 <tr>
                   <th scope="row">{cs.trialEndsAt ? "First charge" : "Renews"}</th>
                   <td>
-                    {fmtDate(cs.renewsAt, { dateStyle: "long" })} at {money(cs.amount)} until you cancel
+                    {fmtDate(cs.renewsAt, { dateStyle: "long" })} at {money(cs.amount, cs.currency)} until you cancel
                   </td>
                 </tr>
               )}
@@ -1175,14 +1177,14 @@ export function CheckoutView({ viewer, vm }: { viewer: Viewer; vm: NonNullable<R
               <tr>
                 <th scope="row">Due today</th>
                 <td className="mono">
-                  <strong>{money(dueToday)}</strong>
+                  <strong>{money(dueToday, cs.currency)}</strong>
                 </td>
               </tr>
             </tbody>
           </table>
           <form method="post" action={`/api/v1/commerce/checkout-sessions/${cs.id}/confirm`} style={{ marginTop: 16 }}>
             <button className="btn btn-primary btn-block" disabled={cs.status === "paid"}>
-              {cs.status === "paid" ? "Already confirmed" : cs.trialEndsAt ? "Start free trial (sandbox)" : `Pay ${money(dueToday)} (sandbox)`}
+              {cs.status === "paid" ? "Already confirmed" : cs.trialEndsAt ? "Start free trial (sandbox)" : `Pay ${money(dueToday, cs.currency)} (sandbox)`}
             </button>
           </form>
           <p className="tiny muted" style={{ marginTop: 10 }}>

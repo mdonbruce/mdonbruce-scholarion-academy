@@ -179,14 +179,15 @@ CREATE POLICY tenant_isolation ON entitlements.grants USING (tenant_id = app_ten
 /* ======================= commerce ======================= */
 CREATE SCHEMA IF NOT EXISTS commerce;
 
+-- One row per region × plan (× product for one-time and program prices). Placeholder until pricing is set.
 CREATE TABLE commerce.price_books (
-  region     text NOT NULL,
+  region     text NOT NULL CHECK (region IN ('US','EU','GB','NG','IN')),
   currency   char(3) NOT NULL,
   plan       text NOT NULL,
   product_id text,
-  amount     numeric(10,2) NOT NULL,
-  PRIMARY KEY (region, plan, product_id)
+  amount     numeric(12,2) NOT NULL CHECK (amount >= 0)
 );
+CREATE UNIQUE INDEX price_books_key ON commerce.price_books (region, plan, coalesce(product_id, ''));
 
 CREATE TABLE commerce.checkout_sessions (
   id              text PRIMARY KEY,
@@ -195,6 +196,7 @@ CREATE TABLE commerce.checkout_sessions (
   plan            text NOT NULL CHECK (plan IN ('program_monthly','plus_monthly','plus_annual','one_time','live_seat')),
   amount          numeric(10,2) NOT NULL,
   currency        char(3) NOT NULL,
+  region          text NOT NULL DEFAULT 'US',
   trial_ends_at   timestamptz,
   renews_at       timestamptz,
   refund_policy   text NOT NULL,
@@ -211,6 +213,7 @@ CREATE TABLE commerce.subscriptions (
   plan                 text NOT NULL,
   product_id           text,
   status               text NOT NULL CHECK (status IN ('trialing','active','paused','canceled','expired','refunded','completed')),
+  currency             char(3) NOT NULL DEFAULT 'USD',
   installments_total   int,                 -- payment plans (live seats): number of installments
   installments_paid    int,
   current_period_start timestamptz NOT NULL,

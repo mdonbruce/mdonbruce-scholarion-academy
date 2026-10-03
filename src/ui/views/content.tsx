@@ -2,9 +2,10 @@ import type { adminArticleVM, adminBlogVM, articleVM, blogVM, hubsVM, hubVM, Vie
 import { fmtDate, fmtDateTime, ProductCard, TYPE_LABEL } from "../components/cards";
 import { AppShell, Flash, PublicPage } from "../components/chrome";
 import { Prose } from "../components/prose";
+import { formatMoney } from "@/platform/pricing";
 
 type FlashProps = { notice?: string; error?: string };
-const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: n % 1 ? 2 : 0 }).format(n);
+const money = (n: number, currency = "USD") => formatMoney(n, currency);
 const h2 = { fontFamily: "var(--font-sans)", fontSize: "1.25rem" } as const;
 
 /* ---------------- /hubs ---------------- */
@@ -120,7 +121,7 @@ export function HubView({ viewer, vm }: { viewer: Viewer; vm: NonNullable<Return
                       <td className="small">{p.format === "live" ? "Live cohort (apply)" : "Self-paced"}</td>
                       <td className="small">{p.freeToAudit ? "Yes" : "No"}</td>
                       <td className="small">{p.plusEligible ? "Yes" : "No"}</td>
-                      <td className="small">{from ? `${money(from.price)} ${from.label}` : <a href="/pricing">See pricing</a>}</td>
+                      <td className="small">{from ? `${money(from.price, from.currency)} ${from.label}` : <a href="/pricing">See pricing</a>}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
+import { cookies, headers } from "next/headers";
 import type { ReactNode } from "react";
+import { isLocale, LOCALE_COOKIE, localeFromAcceptLanguage } from "@/i18n";
 import "@/ui/styles/globals.css";
 import { PwaRegister } from "@/ui/components/client/PwaRegister";
 
@@ -20,9 +22,12 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const [jar, h] = await Promise.all([cookies(), headers()]);
+  const c = jar.get(LOCALE_COOKIE)?.value;
+  const lang = isLocale(c) ? c : localeFromAcceptLanguage(h.get("accept-language"));
   return (
-    <html lang="en">
+    <html lang={lang}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />

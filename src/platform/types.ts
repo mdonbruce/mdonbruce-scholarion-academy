@@ -271,6 +271,8 @@ export interface CheckoutSession {
   /** Live seats only: number of monthly installments (1 = pay in full). */
   installments?: number;
   installmentAmount?: number;
+  /** Price-book region the amount was quoted in (see pricing.ts). */
+  region?: string;
   idempotencyKey: string;
   createdAt: ISODate;
 }
@@ -290,6 +292,8 @@ export interface Subscription {
   cancelAtPeriodEnd: boolean;
   reminderSentAt?: ISODate;
   amount: number;
+  /** Currency the subscription bills in (from its price-book region). */
+  currency?: string;
   createdAt: ISODate;
 }
 

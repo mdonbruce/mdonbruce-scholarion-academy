@@ -1,9 +1,10 @@
 import type { applyVM, Viewer } from "@/bff/views";
 import { fmtDate, fmtDateTime, StatusBadge } from "../components/cards";
 import { Flash, PublicPage } from "../components/chrome";
+import { formatMoney } from "@/platform/pricing";
 
 type FlashProps = { notice?: string; error?: string };
-const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2, minimumFractionDigits: n % 1 ? 2 : 0 }).format(n);
+const money = (n: number, currency = "USD") => formatMoney(n, currency);
 const h2 = { fontFamily: "var(--font-sans)", fontSize: "1.15rem" } as const;
 
 const STATUS_COPY: Record<string, { label: string; text: string }> = {
@@ -56,10 +57,10 @@ export function ApplyView({ viewer, vm, flash }: { viewer: Viewer; vm: NonNullab
                         How would you like to pay?
                       </legend>
                       <label className="check">
-                        <input type="radio" name="installments" value="1" defaultChecked /> Pay in full: {money(vm.price)}
+                        <input type="radio" name="installments" value="1" defaultChecked /> Pay in full: {money(vm.price, vm.currency)}
                       </label>
                       <label className="check">
-                        <input type="radio" name="installments" value="3" /> 3 monthly installments of {money(vm.installment)} (first today)
+                        <input type="radio" name="installments" value="3" /> 3 monthly installments of {money(vm.installment, vm.currency)} (first today)
                       </label>
                     </fieldset>
                     <div>
@@ -117,7 +118,7 @@ export function ApplyView({ viewer, vm, flash }: { viewer: Viewer; vm: NonNullab
             <ol className="small stack" style={{ ["--gap" as string]: "6px", paddingLeft: 18, margin: 0 }}>
               <li>Apply (free).</li>
               <li>Admissions reviews and accepts, waitlists or declines.</li>
-              <li>If accepted, reserve your seat: {money(vm.price)} in full or 3 × {money(vm.installment)}.</li>
+              <li>If accepted, reserve your seat: {money(vm.price, vm.currency)} in full or 3 × {money(vm.installment, vm.currency)}.</li>
               <li>Complete onboarding, then join each session's 40-minute segments.</li>
               <li>Attend at least 80% of session time and finish the work to earn the certificate.</li>
             </ol>

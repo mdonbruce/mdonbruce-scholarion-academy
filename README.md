@@ -48,7 +48,8 @@ State persists to `.data/db.json` when `SCHOLARION_PERSIST=1`. Run `npm run db:r
 12. **Verified reviews and certificate PDF:** sign in as Ngozi (the graduate). *Credentials* has *Download PDF* (a printable certificate with a QR code to the verification page) and *Review this program*. Reviews come only from credential holders; links, contact details or flagged claims hold a review for *Staff → Moderation*. The product page shows the rating, and its structured data includes it, only once real reviews exist.
 13. **Course builder:** as the instructor (or admin), open *Teach*, create a draft, add a module and items (reading, captioned video, quiz, lab with tests and a reference solution, project rubric). The checklist on the right lists everything blocking publication, including uncaptioned videos, short quizzes, labs whose reference solution fails its tests, and any credit, salary, outcome or institution claim. Submit for review; a reviewer approves under *Staff → Course reviews* and the course goes live. *Analytics* then shows completion per item and per-question difficulty.
 14. **Topics, blog and the app:** *Explore → Topics* opens the four hubs (programs, a comparison table, where to start, FAQ). The *Blog* has three editorial articles; staff write and publish under *Staff → Blog*, where the claims checker blocks credit, outcome and partner claims and requires sources for any figures. In a production build the site is installable (manifest, icons, service worker with an offline page; pages are never cached). The bell shows unread notifications; open one to mark it read.
-15. **Claims checker:** *Staff → Claims checker* blocks degree, credit, salary and unregistered-partner claims. `/degrees` returns 404.
+15. **Language and region:** use the selector in the footer (or *Security & Privacy*) to switch the interface to Español or Français and prices to EUR, GBP, NGN or INR. The site picks a first guess from your browser. Checkout, renewals, receipts and the account page use the chosen currency. Regional prices are placeholders, not live exchange rates; course content stays in English with captions.
+16. **Claims checker:** *Staff → Claims checker* blocks degree, credit, salary and unregistered-partner claims. `/degrees` returns 404.
 
 ## Architecture
 
@@ -113,6 +114,7 @@ docs/               Integration notes and ADRs
 | Verified reviews & certificate PDF | 3 | SIMULATED |
 | Topic hubs & blog | 2 | SIMULATED |
 | Installable app & notifications | 2 | SIMULATED (Web Push planned) |
+| Languages & regional pricing | 2 | SIMULATED (placeholder price books) |
 | Partner Registry features | 5+ | PLANNED |
 | Degrees | 5+ | PLANNED |
 

@@ -85,12 +85,12 @@ export const HUBS: Hub[] = [
   },
 ];
 
-function fromPrice(p: Product): { price: number; label: string } | null {
+function fromPrice(p: Product, region?: string | null): { price: number; currency: string; label: string } | null {
   try {
-    const paid = commerce.offers(p.id).filter((o) => o.price && o.price > 0);
+    const paid = commerce.offers(p.id, region).filter((o) => o.price && o.price > 0);
     if (!paid.length) return null;
     const o = paid.reduce((a, b) => ((a.price ?? 0) <= (b.price ?? 0) ? a : b));
-    return { price: o.price!, label: o.interval === "month" ? "per month" : o.interval === "year" ? "per year" : "one time" };
+    return { price: o.price!, currency: o.currency, label: o.interval === "month" ? "per month" : o.interval === "year" ? "per year" : "one time" };
   } catch {
     return null;
   }
@@ -105,7 +105,7 @@ export const content = {
     return HUBS;
   },
 
-  hub(slug: string) {
+  hub(slug: string, region?: string | null) {
     const h = HUBS.find((x) => x.slug === slug);
     if (!h) return null;
     const products = catalog.all().filter(h.match);
@@ -117,7 +117,7 @@ export const content = {
       products,
       compare: products
         .filter((p) => p.type !== "guided_project")
-        .map((p) => ({ product: p, from: fromPrice(p) })),
+        .map((p) => ({ product: p, from: fromPrice(p, region) })),
       articles: this.articles().filter((a) => a.hubSlugs.includes(h.slug)).slice(0, 3),
     };
   },

@@ -2,6 +2,7 @@ import { publish } from "./bus";
 import { admissions } from "./admissions";
 import { catalog } from "./catalog";
 import { commerceConfig, money } from "./config";
+import { formatMoney, installment, localize, region } from "./pricing";
 import { entitlements } from "./entitlements";
 import { getDb, now, nowIso, save } from "./store";
 import type { AidApplication, CheckoutSession, Offer, PlanCode, Product, Subscription } from "./types";
@@ -39,32 +40,36 @@ function planLabel(plan: PlanCode, product?: Product | null): string {
 
 export const commerce = {
   /** GET /v1/commerce/offers — options for the Enroll modal with plain-language terms. */
-  offers(productId: string): Offer[] {
+  /** Offers in the learner's region and currency (sandbox price book, see pricing.ts). */
+  offers(productId: string, regionCode?: string | null): Offer[] {
     const p = catalog.get(productId);
     if (!p) throw new PlatformError("not_found", "Product not found", 404);
     const c = commerceConfig;
+    const cur = region(regionCode).currency;
+    const L = (usd: number) => localize(usd, regionCode);
+    const M = (usd: number) => formatMoney(L(usd), cur);
     const out: Offer[] = [];
     if (p.freeToAudit) {
-      out.push({ code: "audit", label: "Audit for free", price: 0, currency: c.currency, interval: null, includes: AUDIT_INCLUDES, excludes: AUDIT_EXCLUDES, renewalTerms: "Free. No payment details needed.", placeholder: false });
+      out.push({ code: "audit", label: "Audit for free", price: 0, currency: cur, interval: null, includes: AUDIT_INCLUDES, excludes: AUDIT_EXCLUDES, renewalTerms: "Free. No payment details needed.", placeholder: false });
     }
     if (p.format === "live") {
       out.push({
         code: "live_seat",
         label: "Apply for a seat",
-        price: c.oneTime(p.type, p.hours),
-        currency: c.currency,
+        price: L(c.oneTime(p.type, p.hours)),
+        currency: cur,
         interval: "once",
         includes: ["All live sessions for your cohort", "Mentor Q&A", "Recordings with captions", "Certificate on completion"],
         excludes: ["Not included in Scholarion Plus"],
-        renewalTerms: `Apply first. If you're accepted, pay in full or in 3 monthly installments of ${money(Math.ceil((c.oneTime(p.type, p.hours) / 3) * 100) / 100)}. Cohort of ${p.livePlan?.capacity ?? "limited"} seats.`,
+        renewalTerms: `Apply first. If you're accepted, pay in full or in 3 monthly installments of ${formatMoney(installment(L(c.oneTime(p.type, p.hours)), 3, regionCode), cur)}. Cohort of ${p.livePlan?.capacity ?? "limited"} seats.`,
         placeholder: true,
       });
     } else if (p.type === "guided_project" || p.type === "course") {
       out.push({
         code: "one_time",
         label: "Buy this " + (p.type === "course" ? "course" : "project"),
-        price: c.oneTime(p.type, p.hours),
-        currency: c.currency,
+        price: L(c.oneTime(p.type, p.hours)),
+        currency: cur,
         interval: "once",
         includes: FULL_INCLUDES,
         excludes: [],
@@ -76,12 +81,12 @@ export const commerce = {
       out.push({
         code: "program_monthly",
         label: "Subscribe to this program",
-        price: c.programMonthly,
-        currency: c.currency,
+        price: L(c.programMonthly),
+        currency: cur,
         interval: "month",
         includes: [...FULL_INCLUDES, "Every course in this program"],
         excludes: ["Other programs", "Live programs"],
-        renewalTerms: `Renews monthly at ${money(c.programMonthly)} until you cancel. Cancel any time in Account → Billing; access continues to the end of the period you paid for.`,
+        renewalTerms: `Renews monthly at ${M(c.programMonthly)} until you cancel. Cancel any time in Account → Billing; access continues to the end of the period you paid for.`,
         placeholder: true,
       });
     }
@@ -89,13 +94,13 @@ export const commerce = {
       out.push({
         code: "plus_monthly",
         label: `Start a ${c.trialDays}-day free trial of Scholarion Plus`,
-        price: c.plusMonthly,
-        currency: c.currency,
+        price: L(c.plusMonthly),
+        currency: cur,
         interval: "month",
         trialDays: c.trialDays,
         includes: ["Everything in this " + p.type.replace("_", " "), "All Plus-eligible self-paced courses, certificates and guided projects"],
         excludes: ["Live programs (unless marked as included)"],
-        renewalTerms: `Free for ${c.trialDays} days, then ${money(c.plusMonthly)}/month. We email you ${c.trialReminderDays} days before the first charge. Cancel before the trial ends and you pay nothing.`,
+        renewalTerms: `Free for ${c.trialDays} days, then ${M(c.plusMonthly)}/month. We email you ${c.trialReminderDays} days before the first charge. Cancel before the trial ends and you pay nothing.`,
         placeholder: true,
       });
     }
@@ -104,7 +109,7 @@ export const commerce = {
         code: "financial_aid",
         label: "Apply for financial aid",
         price: null,
-        currency: c.currency,
+        currency: cur,
         interval: null,
         includes: ["Up to 100% off this " + (p.type === "course" ? "course" : "program"), "Full access once approved"],
         excludes: ["Approval is not automatic; a person reviews every application"],
@@ -115,14 +120,16 @@ export const commerce = {
     return out;
   },
 
-  plansSummary() {
+  plansSummary(regionCode?: string | null) {
     const c = commerceConfig;
+    const L = (usd: number) => localize(usd, regionCode);
     return {
-      currency: c.currency,
-      programMonthly: c.programMonthly,
-      plusMonthly: c.plusMonthly,
-      plusAnnual: c.plusAnnual,
-      annualSavings: Math.max(0, c.plusMonthly * 12 - c.plusAnnual),
+      currency: region(regionCode).currency,
+      region: region(regionCode).code,
+      programMonthly: L(c.programMonthly),
+      plusMonthly: L(c.plusMonthly),
+      plusAnnual: L(c.plusAnnual),
+      annualSavings: Math.max(0, L(c.plusMonthly) * 12 - L(c.plusAnnual)),
       trialDays: c.trialDays,
       refundDays: c.refundDays,
       reminderDays: c.trialReminderDays,
@@ -131,7 +138,7 @@ export const commerce = {
   },
 
   /** POST /v1/commerce/checkout-sessions (idempotent). */
-  createCheckout(input: { userId: string; plan: PlanCode; productId: string | null; idempotencyKey: string; installments?: number }): CheckoutSession {
+  createCheckout(input: { userId: string; plan: PlanCode; productId: string | null; idempotencyKey: string; installments?: number; region?: string | null }): CheckoutSession {
     const db = getDb();
     const existing = db.checkouts.find((c) => c.idempotencyKey === input.idempotencyKey && c.userId === input.userId);
     if (existing) return existing;
@@ -153,9 +160,12 @@ export const commerce = {
     const start = nowIso();
     const hadTrial = db.subscriptions.some((s) => s.userId === input.userId && s.trialEnd);
     const trialEndsAt = input.plan === "plus_monthly" && !hadTrial ? addDays(start, c.trialDays) : null;
-    const amount =
-      input.plan === "plus_monthly" ? c.plusMonthly : input.plan === "plus_annual" ? c.plusAnnual : input.plan === "program_monthly" ? c.programMonthly : c.oneTime(product!.type, product!.hours);
-    const installmentAmount = installments && installments > 1 ? Math.ceil((amount / installments) * 100) / 100 : undefined;
+    const reg = region(input.region);
+    const amount = localize(
+      input.plan === "plus_monthly" ? c.plusMonthly : input.plan === "plus_annual" ? c.plusAnnual : input.plan === "program_monthly" ? c.programMonthly : c.oneTime(product!.type, product!.hours),
+      reg.code,
+    );
+    const installmentAmount = installments && installments > 1 ? installment(amount, installments, reg.code) : undefined;
     const renewsAt = input.plan === "one_time" || (input.plan === "live_seat" && !installmentAmount) ? null : installmentAmount ? addDays(start, 30) : trialEndsAt ?? periodEnd(start, input.plan);
     const session: CheckoutSession = {
       id: newId("cs"),
@@ -163,7 +173,8 @@ export const commerce = {
       productId: product?.id ?? null,
       plan: input.plan,
       amount,
-      currency: c.currency,
+      currency: reg.currency,
+      region: reg.code,
       trialEndsAt,
       renewsAt,
       refundPolicy:
@@ -216,6 +227,7 @@ export const commerce = {
           trialEnd: null,
           cancelAtPeriodEnd: false,
           amount: cs.installmentAmount,
+          currency: cs.currency,
           installmentsTotal: cs.installments,
           installmentsPaid: 1,
           createdAt: t,
@@ -223,7 +235,7 @@ export const commerce = {
         db.subscriptions.push(subscription);
       }
       if (cs.plan === "live_seat") admissions.markReserved(userId, cs.productId!, cs.installmentAmount ? "installments" : "full");
-      publish("order.paid", "commerce", `user/${userId}`, { userId, orderId, productId: cs.productId, plan: cs.plan, amount: charged });
+      publish("order.paid", "commerce", `user/${userId}`, { userId, orderId, productId: cs.productId, plan: cs.plan, amount: charged, currency: cs.currency });
     } else {
       subscription = {
         id: cs.id.replace("cs_", "sub_"),
@@ -236,6 +248,7 @@ export const commerce = {
         trialEnd: cs.trialEndsAt,
         cancelAtPeriodEnd: false,
         amount: cs.amount,
+        currency: cs.currency,
         createdAt: t,
       };
       db.subscriptions.push(subscription);
@@ -248,9 +261,9 @@ export const commerce = {
         validTo: subscription.currentPeriodEnd,
       });
       if (subscription.status === "trialing") {
-        publish("trial.started", "commerce", `user/${userId}`, { userId, subscriptionId: subscription.id, trialEnd: subscription.trialEnd, amountAfterTrial: subscription.amount });
+        publish("trial.started", "commerce", `user/${userId}`, { userId, subscriptionId: subscription.id, trialEnd: subscription.trialEnd, amountAfterTrial: subscription.amount, currency: subscription.currency });
       } else {
-        publish("order.paid", "commerce", `user/${userId}`, { userId, orderId, subscriptionId: subscription.id, plan: cs.plan, amount: charged });
+        publish("order.paid", "commerce", `user/${userId}`, { userId, orderId, subscriptionId: subscription.id, plan: cs.plan, amount: charged, currency: cs.currency });
       }
     }
     save();
@@ -317,9 +330,9 @@ export const commerce = {
     s.status = "refunded";
     entitlements.revokeBySource(s.id);
     for (const o of db.orders) if (o.userId === userId && o.sessionId === s.id.replace("sub_", "cs_")) o.status = "refunded";
-    publish("refund.issued", "commerce", `user/${userId}`, { userId, subscriptionId: s.id, amount: s.amount });
+    publish("refund.issued", "commerce", `user/${userId}`, { userId, subscriptionId: s.id, amount: s.amount, currency: s.currency });
     save();
-    return { status: "refunded", message: `Refund of ${money(s.amount)} issued (sandbox). Access has ended; your progress is saved.` };
+    return { status: "refunded", message: `Refund of ${money(s.amount, s.currency)} issued (sandbox). Access has ended; your progress is saved.` };
   },
 
   /** Scheduler tick: trial reminders, trial conversion, renewals, period-end expiry. */
@@ -332,7 +345,7 @@ export const commerce = {
         const remindAt = addDays(s.trialEnd, -commerceConfig.trialReminderDays);
         if (!s.reminderSentAt && t >= remindAt) {
           s.reminderSentAt = t;
-          publish("trial.ending", "commerce", `user/${s.userId}`, { userId: s.userId, subscriptionId: s.id, trialEnd: s.trialEnd, amount: s.amount });
+          publish("trial.ending", "commerce", `user/${s.userId}`, { userId: s.userId, subscriptionId: s.id, trialEnd: s.trialEnd, amount: s.amount, currency: s.currency });
           r.reminders++;
         }
         if (t >= s.trialEnd) {
@@ -340,28 +353,28 @@ export const commerce = {
           s.currentPeriodStart = s.trialEnd;
           s.currentPeriodEnd = periodEnd(s.trialEnd, s.plan);
           entitlements.endBySource(s.id, s.currentPeriodEnd);
-          db.orders.push({ id: newId("ord"), userId: s.userId, sessionId: s.id.replace("sub_", "cs_"), amount: s.amount, currency: commerceConfig.currency, description: `${planLabel(s.plan)} (first charge after trial)`, status: "paid", createdAt: t });
-          publish("subscription.renewed", "commerce", `user/${s.userId}`, { userId: s.userId, subscriptionId: s.id, periodEnd: s.currentPeriodEnd, amount: s.amount });
+          db.orders.push({ id: newId("ord"), userId: s.userId, sessionId: s.id.replace("sub_", "cs_"), amount: s.amount, currency: s.currency ?? commerceConfig.currency, description: `${planLabel(s.plan)} (first charge after trial)`, status: "paid", createdAt: t });
+          publish("subscription.renewed", "commerce", `user/${s.userId}`, { userId: s.userId, subscriptionId: s.id, periodEnd: s.currentPeriodEnd, amount: s.amount, currency: s.currency });
           r.converted++;
         }
       } else if (s.status === "active" && s.installmentsTotal && t >= s.currentPeriodEnd) {
         // Payment plan: charge the next installment; the plan completes after the last one.
         const n = (s.installmentsPaid ?? 1) + 1;
         s.installmentsPaid = n;
-        db.orders.push({ id: newId("ord"), userId: s.userId, sessionId: s.id.replace("sub_", "cs_"), amount: s.amount, currency: commerceConfig.currency, description: `${planLabel(s.plan, s.productId ? catalog.get(s.productId) : null)} (installment ${n} of ${s.installmentsTotal})`, status: "paid", createdAt: t });
+        db.orders.push({ id: newId("ord"), userId: s.userId, sessionId: s.id.replace("sub_", "cs_"), amount: s.amount, currency: s.currency ?? commerceConfig.currency, description: `${planLabel(s.plan, s.productId ? catalog.get(s.productId) : null)} (installment ${n} of ${s.installmentsTotal})`, status: "paid", createdAt: t });
         if (n >= s.installmentsTotal) s.status = "completed";
         else {
           s.currentPeriodStart = s.currentPeriodEnd;
           s.currentPeriodEnd = addDays(s.currentPeriodEnd, 30);
         }
-        publish("order.paid", "commerce", `user/${s.userId}`, { userId: s.userId, subscriptionId: s.id, plan: s.plan, amount: s.amount });
+        publish("order.paid", "commerce", `user/${s.userId}`, { userId: s.userId, subscriptionId: s.id, plan: s.plan, amount: s.amount, currency: s.currency });
         r.renewed++;
       } else if (s.status === "active" && t >= s.currentPeriodEnd) {
         s.currentPeriodStart = s.currentPeriodEnd;
         s.currentPeriodEnd = periodEnd(s.currentPeriodStart, s.plan);
         entitlements.endBySource(s.id, s.currentPeriodEnd);
-        db.orders.push({ id: newId("ord"), userId: s.userId, sessionId: s.id.replace("sub_", "cs_"), amount: s.amount, currency: commerceConfig.currency, description: `${planLabel(s.plan)} (renewal)`, status: "paid", createdAt: t });
-        publish("subscription.renewed", "commerce", `user/${s.userId}`, { userId: s.userId, subscriptionId: s.id, periodEnd: s.currentPeriodEnd, amount: s.amount });
+        db.orders.push({ id: newId("ord"), userId: s.userId, sessionId: s.id.replace("sub_", "cs_"), amount: s.amount, currency: s.currency ?? commerceConfig.currency, description: `${planLabel(s.plan)} (renewal)`, status: "paid", createdAt: t });
+        publish("subscription.renewed", "commerce", `user/${s.userId}`, { userId: s.userId, subscriptionId: s.id, periodEnd: s.currentPeriodEnd, amount: s.amount, currency: s.currency });
         r.renewed++;
       } else if (s.status === "canceled" && t >= s.currentPeriodEnd) {
         s.status = "expired";

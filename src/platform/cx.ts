@@ -161,15 +161,15 @@ function email(evt: CloudEvent, template: string, subject: string, body: string)
 
 export function registerHavenRoute(): void {
   subscribe("havenroute", "trial.started", (e) =>
-    email(e, "trial_started", "Your Scholarion Plus trial has started", `Your free trial runs until ${fmtDate(e.data.trialEnd)}. After that it's ${money(Number(e.data.amountAfterTrial))}/month. We'll remind you ${commerceConfig.trialReminderDays} days before you're charged. Cancel any time in Account → Billing: ${publicUrl()}/app/account`),
+    email(e, "trial_started", "Your Scholarion Plus trial has started", `Your free trial runs until ${fmtDate(e.data.trialEnd)}. After that it's ${money(Number(e.data.amountAfterTrial), typeof e.data.currency === "string" ? e.data.currency : undefined)}/month. We'll remind you ${commerceConfig.trialReminderDays} days before you're charged. Cancel any time in Account → Billing: ${publicUrl()}/app/account`),
   );
   subscribe("havenroute", "trial.ending", (e) =>
-    email(e, "trial_ending", "Reminder: your trial ends soon", `Your Scholarion Plus trial ends on ${fmtDate(e.data.trialEnd)}. On that date we'll charge ${money(Number(e.data.amount))} (sandbox). To avoid the charge, cancel before then: ${publicUrl()}/app/account`),
+    email(e, "trial_ending", "Reminder: your trial ends soon", `Your Scholarion Plus trial ends on ${fmtDate(e.data.trialEnd)}. On that date we'll charge ${money(Number(e.data.amount), typeof e.data.currency === "string" ? e.data.currency : undefined)} (sandbox). To avoid the charge, cancel before then: ${publicUrl()}/app/account`),
   );
-  subscribe("havenroute", "order.paid", (e) => email(e, "receipt", "Your Scholarion receipt", `Payment received: ${money(Number(e.data.amount))} (sandbox). Order ${e.data.orderId}.`));
-  subscribe("havenroute", "subscription.renewed", (e) => email(e, "renewal_receipt", "Your subscription renewed", `We charged ${money(Number(e.data.amount))} (sandbox). Your access continues until ${fmtDate(e.data.periodEnd)}.`));
+  subscribe("havenroute", "order.paid", (e) => email(e, "receipt", "Your Scholarion receipt", `Payment received: ${money(Number(e.data.amount), typeof e.data.currency === "string" ? e.data.currency : undefined)} (sandbox). Order ${e.data.orderId}.`));
+  subscribe("havenroute", "subscription.renewed", (e) => email(e, "renewal_receipt", "Your subscription renewed", `We charged ${money(Number(e.data.amount), typeof e.data.currency === "string" ? e.data.currency : undefined)} (sandbox). Your access continues until ${fmtDate(e.data.periodEnd)}.`));
   subscribe("havenroute", "subscription.canceled", (e) => email(e, "cancellation", "Your subscription is canceled", `You won't be charged again. You keep access until ${fmtDate(e.data.accessUntil)}, and your progress is saved.`));
-  subscribe("havenroute", "refund.issued", (e) => email(e, "refund", "Your refund is on its way", `We've refunded ${money(Number(e.data.amount))} (sandbox). Your progress is saved if you come back.`));
+  subscribe("havenroute", "refund.issued", (e) => email(e, "refund", "Your refund is on its way", `We've refunded ${money(Number(e.data.amount), typeof e.data.currency === "string" ? e.data.currency : undefined)} (sandbox). Your progress is saved if you come back.`));
   subscribe("havenroute", "aid.decided", (e) => {
     const p = catalog.get(e.data.productId as string);
     email(

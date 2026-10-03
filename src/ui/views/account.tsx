@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import type { Viewer } from "@/bff/views";
 import { fmtDateTime } from "../components/cards";
-import { AppShell, Flash } from "../components/chrome";
+import { AppShell, Flash, PrefsForm } from "../components/chrome";
+import { t } from "@/i18n";
 
 type V = NonNullable<Viewer>;
 type FlashProps = { notice?: string; error?: string };
@@ -247,6 +248,16 @@ export function SecurityView({ viewer, vm, flash }: { viewer: V; vm: SecurityVM;
           <form method="post" action="/api/v1/me/sessions/revoke-all">
             <button className="btn btn-ghost btn-sm">Sign out everywhere</button>
           </form>
+        </section>
+
+        <section className="card card-pad stack" aria-labelledby="sec-prefs">
+          <h2 id="sec-prefs" style={h2}>
+            {t("prefs.language")} · {t("prefs.region")}
+          </h2>
+          <PrefsForm compact />
+          <p className="tiny muted" style={{ margin: 0 }}>
+            {t("prefs.note")} {t("prefs.priceNote")}
+          </p>
         </section>
 
         <section className="card card-pad stack" aria-labelledby="sec-export">

@@ -27,6 +27,12 @@ export function mfaCookie(token: string, maxAgeSec: number): string {
   return `${MFA_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${maxAgeSec}${secure}`;
 }
 
+/** Long-lived, non-secret preference cookie (language, price region). */
+export function prefCookie(name: string, value: string): string {
+  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+  return `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${365 * 86400}${secure}`;
+}
+
 export function redirectWithCookies(to: string, cookies: string[]): Response {
   const h = new Headers({ location: to });
   for (const c of cookies) h.append("set-cookie", c);

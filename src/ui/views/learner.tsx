@@ -1,5 +1,7 @@
 import type { accountVM, calendarVM, courseHomeVM, credentialsVM, dashboardVM, gradebookVM, gradesOverviewVM, itemVM, liveVM, moduleVM, Viewer } from "@/bff/views";
 import type { Notice, Product } from "@/platform/types";
+import { formatMoney } from "@/platform/pricing";
+import { t } from "@/i18n";
 import { fmtDate, fmtDateTime, Progress, Stat, StatusBadge } from "../components/cards";
 import { AppShell, Crumbs, Flash } from "../components/chrome";
 import { LabWorkspace } from "../components/client/LabWorkspace";
@@ -14,7 +16,7 @@ const ART: Record<string, string> = { prd_cop1047c: "", prd_cai4505c: "ai", prd_
 
 function greeting(name: string) {
   const h = Number(new Date().toLocaleString("en-US", { timeZone: "America/New_York", hour: "numeric", hour12: false }));
-  return `${h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening"}, ${name.split(" ")[0]}!`;
+  return t(h < 12 ? "greet.morning" : h < 18 ? "greet.afternoon" : "greet.evening", { name: name.split(" ")[0] });
 }
 
 /* ======================= Dashboard ======================= */
@@ -24,7 +26,7 @@ export function DashboardView({ viewer, vm, flash }: { viewer: V; vm: ReturnType
     <AppShell viewer={viewer} current="/app">
       <Flash {...flash} />
       <h1 className="page-title">{greeting(viewer.name)}</h1>
-      <p className="muted">Keep going. Your goals are within reach.</p>
+      <p className="muted">{t("dash.sub")}</p>
       {vm.unverifiedEmail && (
         <div className="notice notice-warn row between" role="status" style={{ flexWrap: "wrap", gap: 8 }}>
           <span>
@@ -846,7 +848,7 @@ export function CredentialsView({ viewer, vm }: { viewer: V; vm: ReturnType<type
 /* ======================= Account & billing ======================= */
 
 export function AccountView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<typeof accountVM>; flash: FlashProps }) {
-  const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: n % 1 ? 2 : 0 }).format(n);
+  const money = (n: number, currency = "USD") => formatMoney(n, currency);
   const planName: Record<string, string> = { plus_monthly: "Scholarion Plus — monthly", plus_annual: "Scholarion Plus — annual", program_monthly: "Program subscription", live_seat: "Live seat payment plan" };
   return (
     <AppShell viewer={viewer} current="/app/account">
@@ -871,9 +873,9 @@ export function AccountView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<t
               </strong>{" "}
               <StatusBadge status={s.status === "trialing" ? "Trial" : s.status[0].toUpperCase() + s.status.slice(1)} />
               <div className="small muted">
-                {s.status === "trialing" && s.trialEnd && `Free trial ends ${fmtDate(s.trialEnd, { dateStyle: "long" })}, then ${money(s.amount)}/${s.plan === "plus_annual" ? "year" : "month"}. `}
-                {s.status === "active" && s.installmentsTotal && `${s.installmentsPaid} of ${s.installmentsTotal} installments paid. Next ${money(s.amount)} on ${fmtDate(s.currentPeriodEnd, { dateStyle: "long" })}. `}
-                {s.status === "active" && !s.installmentsTotal && `Renews ${fmtDate(s.currentPeriodEnd, { dateStyle: "long" })} at ${money(s.amount)}. `}
+                {s.status === "trialing" && s.trialEnd && `Free trial ends ${fmtDate(s.trialEnd, { dateStyle: "long" })}, then ${money(s.amount, s.currency)}/${s.plan === "plus_annual" ? "year" : "month"}. `}
+                {s.status === "active" && s.installmentsTotal && `${s.installmentsPaid} of ${s.installmentsTotal} installments paid. Next ${money(s.amount, s.currency)} on ${fmtDate(s.currentPeriodEnd, { dateStyle: "long" })}. `}
+                {s.status === "active" && !s.installmentsTotal && `Renews ${fmtDate(s.currentPeriodEnd, { dateStyle: "long" })} at ${money(s.amount, s.currency)}. `}
                 {s.status === "completed" && "Paid in full. "}
                 {s.status === "canceled" && `Canceled — access until ${fmtDate(s.currentPeriodEnd, { dateStyle: "long" })}. Progress saved. `}
                 {s.status === "paused" && "Paused — progress saved. "}
@@ -923,7 +925,7 @@ export function AccountView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<t
                     </div>
                   </td>
                   <td className="num mono">
-                    {money(o.amount)}
+                    {money(o.amount, o.currency)}
                     {o.status === "refunded" && <div className="tiny">refunded</div>}
                   </td>
                 </tr>

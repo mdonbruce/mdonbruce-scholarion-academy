@@ -23,7 +23,7 @@ export function EnrollModal({ productId, slug, offers, signedIn, label = "Enroll
   }, [open]);
 
   const back = `/learn/${slug}`;
-  const price = (o: Offer) => (o.price === null ? "" : o.price === 0 ? "Free" : `${new Intl.NumberFormat("en-US", { style: "currency", currency: o.currency, maximumFractionDigits: 0 }).format(o.price)}${o.interval === "month" ? "/month" : o.interval === "year" ? "/year" : ""}`);
+  const price = (o: Offer) => (o.price === null ? "" : o.price === 0 ? "Free" : `${new Intl.NumberFormat("en-US", { style: "currency", currency: o.currency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(o.price)}${o.interval === "month" ? "/month" : o.interval === "year" ? "/year" : ""}`);
 
   return (
     <>

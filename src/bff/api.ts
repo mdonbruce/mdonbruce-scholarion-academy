@@ -1,4 +1,6 @@
 import QR from "./qr";
+import { isLocale, LOCALE_COOKIE, REGION_COOKIE } from "@/i18n";
+import { isRegion } from "@/platform/pricing";
 import { certificatePdf } from "./certificate-pdf";
 import {
   capabilities,
@@ -30,7 +32,7 @@ import {
   type User,
 } from "@/platform";
 import { DAY, PlatformError } from "@/platform/util";
-import { body, currentUser, errorResponse, json, mfaCookie, readCookie, MFA_COOKIE, redirect, redirectWithCookies, safeRedirect, sameOrigin, sessionCookie, withQuery } from "./http";
+import { body, currentUser, errorResponse, json, mfaCookie, prefCookie, readCookie, MFA_COOKIE, redirect, redirectWithCookies, safeRedirect, sameOrigin, sessionCookie, withQuery } from "./http";
 
 /**
  * Academy BFF — the only door the browser uses (Integration Spec §2, rule 1).
@@ -88,6 +90,29 @@ on("POST", "auth/reset", (c) => {
 on("POST", "auth/verify-email", (c) => {
   identity.verifyEmail(c.data.token ?? "");
   return redirect(withQuery(c.user ? "/app" : "/login", { notice: "Email confirmed. Thank you." }));
+});
+
+/* ---------------- Language & region ---------------- */
+
+on("POST", "prefs", (c) => {
+  const cookies: string[] = [];
+  const locale = isLocale(c.data.locale) ? c.data.locale : undefined;
+  const region = isRegion(c.data.region) ? c.data.region : undefined;
+  if (locale) cookies.push(prefCookie(LOCALE_COOKIE, locale));
+  if (region) cookies.push(prefCookie(REGION_COOKIE, region));
+  if (c.user) identity.setPreferences(c.user.id, { locale, region });
+  // Return to the page the form was on.
+  const ref = c.req.headers.get("referer");
+  let from = "/";
+  try {
+    if (ref) {
+      const u = new URL(ref);
+      if (u.host === new URL(c.req.url).host) from = u.pathname + u.search;
+    }
+  } catch {
+    /* keep "/" */
+  }
+  return redirectWithCookies(back(c, from), cookies);
 });
 
 /* ---------------- Account security & privacy ---------------- */
@@ -161,7 +186,11 @@ on("GET", "catalog/products/:slug", (c) => {
   return p ? json({ product: p, modules: catalog.modules(p.id), courses: catalog.courses(p.id), nextSteps: catalog.nextSteps(p.id) }) : json({ error: { code: "not_found", message: "Not found" } }, 404);
 });
 on("GET", "catalog/pathways", () => json(catalog.pathway()));
-on("GET", "commerce/offers/:slug", (c) => json({ offers: commerce.offers(c.params.slug), plans: commerce.plansSummary() }));
+on("GET", "commerce/offers/:slug", (c) => {
+  const q = new URL(c.req.url).searchParams.get("region") ?? readCookie(c.req, REGION_COOKIE) ?? c.user?.region;
+  const region = isRegion(q) ? q : "US";
+  return json({ region, offers: commerce.offers(c.params.slug, region), plans: commerce.plansSummary(region) });
+});
 
 /* ---------------- Entitlements ---------------- */
 
@@ -264,7 +293,10 @@ on(
     if (!["program_monthly", "plus_monthly", "plus_annual", "one_time", "live_seat"].includes(plan)) throw new PlatformError("invalid_plan", "Choose a plan.");
     const product = c.data.productId ? catalog.get(c.data.productId) : undefined;
     const installments = plan === "live_seat" && c.data.installments === "3" ? 3 : undefined;
-    const cs = commerce.createCheckout({ userId: c.user!.id, plan, productId: product?.id ?? null, installments, idempotencyKey: c.data.idempotencyKey || `${c.user!.id}:${plan}:${product?.id ?? "plus"}:${installments ?? 1}:${new Date().toISOString().slice(0, 13)}` });
+    // Price-book region: cookie, then the account's saved choice, then US.
+    const cookieRegion = readCookie(c.req, REGION_COOKIE);
+    const region = isRegion(cookieRegion) ? cookieRegion : isRegion(c.user!.region) ? c.user!.region : "US";
+    const cs = commerce.createCheckout({ userId: c.user!.id, plan, productId: product?.id ?? null, installments, region, idempotencyKey: c.data.idempotencyKey || `${c.user!.id}:${plan}:${product?.id ?? "plus"}:${installments ?? 1}:${region}:${new Date().toISOString().slice(0, 13)}` });
     return redirect(`/checkout/${cs.id}`);
   },
   "user",

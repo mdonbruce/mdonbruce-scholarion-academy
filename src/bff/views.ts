@@ -1,3 +1,5 @@
+import { requestPrefs } from "@/i18n";
+import { installment } from "@/platform/pricing";
 import {
   capabilities,
   catalog,
@@ -47,7 +49,7 @@ export function homeVM() {
     guided: catalog.rail("guided"),
     newest: catalog.rail("new", 6),
     programCount: catalog.all().filter((p) => p.type !== "course" && p.type !== "guided_project").length,
-    plans: commerce.plansSummary(),
+    plans: commerce.plansSummary(requestPrefs().region),
   };
 }
 
@@ -82,8 +84,8 @@ export function productVM(slug: string, userId: string | null) {
     courses: catalog.courses(product.id).filter((c) => c.id !== product.id),
     includedIn: catalog.includedIn(product.id),
     nextSteps: catalog.nextSteps(product.id),
-    offers: commerce.offers(product.id),
-    plans: commerce.plansSummary(),
+    offers: commerce.offers(product.id, requestPrefs().region),
+    plans: commerce.plansSummary(requestPrefs().region),
     pace: catalog.pace(product),
     partnerLogos: partners.forProduct(product, "logo"),
     access,
@@ -281,7 +283,7 @@ export function accountVM(user: User) {
     subscriptions: commerce.subscriptionsFor(user.id).map((s) => ({ ...s, product: s.productId ? catalog.get(s.productId) : null })),
     orders: commerce.ordersFor(user.id),
     aid: commerce.aidFor(user.id).map((a) => ({ ...a, product: catalog.get(a.productId) })),
-    plans: commerce.plansSummary(),
+    plans: commerce.plansSummary(requestPrefs().region),
     now: nowIso(),
   };
 }
@@ -290,14 +292,16 @@ export function applyVM(slug: string, userId: string | null) {
   ensurePlatform();
   const product = catalog.get(slug);
   if (!product || product.format !== "live") return null;
-  const offer = commerce.offers(product.id).find((o) => o.code === "live_seat");
+  const region = requestPrefs().region;
+  const offer = commerce.offers(product.id, region).find((o) => o.code === "live_seat");
   const price = offer?.price ?? 0;
   return {
     product,
     application: userId ? admissions.current(userId, product.id) ?? null : null,
     capacity: admissions.capacity(product.id),
     price,
-    installment: Math.ceil((price / 3) * 100) / 100,
+    currency: offer?.currency ?? "USD",
+    installment: installment(price, 3, region),
     sessions: getDb().liveSessions.filter((s) => s.productId === product.id).slice(0, 3),
   };
 }
@@ -489,7 +493,7 @@ export function hubsVM() {
 
 export function hubVM(slug: string) {
   ensurePlatform();
-  const r = content.hub(slug);
+  const r = content.hub(slug, requestPrefs().region);
   if (!r) return null;
   const { match: _m, ...hub } = r.hub;
   void _m;
