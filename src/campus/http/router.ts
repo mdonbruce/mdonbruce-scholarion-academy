@@ -336,9 +336,9 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     if (!["student", "instructor", "app"].includes(edition)) throw new CampusError("not_found", "Unknown edition", 404);
     const teaches = Object.values(a.courseRoles ?? {}).some((r) => r.includes("instructor") || r.includes("ta"));
     if (edition === "instructor" && !teaches && !hasAny(a, ["admin", "designer"])) throw new CampusError("forbidden", "The instructor edition contains answer keys and is for course staff.", 403);
-    const module = url.searchParams.get("module") ?? "";
-    const html = simLabHtml(rest[1], edition, { module, program: url.searchParams.get("program") ?? undefined });
-    const name = simLabFileName(rest[1], edition, module);
+    const moduleNo = url.searchParams.get("module") ?? "";
+    const html = simLabHtml(rest[1], edition, { module: moduleNo, program: url.searchParams.get("program") ?? undefined });
+    const name = simLabFileName(rest[1], edition, moduleNo);
     return new Response(html, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "content-disposition": `${url.searchParams.get("download") ? "attachment" : "inline"}; filename="${name}"`, "cache-control": "no-store", "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'", "x-content-type-options": "nosniff" } });
   }
   if (rest[0] === "assess" && rest[1] && (rest[2] === "qti.xml" || rest[2] === "item-bank.json") && method === "GET") {
