@@ -1,4 +1,4 @@
-import { CampusError, hmac, nowIso, nowMs, registerConsumer, sha256, type Row, type TenantStore } from "../core";
+import { broker, CampusError, hmac, nowIso, nowMs, registerConsumer, sha256, type Row, type TenantStore } from "../core";
 import { registerHooks } from "../entity";
 import { hasAny, type Actor } from "../iam";
 import { audit, isStaff, requireCourse } from "./common";
@@ -21,7 +21,7 @@ const BLOCKED_EXT = ["exe", "bat", "cmd", "msi", "scr", "js", "vbs", "ps1", "jar
 export function signUrl(tenantId: string, op: "put" | "get", fileId: string, ttl = URL_TTL_MS) {
   const exp = nowMs() + ttl;
   const sig = hmac(`${SIGNING_KEY}:${tenantId}`, `${op}:${fileId}:${exp}`);
-  return { url: `/api/campus/objects/${op}/${fileId}?exp=${exp}&sig=${sig}`, exp };
+  return { url: `/api/campus/objects/${broker.tenant(tenantId)?.slug ?? tenantId}/${fileId}?exp=${exp}&sig=${sig}`, method: op === "put" ? "PUT" : "GET", exp };
 }
 export function verifySignature(tenantId: string, op: "put" | "get", fileId: string, exp: string | null, sig: string | null) {
   if (!exp || !sig) throw new CampusError("bad_signature", "Missing signature", 403);

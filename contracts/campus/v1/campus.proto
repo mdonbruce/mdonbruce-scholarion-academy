@@ -1,0 +1,71 @@
+// Scholarion Campus — internal gRPC contract (v1).
+// Served by src/campus/http/grpc.ts over HTTP/2 (h2c in local/staging; TLS in front in staging).
+// Authentication: metadata "authorization: Bearer <access token>" for the tenant named in each request.
+syntax = "proto3";
+
+package scholarion.campus.v1;
+
+service CampusService {
+  // Liveness and number of live tenants (no tenant data).
+  rpc Health(HealthRequest) returns (HealthResponse);
+  // Courses the caller may see in a tenant, paginated.
+  rpc ListCourses(ListCoursesRequest) returns (ListCoursesResponse);
+  // Active enrollments in a course (LMS projection of SIS registrations).
+  rpc ListEnrollments(ListEnrollmentsRequest) returns (ListEnrollmentsResponse);
+  // Outbox events for a tenant after a cursor (internal consumers; admin token required).
+  rpc ListEvents(ListEventsRequest) returns (ListEventsResponse);
+}
+
+message HealthRequest {}
+message HealthResponse {
+  string status = 1;
+  int32 tenants = 2;
+}
+
+message ListCoursesRequest {
+  string tenant = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+message Course {
+  string id = 1;
+  string code = 2;
+  string title = 3;
+  string state = 4;
+}
+message ListCoursesResponse {
+  repeated Course courses = 1;
+  string next_page_token = 2;
+}
+
+message ListEnrollmentsRequest {
+  string tenant = 1;
+  string course_id = 2;
+}
+message Enrollment {
+  string user_id = 1;
+  string role = 2;
+  string state = 3;
+  string section_id = 4;
+}
+message ListEnrollmentsResponse {
+  repeated Enrollment enrollments = 1;
+}
+
+message ListEventsRequest {
+  string tenant = 1;
+  int32 after = 2;
+  int32 limit = 3;
+}
+message Event {
+  string id = 1;
+  string type = 2;
+  string subject = 3;
+  string at = 4;
+  string status = 5;
+  string data_json = 6;
+}
+message ListEventsResponse {
+  repeated Event events = 1;
+  int32 next = 2;
+}

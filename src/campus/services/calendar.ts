@@ -139,7 +139,7 @@ export function issueFeed(store: TenantStore, a: Actor, label = "My calendar") {
   return store.tx(() => {
     const t = store.insert("ical_tokens", { userId: a.id, label, tokenHash: sha256(secret) }, "ict");
     audit(store, a, "ical.issue", `ical_tokens/${t.id}`);
-    return { id: t.id, url: `/api/campus/ical/${store.tenantId}/${secret}.ics` };
+    return { id: t.id, url: `/api/campus/ical/${broker.tenant(store.tenantId)?.slug ?? store.tenantId}/${secret}.ics` };
   });
 }
 
