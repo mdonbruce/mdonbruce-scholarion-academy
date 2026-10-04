@@ -265,7 +265,7 @@ if (cross.status !== 401) {
 } else console.log("ok   401 campus cross-tenant session refused");
 const cOps = await campusSignIn("techdev", "ops", true);
 await expect("campus operator: tenant console", "/campus/techdev/t/tenant-console", 200, { cookie: cOps });
-await expect("campus: metrics", "/api/campus/metrics", 200);
+await expect("campus: metrics need the operator token in production", "/api/campus/metrics", 403);
 
 const status = await (await req("/api/v1/status")).json();
 console.log(`status board: ${status.capabilities.map((c) => `${c.key}=${c.status}`).join(", ")}`);
