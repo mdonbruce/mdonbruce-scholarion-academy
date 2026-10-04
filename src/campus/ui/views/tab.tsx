@@ -17,6 +17,8 @@ import { myTickets } from "../../services/desk";
 import { labNotebook } from "../../services/tutor";
 import { ProctorPanel } from "./proctor";
 import { CampaignsPanel } from "./campaigns";
+import { DesignPanel } from "./design";
+import { isDesignProgram } from "../../academy/design";
 import { studioOverview, programIndex } from "../../services/programs";
 import { PARITY, paritySummary, SECTION_TITLES } from "../../parity";
 import { consolidationReport } from "../../services/hub";
@@ -756,6 +758,7 @@ function ProgramStudio({ t }: { t: T }) {
                 </li>
               ))}
             </ul>
+            {isDesignProgram(p.code) && <DesignPanel store={t.store} actor={t.actor} slug={t.slug} code={p.code} here={t.here} />}
             <h3 className="small">Risks</h3>
             <ul className="small">
               {p.risks.map((r) => (

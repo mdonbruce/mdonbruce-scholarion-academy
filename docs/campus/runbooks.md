@@ -606,7 +606,7 @@ Academy program designs (#1, #12, #13, #14, #26): website pages generated from c
 - **Typical failures:** Program page won't publish (copy check, missing fee or unconfirmed faculty).
 - **Recovery:** Fix the flagged wording or field and publish again; the page reads fees and dates from the catalog.
 - **Resources:** `program_pages`, `program_testimonials`, `program_inquiries`, `selfcheck_attempts`
-- **Operations:** `agentic.hub`, `agentic.quiz_questions`, `agentic.recommend`, `programs.index`, `programs.page`, `programs.self_check_questions`, `programs.self_check`, `programs.inquire`, `programs.apply`, `programs.review`, `programs.quality_gate`, `programs.publish_shells`, `programs.status`, `programs.progress`
+- **Operations:** `agentic.hub`, `agentic.quiz_questions`, `agentic.recommend`, `programs.index`, `programs.page`, `programs.self_check_questions`, `programs.self_check`, `programs.inquire`, `programs.apply`, `programs.review`, `programs.quality_gate`, `programs.publish_shells`, `programs.design`, `programs.design_signoff`, `programs.status`, `programs.progress`
 - **Who sees it:** admin, designer, registrar, advisor, instructor
 
 ## 53. Assessment & Project Studio

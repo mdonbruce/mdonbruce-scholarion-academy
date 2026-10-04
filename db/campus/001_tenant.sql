@@ -2933,6 +2933,22 @@ CREATE TABLE IF NOT EXISTS studio_outputs (
   checksum text
 );
 
+-- Design sign-off (tab: program-studio)
+CREATE TABLE IF NOT EXISTS program_design_signoffs (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  program_code text,
+  kind text,
+  by text,
+  by_name text,
+  at timestamptz,
+  note text,
+  revoked_at timestamptz
+);
+
 -- Campaign (tab: campaigns)
 CREATE TABLE IF NOT EXISTS campaigns (
   id text PRIMARY KEY,

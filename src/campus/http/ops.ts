@@ -37,6 +37,7 @@ import { submitProject } from "../academy/ai801-seed";
 import * as eco from "../services/ecosystem";
 import * as plat from "../services/platform";
 import * as camp from "../services/campaigns";
+import * as design from "../services/design";
 import { isStaff, requireTenant } from "../services/common";
 import { decideSupportGrant, grantRole, requestSupportGrant, revokeRole } from "../iam";
 
@@ -693,6 +694,8 @@ qry("programs.quality_gate", "program-studio", "Quality gate for a program's cou
   return prog.qualityGate(store, args.s("offeringId"));
 });
 cmd("programs.publish_shells", "program-studio", "Publish a program's course shells (after the quality gate).", [P("offeringId")], ({ store, actor, args }) => prog.publishProgramShells(store, actor, args.s("offeringId")));
+qry("programs.design", "program-studio", "Program design package for #1–#11: course standard, alignment matrix with Bloom levels, workload, credential rules, career hooks and the extended quality gate.", [P("program")], ({ store, actor, args }) => design.designSummary(store, actor, args.s("program")));
+cmd("programs.design_signoff", "program-studio", "Sign off a program design as instructional designer or subject-matter expert (one person can't sign both).", [P("program"), P("kind", "string", true, { options: ["designer", "sme"] }), P("note")], ({ store, actor, args }) => design.signOff(store, actor, args.s("program"), args.s("kind") as "designer" | "sme", args.s("note")));
 qry("programs.status", "program-studio", "Design-package status for every program.", [], ({ store, actor }) => prog.studioOverview(store, actor));
 qry("programs.progress", "program-studio", "My progress toward a program credential.", [P("offeringId")], ({ store, actor, args }) => prog.myProgramProgress(store, actor, args.s("offeringId")));
 cmd("lab_keys.issue", "key-vault", "Get a learner API key for a lab (capped and expiring).", [P("assignmentId")], ({ store, actor, args }) => tut.issueLabKey(store, actor, args.s("assignmentId")));

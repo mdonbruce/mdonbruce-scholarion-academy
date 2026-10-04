@@ -6,6 +6,7 @@ import { PROGRAMS, P26_QUIZ, TRADEMARK_NOTICE, type ProgramSpec, type QuizItem, 
 import { LEARNING_PATHS, LIBRARY, P15_CHECKS, PROGRAMS_2, type LibraryModule } from "../academy/programs-data-2";
 import { PROGRAMS_3 } from "../academy/programs-data-3";
 import { GENAI, genaiProgramSpec, genaiSessions } from "../academy/genai-program";
+import { activityEditions, AI_POLICY, AI_POLICY_TEXT, designFor, DRAFT, isDesignProgram, quizBlueprint } from "../academy/design";
 import { DECIDED_BY, DECISIONS, decisionIso } from "../academy/decisions";
 import { facultyByName, fitSize } from "../../brand/faculty";
 import { facultyImageBytes } from "../../brand/faculty-assets";
@@ -69,6 +70,17 @@ export const moduleKeyFor = (code: string, week: string) => `p${num(code)}-w${we
 
 function blocks(paras: string[], title: string, extra: Block[] = []) {
   return validateBlocks([{ type: "heading", level: 2, text: title }, ...paras.map((p) => ({ type: "paragraph" as const, text: p })), ...extra]);
+}
+/** Markdown edition → page blocks (headings become real headings). */
+function mdBlocks(md: string, title: string) {
+  const out: Block[] = [{ type: "heading", level: 2, text: title }];
+  for (const para of md.split(/\n\n+/)) {
+    const h = /^(#{1,3})\s+(.*)$/.exec(para.trim());
+    if (h) {
+      if (h[1].length > 1) out.push({ type: "heading", level: 3, text: h[2] });
+    } else if (para.trim()) out.push({ type: "paragraph", text: para.trim().replace(/^> /, "") });
+  }
+  return validateBlocks(out);
 }
 
 /** Program copy for the honesty guard: "#1" etc. are program numbers, not rankings. */
@@ -169,6 +181,9 @@ function loadProgram(x: Ctx, spec: ProgramSpec) {
   const single = spec.blocks.length === 1;
   const courseByBlock: Record<string, Row> = {};
   x.pos = 0;
+  // #1–#11: the course standard from the program design package (quizzes, labs, assignments,
+  // exams, announcements, sequential locking, activity editions, AI-use policy per item).
+  const design = isDesignProgram(spec.code) ? designFor(spec) : null;
 
   spec.blocks.forEach((b, bi) => {
     const id = bi === 0 && spec.adoptCourse ? spec.adoptCourse.courseId : courseIdFor(slug, spec.code, b.key, single);
@@ -178,12 +193,21 @@ function loadProgram(x: Ctx, spec: ProgramSpec) {
   const groups: Record<string, Record<string, Row>> = {};
   for (const [k, c] of Object.entries(courseByBlock)) {
     const pnp = spec.grading === "pass_no_pass" || spec.completion === "weekend_intensive";
-    groups[k] = {
-      act: store.insert("assignment_groups", { courseId: c.id, name: "In-class activities", weight: pnp ? 10 : 20 }, "ag"),
-      lab: store.insert("assignment_groups", { courseId: c.id, name: "Labs", weight: pnp ? 40 : 20 }, "ag"),
-      quiz: store.insert("assignment_groups", { courseId: c.id, name: "Quizzes and checks", weight: 20 }, "ag"),
-      proj: store.insert("assignment_groups", { courseId: c.id, name: "Projects and capstone", weight: pnp ? 30 : 40 }, "ag"),
-    };
+    groups[k] = design
+      ? {
+          act: store.insert("assignment_groups", { courseId: c.id, name: "In-class activities", weight: 10 }, "ag"),
+          asg: store.insert("assignment_groups", { courseId: c.id, name: "Assignments", weight: 15 }, "ag"),
+          lab: store.insert("assignment_groups", { courseId: c.id, name: "Labs", weight: 15 }, "ag"),
+          quiz: store.insert("assignment_groups", { courseId: c.id, name: "Quizzes", weight: 10 }, "ag"),
+          exam: store.insert("assignment_groups", { courseId: c.id, name: "Exams", weight: 15 }, "ag"),
+          proj: store.insert("assignment_groups", { courseId: c.id, name: "Projects and capstone", weight: 35 }, "ag"),
+        }
+      : {
+          act: store.insert("assignment_groups", { courseId: c.id, name: "In-class activities", weight: pnp ? 10 : 20 }, "ag"),
+          lab: store.insert("assignment_groups", { courseId: c.id, name: "Labs", weight: pnp ? 40 : 20 }, "ag"),
+          quiz: store.insert("assignment_groups", { courseId: c.id, name: "Quizzes and checks", weight: 20 }, "ag"),
+          proj: store.insert("assignment_groups", { courseId: c.id, name: "Projects and capstone", weight: pnp ? 30 : 40 }, "ag"),
+        };
   }
   const firstBlock = spec.blocks[0].key;
   let prevModule: Row | null = null;
@@ -199,7 +223,7 @@ function loadProgram(x: Ctx, spec: ProgramSpec) {
     const wk = weekNo(w.week);
     const weekStart = Math.max(0, wk - 1) * 7;
     const adoptId = bk === firstBlock ? spec.adoptCourse?.weeks[w.week] : undefined;
-    const modData = { courseId: c.id, title: `${w.optional ? "Optional — " : ""}${unit} ${w.week}: ${w.title}`, position: wk + 1, moduleKey: moduleKeyFor(spec.code, w.week), state: "published", requireAll: true, sequential: spec.code === "#26", prerequisiteModuleIds: spec.code === "#26" && prevModule ? [prevModule.id] : [] };
+    const modData = { courseId: c.id, title: `${w.optional ? "Optional — " : ""}${unit} ${w.week}: ${w.title}`, position: wk + 1, moduleKey: moduleKeyFor(spec.code, w.week), state: "published", requireAll: true, sequential: spec.code === "#26" || (!!design && !w.optional), prerequisiteModuleIds: (spec.code === "#26" || (!!design && !w.optional)) && prevModule ? [prevModule.id] : [] };
     const m: Row = adoptId && store.get("modules", adoptId) ? store.update("modules", adoptId, { title: modData.title, position: modData.position, moduleKey: modData.moduleKey }) : store.insert("modules", modData, "mod");
     if (!w.optional) prevModule = m;
     if (x.pos === 0 || (wk <= 1 && bk === firstBlock && !store.list("pages", (p) => p.courseId === c.id && /Orientation/.test(String(p.title))).length)) {
@@ -210,9 +234,18 @@ function loadProgram(x: Ctx, spec: ProgramSpec) {
     const ov = pageOf(x, c, m, `${unit} ${w.week} overview`, [w.focus, ...(w.sessions ? [`Saturday session (3 hours): ${w.sessions[0]}.`, `Sunday session (3 hours): ${w.sessions[1]}.`, "Each session is a guided build: demo → lab → checkpoint."] : []), ...(w.labs ? [`Lab A: ${w.labs[0]}.`, `Lab B: ${w.labs[1]}.`] : []), ...(w.dual ? ["Deep learning labs ship in PyTorch and TensorFlow/Keras versions; choose one. The instructor solution covers both."] : []), ...libraryNote(w.lib), ...research.map((r) => `Research case study: ${r.authors} (${r.year}). ${r.title}. ${r.venue}.`)]);
     itemOf(x, c, m, "page", ov.id, ov.title as string, "view");
     const due = dayOf(start, weekStart + 6, 23, 59);
+    const wp = design?.weeks.find((y) => y.week === w.week);
+    if (design && wp && !w.optional) {
+      store.insert("announcements", { courseId: c.id, title: `${unit} ${w.week} starts: ${w.title}`, body: `This week: ${wp.topics.join(", ")}. Live session: ${wp.liveSession}. Due Sunday 11:59 PM ET: ${[wp.activity, ...wp.assessments.map((id) => design.assessments.find((a) => a.id === id)?.title ?? "")].filter(Boolean).join("; ")}.`, publishAt: dayOf(start, weekStart, 8, 0), state: "published", auto: true, allowReplies: false, readBy: [] }, "ann");
+    }
     if (w.kind !== "capstone" && w.kind !== "midterm") {
-      const act = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `In-Class Activity — ${unit} ${w.week}: ${w.title}`, instructions: ACTIVITY_BODY(w).join("\n\n"), points: 10, groupId: groups[bk].act.id, dueAt: due, submissionTypes: ["file"], allowedExtensions: ["docx", "pdf"], state: "published", gradingType: "points" }, "asg");
+      const ed = design && wp ? activityEditions(spec, design, wp) : null;
+      const act = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `In-Class Activity — ${unit} ${w.week}: ${w.title}`, instructions: ed ? ed.student : ACTIVITY_BODY(w).join("\n\n"), points: 10, groupId: groups[bk].act.id, dueAt: due, submissionTypes: ["file"], allowedExtensions: ["docx", "pdf"], state: "published", gradingType: "points", ...(design ? { aiPolicy: AI_POLICY.activity, designStatus: DRAFT } : {}) }, "asg");
       itemOf(x, c, m, "assignment", act.id, act.title as string, w.optional ? null : "submit");
+      if (ed) {
+        const ie = x.store.insert("pages", { courseId: c.id, moduleId: m.id, title: `Instructor edition — ${unit} ${w.week} activity`, blocks: mdBlocks(ed.instructor, `Instructor edition — ${unit} ${w.week} activity`), html: renderBlocks(x.store, mdBlocks(ed.instructor, `Instructor edition — ${unit} ${w.week} activity`), c.id), position: 2, state: "unpublished", audience: "instructors" }, "pg");
+        itemOf(x, c, m, "page", ie.id, ie.title as string, null, { state: "unpublished" });
+      }
     }
     if (w.sessions) {
       w.sessions.forEach((title, i) => {
@@ -241,7 +274,7 @@ function loadProgram(x: Ctx, spec: ProgramSpec) {
       const r = quizFrom(x, c, m, `Weekend ${wk} check`, P15_CHECKS[wk], { tag: `weekend${wk}`, groupId: groups[bk].quiz.id, bank: checksBank });
       itemOf(x, c, m, "quiz", r.quiz.id, r.quiz.title as string, "min_score", { minScore: 70 });
     }
-    if (spec.code === "#1" && w.kind === "midterm") {
+    if (spec.code === "#1" && w.kind === "midterm" && !design) {
       const ex = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: "Block A exam", instructions: "Exam items pending SME authoring.", points: 20, groupId: groups[bk].quiz.id, dueAt: due, submissionTypes: ["on_paper"], state: "unpublished", gradingType: "points" }, "asg");
       itemOf(x, c, m, "assignment", ex.id, ex.title as string, null);
     }
@@ -249,6 +282,22 @@ function loadProgram(x: Ctx, spec: ProgramSpec) {
       const rb = p.requirements ? rubricFor(store, c.id, `${p.name} rubric`, p.requirements) : null;
       const a = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `${p.kind === "capstone" ? "Capstone" : p.kind === "midterm" ? "Midterm project" : "Project"}: ${p.name}`, instructions: `${p.description}\n\nSkills practiced: ${p.skills.join(", ")}.${p.requirements ? `\n\nRequired: ${p.requirements.join("; ")}.` : ""}\n\nUse the synthetic datasets in Program resources; never real personal or financial data.`, points: rb ? p.requirements!.length * 5 : 20, groupId: groups[bk].proj.id, dueAt: due, submissionTypes: ["file", "url"], rubricId: rb?.id ?? null, state: "published", gradingType: "points", tags: [p.kind] }, "asg");
       itemOf(x, c, m, "assignment", a.id, a.title as string, "submit");
+    }
+    if (design) {
+      for (const a of design.assessments.filter((y) => y.week === w.week && !y.fromSpec)) {
+        if (a.kind === "quiz" || a.kind === "midterm_exam" || a.kind === "final_exam") {
+          const bp = quizBlueprint(design, a);
+          const qb = store.insert("question_banks", { courseId: c.id, title: `${a.title} bank (${bp.poolSize} items to author)` }, "qb");
+          const qz = store.insert("quizzes", { courseId: c.id, moduleId: m.id, title: a.title, bankId: qb.id, pools: [{ bankId: qb.id, tag: a.id, pick: bp.itemsShown }], questionCount: bp.itemsShown, timeLimitMin: a.kind === "quiz" ? 20 : 90, allowedAttempts: a.kind === "quiz" ? 2 : 1, points: bp.itemsShown, groupId: (a.kind === "quiz" ? groups[bk].quiz : groups[bk].exam).id, kind: "graded", scoringPolicy: "highest", shuffleAnswers: true, showResponses: true, state: "unpublished", aiPolicy: a.aiPolicy, blueprint: bp.blueprint, competencies: a.outcomes, designStatus: bp.status }, "qz");
+          itemOf(x, c, m, "quiz", qz.id, `${a.title} (draft — items pending SME authoring)`, null, { state: "unpublished" });
+          continue;
+        }
+        const grp = a.kind === "lab" ? groups[bk].lab : a.kind === "assignment" ? groups[bk].asg : groups[bk].proj;
+        const policy = AI_POLICY_TEXT[a.aiPolicy];
+        const steps = a.kind === "assignment" ? `\n\nWalkthrough:\n1. Load the larger synthetic dataset from Program resources and read its data card.\n2. Reproduce this week's technique on a 10% sample and check it by hand.\n3. Scale to the full dataset; record time, cost or errors.\n4. Compare results with a simple baseline.\n5. Write up decisions, evidence and one limitation.` : a.kind === "lab" ? `\n\n${design.notebooks ? `Open Week_${String(w.week).padStart(2, "0")}_Lab_Starter_TODO.ipynb in the Cloud Lab and complete each TODO; the instructor solution is released after the due date.` : "Follow the lab tool walkthrough and compare with the completed reference build."}` : "";
+        const asg = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: a.title, instructions: `${a.description}${steps}\n\nCompetencies: ${a.outcomes.join(", ")}.\n\nAI-use policy (${a.aiPolicy}): ${policy}\n\n${DRAFT}`, points: a.kind === "final_practical" ? 30 : a.kind === "project" ? 20 : 10, groupId: grp.id, dueAt: due, submissionTypes: ["file", "url"], allowedExtensions: a.kind === "lab" ? ["ipynb", "py", "pdf"] : ["docx", "pdf", "zip", "ipynb"], state: "published", gradingType: "points", tags: [a.kind], aiPolicy: a.aiPolicy, competencies: a.outcomes }, "asg");
+        itemOf(x, c, m, "assignment", asg.id, asg.title as string, "submit");
+      }
     }
     if (spec.code === "#26" && wk === 5) {
       const ms = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: "Capstone milestone check-in", instructions: "Share your chosen brief, architecture sketch and evaluation plan for feedback.", points: 5, groupId: groups[bk].proj.id, dueAt: due, submissionTypes: ["text", "file"], state: "published", gradingType: "points" }, "asg");
@@ -1119,6 +1168,19 @@ export function programStatus(store: TenantStore, offeringId: string) {
     { deliverable: "Brochure", status: "complete", note: "Generated as PDF from the same content." },
     { deliverable: "Quality-gate results", status: gate.every((g) => g.ok) ? "complete" : "blocked", note: gate.filter((g) => !g.ok).map((g) => g.gate).join("; ") || "All gates pass." },
   ];
+  if (isDesignProgram(spec.code)) {
+    const d = designFor(spec);
+    const set = (name: string, status: Status, note: string) => {
+      const it = items.find((i) => i.deliverable.startsWith(name));
+      if (it) Object.assign(it, { status, note });
+    };
+    set("Outcomes map", "needs SME review", `${d.outcomes.length} competencies with Bloom levels; alignment matrix across ${d.assessments.length} assessments; ${d.issues.length} item(s) flagged for review.`);
+    set("In-class activities", "needs SME review", `${d.weeks.filter((w) => !w.kind && !w.optional).length} activities with student and instructor editions in the Academy template (AI DRAFT); instructor editions are unpublished pages.`);
+    set("Starter TODO", d.notebooks ? "needs SME review" : "drafted", d.notebooks ? "Starter and solution notebooks (plus 2 mini labs per module) generated in the design package; execute in the Cloud Lab before release." : "No-code track: tool walkthroughs and reference builds generated; screenshots captured after tool pinning.");
+    set("Synthetic datasets", "complete", `${d.datasets.length} dataset(s) generated from a fixed seed, each with source, license, fields, intended use and known biases.`);
+    set("Quizzes, assignments", "drafted", `${d.assessments.filter((a) => a.kind === "quiz").length} quizzes and ${d.assessments.filter((a) => /exam/.test(a.kind)).length} exams loaded as unpublished shells with blueprints (items need SME authoring); ${d.assessments.filter((a) => a.kind === "lab" || a.kind === "assignment").length} labs and assignments published with AI-use policies.`);
+    set("Slides, video scripts", "drafted", "Slide outlines, lecture script outlines and the instructor guide are generated in the design package.");
+  }
   const risks = [
     "Tool list must be verified current and education-licensed, then version-pinned, before labs are built.",
     ...(spec.pathway?.missing ?? []).map((c) => `Pathway step ${c} isn't in the catalog yet; the pathway runs without it until it exists.`),
