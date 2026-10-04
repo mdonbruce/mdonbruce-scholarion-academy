@@ -148,6 +148,9 @@ function ok(c: Ctx, data: unknown, status = 200, headers: Record<string, string>
     const back = safeBack(c.body.back, `/campus/${c.tenant.slug}`);
     const extra: Record<string, string> = { notice: String(c.body.notice ?? notice) };
     if (data && typeof data === "object" && c.body.show_result) extra.result = JSON.stringify(data).slice(0, 1500);
+    // Forms can ask for the new record's id in the redirect (e.g. to show the reply on the page).
+    const rp = typeof c.body.result_param === "string" && /^[a-z_]{1,24}$/.test(c.body.result_param) ? c.body.result_param : null;
+    if (rp && data && typeof data === "object" && typeof (data as { id?: unknown }).id === "string") extra[rp] = (data as { id: string }).id;
     return redirect(withQuery(back, extra));
   }
   const rate: Record<string, string> = c.rate ? { "x-rate-limit-limit": String(c.rate.limit), "x-rate-limit-remaining": String(c.rate.remaining) } : {};

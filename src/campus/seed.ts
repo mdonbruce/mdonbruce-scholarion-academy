@@ -2,6 +2,7 @@ import { broker, nowMs, relay, type Row, type Tenant, type TenantContext, type T
 import { actorFor, createUser, type Actor } from "./iam";
 import { renderBlocks, validateBlocks, type Block } from "./services/curriculum";
 import { ensureAgents, ensureStandardTemplate } from "./services/ai";
+import { ensureProctorDefaults } from "./services/proctor";
 import { ensureCloudLabTool } from "./services/lti";
 import { issueCredential, rebuildIndex, recomputeSignals } from "./services/success";
 import { setGrade } from "./services/grading";
@@ -193,6 +194,8 @@ function seedTenant(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
   const quiz1 = store.insert("quizzes", { id: `qz_${t.slug}_w1`, courseId: cid, moduleId: m1.id, title: "Week 1 quiz", bankId: bank.id, questionCount: 5, timeLimitMin: 20, allowedAttempts: 2, points: 6, groupId: groups.quiz, availableFrom: iso(-21, 0), availableUntil: iso(30, 0), kind: "graded", scoringPolicy: "highest", shuffleAnswers: true, showResponses: true, state: "published" }, "qz");
   item(m1, "quiz", quiz1.id, quiz1.title as string, "submit");
   snapshotQuiz(store, quiz1.id);
+  const proctoredQuiz = store.insert("quizzes", { id: `qz_${t.slug}_proctored`, courseId: cid, title: "Proctored check-in (practice)", bankId: bank.id, questionCount: 3, timeLimitMin: 15, allowedAttempts: 3, points: 0, availableFrom: iso(-7, 0), availableUntil: iso(30, 0), kind: "practice", proctored: true, scoringPolicy: "highest", shuffleAnswers: true, showResponses: true, state: "published" }, "qz");
+  snapshotQuiz(store, proctoredQuiz.id);
   const loops = page(m2, "loops", "Decisions and loops", ["An if statement runs code only when a condition is true. A for loop repeats code for each item in a sequence.", "A while loop repeats while its condition stays true — make sure the condition eventually becomes false."]);
   item(m2, "page", loops.id, loops.title as string, "view");
   const lab = store.insert("lab_templates", { id: `lt_${t.slug}_sum`, title: "Sum of evens", kind: "python", instructions: "Write sum_evens(n) that returns the sum of even numbers from 0 to n inclusive.", starterCode: "def sum_evens(n):\n    # your code here\n    return 0\n", tests: [{ name: "small", code: "assert sum_evens(4) == 6", points: 5 }, { name: "zero", code: "assert sum_evens(0) == 0", points: 2 }, { name: "odd bound", code: "assert sum_evens(7) == 12", points: 3 }], maxScore: 10 }, "lt");
@@ -281,6 +284,7 @@ function seedTenant(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
 
   /* AI, labs, tools */
   ensureAgents(store);
+  ensureProctorDefaults(store);
   ensureStandardTemplate(store);
   ensureCloudLabTool(store);
   store.insert("role_templates", { name: "Course designer bundle", roles: ["designer"] }, "rt");
@@ -395,6 +399,7 @@ function seedAcademy(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
   for (const [title, body] of [["How sandbox checkout works", "This staging site never takes real payments. Use the sandbox token tok_sandbox_visa at checkout."], ["Using the AI tutor", "The tutor answers from your course pages with citations. It won't do graded work, but it gives hints and can pass your question to your instructor."]]) store.insert("kb_articles", { title, body, tags: ["help"], state: "published" }, "kb");
   store.insert("global_announcements", { title: "Staging environment", body: "Demonstration site with fictional data. Payments are sandbox only.", roles: [], startsAt: iso(-30), endsAt: iso(365), dismissedBy: [] }, "gan");
   ensureAgents(store);
+  ensureProctorDefaults(store);
   ensureStandardTemplate(store);
   ensureCloudLabTool(store);
   relay(store);

@@ -98,7 +98,7 @@ describe("LMS parity acceptance", () => {
 
   it("3 · late policy: 2 days late is deducted automatically, shows as late; a teacher override is in gradebook history", () => {
     const inst = as("demo", "instructor");
-    const asg = entity.create(inst.store, inst.actor, "assignments", { courseId: CID, title: "Late policy check", points: 10, groupId: inst.store.list("assignment_groups", (g) => g.courseId === CID)[0].id, submissionTypes: ["text"], dueAt: at(-2, 0) });
+    const asg = entity.create(inst.store, inst.actor, "assignments", { courseId: CID, title: "Late policy check", points: 10, groupId: inst.store.list("assignment_groups", (g) => g.courseId === CID)[0].id, submissionTypes: ["text"], dueAt: new Date(nowMs() - 2 * day + 3600_000).toISOString() });
     const aid = String(asg.id);
     entity.publish(as("demo", "instructor").store, inst.actor, "assignments", aid);
     const st = as("demo", "student2", false);

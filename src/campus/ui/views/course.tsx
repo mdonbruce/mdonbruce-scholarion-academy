@@ -12,6 +12,7 @@ import { tutor, tutorMemory, type TutorLanguage, type TutorMode } from "../../se
 import { courseAnalytics, studentAnalytics } from "../../services/success";
 import { isGrader, isStaff } from "../../services/common";
 import { OPERATIONS } from "../../http/ops";
+import { PretestChecklist } from "./proctor";
 import { api, Chip, Denied, Empty, EntityForm, EntityTable, fmt, Hidden, OpForm, PageHead, Result } from "../kit";
 
 type SP = Record<string, string | undefined>;
@@ -522,6 +523,8 @@ function QuizDetail({ c, staff }: { c: C; staff: boolean }) {
           </button>
         </form>
       ) : (
+        <>
+        {q.proctored ? <PretestChecklist slug={c.slug} store={c.store} actor={c.actor} quizId={String(q.id)} back={here} /> : null}
         <form method="post" action={api(c.slug, "a/quiz.start")}>
           <Hidden values={{ back: here, quizId: String(q.id) }} />
           {q.accessCode ? (
@@ -533,7 +536,13 @@ function QuizDetail({ c, staff }: { c: C; staff: boolean }) {
           <button className="btn btn-primary" type="submit">
             {attempts.length ? "Take again" : "Take the quiz"}
           </button>
+          {q.proctored ? (
+            <p className="tiny muted">
+              Questions about your setup? <a href={`/campus/${c.slug}/t/proctor-support#ask`}>Ask the setup assistant</a>.
+            </p>
+          ) : null}
         </form>
+        </>
       )}
       {attempts.filter((x) => x.state !== "in_progress").length > 0 && (
         <ul className="item-list">

@@ -390,7 +390,7 @@ export const ENTITIES: EntityDef[] = [
 
   /* 27 Help desk */
   { table: "tickets", label: "Ticket", plural: "Tickets", tab: "helpdesk", prefix: "tkt", titleField: "subject", owner: "requesterId", ownerOps: ["read", "create"],
-    fields: [sys("requesterId", "Requester"), req("subject", "Subject"), req("body", "Description", "text"), f("category", "Category", "enum", { options: ["access", "course", "grades", "registration", "billing", "technical", "other"] }), f("tier", "Tier", "enum", { options: ["1", "2", "3"] }), f("status", "Status", "enum", { options: ["open", "pending", "solved"] }), sys("triage", "AI triage (draft)", "json")],
+    fields: [sys("requesterId", "Requester"), req("subject", "Subject"), req("body", "Description", "text"), f("category", "Category", "enum", { options: ["access", "course", "grades", "registration", "billing", "technical", "assessment", "other"] }), f("tier", "Tier", "enum", { options: ["1", "2", "3"] }), f("status", "Status", "enum", { options: ["open", "pending", "solved"] }), sys("triage", "AI triage (draft)", "json")],
     perms: { read: ["admin", "support"], create: ALL, update: ["admin", "support"], archive: ["admin"] } },
   { table: "kb_articles", label: "Knowledge article", plural: "Knowledge base", tab: "helpdesk", prefix: "kb", titleField: "title", publishable: true,
     fields: [req("title", "Title"), req("body", "Body", "text"), f("tags", "Tags", "tags"), sys("state", "State")],
@@ -553,7 +553,20 @@ ENTITIES.push(
   { table: "connectors", label: "Connector", plural: "Connectors", tab: "connectors", prefix: "con", titleField: "name", workflow: true,
     fields: [sys("key", "Key"), sys("name", "Name"), sys("category", "Category"), sys("status", "Status"), sys("secretRef", "Secret reference"), sys("consentBy", "Consent recorded by"), sys("note", "Note", "text")],
     perms: { read: ["admin"] } },
+  { table: "proctor_settings", label: "Proctoring support settings", plural: "Proctoring support settings", tab: "proctor-support", prefix: "pcs", titleField: "institution",
+    fields: [req("institution", "Institution name"), req("assessmentPolicyUrl", "Assessment Policy link", "url"), req("accommodationsUrl", "Accommodations process link", "url"), req("accessibilityOffice", "Accessibility office"), req("escalationTeam", "Escalation team"), req("supportChannel", "Student support channel"), req("escalationMethod", "Escalation method"), req("responseSla", "Expected response time")],
+    perms: { read: ALL, create: ["admin"], update: ["admin"] } },
+  { table: "proctor_talking_points", label: "Approved talking point", plural: "Approved talking points", tab: "proctor-support", prefix: "ptp", titleField: "question", publishable: true,
+    fields: [req("key", "Key"), req("question", "Student question"), req("answer", "Approved answer", "text", { help: "Placeholders: {{INSTITUTION}}, {{ASSESSMENT_POLICY_LINK}}, {{ACCOMMODATIONS_LINK}}, {{ACCESSIBILITY_OFFICE}}, {{ESCALATION_TEAM}}, {{SUPPORT_CHANNEL}}, {{RESPONSE_SLA}}" }), f("triggers", "Trigger phrases", "tags"), f("escalate", "Also escalate to the team", "boolean"), sys("state", "State")],
+    perms: { read: ["admin", "support", "advisor", "instructor", "ta"], create: ["admin", "support"], update: ["admin", "support"], archive: ["admin"], publish: ["admin"] } },
+  { table: "proctor_readiness", label: "Pre-test checklist", plural: "Pre-test checklists", tab: "proctor-support", prefix: "prd", titleField: "quizId", workflow: true, course: true, owner: "userId", ownerOps: ["read"],
+    fields: [sys("courseId", "Course"), sys("userId", "Student"), sys("quizId", "Assessment"), sys("checks", "Checked items", "json"), sys("complete", "Complete", "boolean"), sys("completedAt", "Completed", "datetime")],
+    perms: { read: ["admin", "instructor", "ta"] } },
+  { table: "proctor_questions", label: "Logged question", plural: "Question log (redacted, no personal data)", tab: "proctor-support", prefix: "pq", titleField: "intent", workflow: true,
+    fields: [sys("question", "Question (redacted)", "text"), sys("intent", "Intent"), sys("decision", "Decision"), sys("talkingPointKey", "Talking point"), sys("ticketId", "Escalation ticket"), sys("promotedTo", "Promoted to talking point"), sys("reply", "Reply given", "text"), sys("askerHash", "Asker (one-way hash)", "string", { secret: true })],
+    perms: { read: ["admin", "support"] } },
 );
+extend("quizzes", [f("proctored", "Proctored (students complete the pre-test checklist first)", "boolean")]);
 extend("lab_templates", [f("image", "Pinned image", "string", { help: "e.g. scholarion/lab-pytorch:2.4.1@sha256:…" }), f("gpu", "Needs GPU", "boolean"), f("egressAllowlist", "Network egress allowlist", "tags"), f("cpuSeconds", "CPU limit (s)", "number", { min: 1, max: 3600 }), f("memoryMb", "Memory (MB)", "number", { min: 64, max: 65536 }), f("idleMinutes", "Idle shutdown (min)", "number", { min: 5, max: 480 }), f("notebookStarter", "Starter notebook (TODO)", "json"), f("notebookExecuted", "Instructor executed notebook", "json", { secret: true }), f("releaseExecutedAt", "Release executed notebook at", "datetime")]);
 extend("credentials", [sys("templateId", "Template"), sys("legalName", "Legal name"), sys("expiresAt", "Expires", "datetime"), sys("reissuedFrom", "Reissued from"), sys("reasonCode", "Reason code")]);
 extend("calendar_events", [f("courseId", "Course event", "ref", { ref: "courses" }), f("sectionId", "Section", "ref", { ref: "sections" }), f("groupId", "Group", "ref", { ref: "groups" }), f("recurrence", "Repeats", "enum", { options: ["none", "daily", "weekly"] }), f("recurUntil", "Repeat until", "date")]);
@@ -845,6 +858,10 @@ export const TABS: TabDef[] = [
     threats: ["Secret exposure → references only, never raw secrets", "Silent fake integrations → status shown everywhere"] },
   { n: 48, slug: "status-board", title: "Capability Status", group: "Platform", phase: 0, summary: "Every capability marked LIVE / CONNECTED / DISABLED / SIMULATED / PLANNED with evidence and blockers, plus the naming-migration checklist.", entities: [], nav: ["admin", "designer", "registrar", "instructor"],
     runbook: { purpose: "Honest status reporting.", deps: "Connectors, tests.", failure: "—", recovery: "—" }, threats: [] },
+  { n: 49, slug: "proctor-support", title: "Proctored Assessment Support", group: "Student Success", phase: 2, summary: "Setup assistant that answers testing-environment questions with approved talking points only, a pre-test checklist that proctored assessments require, routing to the accommodations process, escalation with a response time, and a redacted question log for updating the talking points.", entities: ["proctor_settings", "proctor_talking_points", "proctor_readiness", "proctor_questions"], nav: ALL,
+    actions: [{ label: "Ask the setup assistant", href: "proctor-support#ask", roles: ALL }],
+    runbook: { purpose: "Consistent, supportive answers about proctored-assessment setup.", deps: "Approved talking points (published), settings, Help Desk for escalations, governed agent policy.", failure: "Assistant escalates a question it has no approved answer for.", recovery: "Support reviews the question log, drafts a talking point, an admin reviews and publishes it." },
+    threats: ["Unapproved or punitive wording → only published talking points; publish blocked by the tone and promise check", "Collecting ID photos or medical details → never requested; uploads refused; question log redacts numbers and emails", "Policy decisions by the assistant → exceptions, accommodations and incidents always escalate to people"] },
 ];
 
 export const ENTITY = Object.fromEntries(ENTITIES.map((e) => [e.table, e])) as Record<string, EntityDef>;

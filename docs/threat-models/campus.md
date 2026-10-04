@@ -235,3 +235,9 @@ STRIDE-style notes per tab. Cross-cutting controls first.
 
 - Secret exposure → references only, never raw secrets
 - Silent fake integrations → status shown everywhere
+
+## 49. Proctored Assessment Support
+
+- Unapproved or punitive wording → only published talking points; publish blocked by the tone and promise check
+- Collecting ID photos or medical details → never requested; uploads refused; question log redacts numbers and emails
+- Policy decisions by the assistant → exceptions, accommodations and incidents always escalate to people

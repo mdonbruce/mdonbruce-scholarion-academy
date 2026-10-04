@@ -210,6 +210,10 @@
     {
       "name": "Capability Status",
       "description": "Every capability marked LIVE / CONNECTED / DISABLED / SIMULATED / PLANNED with evidence and blockers, plus the naming-migration checklist."
+    },
+    {
+      "name": "Proctored Assessment Support",
+      "description": "Setup assistant that answers testing-environment questions with approved talking points only, a pre-test checklist that proctored assessments require, routing to the accommodations process, escalation with a response time, and a redacted question log for updating the talking points."
     }
   ],
   "paths": {
@@ -3040,6 +3044,10 @@
                   "anonymousSurvey": {
                     "description": "Anonymous (surveys)",
                     "type": "boolean"
+                  },
+                  "proctored": {
+                    "description": "Proctored (students complete the pre-test checklist first)",
+                    "type": "boolean"
                   }
                 },
                 "required": [
@@ -3255,6 +3263,10 @@
                   },
                   "anonymousSurvey": {
                     "description": "Anonymous (surveys)",
+                    "type": "boolean"
+                  },
+                  "proctored": {
+                    "description": "Proctored (students complete the pre-test checklist first)",
                     "type": "boolean"
                   }
                 },
@@ -18140,6 +18152,7 @@
                       "registration",
                       "billing",
                       "technical",
+                      "assessment",
                       "other"
                     ]
                   },
@@ -18246,6 +18259,7 @@
                       "registration",
                       "billing",
                       "technical",
+                      "assessment",
                       "other"
                     ]
                   },
@@ -23772,6 +23786,778 @@
           "Connectors"
         ],
         "summary": "Delete (tombstone) a connector",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/proctor_settings": {
+      "get": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "List proctoring support settings",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProctorSettings"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "Create a proctoring support settings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "institution": {
+                    "description": "Institution name",
+                    "type": "string"
+                  },
+                  "assessmentPolicyUrl": {
+                    "description": "Assessment Policy link",
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "accommodationsUrl": {
+                    "description": "Accommodations process link",
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "accessibilityOffice": {
+                    "description": "Accessibility office",
+                    "type": "string"
+                  },
+                  "escalationTeam": {
+                    "description": "Escalation team",
+                    "type": "string"
+                  },
+                  "supportChannel": {
+                    "description": "Student support channel",
+                    "type": "string"
+                  },
+                  "escalationMethod": {
+                    "description": "Escalation method",
+                    "type": "string"
+                  },
+                  "responseSla": {
+                    "description": "Expected response time",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "institution",
+                  "assessmentPolicyUrl",
+                  "accommodationsUrl",
+                  "accessibilityOffice",
+                  "escalationTeam",
+                  "supportChannel",
+                  "escalationMethod",
+                  "responseSla"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/proctor_settings/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "Get a proctoring support settings",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "Update a proctoring support settings (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "institution": {
+                    "description": "Institution name",
+                    "type": "string"
+                  },
+                  "assessmentPolicyUrl": {
+                    "description": "Assessment Policy link",
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "accommodationsUrl": {
+                    "description": "Accommodations process link",
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "accessibilityOffice": {
+                    "description": "Accessibility office",
+                    "type": "string"
+                  },
+                  "escalationTeam": {
+                    "description": "Escalation team",
+                    "type": "string"
+                  },
+                  "supportChannel": {
+                    "description": "Student support channel",
+                    "type": "string"
+                  },
+                  "escalationMethod": {
+                    "description": "Escalation method",
+                    "type": "string"
+                  },
+                  "responseSla": {
+                    "description": "Expected response time",
+                    "type": "string"
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "Delete (tombstone) a proctoring support settings",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/proctor_talking_points": {
+      "get": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "List approved talking points",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProctorTalkingPoints"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "Create a approved talking point",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "description": "Key",
+                    "type": "string"
+                  },
+                  "question": {
+                    "description": "Student question",
+                    "type": "string"
+                  },
+                  "answer": {
+                    "description": "Approved answer — Placeholders: {{INSTITUTION}}, {{ASSESSMENT_POLICY_LINK}}, {{ACCOMMODATIONS_LINK}}, {{ACCESSIBILITY_OFFICE}}, {{ESCALATION_TEAM}}, {{SUPPORT_CHANNEL}}, {{RESPONSE_SLA}}",
+                    "type": "string"
+                  },
+                  "triggers": {
+                    "description": "Trigger phrases",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "escalate": {
+                    "description": "Also escalate to the team",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "key",
+                  "question",
+                  "answer"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/proctor_talking_points/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "Get a approved talking point",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "Update a approved talking point (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "description": "Key",
+                    "type": "string"
+                  },
+                  "question": {
+                    "description": "Student question",
+                    "type": "string"
+                  },
+                  "answer": {
+                    "description": "Approved answer — Placeholders: {{INSTITUTION}}, {{ASSESSMENT_POLICY_LINK}}, {{ACCOMMODATIONS_LINK}}, {{ACCESSIBILITY_OFFICE}}, {{ESCALATION_TEAM}}, {{SUPPORT_CHANNEL}}, {{RESPONSE_SLA}}",
+                    "type": "string"
+                  },
+                  "triggers": {
+                    "description": "Trigger phrases",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "escalate": {
+                    "description": "Also escalate to the team",
+                    "type": "boolean"
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "Delete (tombstone) a approved talking point",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/proctor_talking_points/{id}/publish": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "Publish (validation runs first)",
+        "responses": {
+          "200": {
+            "description": "Published"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "Unpublish",
+        "responses": {
+          "200": {
+            "description": "Unpublished"
+          }
+        }
+      }
+    },
+    "/r/proctor_readiness": {
+      "get": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "List pre-test checklists",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProctorReadiness"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/proctor_readiness/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "Get a pre-test checklist",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "Delete (tombstone) a pre-test checklist",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/proctor_questions": {
+      "get": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "List question log (redacted, no personal data)",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProctorQuestions"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/proctor_questions/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "Get a logged question",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "summary": "Delete (tombstone) a logged question",
         "responses": {
           "200": {
             "description": "Deleted"
@@ -41871,6 +42657,287 @@
         }
       }
     },
+    "/a/proctor.ask": {
+      "post": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "operationId": "proctor.ask",
+        "summary": "Ask the proctored-assessment setup assistant.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "question": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "question"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/proctor.reply": {
+      "get": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "operationId": "proctor.reply",
+        "summary": "Show a setup-assistant reply again (only to the person who asked).",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/proctor.my_assessments": {
+      "get": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "operationId": "proctor.my_assessments",
+        "summary": "My proctored assessments and checklist status.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/proctor.readiness": {
+      "get": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "operationId": "proctor.readiness",
+        "summary": "Pre-test checklist for a proctored assessment.",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/proctor.save_readiness": {
+      "post": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "operationId": "proctor.save_readiness",
+        "summary": "Save my pre-test checklist.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "quizId": {
+                    "type": "string"
+                  },
+                  "checks": {
+                    "type": "string",
+                    "enum": [
+                      "id",
+                      "webcam",
+                      "mic",
+                      "devices",
+                      "glasses_mouse",
+                      "attire",
+                      "system"
+                    ]
+                  }
+                },
+                "required": [
+                  "quizId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/proctor.staff_guide": {
+      "get": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "operationId": "proctor.staff_guide",
+        "summary": "Staff guidance: expectations, focus areas, approved answers, staff notes.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/proctor.overview": {
+      "get": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "operationId": "proctor.overview",
+        "summary": "Questions, escalations, checklist completion and questions awaiting an approved answer.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/proctor.promote": {
+      "post": {
+        "tags": [
+          "Proctored Assessment Support"
+        ],
+        "operationId": "proctor.promote",
+        "summary": "Draft a talking point from a logged question (admin publishes it).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "logId": {
+                    "type": "string"
+                  },
+                  "key": {
+                    "type": "string"
+                  },
+                  "answer": {
+                    "type": "string"
+                  },
+                  "triggers": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "question": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "logId",
+                  "key",
+                  "answer"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/a/lab_keys.issue": {
       "post": {
         "tags": [
@@ -43628,6 +44695,10 @@
               },
               "anonymousSurvey": {
                 "description": "Anonymous (surveys)",
+                "type": "boolean"
+              },
+              "proctored": {
+                "description": "Proctored (students complete the pre-test checklist first)",
                 "type": "boolean"
               }
             }
@@ -46925,6 +47996,7 @@
                   "registration",
                   "billing",
                   "technical",
+                  "assessment",
                   "other"
                 ]
               },
@@ -48167,6 +49239,171 @@
           }
         ],
         "description": "Connector (tab: connectors)"
+      },
+      "ProctorSettings": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "institution": {
+                "description": "Institution name",
+                "type": "string"
+              },
+              "assessmentPolicyUrl": {
+                "description": "Assessment Policy link",
+                "type": "string",
+                "format": "uri"
+              },
+              "accommodationsUrl": {
+                "description": "Accommodations process link",
+                "type": "string",
+                "format": "uri"
+              },
+              "accessibilityOffice": {
+                "description": "Accessibility office",
+                "type": "string"
+              },
+              "escalationTeam": {
+                "description": "Escalation team",
+                "type": "string"
+              },
+              "supportChannel": {
+                "description": "Student support channel",
+                "type": "string"
+              },
+              "escalationMethod": {
+                "description": "Escalation method",
+                "type": "string"
+              },
+              "responseSla": {
+                "description": "Expected response time",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Proctoring support settings (tab: proctor-support)"
+      },
+      "ProctorTalkingPoints": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "key": {
+                "description": "Key",
+                "type": "string"
+              },
+              "question": {
+                "description": "Student question",
+                "type": "string"
+              },
+              "answer": {
+                "description": "Approved answer — Placeholders: {{INSTITUTION}}, {{ASSESSMENT_POLICY_LINK}}, {{ACCOMMODATIONS_LINK}}, {{ACCESSIBILITY_OFFICE}}, {{ESCALATION_TEAM}}, {{SUPPORT_CHANNEL}}, {{RESPONSE_SLA}}",
+                "type": "string"
+              },
+              "triggers": {
+                "description": "Trigger phrases",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "escalate": {
+                "description": "Also escalate to the team",
+                "type": "boolean"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Approved talking point (tab: proctor-support)"
+      },
+      "ProctorReadiness": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "courseId": {
+                "description": "Course",
+                "type": "string"
+              },
+              "userId": {
+                "description": "Student",
+                "type": "string"
+              },
+              "quizId": {
+                "description": "Assessment",
+                "type": "string"
+              },
+              "checks": {
+                "description": "Checked items"
+              },
+              "complete": {
+                "description": "Complete",
+                "type": "boolean"
+              },
+              "completedAt": {
+                "description": "Completed",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Pre-test checklist (tab: proctor-support)"
+      },
+      "ProctorQuestions": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "question": {
+                "description": "Question (redacted)",
+                "type": "string"
+              },
+              "intent": {
+                "description": "Intent",
+                "type": "string"
+              },
+              "decision": {
+                "description": "Decision",
+                "type": "string"
+              },
+              "talkingPointKey": {
+                "description": "Talking point",
+                "type": "string"
+              },
+              "ticketId": {
+                "description": "Escalation ticket",
+                "type": "string"
+              },
+              "promotedTo": {
+                "description": "Promoted to talking point",
+                "type": "string"
+              },
+              "reply": {
+                "description": "Reply given",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Logged question (tab: proctor-support)"
       },
       "Accounts": {
         "allOf": [

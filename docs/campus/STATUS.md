@@ -2,9 +2,9 @@
 
 Generated 2026-10-04 by `scripts/campus-docs.ts`. Environment: local + staging only (demonstration data, sandbox payments).
 
-**Capabilities:** 26 LIVE · 0 CONNECTED · 3 SIMULATED · 7 DISABLED · 2 PLANNED
+**Capabilities:** 27 LIVE · 0 CONNECTED · 3 SIMULATED · 8 DISABLED · 2 PLANNED
 
-## Tabs (48)
+## Tabs (49)
 
 A tab is OPERATIONAL when it has persisted resources, enforced authorization, audited writes, an API surface (REST + operations + GraphQL), a working screen, and a passing test. Tabs that depend on outside services report the connector state honestly.
 
@@ -58,6 +58,7 @@ A tab is OPERATIONAL when it has persisted resources, enforced authorization, au
 | 46 | Tenant Console | Platform | OPERATIONAL | platform 1/7/9 |
 | 47 | Connectors | Platform | OPERATIONAL | status board test |
 | 48 | Capability Status | Platform | OPERATIONAL | status board test |
+| 49 | Proctored Assessment Support | Student Success | OPERATIONAL | proctor suite (10 tests) |
 
 ## Capabilities
 
@@ -74,6 +75,8 @@ A tab is OPERATIONAL when it has persisted resources, enforced authorization, au
 | LMS | Assignments, submissions, late/missing policies, peer review | LIVE | parity acceptance (tests/campus-*.test.ts) | — |
 | LMS | Gradebook, posting policies, history, What-If, CSV, mastery | LIVE | parity acceptance (tests/campus-*.test.ts) | — |
 | LMS | Quiz engine, item banks, accommodations, moderation, regrade | LIVE | quiz tests (tests/campus-*.test.ts) | — |
+| Assessment | Proctored-assessment setup assistant (approved talking points only, accommodations routing, escalation with response time, redacted log) and the pre-test checklist gate | LIVE | proctor suite (tests/campus-*.test.ts) | — |
+| Assessment | Remote proctoring vendor (live webcam / ID verification) | DISABLED | Quizzes can reference a proctoring LTI tool; no vendor is connected in staging. Scholarion never collects ID images. | Needs a proctoring vendor agreement, an LTI registration and a go-live decision. |
 | LMS | Discussions with checkpoints, announcements, inbox | LIVE | collaboration tests (tests/campus-*.test.ts) | — |
 | LMS | Calendar, scheduler, pacing, iCal | LIVE | calendar tests (tests/campus-*.test.ts) | — |
 | LMS | Blueprints, copy with date shift, package import/export (CC + QTI) | LIVE | content tests (tests/campus-*.test.ts) | — |

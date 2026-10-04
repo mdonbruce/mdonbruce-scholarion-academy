@@ -37,7 +37,7 @@ function prettyJson(s: string) {
   }
 }
 
-const STATUS_CLASS: Record<string, string> = { LIVE: "badge-green", CONNECTED: "badge-green", SIMULATED: "badge-blue", DISABLED: "badge-amber", PLANNED: "badge", published: "badge-green", unpublished: "badge-amber", active: "badge-green", pending: "badge-amber", approved: "badge-green", rejected: "badge-red", dead: "badge-red", delivered: "badge-green", locked: "badge-amber", late: "badge-amber", missing: "badge-red", excused: "badge-blue" };
+const STATUS_CLASS: Record<string, string> = { LIVE: "badge-green", CONNECTED: "badge-green", SIMULATED: "badge-blue", DISABLED: "badge-amber", PLANNED: "badge", published: "badge-green", unpublished: "badge-amber", active: "badge-green", pending: "badge-amber", approved: "badge-green", rejected: "badge-red", dead: "badge-red", delivered: "badge-green", locked: "badge-amber", late: "badge-amber", missing: "badge-red", excused: "badge-blue", complete: "badge-green", not_started: "badge-amber", answered: "badge-green", focus: "badge-green", accommodations: "badge-blue", escalated: "badge-blue", boundary: "badge-amber", refused: "badge-amber" };
 export function Chip({ s }: { s: string }) {
   return <span className={`badge ${STATUS_CLASS[s] ?? ""}`}>{s.replace(/_/g, " ")}</span>;
 }

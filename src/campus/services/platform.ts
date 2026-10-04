@@ -4,6 +4,7 @@ import { audit, requireTenant } from "./common";
 import { CONTENT_TABLES, contentOf } from "./content";
 import { exportTenant } from "./admin";
 import { ensureAgents, ensureStandardTemplate } from "./ai";
+import { ensureProctorDefaults } from "./proctor";
 import { ensureCloudLabTool } from "./lti";
 
 /**
@@ -114,6 +115,7 @@ export function provisionTenant(a: Actor | null, input: { name: string; slug: st
   // Baseline platform services for every tenant.
   store.tx(() => {
     ensureAgents(store);
+    ensureProctorDefaults(store);
     ensureStandardTemplate(store);
     ensureCloudLabTool(store);
   });
@@ -286,6 +288,8 @@ export function capabilityBoard(store: TenantStore): Capability[] {
     live("LMS", "Assignments, submissions, late/missing policies, peer review", "parity acceptance"),
     live("LMS", "Gradebook, posting policies, history, What-If, CSV, mastery", "parity acceptance"),
     live("LMS", "Quiz engine, item banks, accommodations, moderation, regrade", "quiz tests"),
+    live("Assessment", "Proctored-assessment setup assistant (approved talking points only, accommodations routing, escalation with response time, redacted log) and the pre-test checklist gate", "proctor suite"),
+    { area: "Assessment", capability: "Remote proctoring vendor (live webcam / ID verification)", status: "DISABLED", evidence: "Quizzes can reference a proctoring LTI tool; no vendor is connected in staging. Scholarion never collects ID images.", blockers: "Needs a proctoring vendor agreement, an LTI registration and a go-live decision." },
     live("LMS", "Discussions with checkpoints, announcements, inbox", "collaboration tests"),
     live("LMS", "Calendar, scheduler, pacing, iCal", "calendar tests"),
     live("LMS", "Blueprints, copy with date shift, package import/export (CC + QTI)", "content tests"),

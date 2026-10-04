@@ -584,3 +584,15 @@ Every capability marked LIVE / CONNECTED / DISABLED / SIMULATED / PLANNED with e
 - **Resources:** —
 - **Operations:** `status.board`
 - **Who sees it:** admin, designer, registrar, instructor
+
+## 49. Proctored Assessment Support
+
+Setup assistant that answers testing-environment questions with approved talking points only, a pre-test checklist that proctored assessments require, routing to the accommodations process, escalation with a response time, and a redacted question log for updating the talking points.
+
+- **Purpose:** Consistent, supportive answers about proctored-assessment setup.
+- **Depends on:** Approved talking points (published), settings, Help Desk for escalations, governed agent policy.
+- **Typical failures:** Assistant escalates a question it has no approved answer for.
+- **Recovery:** Support reviews the question log, drafts a talking point, an admin reviews and publishes it.
+- **Resources:** `proctor_settings`, `proctor_talking_points`, `proctor_readiness`, `proctor_questions`
+- **Operations:** `proctor.ask`, `proctor.reply`, `proctor.my_assessments`, `proctor.readiness`, `proctor.save_readiness`, `proctor.staff_guide`, `proctor.overview`, `proctor.promote`
+- **Who sees it:** admin, instructor, ta, designer, student, observer, advisor, registrar, support

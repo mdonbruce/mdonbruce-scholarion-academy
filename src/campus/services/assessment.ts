@@ -294,6 +294,8 @@ export function startAttempt(store: TenantStore, a: Actor, quizId: string, opts:
   const mine = store.list("attempts", (x) => x.quizId === quizId && x.userId === a.id);
   const open = mine.find((x) => x.state === "in_progress");
   if (open) return attemptView(store, a, open.id);
+  // Proctored assessments: the student confirms the pre-test checklist first (Tab 49).
+  if (quiz.proctored && !store.list("proctor_readiness", (r) => r.quizId === quizId && r.userId === a.id && !!r.complete).length) throw new CampusError("pretest_checklist", "Before you start, complete the pre-test checklist for this proctored assessment.", 428);
   const acc = accommodation(store, a.id, courseId);
   const extraMod = store.list("quiz_moderations", (m) => m.quizId === quizId && m.userId === a.id && m.kind === "extra_attempt").length;
   const allowed = Number(quiz.allowedAttempts ?? 1) + acc.extraAttempts + extraMod;

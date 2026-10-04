@@ -290,7 +290,8 @@ CREATE TABLE IF NOT EXISTS quizzes (
   calculator text CHECK (calculator IN ('none', 'basic', 'scientific')),
   only_assigned boolean,
   pools jsonb,
-  anonymous_survey boolean
+  anonymous_survey boolean,
+  proctored boolean
 );
 CREATE INDEX IF NOT EXISTS quizzes_course_id ON quizzes (course_id) WHERE deleted_at IS NULL;
 CREATE INDEX IF NOT EXISTS quizzes_module_id ON quizzes (module_id) WHERE deleted_at IS NULL;
@@ -1546,7 +1547,7 @@ CREATE TABLE IF NOT EXISTS tickets (
   requester_id text,
   subject text NOT NULL,
   body text NOT NULL,
-  category text CHECK (category IN ('access', 'course', 'grades', 'registration', 'billing', 'technical', 'other')),
+  category text CHECK (category IN ('access', 'course', 'grades', 'registration', 'billing', 'technical', 'assessment', 'other')),
   tier text CHECK (tier IN ('1', '2', '3')),
   status text CHECK (status IN ('open', 'pending', 'solved')),
   triage jsonb
@@ -2004,6 +2005,70 @@ CREATE TABLE IF NOT EXISTS connectors (
   secret_ref text,
   consent_by text,
   note text
+);
+
+-- Proctoring support settings (tab: proctor-support)
+CREATE TABLE IF NOT EXISTS proctor_settings (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  institution text NOT NULL,
+  assessment_policy_url text NOT NULL,
+  accommodations_url text NOT NULL,
+  accessibility_office text NOT NULL,
+  escalation_team text NOT NULL,
+  support_channel text NOT NULL,
+  escalation_method text NOT NULL,
+  response_sla text NOT NULL
+);
+
+-- Approved talking point (tab: proctor-support)
+CREATE TABLE IF NOT EXISTS proctor_talking_points (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  "key" text NOT NULL,
+  question text NOT NULL,
+  answer text NOT NULL,
+  triggers text[],
+  escalate boolean,
+  state text
+);
+
+-- Pre-test checklist (tab: proctor-support)
+CREATE TABLE IF NOT EXISTS proctor_readiness (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  course_id text,
+  user_id text,
+  quiz_id text,
+  checks jsonb,
+  complete boolean,
+  completed_at timestamptz
+);
+
+-- Logged question (tab: proctor-support)
+CREATE TABLE IF NOT EXISTS proctor_questions (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  question text,
+  intent text,
+  decision text,
+  talking_point_key text,
+  ticket_id text,
+  promoted_to text,
+  reply text,
+  asker_hash text
 );
 
 -- Account (tab: tenant-admin)

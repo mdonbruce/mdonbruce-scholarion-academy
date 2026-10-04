@@ -28,4 +28,5 @@ export * as seed from "./seed";
 export * as claims from "./services/claims";
 export * as academy from "./services/academy";
 export * as tutor from "./services/tutor";
+export * as proctor from "./services/proctor";
 export * as platform from "./services/platform";

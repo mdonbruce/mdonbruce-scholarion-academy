@@ -20,6 +20,7 @@ import { CatalogView, SigninView, TenantHome, TenantPicker, VerifyView } from ".
 import { startAttempt } from "../src/campus/services/assessment";
 import { checkout } from "../src/campus/services/academy";
 import { openItem, moduleStates } from "../src/campus/services/curriculum";
+import { proctorAsk, saveReadiness } from "../src/campus/services/proctor";
 
 process.env.CAMPUS_LOGS = "0";
 process.env.CLOUDLAB_LOCAL_RUNNER ??= "1";
@@ -145,6 +146,17 @@ for (const tab of TABS) {
   page(who[0], who[1], `t/${tab.slug}`, tab.title);
 }
 page("demo", "registrar", "t/registration", "Registration (registrar)");
+{
+  const s1 = as("demo", "student1");
+  const r = proctorAsk(s1.store, s1.actor, "What do I need to set up before my exam?");
+  page("demo", "student1", `t/proctor-support?reply=${r.id}`, "Proctored assessment setup assistant");
+  const s2 = as("demo", "student2");
+  const esc = proctorAsk(s2.store, s2.actor, "Can you make an exception and let me keep my phone on the desk?");
+  page("demo", "student2", `t/proctor-support?reply=${esc.id}`, "Setup assistant escalation");
+  page("demo", "student1", `${C}/quizzes/qz_demo_proctored`, "Proctored quiz: pre-test checklist");
+  saveReadiness(as("demo", "student3").store, as("demo", "student3").actor, "qz_demo_proctored", ["id", "webcam", "mic"]);
+  page("demo", "instructor", "t/proctor-support", "Proctored support (instructor)");
+}
 page("demo", "advisor", "t/advising", "Advising");
 page("demo", "parent", "t/observers", "Observers");
 page("demo", "admin", "t/tenant-admin?accountId=acc_demo_computing", "Permissions (sub-account)");

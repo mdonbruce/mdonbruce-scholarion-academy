@@ -13,6 +13,7 @@ import { validateRegistration } from "../../services/sis";
 import { groupSetView, myObservees } from "../../services/people";
 import { myTickets } from "../../services/desk";
 import { labNotebook } from "../../services/tutor";
+import { ProctorPanel } from "./proctor";
 import { api, Chip, Denied, Empty, EntityForm, EntityTable, fmt, Hidden, OpForm, PageHead, Result } from "../kit";
 
 type SP = Record<string, string | undefined>;
@@ -167,6 +168,8 @@ function Bespoke({ t, tab }: { t: T; tab: string }) {
         return <Observers t={t} />;
       case "helpdesk":
         return <Helpdesk t={t} />;
+      case "proctor-support":
+        return <ProctorPanel store={t.store} actor={t.actor} slug={t.slug} sp={t.sp} here={t.here} />;
       case "catalog":
         return (
           <p className="notice notice-info">
