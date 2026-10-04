@@ -272,6 +272,24 @@ STRIDE-style notes per tab. Cross-cutting controls first.
 - Prompt injection through sources → source text is data and never changes settings
 - Answer leaks → instructor outputs are excluded from student bundles and downloads
 
+## 57. Free Education Resource Hub
+
+- Overstated free claims → nothing is verified without official evidence; trials and credits are labelled; API access tracked separately
+- Copyright → full content is never imported unless redistribution is allowed; links and attributed summaries otherwise
+- Credential leakage → definitions are schema-checked for secrets; connections hold key-vault references only
+
+## 58. Career Connect & Employer Portal
+
+- Profile exposure → opt-in discoverability, per-field visibility, pseudonymous candidate references, contact only after the learner accepts
+- Automated outreach → no application, résumé or message is sent without the learner's explicit action
+- Biased matching → skills evidence and published requirements only; every match is explained
+
+## 59. Auto-Discovery & Workflow Automation
+
+- Prompt injection from fetched pages → content is parsed as data; it never changes permissions, schedules or publication rules
+- SSRF → only configured trusted hosts; private and internal addresses are refused
+- Runaway agents → per-job request and runtime budgets, leases and retry limits; agents can't add credentials, enable billing or share learner data
+
 ## 52. Module Library & Catalog Consolidation
 
 - Unapproved refund terms shown to learners → policies display only after product-owner approval

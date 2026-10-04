@@ -1,3 +1,4 @@
+import { ecoTick } from "./ecosystem/discovery";
 import { broker, CampusError, consumerNames, metrics, nowIso, nowMs, relay, type TenantStore } from "../core";
 import type { Actor } from "../iam";
 import { announcementJob } from "./collaboration";
@@ -36,6 +37,7 @@ export async function runJobs(store: TenantStore) {
   out.overdue = overdueJob(store);
   out.retention = retentionJob(store);
   out.digestDaily = digestJob(store, "daily");
+  out.ecosystem = await ecoTick(store);
   out.relayed = relay(store);
   out.webhooks = await deliverWebhooks(store);
   metrics.inc("jobs_runs_total", { tenant: store.tenantId });

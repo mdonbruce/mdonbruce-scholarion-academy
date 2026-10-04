@@ -337,6 +337,10 @@ input[type="email"],
 input[type="password"],
 input[type="search"],
 input[type="number"],
+input[type="url"],
+input[type="date"],
+input[type="datetime-local"],
+input:not([type]),
 select,
 textarea {
   width: 100%;
@@ -1953,3 +1957,12 @@ details.acc > div {
 @media (prefers-color-scheme:dark){.learn-ok{color:#86efac}.learn-no{color:#fdba74}}
 .campus-learn .small li{margin:0 0 6px}
 .campus-learn .small li a,.learn-editor nav a,.learn-files a{display:inline-block;min-height:24px;padding:2px 0;line-height:20px}
+/* Free Education Resource Hub & Career Connect (Tabs 57–59) */
+.g4{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.eco-cards{list-style:none;padding:0;margin:0}
+.eco-filters label{display:flex;gap:6px;align-items:center}
+.inline-form{display:inline-flex;margin-left:8px;vertical-align:middle}
+.eco-sources{columns:2;column-gap:24px}
+.campus-hub .small li{margin:0 0 6px}
+.campus-hub .small li a,.campus-hub td a{display:inline-block;min-height:24px;padding:2px 0;line-height:20px}
+@media (max-width:800px){.eco-sources{columns:1}}

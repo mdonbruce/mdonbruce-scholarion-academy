@@ -2,9 +2,9 @@
 
 Generated 2026-10-04 by `scripts/campus-docs.ts`. Environment: local + staging only (demonstration data, sandbox payments).
 
-**Capabilities:** 34 LIVE · 0 CONNECTED · 3 SIMULATED · 8 DISABLED · 4 PLANNED
+**Capabilities:** 37 LIVE · 0 CONNECTED · 3 SIMULATED · 8 DISABLED · 6 PLANNED
 
-## Tabs (56)
+## Tabs (59)
 
 A tab is OPERATIONAL when it has persisted resources, enforced authorization, audited writes, an API surface (REST + operations + GraphQL), a working screen, and a passing test. Tabs that depend on outside services report the connector state honestly.
 
@@ -64,6 +64,9 @@ A tab is OPERATIONAL when it has persisted resources, enforced authorization, au
 | 54 | Agentic Cloud Labs | Intelligence | OPERATIONAL | labs suite (Tab 54: workspaces, bounded autonomous runner, permissions, run logs, rubric grading, 2 attempts) |
 | 55 | Hosted Learning Area (Agentic Cloud Labs) | Intelligence | OPERATIONAL | learning-area suite (Tab 55: 15 sections, workspaces, practice vs graded, idempotent submit and posting, infra failure, Check Answers, passbook, projection lock, protected downloads) |
 | 56 | Course Studio (Master Studio Generator) | Intelligence | OPERATIONAL | studio suite (Tab 56: sources, resumable pipeline, 10-slide deck, folder tree, release gate, honest media status) + learning-area suite |
+| 57 | Free Education Resource Hub | Intelligence | OPERATIONAL | ecosystem suite (Tab 57: seeded verified catalog, schema validation, filters, live blocks, mappings, connections) |
+| 58 | Career Connect & Employer Portal | Student Success | OPERATIONAL | ecosystem suite (Tab 58: opt-in talent search, consent contact, idempotent applications, partner rule) |
+| 59 | Auto-Discovery & Workflow Automation | Platform | OPERATIONAL | ecosystem suite (Tab 59: terms review, link checks, dedupe, retries/dead-letter, missed runs, API v1) |
 | 52 | Module Library & Catalog Consolidation | Academy & Commerce | OPERATIONAL | agentic suite (Tab 52: hub, library, policies, consolidation) |
 | 51 | LMS Parity Status | Platform | OPERATIONAL | programs suite (Tab 51) |
 
@@ -97,6 +100,11 @@ A tab is OPERATIONAL when it has persisted resources, enforced authorization, au
 | Cloud Lab | Real code execution in isolated containers (Python, Docker, Kubernetes) for learner workspaces | PLANNED | Simulated shell and declarative agent specs only; nothing learners write is executed | Container runner, isolation review and owner approval. |
 | Curriculum | Course Studio (Tab 56): source-grounded topic packages in the 01_Sources … 13_Environment_Templates folder tree — 10-slide deck with notes, notes, study guide, mind map, infographic, 20+ flashcards, practice quiz, two mini-labs with server-side checks, environment templates, rubrics, cover variants A/B with the approved faculty photograph, QA report, manifest, protected instructor files, release gate | LIVE | studio suite (tests/campus-*.test.ts) | — |
 | Curriculum | Narrated audio lecture, two-host deep dive and narrated MP4 videos | PLANNED | Scripts, transcripts, captions and storyboards generated; silent 1280×720 preview rendered with ffmpeg when enabled; narration marked awaiting rendering | Text-to-speech provider and media renderer. |
+| Catalog | Free Education Resource Hub (Tab 57): evidence-backed catalog of free tools, open courses and readings (initial catalog researched from official provider pages 2026-10-04; unverified claims stay pending), availability classes, API access tracked separately, live classroom blocks within verified free meeting limits, course mappings, bookmarks, What's New | LIVE | ecosystem suite (tests/campus-*.test.ts) | — |
+| Careers | Career Connect & Employer Portal (Tab 58): verified employer onboarding, partner label only after a recorded relationship, opt-in learner profiles with per-field visibility, explainable matching from passbook evidence, learner-initiated applications, consent-based contact | LIVE | ecosystem suite (tests/campus-*.test.ts) | — |
+| Platform | Auto-Discovery (Tab 59): cron schedules in America/New_York, durable jobs with unique period keys, leases, budgets, checkpoints, backoff with jitter, dead-letter, run-now/pause/resume; trusted-source adapters (official pages, RSS/Atom, Greenhouse public job boards); Integration JSON Schema (Draft 2020-12) with semantic checks; REST API v1 | LIVE | ecosystem suite (tests/campus-*.test.ts) | — |
+| Platform | Live outbound fetching for discovery jobs in staging | PLANNED | Adapters, scheduler and job engine are tested against a fixture network | Egress to the trusted provider hosts from the staging runtime; job-board sources (e.g. a Greenhouse board token) chosen by the owner. |
+| Careers | External job-board APIs (LinkedIn, Indeed, Handshake) and email/SMS delivery | PLANNED | Not connected; in-site notifications only | Partner API agreements and credentials; an authorized notification service. |
 | Catalog | Shared module library, policy approval gate (refund / deferral / batch change) and catalog consolidation report with product-owner decision | LIVE | agentic suite (Tab 52) (tests/campus-*.test.ts) | — |
 | Pathways | Prerequisite / stacks / waives / mutually-exclusive rules, transfer credit, consolidation report | LIVE | platform acceptance 4 (tests/campus-*.test.ts) | — |
 | Commerce | Checkout, coupons, installments, subscriptions, seats, invoices, refunds | SIMULATED | Sandbox only; policy engine tested | Payment provider and go-live decision. |

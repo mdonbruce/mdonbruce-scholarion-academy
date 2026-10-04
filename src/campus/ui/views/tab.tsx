@@ -186,6 +186,14 @@ function Bespoke({ t, tab }: { t: T; tab: string }) {
         return <AssessmentStudio t={t} />;
       case "agentic-cloud-labs":
         return <AgenticLabsPanel t={t} />;
+      case "free-resources":
+      case "career-connect":
+      case "discovery-automation":
+        return (
+          <p className="notice notice-info">
+            Work in the hub: <a href={`/campus/${t.slug}/hub/${tab === "free-resources" ? "tools" : tab === "career-connect" ? "career" : "automation"}`}>open it</a>.
+          </p>
+        );
       case "proctor-support":
         return <ProctorPanel store={t.store} actor={t.actor} slug={t.slug} sp={t.sp} here={t.here} />;
       case "catalog":

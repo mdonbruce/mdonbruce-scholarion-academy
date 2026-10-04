@@ -5,6 +5,7 @@
  *
  *   npx tsx --tsconfig tsconfig.scripts.json scripts/campus-render.tsx [--check]
  */
+process.env.SCHOLARION_SCHEDULER ??= "off";
 import fs from "node:fs";
 import path from "node:path";
 import type { ReactElement } from "react";
@@ -32,6 +33,7 @@ import { submit as gradedSubmit } from "../src/campus/services/graded";
 import { launchWorkspace, writeFile as wsWrite, runCommand as wsCommand, runAgent } from "../src/campus/services/workspace";
 import { listOutputs as studioListOutputs, readOutput as studioReadOutput } from "../src/campus/services/studio";
 import { setProjectionLock } from "../src/campus/services/projection";
+import { scheduleLiveSession as ecoSchedule } from "../src/campus/services/ecosystem";
 import { AI801_LAB_KEY, submitProject } from "../src/campus/academy/ai801-seed";
 import { AI801_MINILABS, AI801_QUIZ } from "../src/campus/academy/ai801";
 import { SIM_SCENARIOS } from "../src/campus/academy/sim-scenarios";
@@ -285,6 +287,35 @@ page("academy", "admin", "t/module-library", "Module Library & Catalog Consolida
   }
   setProjectionLock(as("academy", "lead").store, as("academy", "lead").actor, C, false);
   page("academy", "lead", L("instructor", "?view=unlocked"), "Learning area — Instructor Control Panel (unlocked, INSTRUCTOR MODE banner)");
+}
+{
+  // Free Education Resource Hub, Career Connect, Employer Portal and Auto-Discovery.
+  const zoom = as("academy", "admin").store.list("eco_resources", (r) => r.key === "zoom-basic")[0];
+  const webex = as("academy", "admin").store.list("eco_resources", (r) => r.key === "webex-free")[0];
+  const inst = as("academy", "instructor");
+  ecoSchedule(inst.store, inst.actor, { courseId: "crs_academy_ai801", title: "Module 1 live lecture", providerId: webex.id, startsAt: "2026-10-10T14:00:00Z", totalMinutes: 90, joinUrl: "https://example.webex.com/meet/scholarion-ai801" });
+  page("academy", "student1", "hub/overview", "Resource Hub — learner overview");
+  page("academy", "student1", "hub/tools", "Free Tools Directory");
+  page("academy", "student1", `hub/tools?r=${zoom.id}`, "Free Tools Directory — detail with evidence");
+  page("academy", "student1", "hub/agentic", "Agentic AI Tools & Templates");
+  page("academy", "student1", "hub/avatar", "Virtual Instructor & Avatar Studio");
+  page("academy", "student1", "hub/live", "Live Classroom Hub — blocks within verified limits");
+  page("academy", "student1", "hub/media", "Video & Audio Studio");
+  page("academy", "student1", "hub/library", "Open Courses & Reading Library");
+  page("academy", "instructor", "hub/recommendations?course=crs_academy_ai801", "Course Resource Recommendations");
+  page("academy", "student1", "hub/whats-new", "What's New");
+  page("academy", "student1", "hub/career", "Career Connect — profile, matches, applications");
+  page("academy", "student1", "hub/board", "Internship & Employment Board");
+  page("academy", "employer1", "hub/employer", "Employer Portal — verified employer");
+  page("academy", "employer2", "hub/employer", "Employer Portal — awaiting verification");
+  page("academy", "admin", "hub/integrations", "Integration Connections");
+  page("academy", "admin", "hub/employers", "Employer Verification");
+  page("academy", "admin", "hub/automation", "Discovery & Update Settings");
+  page("academy", "admin", "hub/schema", "Integration JSON Schema");
+  page("academy", "admin", "hub/library?status=pending", "Library — curator view");
+  page("academy", "admin", "t/free-resources", "Tab 57 — Free Education Resource Hub");
+  page("academy", "admin", "t/career-connect", "Tab 58 — Career Connect");
+  page("academy", "admin", "t/discovery-automation", "Tab 59 — Auto-Discovery");
 }
 page("academy", "instructor", "t/agentic-cloud-labs", "Agentic Cloud Labs — instructor");
 page("academy", "student1", "agent-labs", "Agentic Cloud Labs — my labs");

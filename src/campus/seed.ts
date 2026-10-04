@@ -7,6 +7,8 @@ import { ensurePrograms } from "./services/programs";
 import { ensureConsolidationDecision } from "./services/hub";
 import { ensureAgentLabs } from "./services/agentlabs";
 import { ensureAI801 } from "./academy/ai801-seed";
+import { ensureEcosystem } from "./services/ecosystem";
+import { startEcoScheduler } from "./services/ecosystem/scheduler";
 import { ensureCloudLabTool } from "./services/lti";
 import { issueCredential, rebuildIndex, recomputeSignals } from "./services/success";
 import { setGrade } from "./services/grading";
@@ -318,6 +320,7 @@ export function ensureCampusSeed(): Record<string, SeedUsers> {
     }
     seeded[t.slug] = t.id === "tn_academy" ? seedAcademy(t) : seedTenant(t);
   }
+  startEcoScheduler();
   return seeded;
 }
 
@@ -403,6 +406,7 @@ function seedAcademy(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
   ensureConsolidationDecision(store);
   ensureAgentLabs(store);
   ensureAI801(store);
+  ensureEcosystem(store);
   ensureAgents(store);
   ensureProctorDefaults(store);
   ensureStandardTemplate(store);

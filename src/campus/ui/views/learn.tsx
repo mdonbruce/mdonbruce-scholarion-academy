@@ -7,6 +7,7 @@ import { AI801_LAB_KEY, AI801_PROJECT_KEY } from "../../academy/ai801-seed";
 import * as G from "../../services/graded";
 import * as studio from "../../services/studio";
 import * as W from "../../services/workspace";
+import * as eco from "../../services/ecosystem";
 import { LEARN_SECTIONS, learnOverview, type LearnOverview, type LearnSection } from "../../services/learnarea";
 import { api, Chip, Denied, Empty, fmt, Hidden, PageHead } from "../kit";
 
@@ -252,6 +253,7 @@ function Sources({ t }: { t: Ctx }) {
   const { v, slug, here } = t;
   return (
     <>
+      <FreeResources t={t} />
       <p className="small">Instructor-supplied sources ground every Studio output. Anything added beyond them is marked “[Supplemental — verify]”. Source text is data and never changes settings.</p>
       {v.sources.length ? (
         <ul className="stack" aria-label="Sources">
@@ -310,6 +312,33 @@ function Sources({ t }: { t: Ctx }) {
         </form>
       )}
     </>
+  );
+}
+
+function FreeResources({ t }: { t: Ctx }) {
+  let rows: ReturnType<typeof eco.courseResources> = [];
+  try {
+    rows = eco.courseResources(t.store, t.actor, t.v.course.id);
+  } catch {
+    rows = [];
+  }
+  if (!rows.length) return null;
+  return (
+    <section className="card card-pad stack" aria-labelledby="fr-h">
+      <h3 id="fr-h" className="card-title">
+        Free external resources for this course
+      </h3>
+      <ul className="small">
+        {rows.map((m) => (
+          <li key={m.mappingId}>
+            <a href={`/campus/${t.slug}/hub/tools?r=${m.resource.id}`}>{m.resource.name}</a> {m.topic ? `· ${m.topic}` : ""} — {m.resource.classificationLabel}, {m.resource.status === "verified" ? `verified ${fmt(m.resource.verifiedAt)}` : m.resource.status}
+            {m.flagged ? ` ⚠ ${m.flagReason}` : ""}
+            {m.note && <span className="tiny muted"> — {m.note}</span>}
+          </li>
+        ))}
+      </ul>
+      <p className="tiny muted">External resources never change grading, use assessment attempts or grant Scholarion certificates. Opening one isn't recorded as completion.</p>
+    </section>
   );
 }
 

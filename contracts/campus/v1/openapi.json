@@ -236,6 +236,18 @@
       "description": "Source-grounded generation per topic into the Scholarion_Academy/[Program]/[Course]/Module_[NN]/[Topic]/01_Sources … 13_Environment_Templates folder tree: 10-slide deck with notes, overview, notes, study guide, mind map, 16:9 infographic, 20+ flashcards, 10-question practice quiz, two mini-labs, lab/programming/DevOps environments, rubrics, cover variants A and B with the approved faculty photograph, video and audio scripts with honest media status, QA report, manifest, protected instructor bundle and regeneration commands. Every output is labelled AI DRAFT until an instructor releases it."
     },
     {
+      "name": "Free Education Resource Hub",
+      "description": "Scholarion AI Tools Registry and Free Course Library: an evidence-backed catalog of free tools, open courses, textbooks and readings with accurate availability classes (ongoing free, open-source, OER, education benefit, limited credits, trial), verified limits, API access tracked separately from free apps, licenses, connection states, last-verified dates, bookmarks, course mappings and recommendations, the Live Classroom Hub (lectures split into blocks within verified free meeting limits), the Video, Audio and Avatar studio, integration connections (key-vault references only) and an in-site What's New feed."
+    },
+    {
+      "name": "Career Connect & Employer Portal",
+      "description": "Internship and employment board (employer-posted and externally discovered listings, labelled accurately), verified employer onboarding, partner status only after an established relationship, learner career profiles with opt-in discoverability and per-field visibility, explainable matching from passbook and credential evidence, learner-initiated applications, consent-based employer contact, and placement tracking kept separate from course completion."
+    },
+    {
+      "name": "Auto-Discovery & Workflow Automation",
+      "description": "Scheduled, bounded discovery and maintenance: cron schedules in America/New_York (jobs daily 6:00, resources Monday 7:00, terms review monthly, link checks daily 5:00, integration health every six hours), durable jobs with unique period keys, leases, request/runtime budgets, checkpoints, backoff with jitter and dead-letter, run-now/pause/resume, trusted-source adapters (official pages, RSS/Atom, public job-board API — no arbitrary-URL proxy), automatic publication of evidence-backed records, the versioned Scholarion Integration JSON Schema (Draft 2020-12) with semantic checks, and the API integration layer."
+    },
+    {
       "name": "Module Library & Catalog Consolidation",
       "description": "The versioned shared module library (blueprint course), the catalog consolidation report for programs #1–#38 (shared modules, credit transfers, mutually exclusive pairs, merge/retire recommendations, proposed #27) with product-owner approval, and the refund, deferral and batch-change policies that only display once approved."
     },
@@ -28833,6 +28845,4261 @@
         }
       }
     },
+    "/r/eco_resources": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "List free tools, courses and readings",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoResources"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Create a catalog resource",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_resources/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Get a catalog resource",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Update a catalog resource (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Delete (tombstone) a catalog resource",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_resource_versions": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "List resource version history",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoResourceVersions"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Create a resource version",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_resource_versions/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Get a resource version",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Update a resource version (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Delete (tombstone) a resource version",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_evidence": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "List source evidence",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoEvidence"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Create a source evidence",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_evidence/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Get a source evidence",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Update a source evidence (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Delete (tombstone) a source evidence",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_course_mappings": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "List course resource mappings",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoCourseMappings"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Create a course resource mapping",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_course_mappings/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Get a course resource mapping",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Update a course resource mapping (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Delete (tombstone) a course resource mapping",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_bookmarks": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "List bookmarks",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoBookmarks"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Create a bookmark",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_bookmarks/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Get a bookmark",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Update a bookmark (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Delete (tombstone) a bookmark",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_external_completions": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "List external completions",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoExternalCompletions"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Create a external completion (learner evidence)",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_external_completions/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Get a external completion (learner evidence)",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Update a external completion (learner evidence) (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Delete (tombstone) a external completion (learner evidence)",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_subscriptions": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "List what's new subscriptions",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoSubscriptions"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Create a what's new subscription",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_subscriptions/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Get a what's new subscription",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Update a what's new subscription (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Delete (tombstone) a what's new subscription",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_feed": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "List what's new",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoFeed"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Create a what's new item",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_feed/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Get a what's new item",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Update a what's new item (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Delete (tombstone) a what's new item",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_connections": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "List integration connections",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoConnections"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Create a integration connection (protected)",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_connections/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Get a integration connection (protected)",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Update a integration connection (protected) (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Delete (tombstone) a integration connection (protected)",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_health": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "List integration health checks",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoHealth"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Create a integration health check",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_health/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Get a integration health check",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Update a integration health check (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Delete (tombstone) a integration health check",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_live_sessions": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "List live classroom sessions",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoLiveSessions"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Create a live session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_live_sessions/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Get a live session",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Update a live session (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "summary": "Delete (tombstone) a live session",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_sources": {
+      "get": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "List discovery sources",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoSources"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Create a discovery source",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_sources/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Get a discovery source",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Update a discovery source (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Delete (tombstone) a discovery source",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_schedules": {
+      "get": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "List discovery schedules",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoSchedules"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Create a discovery schedule",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_schedules/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Get a discovery schedule",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Update a discovery schedule (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Delete (tombstone) a discovery schedule",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_jobs": {
+      "get": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "List discovery jobs",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoJobs"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Create a discovery job",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_jobs/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Get a discovery job",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Update a discovery job (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Delete (tombstone) a discovery job",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_candidates": {
+      "get": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "List discovery candidates",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoCandidates"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Create a discovery candidate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_candidates/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Get a discovery candidate",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Update a discovery candidate (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Delete (tombstone) a discovery candidate",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_checks": {
+      "get": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "List verification checks",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoChecks"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Create a verification check",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_checks/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Get a verification check",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Update a verification check (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "summary": "Delete (tombstone) a verification check",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_employers": {
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "List employers",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoEmployers"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Create a employer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_employers/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Get a employer",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Update a employer (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Delete (tombstone) a employer",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_employer_members": {
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "List employer members",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoEmployerMembers"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Create a employer member",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_employer_members/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Get a employer member",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Update a employer member (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Delete (tombstone) a employer member",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_opportunities": {
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "List internships and employment",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoOpportunities"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Create a opportunity",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_opportunities/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Get a opportunity",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Update a opportunity (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Delete (tombstone) a opportunity",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_career_profiles": {
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "List learner career profiles",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoCareerProfiles"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Create a career profile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_career_profiles/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Get a career profile",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Update a career profile (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Delete (tombstone) a career profile",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_matches": {
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "List opportunity matches",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoMatches"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Create a opportunity match",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_matches/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Get a opportunity match",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Update a opportunity match (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Delete (tombstone) a opportunity match",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_applications": {
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "List applications",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoApplications"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Create a application",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_applications/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Get a application",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Update a application (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Delete (tombstone) a application",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_contact_requests": {
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "List employer contact requests",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EcoContactRequests"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Create a contact request",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/eco_contact_requests/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Get a contact request",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Update a contact request (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "summary": "Delete (tombstone) a contact request",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/r/studio_sources": {
       "get": {
         "tags": [
@@ -51104,6 +55371,2334 @@
         }
       }
     },
+    "/q/eco.summary": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.summary",
+        "summary": "Hub summary: verified, pending, stale and unavailable records, connected services, active opportunities, recent activity.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.resources": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.resources",
+        "summary": "Search the catalog (filters: group, category, subject, freeOnly, noCard, api, selfHosted, accessible, status, connection; paginated).",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "group",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "category",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "subject",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "freeOnly",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query"
+          },
+          {
+            "name": "noCard",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query"
+          },
+          {
+            "name": "api",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query"
+          },
+          {
+            "name": "selfHosted",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query"
+          },
+          {
+            "name": "accessible",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query"
+          },
+          {
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "connection",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "page",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "in": "query"
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.resource": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.resource",
+        "summary": "One record: evidence, limits, versions, course mappings, connection state and its Integration Definition.",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.curate": {
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.curate",
+        "summary": "Add or update a catalog record (it stays pending until official evidence verifies it).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "provider": {
+                    "type": "string"
+                  },
+                  "officialUrl": {
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "classification": {
+                    "type": "string"
+                  },
+                  "apiAccess": {
+                    "type": "string"
+                  },
+                  "integrationMethod": {
+                    "type": "string"
+                  },
+                  "license": {
+                    "type": "string"
+                  },
+                  "subjects": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "name",
+                  "provider",
+                  "officialUrl"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.add_evidence": {
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.add_evidence",
+        "summary": "Attach an official source page and the claims it supports; the verification job confirms it.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resourceId": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "claims": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "checkTerms": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "resourceId",
+                  "url"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.archive": {
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.archive",
+        "summary": "Archive a record (kept in history).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resourceId": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "resourceId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.bookmark": {
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.bookmark",
+        "summary": "Bookmark or un-bookmark a resource.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resourceId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "resourceId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.bookmarks": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.bookmarks",
+        "summary": "My bookmarks.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.report_completion": {
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.report_completion",
+        "summary": "Record an external completion with your own evidence (opening a link is never treated as completion).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resourceId": {
+                    "type": "string"
+                  },
+                  "evidenceUrl": {
+                    "type": "string"
+                  },
+                  "note": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "resourceId",
+                  "evidenceUrl"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.subscribe": {
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.subscribe",
+        "summary": "Subscribe to in-site What's New notifications by subject, course or career interest.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "subject",
+                      "course",
+                      "career",
+                      "all"
+                    ]
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.unsubscribe": {
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.unsubscribe",
+        "summary": "Remove a subscription.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.whats_new": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.whats_new",
+        "summary": "What's New: newly verified tools and resources, changed limits, discontinued services, new opportunities.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.map_course": {
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.map_course",
+        "summary": "Map a resource to a course topic (idempotent).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "resourceId": {
+                    "type": "string"
+                  },
+                  "topic": {
+                    "type": "string"
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "idempotencyKey": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "courseId",
+                  "resourceId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.course_resources": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.course_resources",
+        "summary": "Resources mapped to a course.",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.recommend": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.recommend",
+        "summary": "Verified free resources recommended for a course, with reasons.",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "accessible",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.connect": {
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.connect",
+        "summary": "Admin: connect a service (key-vault reference only; states reflect what is actually possible).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resourceId": {
+                    "type": "string"
+                  },
+                  "credentialRef": {
+                    "type": "string"
+                  },
+                  "scopes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "eligibilityConfirmed": {
+                    "type": "boolean"
+                  },
+                  "idempotencyKey": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "resourceId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.connections": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.connections",
+        "summary": "Admin: integration connections and health (no secrets).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.connection_health": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.connection_health",
+        "summary": "Admin: one connection's health history.",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.disconnect": {
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.disconnect",
+        "summary": "Admin: remove a connection.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.live_schedule": {
+      "post": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.live_schedule",
+        "summary": "Schedule a live session on a verified provider; split into blocks within its verified free limit.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "providerId": {
+                    "type": "string"
+                  },
+                  "startsAt": {
+                    "type": "string"
+                  },
+                  "totalMinutes": {
+                    "type": "number"
+                  },
+                  "joinUrl": {
+                    "type": "string"
+                  },
+                  "breakMinutes": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "courseId",
+                  "title",
+                  "providerId",
+                  "startsAt",
+                  "totalMinutes"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.live_sessions": {
+      "get": {
+        "tags": [
+          "Free Education Resource Hub"
+        ],
+        "operationId": "eco.live_sessions",
+        "summary": "Live sessions for my courses.",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.opportunities": {
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.opportunities",
+        "summary": "Open internships, apprenticeships and entry-level roles (closed listings drop out).",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "type",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "remote",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.employers": {
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.employers",
+        "summary": "Employers with their relationship label.",
+        "parameters": [
+          {
+            "name": "relationship",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.profile": {
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.profile",
+        "summary": "My career profile, visibility and evidence-backed skills.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.profile_save": {
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.profile_save",
+        "summary": "Save my career profile and choose what employers may see (off by default).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "headline": {
+                    "type": "string"
+                  },
+                  "statedSkills": {
+                    "type": "string"
+                  },
+                  "interests": {
+                    "type": "string"
+                  },
+                  "preferredLocations": {
+                    "type": "string"
+                  },
+                  "remoteOk": {
+                    "type": "boolean"
+                  },
+                  "portfolioUrl": {
+                    "type": "string"
+                  },
+                  "contactEmail": {
+                    "type": "string"
+                  },
+                  "discoverable": {
+                    "type": "boolean"
+                  },
+                  "show_headline": {
+                    "type": "boolean"
+                  },
+                  "show_skills": {
+                    "type": "boolean"
+                  },
+                  "show_certificates": {
+                    "type": "boolean"
+                  },
+                  "show_portfolio": {
+                    "type": "boolean"
+                  },
+                  "show_contact": {
+                    "type": "boolean"
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.matches": {
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.matches",
+        "summary": "Opportunities that match my demonstrated and stated skills, with explanations.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.apply": {
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.apply",
+        "summary": "Apply (learner-initiated). Employer-posted roles receive only the fields you choose; external listings are recorded after you apply on the official site.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "opportunityId": {
+                    "type": "string"
+                  },
+                  "idempotencyKey": {
+                    "type": "string"
+                  },
+                  "share": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "note": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "opportunityId",
+                  "idempotencyKey"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.applications": {
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.applications",
+        "summary": "My applications.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.withdraw": {
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.withdraw",
+        "summary": "Withdraw my application.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.contact_requests": {
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.contact_requests",
+        "summary": "Employer contact requests waiting for my answer.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.answer_contact": {
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.answer_contact",
+        "summary": "Accept or decline an employer's contact request.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "accept": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "id",
+                  "accept"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.employer_register": {
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.employer_register",
+        "summary": "Register an organization (verification required before talent search).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "website": {
+                    "type": "string"
+                  },
+                  "industries": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "locations": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "about": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "website"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.employer_verify": {
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.employer_verify",
+        "summary": "Admin: verify or reject an employer.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "employerId": {
+                    "type": "string"
+                  },
+                  "decision": {
+                    "type": "string",
+                    "enum": [
+                      "verified",
+                      "rejected"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "employerId",
+                  "decision"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.employer_partner": {
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.employer_partner",
+        "summary": "Admin: record an established partnership (required before the partner label).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "employerId": {
+                    "type": "string"
+                  },
+                  "note": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "employerId",
+                  "note"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.employer_portal": {
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.employer_portal",
+        "summary": "Employer portal: organization, opportunities, applications (shared fields only) and contact requests.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.post_opportunity": {
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.post_opportunity",
+        "summary": "Verified employers: publish an opportunity.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "skills": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "location": {
+                    "type": "string"
+                  },
+                  "remote": {
+                    "type": "string"
+                  },
+                  "workEligibility": {
+                    "type": "string"
+                  },
+                  "compensation": {
+                    "type": "string"
+                  },
+                  "applicationUrl": {
+                    "type": "string"
+                  },
+                  "closesAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "title",
+                  "type"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.close_opportunity": {
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.close_opportunity",
+        "summary": "Close a filled or withdrawn position.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.talent": {
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.talent",
+        "summary": "Verified employers: search learners who opted in (visible fields only).",
+        "parameters": [
+          {
+            "name": "skill",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "opportunityId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.request_contact": {
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.request_contact",
+        "summary": "Verified employers: ask a candidate for contact (they decide).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ref": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "opportunityId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "ref",
+                  "message"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.application_update": {
+      "post": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.application_update",
+        "summary": "Employers: update an application's status.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "reviewing",
+                      "interview",
+                      "offer",
+                      "hired",
+                      "not_selected"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "state"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.placements": {
+      "get": {
+        "tags": [
+          "Career Connect & Employer Portal"
+        ],
+        "operationId": "eco.placements",
+        "summary": "Staff: placement outcomes (kept separate from course completion).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.automation": {
+      "get": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "operationId": "eco.automation",
+        "summary": "Schedules, jobs, sources, verification exceptions and network mode.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.schedule_save": {
+      "post": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "operationId": "eco.schedule_save",
+        "summary": "Create or edit a schedule (cron + IANA time zone + budget).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "key": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string"
+                  },
+                  "cron": {
+                    "type": "string"
+                  },
+                  "timeZone": {
+                    "type": "string"
+                  },
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "budget": {}
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.schedule_pause": {
+      "post": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "operationId": "eco.schedule_pause",
+        "summary": "Pause a schedule.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.schedule_resume": {
+      "post": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "operationId": "eco.schedule_resume",
+        "summary": "Resume a schedule.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.run_now": {
+      "post": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "operationId": "eco.run_now",
+        "summary": "Run a schedule now (queued and worked immediately).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.tick": {
+      "post": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "operationId": "eco.tick",
+        "summary": "Admin: plan and work due discovery jobs now.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.job": {
+      "get": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "operationId": "eco.job",
+        "summary": "A job with its candidates and checks.",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.job_create": {
+      "post": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "operationId": "eco.job_create",
+        "summary": "Create a one-off discovery job (idempotent).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string"
+                  },
+                  "idempotencyKey": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.source_add": {
+      "post": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "operationId": "eco.source_add",
+        "summary": "Add a trusted source (official page, RSS/Atom feed, or a public Greenhouse job board).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "official_page",
+                      "rss",
+                      "greenhouse"
+                    ]
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "purpose": {
+                    "type": "string"
+                  },
+                  "provider": {
+                    "type": "string"
+                  },
+                  "evidenceUrl": {
+                    "type": "string"
+                  },
+                  "defaults": {},
+                  "subjects": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "entryLevelOnly": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "key",
+                  "name",
+                  "kind",
+                  "url"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.source_toggle": {
+      "post": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "operationId": "eco.source_toggle",
+        "summary": "Enable or disable a source.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "id",
+                  "enabled"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/eco.schemas": {
+      "get": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "operationId": "eco.schemas",
+        "summary": "The versioned Scholarion JSON Schemas (Draft 2020-12).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/eco.validate": {
+      "post": {
+        "tags": [
+          "Auto-Discovery & Workflow Automation"
+        ],
+        "operationId": "eco.validate",
+        "summary": "Validate an Integration Definition (structure, formats and semantic rules).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "definition": {}
+                },
+                "required": [
+                  "definition"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/q/catalog.consolidation": {
       "get": {
         "tags": [
@@ -59434,6 +66029,895 @@
           }
         ],
         "description": "Projection lock (tab: learning-area)"
+      },
+      "EcoResources": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "Name",
+                "type": "string"
+              },
+              "provider": {
+                "description": "Provider",
+                "type": "string"
+              },
+              "officialUrl": {
+                "description": "Official website",
+                "type": "string"
+              },
+              "category": {
+                "description": "Category",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind",
+                "type": "string"
+              },
+              "subjects": {
+                "description": "Subjects",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "classification": {
+                "description": "Free-access classification",
+                "type": "string"
+              },
+              "apiAccess": {
+                "description": "API access (separate from the free app)",
+                "type": "string"
+              },
+              "cardRequired": {
+                "description": "Payment card required",
+                "type": "boolean"
+              },
+              "accountRequired": {
+                "description": "Account required",
+                "type": "boolean"
+              },
+              "limits": {
+                "description": "Verified limits"
+              },
+              "license": {
+                "description": "License",
+                "type": "string"
+              },
+              "redistribution": {
+                "description": "Redistribution",
+                "type": "string"
+              },
+              "integrationMethod": {
+                "description": "Integration method",
+                "type": "string"
+              },
+              "connectionState": {
+                "description": "Connection state",
+                "type": "string"
+              },
+              "status": {
+                "description": "Verification (verified / pending / stale / unavailable / archived)",
+                "type": "string"
+              },
+              "statusReason": {
+                "description": "Why",
+                "type": "string"
+              },
+              "verifiedAt": {
+                "description": "Last verified",
+                "type": "string",
+                "format": "date-time"
+              },
+              "nextReviewAt": {
+                "description": "Next review",
+                "type": "string",
+                "format": "date-time"
+              },
+              "version": {
+                "description": "Version",
+                "type": "number"
+              }
+            }
+          }
+        ],
+        "description": "Catalog resource (tab: free-resources)"
+      },
+      "EcoResourceVersions": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "resourceId": {
+                "description": "Resource",
+                "type": "string"
+              },
+              "version": {
+                "description": "Version",
+                "type": "number"
+              },
+              "changedFields": {
+                "description": "Changed",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reason": {
+                "description": "Reason",
+                "type": "string"
+              },
+              "jobId": {
+                "description": "Job",
+                "type": "string"
+              },
+              "changedAt": {
+                "description": "Changed",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Resource version (tab: free-resources)"
+      },
+      "EcoEvidence": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "resourceId": {
+                "description": "Resource",
+                "type": "string"
+              },
+              "url": {
+                "description": "Official source",
+                "type": "string"
+              },
+              "retrievedAt": {
+                "description": "Retrieved",
+                "type": "string",
+                "format": "date-time"
+              },
+              "claims": {
+                "description": "Claims"
+              },
+              "checkTerms": {
+                "description": "Terms re-checked",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "confirmed": {
+                "description": "Confirmed",
+                "type": "boolean"
+              }
+            }
+          }
+        ],
+        "description": "Source evidence (tab: free-resources)"
+      },
+      "EcoCourseMappings": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "courseId": {
+                "description": "Course",
+                "type": "string"
+              },
+              "resourceId": {
+                "description": "Resource",
+                "type": "string"
+              },
+              "topic": {
+                "description": "Topic",
+                "type": "string"
+              },
+              "note": {
+                "description": "Note",
+                "type": "string"
+              },
+              "flagged": {
+                "description": "Flagged by a terms change",
+                "type": "boolean"
+              }
+            }
+          }
+        ],
+        "description": "Course resource mapping (tab: free-resources)"
+      },
+      "EcoBookmarks": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "description": "Learner",
+                "type": "string"
+              },
+              "resourceId": {
+                "description": "Resource",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Bookmark (tab: free-resources)"
+      },
+      "EcoExternalCompletions": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "description": "Learner",
+                "type": "string"
+              },
+              "resourceId": {
+                "description": "Resource",
+                "type": "string"
+              },
+              "evidenceUrl": {
+                "description": "Evidence URL",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status (self_reported)",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "External completion (learner evidence) (tab: free-resources)"
+      },
+      "EcoSubscriptions": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "description": "User",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind",
+                "type": "string"
+              },
+              "value": {
+                "description": "Value",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "What's New subscription (tab: free-resources)"
+      },
+      "EcoFeed": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "description": "Kind",
+                "type": "string"
+              },
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "at": {
+                "description": "At",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "What's New item (tab: free-resources)"
+      },
+      "EcoConnections": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "resourceId": {
+                "description": "Service",
+                "type": "string"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              },
+              "scopes": {
+                "description": "Granted scopes",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "lastHealthAt": {
+                "description": "Last health check",
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastHealthOk": {
+                "description": "Healthy",
+                "type": "boolean"
+              }
+            }
+          }
+        ],
+        "description": "Integration connection (protected) (tab: free-resources)"
+      },
+      "EcoHealth": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "connectionId": {
+                "description": "Connection",
+                "type": "string"
+              },
+              "ok": {
+                "description": "OK",
+                "type": "boolean"
+              },
+              "detail": {
+                "description": "Detail",
+                "type": "string"
+              },
+              "at": {
+                "description": "At",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Integration health check (tab: free-resources)"
+      },
+      "EcoLiveSessions": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "courseId": {
+                "description": "Course",
+                "type": "string"
+              },
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "provider": {
+                "description": "Provider",
+                "type": "string"
+              },
+              "startsAt": {
+                "description": "Starts",
+                "type": "string",
+                "format": "date-time"
+              },
+              "totalMinutes": {
+                "description": "Minutes",
+                "type": "number"
+              },
+              "providerLimitMinutes": {
+                "description": "Verified free limit (min)",
+                "type": "number"
+              },
+              "blocks": {
+                "description": "Teaching blocks"
+              }
+            }
+          }
+        ],
+        "description": "Live session (tab: free-resources)"
+      },
+      "EcoSources": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "key": {
+                "description": "Key",
+                "type": "string"
+              },
+              "name": {
+                "description": "Name",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind (official_page / rss / greenhouse)",
+                "type": "string"
+              },
+              "url": {
+                "description": "URL",
+                "type": "string"
+              },
+              "host": {
+                "description": "Trusted host",
+                "type": "string"
+              },
+              "enabled": {
+                "description": "Enabled",
+                "type": "boolean"
+              },
+              "lastFetchedAt": {
+                "description": "Last fetched",
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastError": {
+                "description": "Last error",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Discovery source (tab: discovery-automation)"
+      },
+      "EcoSchedules": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "key": {
+                "description": "Key",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Job kind",
+                "type": "string"
+              },
+              "cron": {
+                "description": "Cron",
+                "type": "string"
+              },
+              "timeZone": {
+                "description": "Time zone",
+                "type": "string"
+              },
+              "enabled": {
+                "description": "Enabled",
+                "type": "boolean"
+              },
+              "paused": {
+                "description": "Paused",
+                "type": "boolean"
+              },
+              "budget": {
+                "description": "Budget"
+              },
+              "lastSuccessAt": {
+                "description": "Last successful run",
+                "type": "string",
+                "format": "date-time"
+              },
+              "nextRunAt": {
+                "description": "Next run",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Discovery schedule (tab: discovery-automation)"
+      },
+      "EcoJobs": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "key": {
+                "description": "Unique key",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind",
+                "type": "string"
+              },
+              "trigger": {
+                "description": "Trigger",
+                "type": "string"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              },
+              "attempts": {
+                "description": "Attempts",
+                "type": "number"
+              },
+              "runAfter": {
+                "description": "Run after",
+                "type": "string",
+                "format": "date-time"
+              },
+              "checkpoint": {
+                "description": "Checkpoint",
+                "type": "number"
+              },
+              "summary": {
+                "description": "Summary",
+                "type": "string"
+              },
+              "errors": {
+                "description": "Errors"
+              }
+            }
+          }
+        ],
+        "description": "Discovery job (tab: discovery-automation)"
+      },
+      "EcoCandidates": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "jobId": {
+                "description": "Job",
+                "type": "string"
+              },
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "url": {
+                "description": "URL",
+                "type": "string"
+              },
+              "decision": {
+                "description": "Decision",
+                "type": "string"
+              },
+              "reason": {
+                "description": "Reason",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Discovery candidate (tab: discovery-automation)"
+      },
+      "EcoChecks": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "resourceId": {
+                "description": "Resource",
+                "type": "string"
+              },
+              "jobId": {
+                "description": "Job",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind",
+                "type": "string"
+              },
+              "ok": {
+                "description": "OK",
+                "type": "boolean"
+              },
+              "httpStatus": {
+                "description": "HTTP",
+                "type": "number"
+              },
+              "detail": {
+                "description": "Detail",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Verification check (tab: discovery-automation)"
+      },
+      "EcoEmployers": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "Name",
+                "type": "string"
+              },
+              "website": {
+                "description": "Website",
+                "type": "string"
+              },
+              "relationship": {
+                "description": "Relationship (external / registered / verified / partner)",
+                "type": "string"
+              },
+              "verification": {
+                "description": "Verification",
+                "type": "string"
+              },
+              "partnerNote": {
+                "description": "Established relationship",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Employer (tab: career-connect)"
+      },
+      "EcoEmployerMembers": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "employerId": {
+                "description": "Employer",
+                "type": "string"
+              },
+              "userId": {
+                "description": "User",
+                "type": "string"
+              },
+              "role": {
+                "description": "Role",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Employer member (tab: career-connect)"
+      },
+      "EcoOpportunities": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "employerName": {
+                "description": "Employer",
+                "type": "string"
+              },
+              "type": {
+                "description": "Type",
+                "type": "string"
+              },
+              "source": {
+                "description": "Source",
+                "type": "string"
+              },
+              "skills": {
+                "description": "Skills",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "location": {
+                "description": "Location",
+                "type": "string"
+              },
+              "remote": {
+                "description": "Remote",
+                "type": "string"
+              },
+              "compensation": {
+                "description": "Compensation (when published)",
+                "type": "string"
+              },
+              "applicationUrl": {
+                "description": "Official application URL",
+                "type": "string"
+              },
+              "closesAt": {
+                "description": "Closes",
+                "type": "string",
+                "format": "date-time"
+              },
+              "status": {
+                "description": "Status",
+                "type": "string"
+              },
+              "lastVerifiedAt": {
+                "description": "Last verified",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Opportunity (tab: career-connect)"
+      },
+      "EcoCareerProfiles": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "description": "Learner",
+                "type": "string"
+              },
+              "headline": {
+                "description": "Headline",
+                "type": "string"
+              },
+              "statedSkills": {
+                "description": "Stated skills",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "discoverable": {
+                "description": "Discoverable by employers",
+                "type": "boolean"
+              },
+              "visible": {
+                "description": "Visible fields"
+              }
+            }
+          }
+        ],
+        "description": "Career profile (tab: career-connect)"
+      },
+      "EcoMatches": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "description": "Learner",
+                "type": "string"
+              },
+              "opportunityId": {
+                "description": "Opportunity",
+                "type": "string"
+              },
+              "score": {
+                "description": "Score",
+                "type": "number"
+              },
+              "reasons": {
+                "description": "Why"
+              }
+            }
+          }
+        ],
+        "description": "Opportunity match (tab: career-connect)"
+      },
+      "EcoApplications": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "description": "Learner",
+                "type": "string"
+              },
+              "opportunityId": {
+                "description": "Opportunity",
+                "type": "string"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              },
+              "sharedFields": {
+                "description": "Shared fields",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "authorizedAt": {
+                "description": "Authorized by the learner",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Application (tab: career-connect)"
+      },
+      "EcoContactRequests": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "employerId": {
+                "description": "Employer",
+                "type": "string"
+              },
+              "userId": {
+                "description": "Learner",
+                "type": "string"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              },
+              "requestedAt": {
+                "description": "Requested",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Contact request (tab: career-connect)"
       },
       "StudioSources": {
         "allOf": [

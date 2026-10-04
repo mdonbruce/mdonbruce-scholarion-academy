@@ -19,6 +19,7 @@ import { simLabFileName, simLabHtml } from "../services/simlab";
 import { answersLocked } from "../services/projection";
 import { gradebookCsv as gradedCsv } from "../services/graded";
 import { bundleZip, readOutput } from "../services/studio";
+import * as eco from "../services/ecosystem";
 import { draftView, qtiXml } from "../services/assess";
 import { coverHtml, type CoverKind } from "../services/covers";
 import { redeemQrLogin, startMasquerade, stopMasquerade, activeGlobalAnnouncements } from "../services/admin";
@@ -346,6 +347,40 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     const html = simLabHtml(rest[1], edition, { module: moduleNo, program: url.searchParams.get("program") ?? undefined });
     const name = simLabFileName(rest[1], edition, moduleNo);
     return new Response(html, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "content-disposition": `${url.searchParams.get("download") ? "attachment" : "inline"}; filename="${name}"`, "cache-control": "no-store", "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'", "x-content-type-options": "nosniff" } });
+  }
+  // Scholarion API integration layer (v1): REST aliases for the ecosystem operations.
+  {
+    const idem = req.headers.get("idempotency-key") ?? (body.idempotencyKey as string | undefined);
+    const q = Object.fromEntries(url.searchParams);
+    const page = (r: { items: unknown[]; total: number; page: number; pageSize: number }) => json({ data: r.items, page: { number: r.page, size: r.pageSize, total: r.total } });
+    const filt = { q: q.q, subject: q.subject, category: q.category, status: q.status, connection: q.connection, freeOnly: q.free === "true" || q.freeOnly === "true", noCard: q.noCard === "true", api: q.api === "true", selfHosted: q.selfHosted === "true", accessible: q.accessible === "true", page: q.page ? Number(q.page) : undefined, pageSize: q.pageSize ? Number(q.pageSize) : undefined };
+    if (method === "GET" && route === "resources") return page(eco.listResources(store, a, filt));
+    if (method === "GET" && rest[0] === "resources" && rest[1] && rest.length === 2) return json({ data: eco.getResource(store, a, rest[1]) });
+    if (method === "GET" && route === "tools") return page(eco.listResources(store, a, { ...filt, kind: "tool" }));
+    if (method === "GET" && route === "courses/free") return page(eco.listResources(store, a, { ...filt, group: "library" }));
+    if (method === "GET" && route === "employers") return json({ data: eco.listEmployers(store, a) });
+    if (method === "GET" && route === "opportunities") return json({ data: eco.listOpportunities(store, { q: q.q, type: q.type, remote: q.remote }) });
+    if (method === "GET" && route === "integrations") return page(eco.listResources(store, a, { ...filt, pageSize: filt.pageSize ?? 100 }));
+    if (method === "POST" && rest[0] === "integrations" && rest[1] && rest[2] === "connections") return json({ data: eco.connect(store, a, rest[1], { credentialRef: body.credentialRef as string | undefined, scopes: (body.scopes as string[]) ?? [], eligibilityConfirmed: body.eligibilityConfirmed === true }, idem) }, 201);
+    if (method === "GET" && rest[0] === "connections" && rest[1] && rest[2] === "health") return json({ data: eco.connectionHealth(store, a, rest[1]) });
+    if (method === "DELETE" && rest[0] === "connections" && rest[1] && rest.length === 2) return json({ data: eco.disconnect(store, a, rest[1]) });
+    if (method === "POST" && route === "discovery/jobs") return json({ data: eco.createJob(store, a, String(body.kind ?? ""), idem) }, 202);
+    if (method === "GET" && rest[0] === "discovery" && rest[1] === "jobs" && rest[2]) return json({ data: eco.getJob(store, a, rest[2]) });
+    if (method === "GET" && route === "schedules") {
+      if (!a.roles.includes("admin")) throw new CampusError("forbidden", "Administrators only.", 403);
+      return json({ data: eco.listSchedules(store) });
+    }
+    if (method === "POST" && route === "schedules") return json({ data: eco.upsertSchedule(store, a, body as never) }, 201);
+    if (method === "PATCH" && rest[0] === "schedules" && rest[1]) return json({ data: eco.upsertSchedule(store, a, { ...(body as object), id: rest[1] } as never) });
+    if (method === "GET" && rest[0] === "courses" && rest[1] && rest[2] === "resources") return json({ data: eco.courseResources(store, a, rest[1]) });
+    if (method === "POST" && rest[0] === "courses" && rest[1] && rest[2] === "resource-mappings") return json({ data: eco.mapToCourse(store, a, { courseId: rest[1], resourceId: String(body.resourceId ?? ""), topic: body.topic as string | undefined, note: body.note as string | undefined }, idem) }, 201);
+    if (method === "GET" && route === "me/career-profile") return json({ data: eco.myProfile(store, a) });
+    if (method === "PATCH" && route === "me/career-profile") return json({ data: eco.saveProfile(store, a, body) });
+    if (method === "GET" && route === "me/opportunity-matches") return json({ data: eco.myMatches(store, a) });
+    if (method === "POST" && rest[0] === "opportunities" && rest[1] && rest[2] === "applications") {
+      if (!idem) throw new CampusError("invalid", "Send an Idempotency-Key header.", 422);
+      return json({ data: eco.apply(store, a, rest[1], { share: (body.share as string[]) ?? [], note: body.note as string | undefined }, idem) }, 201);
+    }
   }
   // Hosted learning area downloads: Studio outputs, bundles and the gradebook CSV (access enforced by the services).
   if (rest[0] === "learn" && rest[1] && method === "GET") {

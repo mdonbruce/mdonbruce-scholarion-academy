@@ -2482,6 +2482,353 @@ CREATE TABLE IF NOT EXISTS projection_locks (
   changed_at timestamptz
 );
 
+-- Catalog resource (tab: free-resources)
+CREATE TABLE IF NOT EXISTS eco_resources (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  name text,
+  provider text,
+  official_url text,
+  category text,
+  kind text,
+  subjects text[],
+  classification text,
+  api_access text,
+  card_required boolean,
+  account_required boolean,
+  limits jsonb,
+  license text,
+  redistribution text,
+  integration_method text,
+  connection_state text,
+  status text,
+  status_reason text,
+  verified_at timestamptz,
+  next_review_at timestamptz,
+  content_version numeric
+);
+
+-- Resource version (tab: free-resources)
+CREATE TABLE IF NOT EXISTS eco_resource_versions (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  resource_id text,
+  content_version numeric,
+  changed_fields text[],
+  reason text,
+  job_id text,
+  changed_at timestamptz
+);
+
+-- Source evidence (tab: free-resources)
+CREATE TABLE IF NOT EXISTS eco_evidence (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  resource_id text,
+  url text,
+  retrieved_at timestamptz,
+  claims jsonb,
+  check_terms text[],
+  confirmed boolean
+);
+
+-- Course resource mapping (tab: free-resources)
+CREATE TABLE IF NOT EXISTS eco_course_mappings (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  course_id text,
+  resource_id text,
+  topic text,
+  note text,
+  flagged boolean
+);
+
+-- Bookmark (tab: free-resources)
+CREATE TABLE IF NOT EXISTS eco_bookmarks (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  user_id text,
+  resource_id text
+);
+
+-- External completion (learner evidence) (tab: free-resources)
+CREATE TABLE IF NOT EXISTS eco_external_completions (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  user_id text,
+  resource_id text,
+  evidence_url text,
+  status text
+);
+
+-- What's New subscription (tab: free-resources)
+CREATE TABLE IF NOT EXISTS eco_subscriptions (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  user_id text,
+  kind text,
+  value text
+);
+
+-- What's New item (tab: free-resources)
+CREATE TABLE IF NOT EXISTS eco_feed (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  kind text,
+  title text,
+  at timestamptz
+);
+
+-- Integration connection (protected) (tab: free-resources)
+CREATE TABLE IF NOT EXISTS eco_connections (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  resource_id text,
+  state text,
+  scopes text[],
+  last_health_at timestamptz,
+  last_health_ok boolean
+);
+
+-- Integration health check (tab: free-resources)
+CREATE TABLE IF NOT EXISTS eco_health (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  connection_id text,
+  ok boolean,
+  detail text,
+  at timestamptz
+);
+
+-- Live session (tab: free-resources)
+CREATE TABLE IF NOT EXISTS eco_live_sessions (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  course_id text,
+  title text,
+  provider text,
+  starts_at timestamptz,
+  total_minutes numeric,
+  provider_limit_minutes numeric,
+  blocks jsonb
+);
+
+-- Discovery source (tab: discovery-automation)
+CREATE TABLE IF NOT EXISTS eco_sources (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  "key" text,
+  name text,
+  kind text,
+  url text,
+  host text,
+  enabled boolean,
+  last_fetched_at timestamptz,
+  last_error text
+);
+
+-- Discovery schedule (tab: discovery-automation)
+CREATE TABLE IF NOT EXISTS eco_schedules (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  "key" text,
+  kind text,
+  cron text,
+  time_zone text,
+  enabled boolean,
+  paused boolean,
+  budget jsonb,
+  last_success_at timestamptz,
+  next_run_at timestamptz
+);
+
+-- Discovery job (tab: discovery-automation)
+CREATE TABLE IF NOT EXISTS eco_jobs (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  "key" text,
+  kind text,
+  trigger text,
+  state text,
+  attempts numeric,
+  run_after timestamptz,
+  checkpoint numeric,
+  summary text,
+  errors jsonb
+);
+
+-- Discovery candidate (tab: discovery-automation)
+CREATE TABLE IF NOT EXISTS eco_candidates (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  job_id text,
+  title text,
+  url text,
+  decision text,
+  reason text
+);
+
+-- Verification check (tab: discovery-automation)
+CREATE TABLE IF NOT EXISTS eco_checks (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  resource_id text,
+  job_id text,
+  kind text,
+  ok boolean,
+  http_status numeric,
+  detail text
+);
+
+-- Employer (tab: career-connect)
+CREATE TABLE IF NOT EXISTS eco_employers (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  name text,
+  website text,
+  relationship text,
+  verification text,
+  partner_note text
+);
+
+-- Employer member (tab: career-connect)
+CREATE TABLE IF NOT EXISTS eco_employer_members (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  employer_id text,
+  user_id text,
+  role text
+);
+
+-- Opportunity (tab: career-connect)
+CREATE TABLE IF NOT EXISTS eco_opportunities (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  title text,
+  employer_name text,
+  type text,
+  source text,
+  skills text[],
+  location text,
+  remote text,
+  compensation text,
+  application_url text,
+  closes_at timestamptz,
+  status text,
+  last_verified_at timestamptz
+);
+
+-- Career profile (tab: career-connect)
+CREATE TABLE IF NOT EXISTS eco_career_profiles (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  user_id text,
+  headline text,
+  stated_skills text[],
+  discoverable boolean,
+  visible jsonb
+);
+
+-- Opportunity match (tab: career-connect)
+CREATE TABLE IF NOT EXISTS eco_matches (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  user_id text,
+  opportunity_id text,
+  score numeric,
+  reasons jsonb
+);
+
+-- Application (tab: career-connect)
+CREATE TABLE IF NOT EXISTS eco_applications (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  user_id text,
+  opportunity_id text,
+  state text,
+  shared_fields text[],
+  authorized_at timestamptz
+);
+
+-- Contact request (tab: career-connect)
+CREATE TABLE IF NOT EXISTS eco_contact_requests (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  employer_id text,
+  user_id text,
+  state text,
+  requested_at timestamptz
+);
+
 -- Studio source (tab: course-studio)
 CREATE TABLE IF NOT EXISTS studio_sources (
   id text PRIMARY KEY,

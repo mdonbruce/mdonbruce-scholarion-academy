@@ -657,6 +657,42 @@ Source-grounded generation per topic into the Scholarion_Academy/[Program]/[Cour
 - **Operations:** `studio.add_source`, `studio.sources`, `studio.start`, `studio.resume`, `studio.regenerate`, `studio.regenerate_quiz`, `studio.release`, `studio.runs`, `studio.run`, `studio.outputs`, `studio.edit_output`, `studio.check_minilab`
 - **Who sees it:** admin, designer, instructor
 
+## 57. Free Education Resource Hub
+
+Scholarion AI Tools Registry and Free Course Library: an evidence-backed catalog of free tools, open courses, textbooks and readings with accurate availability classes (ongoing free, open-source, OER, education benefit, limited credits, trial), verified limits, API access tracked separately from free apps, licenses, connection states, last-verified dates, bookmarks, course mappings and recommendations, the Live Classroom Hub (lectures split into blocks within verified free meeting limits), the Video, Audio and Avatar studio, integration connections (key-vault references only) and an in-site What's New feed.
+
+- **Purpose:** Give learners and faculty free, verified tools and materials without overstating what is free.
+- **Depends on:** Discovery jobs, official provider pages, course catalog.
+- **Typical failures:** A provider changes its free terms (record drops to pending, courses are notified with a verified alternative); a page disappears (unavailable).
+- **Recovery:** Add fresh official evidence; the next verification run republishes automatically.
+- **Resources:** `eco_resources`, `eco_resource_versions`, `eco_evidence`, `eco_course_mappings`, `eco_bookmarks`, `eco_external_completions`, `eco_subscriptions`, `eco_feed`, `eco_connections`, `eco_health`, `eco_live_sessions`
+- **Operations:** `eco.summary`, `eco.resources`, `eco.resource`, `eco.curate`, `eco.add_evidence`, `eco.archive`, `eco.bookmark`, `eco.bookmarks`, `eco.report_completion`, `eco.subscribe`, `eco.unsubscribe`, `eco.whats_new`, `eco.map_course`, `eco.course_resources`, `eco.recommend`, `eco.connect`, `eco.connections`, `eco.connection_health`, `eco.disconnect`, `eco.live_schedule`, `eco.live_sessions`
+- **Who sees it:** admin, designer, instructor, ta, student, advisor
+
+## 58. Career Connect & Employer Portal
+
+Internship and employment board (employer-posted and externally discovered listings, labelled accurately), verified employer onboarding, partner status only after an established relationship, learner career profiles with opt-in discoverability and per-field visibility, explainable matching from passbook and credential evidence, learner-initiated applications, consent-based employer contact, and placement tracking kept separate from course completion.
+
+- **Purpose:** Connect learners with real opportunities while they control what employers see.
+- **Depends on:** Passbook, credentials, discovery jobs, employer verification.
+- **Typical failures:** Unverified employer (403 on talent search); closed listing (409 on apply).
+- **Recovery:** Admin verifies the employer; learners pick another listing.
+- **Resources:** `eco_employers`, `eco_employer_members`, `eco_opportunities`, `eco_career_profiles`, `eco_matches`, `eco_applications`, `eco_contact_requests`
+- **Operations:** `eco.opportunities`, `eco.employers`, `eco.profile`, `eco.profile_save`, `eco.matches`, `eco.apply`, `eco.applications`, `eco.withdraw`, `eco.contact_requests`, `eco.answer_contact`, `eco.employer_register`, `eco.employer_verify`, `eco.employer_partner`, `eco.employer_portal`, `eco.post_opportunity`, `eco.close_opportunity`, `eco.talent`, `eco.request_contact`, `eco.application_update`, `eco.placements`
+- **Who sees it:** admin, advisor, student
+
+## 59. Auto-Discovery & Workflow Automation
+
+Scheduled, bounded discovery and maintenance: cron schedules in America/New_York (jobs daily 6:00, resources Monday 7:00, terms review monthly, link checks daily 5:00, integration health every six hours), durable jobs with unique period keys, leases, request/runtime budgets, checkpoints, backoff with jitter and dead-letter, run-now/pause/resume, trusted-source adapters (official pages, RSS/Atom, public job-board API — no arbitrary-URL proxy), automatic publication of evidence-backed records, the versioned Scholarion Integration JSON Schema (Draft 2020-12) with semantic checks, and the API integration layer.
+
+- **Purpose:** Keep the catalog and job board current without human approval gates, inside fixed permissions.
+- **Depends on:** Network egress to trusted hosts; the in-process scheduler or an external cron calling ops.run_jobs.
+- **Typical failures:** Source unreachable (retries with backoff, then dead-letter and an admin notification); budget exhausted (checkpoint and resume).
+- **Recovery:** Fix or disable the source, then Run now; dead jobs can be re-queued by Run now.
+- **Resources:** `eco_schedules`, `eco_jobs`, `eco_sources`, `eco_candidates`, `eco_checks`
+- **Operations:** `eco.automation`, `eco.schedule_save`, `eco.schedule_pause`, `eco.schedule_resume`, `eco.run_now`, `eco.tick`, `eco.job`, `eco.job_create`, `eco.source_add`, `eco.source_toggle`, `eco.schemas`, `eco.validate`
+- **Who sees it:** admin
+
 ## 52. Module Library & Catalog Consolidation
 
 The versioned shared module library (blueprint course), the catalog consolidation report for programs #1–#38 (shared modules, credit transfers, mutually exclusive pairs, merge/retire recommendations, proposed #27) with product-owner approval, and the refund, deferral and batch-change policies that only display once approved.

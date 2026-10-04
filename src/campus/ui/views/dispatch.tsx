@@ -6,6 +6,7 @@ import { CourseView, CoursesList } from "./course";
 import { TabPage } from "./tab";
 import { AgentLabsList, AgentLabWorkspace } from "./agentlabs";
 import { LearnArea } from "./learn";
+import { EcoHub } from "./ecohub";
 
 type SP = Record<string, string | undefined>;
 
@@ -29,6 +30,8 @@ export function CampusPage({ store, actor, slug, path, sp }: { store: TenantStor
         return <AccountView store={store} actor={actor} slug={slug} />;
       case "t":
         return <TabPage store={store} actor={actor} slug={slug} tabSlug={path[1] ?? ""} sp={sp} />;
+      case "hub":
+        return <EcoHub store={store} actor={actor} slug={slug} section={path[1] ?? "overview"} sp={sp} />;
       case "learn":
         return path[1] ? <LearnArea store={store} actor={actor} slug={slug} courseId={path[1]} section={path[2] ?? "dashboard"} sp={sp} /> : <CoursesList store={store} actor={actor} slug={slug} />;
       case "agent-labs":
