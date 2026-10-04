@@ -1,6 +1,6 @@
 # Scholarion Campus
 
-Multi-tenant SIS + LMS + ERP layer of Scholarion: tenant isolation, identity and policy, LMS parity (modules, assignments, quizzes, gradebook, sequential grader, discussions, calendar, inbox, blueprints…), SIS (admissions, registration, records, finance), governed AI, the Cloud Lab (LTI 1.3), catalog/pathways/sandbox commerce, Academy program pages, the Agentic AI catalog hub, the shared module library, proctored-assessment support, credentials and the control plane — **52 tabs**, all operational in local and staging.
+Multi-tenant SIS + LMS + ERP layer of Scholarion: tenant isolation, identity and policy, LMS parity (modules, assignments, quizzes, gradebook, sequential grader, discussions, calendar, inbox, blueprints…), SIS (admissions, registration, records, finance), governed AI, the Cloud Lab (LTI 1.3), catalog/pathways/sandbox commerce, Academy program pages, the Agentic AI catalog hub, the shared module library, proctored-assessment support, credentials and the control plane — **54 tabs**, all operational in local and staging.
 
 > Local + staging only. All people, schools and records are fictional demonstration data. Payments are sandbox only. No accreditation or outcome claims.
 
@@ -110,7 +110,7 @@ npm run campus:docs        # regenerate schemas, OpenAPI, runbooks, threat model
 src/campus/core.ts           tenants, broker (per-tenant stores), outbox + idempotent consumers, audit, metrics
 src/campus/iam.ts            actors, sessions, TOTP, role grants, support grants, act-as
 src/campus/permissions.ts    permission matrix with account inheritance and locks
-src/campus/registry.ts       165 resources and 52 tabs (fields, permissions, runbooks, threats)
+src/campus/registry.ts       170 resources and 54 tabs (fields, permissions, runbooks, threats)
 src/campus/entity.ts         generic CRUD with authorization, validation, publish checks, tombstones
 src/campus/services/*        domain services (curriculum, assessment, grading, sis, ai, lti, academy, tutor, proctor, platform…)
 src/campus/http/*            REST router, operations registry, OpenAPI, GraphQL, gRPC

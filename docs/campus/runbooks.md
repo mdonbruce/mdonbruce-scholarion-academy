@@ -609,6 +609,30 @@ Academy program designs (#1, #12, #13, #14, #26): website pages generated from c
 - **Operations:** `agentic.hub`, `agentic.quiz_questions`, `agentic.recommend`, `programs.index`, `programs.page`, `programs.self_check_questions`, `programs.self_check`, `programs.inquire`, `programs.apply`, `programs.review`, `programs.quality_gate`, `programs.publish_shells`, `programs.status`, `programs.progress`
 - **Who sees it:** admin, designer, registrar, advisor, instructor
 
+## 53. Assessment & Project Studio
+
+Curriculum Engine generators for every module: hands-on labs, in-class activities, quizzes with item banks (QTI export), practice exercises, mini-projects, real-world scenario projects, senior capstones and simulated Student/Instructor labs with an application demo — Four Project Pillars, alignment tables, student and instructor editions, AI DRAFT until an SME and an instructional designer approve.
+
+- **Purpose:** Turn the program design into assessable, aligned learning activities fast — with humans approving every word that reaches learners.
+- **Depends on:** Program pages (outcomes, weeks, tools, data cards), module shells, the copy checker, sandbox scenarios.
+- **Typical failures:** [SME] slots open, copy-check flags or a missing approval block publishing.
+- **Recovery:** Fill the slots, re-run approvals with two different people, publish (creates unpublished course items).
+- **Resources:** `assessment_drafts`
+- **Operations:** `assess.programs`, `assess.context`, `assess.generate`, `assess.drafts`, `assess.view`, `assess.fill`, `assess.approve`, `assess.publish`, `simlab.scenarios`
+- **Who sees it:** admin, designer, instructor
+
+## 54. Agentic Cloud Labs
+
+Scholarion's hosted agent-building area: saved workspaces with version history, a bounded autonomous agent runner (no approval gates; step and tool-call budgets), per-tool permissions with violation tracking, evaluation traces, rubric auto-grading posted to the gradebook with a pass/no-pass mark, and two graded attempts per lab (best counts; staff can grant one more).
+
+- **Purpose:** Practice and assess agent design safely and at scale.
+- **Depends on:** Courses and assignments, gradebook, sandbox scenarios.
+- **Typical failures:** Invalid agent spec (shown in the workspace); attempts exhausted (409).
+- **Recovery:** Fix the spec and re-run practice; staff grant an extra attempt with a reason (audited).
+- **Resources:** `agent_labs`, `agent_lab_runs`, `agent_lab_grants`, `agent_workspaces`
+- **Operations:** `agentlabs.mine`, `agentlabs.open`, `agentlabs.save`, `agentlabs.run`, `agentlabs.restore`, `agentlabs.reset`, `agentlabs.run_detail`, `agentlabs.roster`, `agentlabs.grant_attempt`, `agentlabs.verify`
+- **Who sees it:** admin, designer, instructor, ta, student
+
 ## 52. Module Library & Catalog Consolidation
 
 The versioned shared module library (blueprint course), the catalog consolidation report for programs #1–#38 (shared modules, credit transfers, mutually exclusive pairs, merge/retire recommendations, proposed #27) with product-owner approval, and the refund, deferral and batch-change policies that only display once approved.

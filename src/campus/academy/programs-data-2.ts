@@ -64,16 +64,16 @@ export const PROPOSED: { code: string; title: string; weeks: number; library: st
 
 /* ---------------- helpers ---------------- */
 
-const CAREER = ["Résumé and portfolio review", "Mock interviews", "Role mapping", "Portfolio guidance for your projects"];
-const NONCREDIT = "Non-credit professional training. It does not carry academic credit.";
-const FUNDING = "Self-pay, employer sponsorship, team invoicing and installments (sandbox) are accepted. As non-credit training it is not eligible for federal student aid or military education benefits.";
-const VALIDITY = "The certificate does not expire; the skills it covers evolve, so refresher modules are offered.";
-const GADDIS = "Gaddis, Starting Out with Python, 6th ed. (Python foundations; chapter map in the instructor guide)";
-const ML_BOOKS = ["Raschka et al., Machine Learning with PyTorch and Scikit-Learn (recommended reading)", "Géron, Hands-On Machine Learning, 3rd ed. (recommended reading)"];
+export const CAREER = ["Résumé and portfolio review", "Mock interviews", "Role mapping", "Portfolio guidance for your projects"];
+export const NONCREDIT = "Non-credit professional training. It does not carry academic credit.";
+export const FUNDING = "Self-pay, employer sponsorship, team invoicing and installments (sandbox) are accepted. As non-credit training it is not eligible for federal student aid or military education benefits.";
+export const VALIDITY = "The certificate does not expire; the skills it covers evolve, so refresher modules are offered.";
+export const GADDIS = "Gaddis, Starting Out with Python, 6th ed. (Python foundations; chapter map in the instructor guide)";
+export const ML_BOOKS = ["Raschka et al., Machine Learning with PyTorch and Scikit-Learn (recommended reading)", "Géron, Hands-On Machine Learning, 3rd ed. (recommended reading)"];
 
-const w = (week: string, title: string, focus: string, lib: string[] = [], extra: Partial<WeekSpec> = {}): WeekSpec => ({ week, title, focus, lib, ...extra });
+export const w = (week: string, title: string, focus: string, lib: string[] = [], extra: Partial<WeekSpec> = {}): WeekSpec => ({ week, title, focus, lib, ...extra });
 
-function live(p: Partial<ProgramSpec> & Pick<ProgramSpec, "code" | "slug" | "title" | "productType" | "track" | "valueStatement" | "overview" | "level" | "weeks" | "outcomes" | "audience" | "prerequisites" | "codingRequirement" | "curriculum" | "projects" | "tools">, o: { price: number; start: number; hours: [number, number] | null; schedule: string; capacity?: number; faqs?: { q: string; a: string }[]; cert?: string; badge?: string }): ProgramSpec {
+export function live(p: Partial<ProgramSpec> & Pick<ProgramSpec, "code" | "slug" | "title" | "productType" | "track" | "valueStatement" | "overview" | "level" | "weeks" | "outcomes" | "audience" | "prerequisites" | "codingRequirement" | "curriculum" | "projects" | "tools">, o: { price: number; start: number; hours: [number, number] | null; schedule: string; capacity?: number; faqs?: { q: string; a: string }[]; cert?: string; badge?: string }): ProgramSpec {
   const weeksText = o.hours ? `${o.hours[0]}–${o.hours[1]} hours a week` : "a weekly load confirmed before enrollment opens";
   return {
     blocks: [{ key: "A", title: p.title, weeks: `1–${p.weeks}` }],
@@ -98,10 +98,10 @@ function live(p: Partial<ProgramSpec> & Pick<ProgramSpec, "code" | "slug" | "tit
   } as ProgramSpec;
 }
 
-function q(prompt: string, choices: string[], answer: string, explanation?: string): QuizItem {
+export function q(prompt: string, choices: string[], answer: string, explanation?: string): QuizItem {
   return { kind: "multiple_choice", prompt, choices, answer, explanation };
 }
-function tf(prompt: string, answer: "True" | "False", explanation?: string): QuizItem {
+export function tf(prompt: string, answer: "True" | "False", explanation?: string): QuizItem {
   return { kind: "true_false", prompt, answer, explanation };
 }
 

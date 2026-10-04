@@ -4,6 +4,7 @@ import { Denied } from "../kit";
 import { AccountView, CalendarView, DashboardView, InboxView, NotificationsView, SearchView } from "./personal";
 import { CourseView, CoursesList } from "./course";
 import { TabPage } from "./tab";
+import { AgentLabsList, AgentLabWorkspace } from "./agentlabs";
 
 type SP = Record<string, string | undefined>;
 
@@ -27,6 +28,8 @@ export function CampusPage({ store, actor, slug, path, sp }: { store: TenantStor
         return <AccountView store={store} actor={actor} slug={slug} />;
       case "t":
         return <TabPage store={store} actor={actor} slug={slug} tabSlug={path[1] ?? ""} sp={sp} />;
+      case "agent-labs":
+        return path[1] ? <AgentLabWorkspace store={store} actor={actor} slug={slug} labId={path[1]} sp={sp} /> : <AgentLabsList store={store} actor={actor} slug={slug} sp={sp} />;
       case "helpdesk":
         return <TabPage store={store} actor={actor} slug={slug} tabSlug="helpdesk" sp={sp} />;
       case "people":

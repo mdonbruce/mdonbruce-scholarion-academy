@@ -35,7 +35,7 @@ import type {
   Subscription,
   Tenant,
   Ticket,
-  User, Review, Notice, Article } from "./types";
+  User, Review, Notice, Article, Coupon, RefundRequest, CommerceSettings, SavedItem, VideoNote } from "./types";
 
 /**
  * In-process stand-in for the platform services' own databases.
@@ -63,6 +63,12 @@ export interface Db {
   subscriptions: Subscription[];
   orders: Order[];
   aid: AidApplication[];
+  coupons: Coupon[];
+  refundRequests: RefundRequest[];
+  commerceSettings: CommerceSettings;
+  // My Learning
+  saved: SavedItem[];
+  videoNotes: VideoNote[];
   // LMS
   enrollments: Enrollment[];
   progress: ProgressRecord[];
@@ -105,7 +111,7 @@ export interface Db {
   processed: string[]; // consumer:eventId pairs already handled (idempotency)
 }
 
-export const DB_VERSION = 5;
+export const DB_VERSION = 6;
 
 export function emptyDb(): Db {
   return {
@@ -125,6 +131,11 @@ export function emptyDb(): Db {
     subscriptions: [],
     orders: [],
     aid: [],
+    coupons: [],
+    refundRequests: [],
+    commerceSettings: {},
+    saved: [],
+    videoNotes: [],
     enrollments: [],
     progress: [],
     attempts: [],

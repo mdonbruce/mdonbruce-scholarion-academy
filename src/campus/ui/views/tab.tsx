@@ -17,6 +17,9 @@ import { ProctorPanel } from "./proctor";
 import { studioOverview, programIndex } from "../../services/programs";
 import { PARITY, paritySummary, SECTION_TITLES } from "../../parity";
 import { consolidationReport } from "../../services/hub";
+import * as assess from "../../services/assess";
+import * as alabs from "../../services/agentlabs";
+import { simScenarios } from "../../services/simlab";
 import { LIBRARY } from "../../academy/programs-data-2";
 import { api, Chip, Denied, Empty, EntityForm, EntityTable, fmt, Hidden, OpForm, PageHead, Result } from "../kit";
 
@@ -178,6 +181,10 @@ function Bespoke({ t, tab }: { t: T; tab: string }) {
         return <ParityStatus t={t} />;
       case "module-library":
         return <ModuleLibrary t={t} />;
+      case "assessment-studio":
+        return <AssessmentStudio t={t} />;
+      case "agentic-cloud-labs":
+        return <AgenticLabsPanel t={t} />;
       case "proctor-support":
         return <ProctorPanel store={t.store} actor={t.actor} slug={t.slug} sp={t.sp} here={t.here} />;
       case "catalog":
@@ -972,6 +979,367 @@ function ModuleLibrary({ t }: { t: T }) {
           ))}
         </ul>
       </section>
+    </>
+  );
+}
+
+function slotPaths(v: unknown, base = ""): string[] {
+  if (typeof v === "string") return v.includes("[SME:") ? [base] : [];
+  if (Array.isArray(v)) return v.flatMap((x, i) => slotPaths(x, `${base}.${i}`));
+  if (v && typeof v === "object") return Object.entries(v).flatMap(([k, x]) => slotPaths(x, base ? `${base}.${k}` : k));
+  return [];
+}
+
+function Tree({ v, depth = 0 }: { v: unknown; depth?: number }) {
+  if (v === null || v === undefined || v === "") return <span className="muted">—</span>;
+  if (typeof v !== "object") {
+    const s = String(v);
+    return s.includes("\n") ? <pre className="small mono">{s}</pre> : <span className={s.includes("[SME:") ? "campus-sme" : undefined}>{s}</span>;
+  }
+  if (Array.isArray(v)) {
+    if (v.length && v.every((x) => x && typeof x === "object" && !Array.isArray(x)) && depth > 0) return <Result value={v} />;
+    return (
+      <ul className="small">
+        {v.map((x, i) => (
+          <li key={i}>
+            <Tree v={x} depth={depth + 1} />
+          </li>
+        ))}
+      </ul>
+    );
+  }
+  return (
+    <dl className="campus-dl small">
+      {Object.entries(v as Record<string, unknown>).map(([k, x]) => (
+        <div key={k}>
+          <dt>{k.replace(/([A-Z])/g, " $1").replace(/_/g, " ")}</dt>
+          <dd>
+            <Tree v={x} depth={depth + 1} />
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+function AssessmentStudio({ t }: { t: T }) {
+  const programs = assess.studioPrograms(t.store);
+  const prog = programs.find((p) => p.offeringId === t.sp.program) ?? null;
+  const drafts = assess.draftsList(t.store, t.actor, prog?.offeringId);
+  const view = t.sp.draft ? (() => {
+    try {
+      return assess.draftView(t.store, t.actor, t.sp.draft!, t.sp.edition === "student" ? "student" : "instructor");
+    } catch {
+      return null;
+    }
+  })() : null;
+  const api1 = `/api/campus/v1/t/${t.slug}`;
+  const slots = view ? slotPaths({ student: view.student, instructor: view.instructor }) : [];
+  const scen = simScenarios();
+  return (
+    <>
+      <section className="card card-pad stack" aria-labelledby="as-gen">
+        <h2 id="as-gen" className="card-title">
+          Generate for a module
+        </h2>
+        <p className="small">Everything generated is labelled “AI DRAFT — requires SME and instructional-designer approval”. Parts that need expert writing are marked [SME] and block approval until filled. Publishing creates unpublished course items for an instructor to schedule.</p>
+        <form method="get" action={t.here} className="row">
+          <label className="small">
+            Program{" "}
+            <select name="program" defaultValue={prog?.offeringId ?? ""}>
+              <option value="">Choose…</option>
+              {programs.map((p) => (
+                <option key={p.offeringId} value={p.offeringId}>
+                  {p.code} {p.title}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button className="btn btn-ghost btn-sm" type="submit">
+            Choose
+          </button>
+        </form>
+        {prog && (
+          <form method="post" action={api(t.slug, "a/assess.generate")} className="row">
+            <Hidden values={{ back: `${t.here}?program=${prog.offeringId}`, offeringId: prog.offeringId, result_param: "draft", notice: "Draft generated." }} />
+            <label className="small">
+              Module{" "}
+              <select name="week">
+                {prog.weeks.map((w) => (
+                  <option key={w.week} value={w.week}>
+                    {w.week}: {w.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="small">
+              Generate{" "}
+              <select name="kind">
+                {assess.KINDS.map((k) => (
+                  <option key={k} value={k}>
+                    {assess.KIND_LABEL[k]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="small">
+              Quiz items <input name="n" type="number" min={5} max={30} defaultValue={10} style={{ width: "5em" }} />
+            </label>
+            <button className="btn btn-primary btn-sm" type="submit">
+              Generate draft
+            </button>
+          </form>
+        )}
+        <div className="table-wrap" tabIndex={0} role="region" aria-label="Four Project Pillars">
+          <table className="table">
+            <caption className="small">Four Project Pillars — intensity by type</caption>
+            <thead>
+              <tr>
+                <th scope="col">Type</th>
+                <th scope="col">Problem</th>
+                <th scope="col">Constraints</th>
+                <th scope="col">Tools</th>
+                <th scope="col">Definition of done</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(assess.PILLARS).map(([k, p]) => (
+                <tr key={k}>
+                  <td>{assess.KIND_LABEL[k as assess.DraftKind] ?? k}</td>
+                  <td className="small">{p.problem}</td>
+                  <td className="small">{p.constraints}</td>
+                  <td className="small">{p.tools}</td>
+                  <td className="small">{p.done}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="card card-pad stack" aria-labelledby="as-sim">
+        <h2 id="as-sim" className="card-title">
+          Simulated labs and demo apps
+        </h2>
+        <p className="small">Each scenario has a Student Lab (worksheet of 10 questions, no answers), an Instructor Lab (INSTRUCTOR MODE banner, answer keys, control panel, Switch to Student View) and a Simulated Application Demo of a working agent for class.</p>
+        <ul className="item-list">
+          {scen.map((s) => (
+            <li key={s.key}>
+              <strong>{s.title}</strong> <span className="tiny muted">{s.org} · fits {s.programs.join(", ")}</span>
+              <br />
+              <a href={`${api1}/sim-labs/${s.key}/student.html`}>Student Lab</a> · <a href={`${api1}/sim-labs/${s.key}/instructor.html`}>Instructor Lab</a> · <a href={`${api1}/sim-labs/${s.key}/app.html`}>Application Demo</a> · <a href={`${api1}/sim-labs/${s.key}/student.html?download=1`}>download</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="card card-pad stack" aria-labelledby="as-drafts">
+        <h2 id="as-drafts" className="card-title">
+          Drafts{prog ? ` — ${prog.code}` : ""}
+        </h2>
+        {drafts.length ? (
+          <div className="table-wrap" tabIndex={0} role="region" aria-label="Drafts">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th scope="col">Draft</th>
+                  <th scope="col">State</th>
+                  <th scope="col">[SME] slots</th>
+                  <th scope="col">Approvals</th>
+                  <th scope="col">Open</th>
+                </tr>
+              </thead>
+              <tbody>
+                {drafts.map((d) => (
+                  <tr key={d.id}>
+                    <td className="small">{d.title}</td>
+                    <td>
+                      <Chip s={d.state} />
+                    </td>
+                    <td>{d.smeSlots}</td>
+                    <td className="small">
+                      SME {d.sme ? "✓" : "—"} · Designer {d.designer ? "✓" : "—"}
+                    </td>
+                    <td className="small">
+                      <a href={`${t.here}?${prog ? `program=${prog.offeringId}&` : ""}draft=${d.id}`}>Instructor edition</a> · <a href={`${t.here}?${prog ? `program=${prog.offeringId}&` : ""}draft=${d.id}&edition=student`}>Student edition</a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <Empty title="No drafts yet.">Choose a program and module above.</Empty>
+        )}
+      </section>
+
+      {view && (
+        <section className="card card-pad stack" aria-labelledby="as-view">
+          <h2 id="as-view" className="card-title">
+            {String(view.title)} — {t.sp.edition === "student" ? "student edition" : "instructor edition"}
+          </h2>
+          <p className="draft-label">{String(view.label)}</p>
+          <div className="row">
+            {view.kind === "quiz" && (
+              <>
+                <a className="btn btn-ghost btn-sm" href={`${api1}/assess/${view.id}/item-bank.json`}>
+                  Item bank JSON
+                </a>
+                <a className="btn btn-ghost btn-sm" href={`${api1}/assess/${view.id}/qti.xml`}>
+                  QTI 2.1 export
+                </a>
+              </>
+            )}
+            {(["sme", "id"] as const).map((as) => (
+              <form key={as} method="post" action={api(t.slug, "a/assess.approve")}>
+                <Hidden values={{ back: `${t.here}?draft=${view.id}`, id: String(view.id), as, notice: as === "sme" ? "SME approval recorded." : "Designer approval recorded." }} />
+                <button className="btn btn-sm" type="submit">
+                  Approve as {as === "sme" ? "SME" : "instructional designer"}
+                </button>
+              </form>
+            ))}
+            <form method="post" action={api(t.slug, "a/assess.publish")}>
+              <Hidden values={{ back: `${t.here}?draft=${view.id}`, id: String(view.id), notice: "Published into the course (unpublished for scheduling)." }} />
+              <button className="btn btn-primary btn-sm" type="submit" disabled={view.state !== "approved"}>
+                Publish to course
+              </button>
+            </form>
+          </div>
+          {slots.length > 0 && view.state !== "published" && (
+            <details>
+              <summary className="small">Fill {slots.length} [SME] slot(s)</summary>
+              <form method="post" action={api(t.slug, "a/assess.fill")} className="stack">
+                <Hidden values={{ back: `${t.here}?draft=${view.id}`, id: String(view.id), notice: "Saved. Approvals were cleared so the new text gets reviewed." }} />
+                <label className="small" htmlFor="as-patch">
+                  JSON of path → text (replace each placeholder with expert content)
+                </label>
+                <textarea id="as-patch" name="patch" rows={10} className="mono" defaultValue={JSON.stringify(Object.fromEntries(slots.slice(0, 40).map((p) => [p, ""])), null, 2)} />
+                <button className="btn btn-sm" type="submit">
+                  Save content
+                </button>
+              </form>
+            </details>
+          )}
+          <h3 className="small">Context header</h3>
+          <Tree v={view.context} />
+          {view.blueprint ? (
+            <>
+              <h3 className="small">Blueprint</h3>
+              <Result value={view.blueprint} />
+            </>
+          ) : null}
+          <h3 className="small">Alignment</h3>
+          <Result value={view.alignment} />
+          <h3 className="small">Student edition</h3>
+          <Tree v={view.student} />
+          {view.instructor ? (
+            <>
+              <h3 className="small">Instructor edition</h3>
+              <Tree v={view.instructor} />
+            </>
+          ) : null}
+        </section>
+      )}
+    </>
+  );
+}
+
+function AgenticLabsPanel({ t }: { t: T }) {
+  const labs = alabs.myLabs(t.store, t.actor).filter((l) => l.role === "staff");
+  const sel = labs.find((l) => l.id === t.sp.lab) ?? labs[0];
+  const roster = sel ? alabs.labRoster(t.store, t.actor, sel.id) : [];
+  let check: { reference: number; starter: number; ok: boolean } | null = null;
+  try {
+    check = sel && t.sp.verify ? alabs.verifyLab(t.store, t.actor, sel.id) : null;
+  } catch {
+    check = null;
+  }
+  return (
+    <>
+      <section className="card card-pad stack" aria-labelledby="acl-h">
+        <h2 id="acl-h" className="card-title">
+          Labs you teach
+        </h2>
+        <p className="small">Agents run autonomously — no approval gates — inside a bounded runner: per-tool allow/deny, per-task call caps, and step and tool-call budgets. Learners get {alabs.DEFAULT_MAX_ATTEMPTS} graded attempts; the best posts to the gradebook with a pass/no-pass mark (pass at {alabs.PASS_MARK}).</p>
+        {labs.length ? (
+          <nav className="row" aria-label="Labs">
+            {labs.map((l) => (
+              <a key={l.id} className="btn btn-ghost btn-sm" aria-current={sel?.id === l.id ? "page" : undefined} href={`${t.here}?lab=${l.id}`}>
+                {l.title.replace(/^Agentic Cloud Lab: /, "")}
+              </a>
+            ))}
+          </nav>
+        ) : (
+          <Empty title="No labs in courses you teach." />
+        )}
+      </section>
+      {sel && (
+        <section className="card card-pad stack" aria-labelledby="acl-r">
+          <div className="between">
+            <h2 id="acl-r" className="card-title">
+              {sel.title} — {sel.course}
+            </h2>
+            <span className="row">
+              <a className="btn btn-sm" href={`/campus/${t.slug}/agent-labs/${sel.id}`}>
+                Open workspace
+              </a>
+              <a className="btn btn-ghost btn-sm" href={`${t.here}?lab=${sel.id}&verify=1`}>
+                Verify reference vs starter
+              </a>
+            </span>
+          </div>
+          {check && (
+            <p className={`notice ${check.ok ? "notice-ok" : "notice-warn"}`} role="status">
+              Reference agent {check.reference}/100 · starter {check.starter}/100 — {check.ok ? "lab is calibrated" : "check the lab"}
+            </p>
+          )}
+          {roster.length ? (
+            <div className="table-wrap" tabIndex={0} role="region" aria-label="Learner roster">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Learner</th>
+                    <th scope="col">Practice runs</th>
+                    <th scope="col">Graded attempts</th>
+                    <th scope="col">Best</th>
+                    <th scope="col">Violations</th>
+                    <th scope="col">Trace</th>
+                    <th scope="col">Extra attempt</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {roster.map((r) => (
+                    <tr key={r.userId}>
+                      <td>{r.name}</td>
+                      <td>{r.practiceRuns}</td>
+                      <td>
+                        {r.attemptsUsed} / {r.allowed}
+                      </td>
+                      <td>{r.best === null ? "—" : r.best}</td>
+                      <td>{r.violations}</td>
+                      <td>{r.lastRunId ? <a href={`/campus/${t.slug}/agent-labs/${sel.id}?run=${r.lastRunId}`}>Latest</a> : "—"}</td>
+                      <td>
+                        <form method="post" action={api(t.slug, "a/agentlabs.grant_attempt")} className="row">
+                          <Hidden values={{ back: `${t.here}?lab=${sel.id}`, labId: sel.id, userId: r.userId, notice: "Extra attempt granted." }} />
+                          <label className="sr-only" htmlFor={`gr-${r.userId}`}>
+                            Reason
+                          </label>
+                          <input id={`gr-${r.userId}`} name="reason" required placeholder="Reason" maxLength={300} />
+                          <button className="btn btn-ghost btn-sm" type="submit">
+                            Grant
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <Empty title="No learners enrolled yet." />
+          )}
+        </section>
+      )}
     </>
   );
 }

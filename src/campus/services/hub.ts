@@ -320,6 +320,7 @@ function buildConsolidation(store: TenantStore) {
       "Earlier demo offerings “AI Agents Specialization” (#20) and “Machine Learning Professional Certificate” (#38) are retired; #20 and #38 now carry the new programs.",
       "The Python course formerly listed as #1 is #1-R (Week 0 refresher of #1).",
       "#27 Certificate in MLOps & LLMOps moved from proposed to built after the product owner approved it.",
+      "The earlier demo guided project “Prompting and Evaluation” (#5) is retired; #2–#11 now carry the design-prompt programs (#5 is the No-Code AI, ML & Agents certificate).",
     ],
     decisionsRecorded: DECISION_LOG,
     decisionsPending: ["Relationship of #13 to #9 (recorded as a recommendation; not yet decided)"],

@@ -220,6 +220,14 @@
       "description": "Academy program designs (#1, #12, #13, #14, #26): website pages generated from catalog data, course shells, credentials, apply → admission → sandbox seat → orientation, brochures, team and advisor inquiries, prerequisite self-checks, consented testimonials and the design-package status report."
     },
     {
+      "name": "Assessment & Project Studio",
+      "description": "Curriculum Engine generators for every module: hands-on labs, in-class activities, quizzes with item banks (QTI export), practice exercises, mini-projects, real-world scenario projects, senior capstones and simulated Student/Instructor labs with an application demo — Four Project Pillars, alignment tables, student and instructor editions, AI DRAFT until an SME and an instructional designer approve."
+    },
+    {
+      "name": "Agentic Cloud Labs",
+      "description": "Scholarion's hosted agent-building area: saved workspaces with version history, a bounded autonomous agent runner (no approval gates; step and tool-call budgets), per-tool permissions with violation tracking, evaluation traces, rubric auto-grading posted to the gradebook with a pass/no-pass mark, and two graded attempts per lab (best counts; staff can grant one more)."
+    },
+    {
       "name": "Module Library & Catalog Consolidation",
       "description": "The versioned shared module library (blueprint course), the catalog consolidation report for programs #1–#38 (shared modules, credit transfers, mutually exclusive pairs, merge/retire recommendations, proposed #27) with product-owner approval, and the refund, deferral and batch-change policies that only display once approved."
     },
@@ -25847,6 +25855,936 @@
         }
       }
     },
+    "/r/assessment_drafts": {
+      "get": {
+        "tags": [
+          "Assessment & Project Studio"
+        ],
+        "summary": "List assessment & project drafts",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AssessmentDrafts"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/assessment_drafts/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Assessment & Project Studio"
+        ],
+        "summary": "Get a assessment draft",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Assessment & Project Studio"
+        ],
+        "summary": "Delete (tombstone) a assessment draft",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/agent_labs": {
+      "get": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "List agentic cloud labs",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AgentLabs"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Create a agentic cloud lab",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "description": "Title",
+                    "type": "string"
+                  },
+                  "maxAttempts": {
+                    "description": "Graded attempts",
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 5
+                  },
+                  "passMark": {
+                    "description": "Pass mark (out of 100)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/agent_labs/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Get a agentic cloud lab",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Update a agentic cloud lab (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "description": "Title",
+                    "type": "string"
+                  },
+                  "maxAttempts": {
+                    "description": "Graded attempts",
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 5
+                  },
+                  "passMark": {
+                    "description": "Pass mark (out of 100)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Delete (tombstone) a agentic cloud lab",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/agent_labs/{id}/publish": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Publish (validation runs first)",
+        "responses": {
+          "200": {
+            "description": "Published"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Unpublish",
+        "responses": {
+          "200": {
+            "description": "Unpublished"
+          }
+        }
+      }
+    },
+    "/r/agent_workspaces": {
+      "get": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "List agent lab workspaces",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AgentWorkspaces"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Create a agent lab workspace",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/agent_workspaces/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Get a agent lab workspace",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Update a agent lab workspace (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Delete (tombstone) a agent lab workspace",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/agent_lab_runs": {
+      "get": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "List agent lab runs and evaluation traces",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AgentLabRuns"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Create a agent lab run",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/agent_lab_runs/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Get a agent lab run",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Update a agent lab run (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Delete (tombstone) a agent lab run",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/agent_lab_grants": {
+      "get": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "List extra attempt grants",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AgentLabGrants"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Create a extra attempt grant",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/agent_lab_grants/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Get a extra attempt grant",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Update a extra attempt grant (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "summary": "Delete (tombstone) a extra attempt grant",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/r/consolidation_reports": {
       "get": {
         "tags": [
@@ -45116,6 +46054,744 @@
         }
       }
     },
+    "/q/assess.programs": {
+      "get": {
+        "tags": [
+          "Assessment & Project Studio"
+        ],
+        "operationId": "assess.programs",
+        "summary": "Programs and modules available to the generators.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/assess.context": {
+      "get": {
+        "tags": [
+          "Assessment & Project Studio"
+        ],
+        "operationId": "assess.context",
+        "summary": "Context header for a module (competencies, outcomes, readings, tools, run environment).",
+        "parameters": [
+          {
+            "name": "offeringId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "week",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/assess.generate": {
+      "post": {
+        "tags": [
+          "Assessment & Project Studio"
+        ],
+        "operationId": "assess.generate",
+        "summary": "Generate an AI DRAFT lab, activity, quiz + item bank, exercises, mini-project, real-world project, senior capstone or simulated lab for a module.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "offeringId": {
+                    "type": "string"
+                  },
+                  "week": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "lab",
+                      "activity",
+                      "quiz",
+                      "exercises",
+                      "mini_project",
+                      "real_world_project",
+                      "senior_capstone",
+                      "simulated_lab"
+                    ]
+                  },
+                  "n": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "offeringId",
+                  "week",
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/assess.drafts": {
+      "get": {
+        "tags": [
+          "Assessment & Project Studio"
+        ],
+        "operationId": "assess.drafts",
+        "summary": "Assessment and project drafts.",
+        "parameters": [
+          {
+            "name": "offeringId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/assess.view": {
+      "get": {
+        "tags": [
+          "Assessment & Project Studio"
+        ],
+        "operationId": "assess.view",
+        "summary": "A draft's student or instructor edition.",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "edition",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "student",
+                "instructor"
+              ]
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/assess.fill": {
+      "post": {
+        "tags": [
+          "Assessment & Project Studio"
+        ],
+        "operationId": "assess.fill",
+        "summary": "Write expert content into [SME] slots (JSON of path → text). Clears approvals.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "patch": {}
+                },
+                "required": [
+                  "id",
+                  "patch"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/assess.approve": {
+      "post": {
+        "tags": [
+          "Assessment & Project Studio"
+        ],
+        "operationId": "assess.approve",
+        "summary": "Approve a draft as the SME or the instructional designer (two different people).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "as": {
+                    "type": "string",
+                    "enum": [
+                      "sme",
+                      "id"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "as"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/assess.publish": {
+      "post": {
+        "tags": [
+          "Assessment & Project Studio"
+        ],
+        "operationId": "assess.publish",
+        "summary": "Publish an approved draft into its course (created unpublished for scheduling).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/simlab.scenarios": {
+      "get": {
+        "tags": [
+          "Assessment & Project Studio"
+        ],
+        "operationId": "simlab.scenarios",
+        "summary": "Sandbox scenarios for simulated Student/Instructor labs and demo apps.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/agentlabs.mine": {
+      "get": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "operationId": "agentlabs.mine",
+        "summary": "My Agentic Cloud Labs with attempts used and best score.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/agentlabs.open": {
+      "get": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "operationId": "agentlabs.open",
+        "summary": "Open a lab: brief, tools and permissions, budget, rubric, my workspace, attempts and runs.",
+        "parameters": [
+          {
+            "name": "labId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/agentlabs.save": {
+      "post": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "operationId": "agentlabs.save",
+        "summary": "Save my agent spec to the workspace (keeps the last 10 versions).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "labId": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "labId",
+                  "code"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/agentlabs.run": {
+      "post": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "operationId": "agentlabs.run",
+        "summary": "Run my agent autonomously: practice (unlimited) or graded (uses one of my attempts and posts the best score to the gradebook).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "labId": {
+                    "type": "string"
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "practice",
+                      "graded"
+                    ]
+                  },
+                  "code": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "labId",
+                  "mode"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/agentlabs.restore": {
+      "post": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "operationId": "agentlabs.restore",
+        "summary": "Restore a saved workspace version.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "labId": {
+                    "type": "string"
+                  },
+                  "index": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "labId",
+                  "index"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/agentlabs.reset": {
+      "post": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "operationId": "agentlabs.reset",
+        "summary": "Reset my workspace to the starter spec (the current version is kept in history).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "labId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "labId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/agentlabs.run_detail": {
+      "get": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "operationId": "agentlabs.run_detail",
+        "summary": "A run's rubric breakdown and evaluation traces.",
+        "parameters": [
+          {
+            "name": "runId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/agentlabs.roster": {
+      "get": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "operationId": "agentlabs.roster",
+        "summary": "Staff: each learner's attempts, best score and violations.",
+        "parameters": [
+          {
+            "name": "labId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/agentlabs.grant_attempt": {
+      "post": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "operationId": "agentlabs.grant_attempt",
+        "summary": "Staff: grant a learner one more graded attempt (reason required, audited).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "labId": {
+                    "type": "string"
+                  },
+                  "userId": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "labId",
+                  "userId",
+                  "reason"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/agentlabs.verify": {
+      "get": {
+        "tags": [
+          "Agentic Cloud Labs"
+        ],
+        "operationId": "agentlabs.verify",
+        "summary": "Staff: check the reference agent scores 100 and the starter scores below the pass mark.",
+        "parameters": [
+          {
+            "name": "labId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/q/catalog.consolidation": {
       "get": {
         "tags": [
@@ -52660,6 +54336,272 @@
           }
         ],
         "description": "Catalog policy (tab: module-library)"
+      },
+      "AssessmentDrafts": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "offeringId": {
+                "description": "Program",
+                "type": "string"
+              },
+              "week": {
+                "description": "Module / week",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind",
+                "type": "string"
+              },
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "content": {
+                "description": "Content (student + instructor editions)"
+              },
+              "smeSlots": {
+                "description": "Open [SME] slots",
+                "type": "number"
+              },
+              "copyFlags": {
+                "description": "Copy-check flags",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "smeApprovedBy": {
+                "description": "SME approval",
+                "type": "string"
+              },
+              "idApprovedBy": {
+                "description": "Instructional-designer approval",
+                "type": "string"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              },
+              "publishedRef": {
+                "description": "Published as",
+                "type": "string"
+              },
+              "publishedAt": {
+                "description": "Published",
+                "type": "string",
+                "format": "date-time"
+              },
+              "courseId": {
+                "description": "Course",
+                "type": "string"
+              },
+              "moduleId": {
+                "description": "Module",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Assessment draft (tab: assessment-studio)"
+      },
+      "AgentLabs": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "key": {
+                "description": "Key",
+                "type": "string"
+              },
+              "scenario": {
+                "description": "Sandbox scenario",
+                "type": "string"
+              },
+              "courseId": {
+                "description": "Course",
+                "type": "string"
+              },
+              "assignmentId": {
+                "description": "Gradebook assignment",
+                "type": "string"
+              },
+              "spec": {
+                "description": "Tasks, permissions and budget"
+              },
+              "starterCode": {
+                "description": "Starter agent spec",
+                "type": "string"
+              },
+              "referenceCode": {
+                "description": "Reference agent spec (staff)",
+                "type": "string"
+              },
+              "maxAttempts": {
+                "description": "Graded attempts",
+                "type": "number",
+                "minimum": 1,
+                "maximum": 5
+              },
+              "passMark": {
+                "description": "Pass mark (out of 100)",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "rubric": {
+                "description": "Rubric"
+              },
+              "autonomous": {
+                "description": "Autonomous (no approval gates)",
+                "type": "boolean"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Agentic Cloud Lab (tab: agentic-cloud-labs)"
+      },
+      "AgentWorkspaces": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "labId": {
+                "description": "Lab",
+                "type": "string"
+              },
+              "userId": {
+                "description": "Learner",
+                "type": "string"
+              },
+              "files": {
+                "description": "Files"
+              },
+              "versions": {
+                "description": "Version history (last 10)"
+              },
+              "savedAt": {
+                "description": "Saved",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Agent lab workspace (tab: agentic-cloud-labs)"
+      },
+      "AgentLabRuns": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "labId": {
+                "description": "Lab",
+                "type": "string"
+              },
+              "userId": {
+                "description": "Learner",
+                "type": "string"
+              },
+              "mode": {
+                "description": "Mode (practice / graded)",
+                "type": "string"
+              },
+              "attempt": {
+                "description": "Graded attempt",
+                "type": "number"
+              },
+              "code": {
+                "description": "Agent spec run",
+                "type": "string"
+              },
+              "score": {
+                "description": "Score",
+                "type": "number"
+              },
+              "max": {
+                "description": "Max",
+                "type": "number"
+              },
+              "passed": {
+                "description": "Passed",
+                "type": "boolean"
+              },
+              "criteria": {
+                "description": "Rubric breakdown"
+              },
+              "taskResults": {
+                "description": "Task results"
+              },
+              "violations": {
+                "description": "Permission violations",
+                "type": "number"
+              },
+              "traces": {
+                "description": "Evaluation traces"
+              },
+              "autonomous": {
+                "description": "Autonomous",
+                "type": "boolean"
+              }
+            }
+          }
+        ],
+        "description": "Agent lab run (tab: agentic-cloud-labs)"
+      },
+      "AgentLabGrants": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "labId": {
+                "description": "Lab",
+                "type": "string"
+              },
+              "userId": {
+                "description": "Learner",
+                "type": "string"
+              },
+              "extraAttempts": {
+                "description": "Extra attempts",
+                "type": "number"
+              },
+              "reason": {
+                "description": "Reason",
+                "type": "string"
+              },
+              "grantedBy": {
+                "description": "Granted by",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Extra attempt grant (tab: agentic-cloud-labs)"
       },
       "ConsolidationReports": {
         "allOf": [

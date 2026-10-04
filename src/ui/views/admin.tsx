@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
-import type { adminVM, admissionsVM, courseReviewsVM, aidQueueVM, claimsVM, gradingVM, liveAdminVM, moderationVM, studioVM, supportVM, Viewer } from "@/bff/views";
-import { fmtDateTime, StatusBadge } from "../components/cards";
+import type { adminVM, commerceAdminVM, admissionsVM, courseReviewsVM, aidQueueVM, claimsVM, gradingVM, liveAdminVM, moderationVM, studioVM, supportVM, Viewer } from "@/bff/views";
+import { fmtDate, fmtDateTime, StatusBadge } from "../components/cards";
+import { formatMoney } from "@/platform/pricing";
 import { AppShell, Flash } from "../components/chrome";
 import { CourseReviewQueue } from "./teach";
+import { StudioOutputView } from "../components/studio";
 
 type V = NonNullable<Viewer>;
 type FlashProps = { notice?: string; error?: string };
@@ -17,6 +19,7 @@ function AdminTabs({ current }: { current: string }) {
     <nav className="tabs" aria-label="Admin sections">
       {t("/admin", "Status & events")}
       {t("/admin/aid", "Financial aid")}
+      {t("/admin/commerce", "Commerce (sandbox)")}
       {t("/admin/admissions", "Admissions")}
       {t("/admin/grading", "Grading")}
       {t("/admin/studio", "Studio review")}
@@ -316,9 +319,9 @@ export function AdminStudioView({ viewer, vm, flash }: { viewer: V; vm: ReturnTy
                 <button className="btn btn-primary btn-sm">Approve & publish</button>
               </form>
             </div>
-            <pre className="tiny" style={{ whiteSpace: "pre-wrap", maxHeight: 160, overflow: "auto", background: "var(--surface-2)", padding: 10, borderRadius: 6 }}>
-              {JSON.stringify(d.content, null, 2)}
-            </pre>
+            <div className="small studio-preview">
+              <StudioOutputView o={d} />
+            </div>
           </section>
         ))}
       </div>
@@ -596,6 +599,200 @@ export function AdminCourseReviewsView({ viewer, vm, flash }: { viewer: V; vm: R
     <Shell viewer={viewer} current="/admin/course-reviews" title="Course reviews" flash={flash}>
       <p className="small muted">Instructor-built courses waiting to publish. They passed the checklist when submitted; check the teaching quality and that nothing promises credit, jobs or partner endorsements.</p>
       <CourseReviewQueue vm={vm} />
+    </Shell>
+  );
+}
+
+/* ======================= Commerce (sandbox) ======================= */
+
+export function AdminCommerceView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<typeof commerceAdminVM>; flash: FlashProps }) {
+  const st = vm.settings;
+  const now = vm.now;
+  return (
+    <Shell viewer={viewer} current="/admin/commerce" title="Commerce — sandbox" flash={flash}>
+      <div className="dev-banner" style={{ marginBottom: 16 }}>
+        <strong>Sandbox.</strong> All prices are placeholders, tax rates are simulated, and no money moves. Changes apply to new checkouts; existing subscriptions keep their price until they change plan.
+      </div>
+      <section className="card card-pad" aria-labelledby="ca-prices">
+        <h2 id="ca-prices" className="ca-h">
+          Plans, prices and billing rules
+        </h2>
+        <p className="small muted">Base prices are in USD; other regions are derived from the regional price book.{st.updatedAt ? ` Last saved ${fmtDateTime(st.updatedAt)}.` : ""}</p>
+        <form method="post" action="/api/v1/admin/commerce/settings" className="stack" style={{ ["--gap" as string]: "12px" }}>
+          <div className="grid g3">
+            {(
+              [
+                ["programMonthly", "Program subscription (per month, USD)", st.programMonthly],
+                ["plusMonthly", "Scholarion Plus monthly (USD)", st.plusMonthly],
+                ["plusAnnual", "Scholarion Plus annual (USD)", st.plusAnnual],
+              ] as const
+            ).map(([k, label, v]) => (
+              <div key={k} className="field" style={{ margin: 0 }}>
+                <label htmlFor={`ca-${k}`}>{label}</label>
+                <input id={`ca-${k}`} name={k} type="number" min={1} max={10000} step="0.01" defaultValue={v} required />
+              </div>
+            ))}
+            <div className="field" style={{ margin: 0 }}>
+              <label htmlFor="ca-trial">Plus free trial (days)</label>
+              <input id="ca-trial" name="trialDays" type="number" min={1} max={30} defaultValue={st.trialDays} required />
+            </div>
+            <div className="field" style={{ margin: 0 }}>
+              <label htmlFor="ca-notice">Pre-renewal notice (days before charge)</label>
+              <input id="ca-notice" name="renewalNoticeDays" type="number" min={1} max={30} defaultValue={st.renewalNoticeDays} required />
+            </div>
+            <div className="field" style={{ margin: 0 }}>
+              <span className="label-like">Refund window</span>
+              <p className="small" style={{ margin: "6px 0 0" }}>
+                {st.refundDays} days (set by environment)
+              </p>
+            </div>
+          </div>
+          <fieldset style={{ border: "1px solid var(--border)", borderRadius: 8, padding: 12 }}>
+            <legend className="small" style={{ fontWeight: 700, padding: "0 6px" }}>
+              Simulated tax rate by price-book region (%)
+            </legend>
+            <div className="grid g4">
+              {vm.regions.map((r) => (
+                <div key={r.code} className="field" style={{ margin: 0 }}>
+                  <label htmlFor={`tax-${r.code}`}>
+                    {r.name} ({r.currency})
+                  </label>
+                  <input id={`tax-${r.code}`} name={`tax_${r.code}`} type="number" min={0} max={30} step="0.01" defaultValue={st.taxRates[r.code] ?? 0} />
+                </div>
+              ))}
+            </div>
+            <p className="tiny muted" style={{ margin: "8px 0 0" }}>
+              Shown as a separate “simulated tax” line at checkout and on receipts. Not a tax calculation.
+            </p>
+          </fieldset>
+          <div>
+            <button className="btn btn-primary btn-sm">Save sandbox settings</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="coupons" className="card card-pad" style={{ marginTop: 20 }} aria-labelledby="ca-coupons">
+        <h2 id="ca-coupons" className="ca-h">
+          Coupons
+        </h2>
+        <p className="small muted">A code takes a percentage off today's payment for paid checkouts. It can't be combined with a free trial or financial aid.</p>
+        <form method="post" action="/api/v1/admin/commerce/coupons" className="row" style={{ alignItems: "flex-end", ["--gap" as string]: "10px" }}>
+          <div className="field" style={{ margin: 0 }}>
+            <label htmlFor="cp-code">Code</label>
+            <input id="cp-code" name="code" required pattern="[A-Za-z0-9-]{3,24}" style={{ width: 170, textTransform: "uppercase" }} aria-describedby="cp-code-hint" />
+          </div>
+          <div className="field" style={{ margin: 0 }}>
+            <label htmlFor="cp-pct">Percent off</label>
+            <input id="cp-pct" name="percentOff" type="number" min={1} max={100} required style={{ width: 100 }} />
+          </div>
+          <div className="field" style={{ margin: 0 }}>
+            <label htmlFor="cp-days">Expires in (days, optional)</label>
+            <input id="cp-days" name="expiresInDays" type="number" min={1} max={730} style={{ width: 120 }} />
+          </div>
+          <div className="field" style={{ margin: 0 }}>
+            <label htmlFor="cp-max">Max redemptions (optional)</label>
+            <input id="cp-max" name="maxRedemptions" type="number" min={1} style={{ width: 120 }} />
+          </div>
+          <button className="btn btn-primary btn-sm">Create code</button>
+        </form>
+        <p id="cp-code-hint" className="tiny muted">
+          3–24 letters, numbers or hyphens.
+        </p>
+        <div className="table-wrap">
+          <table className="table">
+            <caption className="sr-only">Coupon codes</caption>
+            <thead>
+              <tr>
+                <th scope="col">Code</th>
+                <th scope="col">Off</th>
+                <th scope="col">Redeemed</th>
+                <th scope="col">Expires</th>
+                <th scope="col">Status</th>
+                <th scope="col">
+                  <span className="sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {vm.coupons.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="muted small">
+                    No codes yet.
+                  </td>
+                </tr>
+              )}
+              {vm.coupons.map((c) => {
+                const expired = !!c.expiredAt || (!!c.expiresAt && now >= c.expiresAt);
+                const usedUp = c.maxRedemptions !== null && c.redemptions >= c.maxRedemptions;
+                return (
+                  <tr key={c.code}>
+                    <td className="mono">{c.code}</td>
+                    <td>{c.percentOff}%</td>
+                    <td>
+                      {c.redemptions}
+                      {c.maxRedemptions !== null ? ` of ${c.maxRedemptions}` : ""}
+                    </td>
+                    <td>{c.expiredAt ? `Expired ${fmtDate(c.expiredAt)}` : c.expiresAt ? fmtDate(c.expiresAt) : "No expiry"}</td>
+                    <td>
+                      <StatusBadge status={expired ? "Expired" : usedUp ? "Used up" : "Active"} />
+                    </td>
+                    <td className="num">
+                      {!expired && (
+                        <form method="post" action={`/api/v1/admin/commerce/coupons/${c.code}/expire`}>
+                          <button className="btn btn-ghost btn-sm" aria-label={`Expire code ${c.code} now`}>
+                            Expire now
+                          </button>
+                        </form>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="refunds" className="card card-pad" style={{ marginTop: 20 }} aria-labelledby="ca-refunds">
+        <h2 id="ca-refunds" className="ca-h">
+          Refund requests
+        </h2>
+        <p className="small muted">One-time purchases within the refund window. Policy: refunds if the learner hasn't completed graded work. Annual Plus refunds inside the window are automatic.</p>
+        {vm.refunds.length === 0 && <div className="panel muted small">No refund requests waiting.</div>}
+        <div className="stack">
+          {vm.refunds.map((r) => (
+            <div key={r.id} className="panel stack" style={{ ["--gap" as string]: "6px" }}>
+              <div className="row between">
+                <strong>
+                  {r.learner} · {r.product?.title ?? r.order?.description ?? r.orderId}
+                </strong>
+                <span className="mono">{formatMoney(r.amount, r.currency)}</span>
+              </div>
+              <div className="tiny muted">
+                Order {r.orderId} · paid {r.order ? fmtDateTime(r.order.createdAt) : "—"} · requested {fmtDateTime(r.createdAt)}
+              </div>
+              <div className="small">
+                Graded work recorded for this purchase: <strong>{r.gradedItems}</strong> item{r.gradedItems === 1 ? "" : "s"}
+              </div>
+              {r.reason && (
+                <p className="small" style={{ margin: 0 }}>
+                  <strong>Reason:</strong> {r.reason}
+                </p>
+              )}
+              <form method="post" action={`/api/v1/admin/commerce/refunds/${r.id}/approve`} className="row" style={{ ["--gap" as string]: "8px" }}>
+                <label htmlFor={`rn-${r.id}`} className="sr-only">
+                  Note to the learner
+                </label>
+                <input id={`rn-${r.id}`} name="note" placeholder="Note to the learner (optional)" style={{ flex: 1, minWidth: 200 }} />
+                <button className="btn btn-primary btn-sm">Approve refund</button>
+                <button className="btn btn-danger btn-sm" formAction={`/api/v1/admin/commerce/refunds/${r.id}/deny`}>
+                  Deny
+                </button>
+              </form>
+            </div>
+          ))}
+        </div>
+      </section>
     </Shell>
   );
 }

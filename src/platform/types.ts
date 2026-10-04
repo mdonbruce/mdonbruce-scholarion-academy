@@ -26,7 +26,9 @@ export interface User {
   tenantIds: ID[];
   createdAt: ISODate;
   timezone: string;
-  onboarding?: { goal: string; level: string; topics: string[]; hoursPerWeek: number };
+  onboarding?: { goal: string; level: string; topics: string[]; hoursPerWeek: number; role?: string };
+  /** Opt-out of personalised "Recommended next" suggestions. */
+  recommendationsOff?: boolean;
   emailVerifiedAt?: ISODate;
   /** Base32 TOTP secret once multi-factor sign-in is on; `mfaPendingSecret` during setup. */
   mfaSecret?: string;
@@ -273,6 +275,18 @@ export interface CheckoutSession {
   installmentAmount?: number;
   /** Price-book region the amount was quoted in (see pricing.ts). */
   region?: string;
+  /** List price before an approved partial financial-aid discount (amount is after it). */
+  listAmount?: number;
+  aidDiscountPercent?: number;
+  aidApplicationId?: ID;
+  /** Coupon applied to today's payment only (sandbox). */
+  couponCode?: string;
+  couponPercent?: number;
+  discount?: number;
+  /** Simulated tax for the price-book region (sandbox; set by admins). */
+  taxRate?: number;
+  tax?: number;
+  dueToday?: number;
   idempotencyKey: string;
   createdAt: ISODate;
 }
@@ -291,6 +305,11 @@ export interface Subscription {
   trialEnd: ISODate | null;
   cancelAtPeriodEnd: boolean;
   reminderSentAt?: ISODate;
+  /** Period end the pre-renewal notice was sent for (one notice per period). */
+  renewalNoticeFor?: ISODate;
+  /** Proration credit applied to the next charge after a downgrade. */
+  credit?: number;
+  planChangedAt?: ISODate;
   amount: number;
   /** Currency the subscription bills in (from its price-book region). */
   currency?: string;
@@ -306,6 +325,52 @@ export interface Order {
   description: string;
   status: "paid" | "refunded";
   createdAt: ISODate;
+  /** Invoice lines (orders created before these existed show amount only). */
+  subtotal?: number;
+  discount?: number;
+  couponCode?: string;
+  tax?: number;
+  taxRate?: number;
+  plan?: PlanCode;
+  productId?: ID | null;
+}
+
+export interface Coupon {
+  code: string;
+  percentOff: number;
+  expiresAt: ISODate | null;
+  maxRedemptions: number | null;
+  redemptions: number;
+  createdBy: ID;
+  createdAt: ISODate;
+  expiredAt?: ISODate;
+}
+
+export interface RefundRequest {
+  id: ID;
+  userId: ID;
+  orderId: ID;
+  amount: number;
+  currency: string;
+  reason: string;
+  status: "pending" | "approved" | "denied";
+  createdAt: ISODate;
+  decidedAt?: ISODate;
+  decidedBy?: ID;
+  note?: string;
+}
+
+/** Admin overrides of the sandbox price book and billing rules (base prices in USD). */
+export interface CommerceSettings {
+  programMonthly?: number;
+  plusMonthly?: number;
+  plusAnnual?: number;
+  trialDays?: number;
+  renewalNoticeDays?: number;
+  /** Simulated tax percent by price-book region. */
+  taxRates?: Record<string, number>;
+  updatedAt?: ISODate;
+  updatedBy?: ID;
 }
 
 export interface AidApplication {
@@ -320,6 +385,26 @@ export interface AidApplication {
   discountPercent?: number;
   reviewerId?: ID;
   decidedAt?: ISODate;
+  createdAt: ISODate;
+}
+
+/* ---------- My Learning ---------- */
+
+export interface SavedItem {
+  userId: ID;
+  productId: ID;
+  createdAt: ISODate;
+}
+
+/** Timestamped note or bookmark on a lesson video (private to the learner). */
+export interface VideoNote {
+  id: ID;
+  userId: ID;
+  itemId: ID;
+  courseId: ID;
+  kind: "note" | "bookmark";
+  atSec: number;
+  text: string;
   createdAt: ISODate;
 }
 
@@ -452,6 +537,21 @@ export interface IssuedCredential {
 }
 
 /* ---------- Studio ---------- */
+
+export interface MindMapNode {
+  label: string;
+  children: MindMapNode[];
+}
+
+export interface AudioOverview {
+  /** Narrated two-voice script. */
+  script: { speaker: string; text: string }[];
+  transcript: string;
+  estimatedMinutes: number;
+  /** Null until a text-to-speech service is connected. */
+  audioUrl: string | null;
+  audioStatus: string;
+}
 
 export interface StudioOutput {
   id: ID;

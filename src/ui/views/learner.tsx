@@ -1,4 +1,4 @@
-import type { accountVM, calendarVM, courseHomeVM, credentialsVM, dashboardVM, gradebookVM, gradesOverviewVM, itemVM, liveVM, moduleVM, Viewer } from "@/bff/views";
+import type { accountVM, calendarVM, courseHomeVM, credentialsVM, dashboardVM, gradebookVM, gradesOverviewVM, itemVM, liveVM, moduleVM, myLearningVM, onboardingVM, Viewer } from "@/bff/views";
 import type { Notice, Product } from "@/platform/types";
 import { formatMoney } from "@/platform/pricing";
 import { t } from "@/i18n";
@@ -9,6 +9,7 @@ import { QuizPlayer } from "../components/client/QuizPlayer";
 import { TutorPanel } from "../components/client/TutorPanel";
 import { VideoPlayer } from "../components/client/VideoPlayer";
 import { Icon, KIND_ICON } from "../components/icons";
+import { StudioOutputView } from "../components/studio";
 
 type V = NonNullable<Viewer>;
 type FlashProps = { notice?: string; error?: string };
@@ -154,7 +155,7 @@ export function DashboardView({ viewer, vm, flash }: { viewer: V; vm: ReturnType
               </a>
             </section>
           )}
-          {vm.recommendations.length > 0 && (
+          {vm.recommendationsOn && vm.recommendations.length > 0 && (
             <section className="card card-pad">
               <h2 style={{ fontFamily: "var(--font-sans)", fontSize: "1.1rem" }}>Recommended next</h2>
               <ul className="item-list">
@@ -167,15 +168,32 @@ export function DashboardView({ viewer, vm, flash }: { viewer: V; vm: ReturnType
                         </strong>
                         <br />
                         <span className="tiny muted">{r.because}</span>
+                        {r.reasons.length > 1 && <span className="tiny muted"> · {r.reasons.slice(1, 3).join(" · ")}</span>}
                       </span>
                     </a>
                   </li>
                 ))}
               </ul>
               <p className="tiny muted" style={{ margin: 0 }}>
-                Based on your enrollments and the program map. Turn off in Account settings.
+                Based on your onboarding answers, your enrollments and the program map. <a href="/app/onboarding">Change your answers</a> or <a href="/app/account#recommendations">turn recommendations off</a>.
               </p>
             </section>
+          )}
+          {vm.recommendationsOn && vm.recommendations.length === 0 && !vm.onboarded && (
+            <section className="card card-pad small">
+              <strong>Get suggestions that fit you</strong>
+              <p className="muted" style={{ margin: "4px 0 8px" }}>
+                Tell us your goal, role, level, topics and weekly time.
+              </p>
+              <a className="btn btn-outline btn-sm" href="/app/onboarding">
+                Answer 5 quick questions
+              </a>
+            </section>
+          )}
+          {!vm.recommendationsOn && (
+            <p className="tiny muted">
+              Personalised recommendations are off. <a href="/app/account#recommendations">Turn them on</a>
+            </p>
           )}
         </div>
       </div>
@@ -183,43 +201,123 @@ export function DashboardView({ viewer, vm, flash }: { viewer: V; vm: ReturnType
   );
 }
 
-export function MyCoursesView({ viewer, vm }: { viewer: V; vm: ReturnType<typeof dashboardVM> }) {
+export function MyCoursesView({ viewer, vm, mine, flash = {} }: { viewer: V; vm: ReturnType<typeof dashboardVM>; mine: ReturnType<typeof myLearningVM>; flash?: FlashProps }) {
   return (
     <AppShell viewer={viewer} current="/app/courses">
-      <h1 className="page-title">My Courses</h1>
-      <div className="card table-wrap">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Course</th>
-              <th>Access</th>
-              <th>Progress</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {vm.courses.map((c) => (
-              <tr key={c.course.id}>
-                <td>
-                  <strong>
-                    {c.course.code} {c.course.title}
-                  </strong>
-                </td>
-                <td>{c.access === "full" ? <span className="badge badge-green">Full access</span> : <span className="badge">Auditing</span>}</td>
-                <td style={{ minWidth: 180 }}>
-                  <Progress value={c.progress.percent} label={`${c.course.title} progress`} />
-                  <span className="tiny muted">{c.progress.percent}%</span>
-                </td>
-                <td className="num">
-                  <a className="btn btn-outline btn-sm" href={`/app/course/${c.course.id}`}>
-                    Open
-                  </a>
-                </td>
+      <h1 className="page-title">My Learning</h1>
+      <Flash {...flash} />
+      <nav className="tabs" aria-label="My Learning sections">
+        <a href="#in-progress">In progress ({vm.courses.length})</a>
+        <a href="#saved">Saved ({mine.saved.length})</a>
+        <a href="#completed">Completed ({mine.completed.length})</a>
+      </nav>
+      <section id="in-progress" aria-labelledby="ml-progress">
+        <h2 id="ml-progress" className="ml-h">
+          In progress
+        </h2>
+        <div className="card table-wrap">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Course</th>
+                <th>Access</th>
+                <th>Progress</th>
+                <th>
+                  <span className="sr-only">Actions</span>
+                </th>
               </tr>
+            </thead>
+            <tbody>
+              {vm.courses.map((c) => (
+                <tr key={c.course.id}>
+                  <td>
+                    <strong>
+                      {c.course.code} {c.course.title}
+                    </strong>
+                  </td>
+                  <td>{c.access === "full" ? <span className="badge badge-green">Full access</span> : <span className="badge">Auditing</span>}</td>
+                  <td style={{ minWidth: 180 }}>
+                    <Progress value={c.progress.percent} label={`${c.course.title} progress`} />
+                    <span className="tiny muted">{c.progress.percent}%</span>
+                  </td>
+                  <td className="num">
+                    <a className="btn btn-outline btn-sm" href={`/app/course/${c.course.id}`}>
+                      Open
+                    </a>
+                  </td>
+                </tr>
+              ))}
+              {vm.courses.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="muted small">
+                    Nothing in progress. <a href="/explore">Explore courses</a>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section id="saved" aria-labelledby="ml-saved" style={{ marginTop: 24 }}>
+        <h2 id="ml-saved" className="ml-h">
+          Saved for later
+        </h2>
+        {mine.saved.length === 0 ? (
+          <p className="small muted">Nothing saved. Use “Save for later” on any course or program page.</p>
+        ) : (
+          <ul className="item-list card">
+            {mine.saved.map(({ product: p, savedAt }) => (
+              <li key={p.id} className="li" style={{ justifyContent: "space-between", borderBottom: "1px solid var(--border)" }}>
+                <span>
+                  <a href={`/learn/${p.slug}`}>
+                    <strong className="small">
+                      {p.code} {p.title}
+                    </strong>
+                  </a>
+                  <br />
+                  <span className="tiny muted">
+                    {p.durationLabel} · {p.level} · saved {fmtDate(savedAt)}
+                  </span>
+                </span>
+                <form method="post" action={`/api/v1/me/saved/${p.id}/remove`}>
+                  <input type="hidden" name="back" value="/app/courses#saved" />
+                  <button className="btn btn-ghost btn-sm" aria-label={`Remove ${p.title} from saved`}>
+                    Remove
+                  </button>
+                </form>
+              </li>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </ul>
+        )}
+      </section>
+      <section id="completed" aria-labelledby="ml-done" style={{ marginTop: 24 }}>
+        <h2 id="ml-done" className="ml-h">
+          Completed
+        </h2>
+        {mine.completed.length === 0 ? (
+          <p className="small muted">Courses and programs you pass appear here, with their credentials.</p>
+        ) : (
+          <ul className="item-list card">
+            {mine.completed.map(({ product: p, completedAt, credentialId }) => (
+              <li key={p.id} className="li" style={{ justifyContent: "space-between", borderBottom: "1px solid var(--border)" }}>
+                <span>
+                  <span className="sr-only">Completed: </span>
+                  <Icon name="check" size={16} /> <strong className="small">{p.title}</strong>
+                  <br />
+                  <span className="tiny muted">Completed {fmtDate(completedAt)}</span>
+                </span>
+                {credentialId ? (
+                  <a className="btn btn-outline btn-sm" href={`/verify/${credentialId}`}>
+                    View credential
+                  </a>
+                ) : (
+                  <span className="tiny muted">No credential for this item</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </AppShell>
   );
 }
@@ -439,26 +537,7 @@ export function ModuleView({ viewer, vm }: { viewer: V; vm: NonNullable<ReturnTy
                       <details key={x.id} className="acc">
                         <summary>{x.title}</summary>
                         <div className="small">
-                          {x.kind === "flashcards" ? (
-                            <dl>
-                              {(x.content as { front: string; back: string }[]).map((f) => (
-                                <div key={f.front} style={{ marginBottom: 8 }}>
-                                  <dt>
-                                    <strong>{f.front}</strong>
-                                  </dt>
-                                  <dd style={{ margin: 0 }} className="muted">
-                                    {f.back}
-                                  </dd>
-                                </div>
-                              ))}
-                            </dl>
-                          ) : (
-                            (x.content as { sections: { heading: string; text: string }[] }).sections.map((s) => (
-                              <p key={s.heading}>
-                                <strong>{s.heading}.</strong> {s.text}
-                              </p>
-                            ))
-                          )}
+                          <StudioOutputView o={x} />
                         </div>
                       </details>
                     ))}
@@ -535,7 +614,7 @@ export function ItemView({ viewer, vm, flash, retake }: { viewer: V; vm: NonNull
             </div>
           ) : i.kind === "video" ? (
             <>
-              <VideoPlayer itemId={i.id} title={i.title} durationSec={i.video!.durationSec} transcript={i.video!.transcript} captions={i.video!.captions} resumeSec={vm.resumeSec} completed={vm.status === "completed"} />
+              <VideoPlayer itemId={i.id} title={i.title} durationSec={i.video!.durationSec} transcript={i.video!.transcript} captions={i.video!.captions} resumeSec={vm.resumeSec} completed={vm.status === "completed"} notes={vm.notes} notesEnabled={vm.canView} />
               {completeForm}
             </>
           ) : i.kind === "lab" && i.lab ? (
@@ -865,7 +944,7 @@ export function AccountView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<t
           </p>
         )}
         {vm.subscriptions.map((s) => (
-          <div key={s.id} className="row between" style={{ padding: "12px 0", borderBottom: "1px solid var(--border)", alignItems: "flex-start" }}>
+          <div key={s.id} className="row between" style={{ padding: "12px 0", borderBottom: "1px solid var(--border)", alignItems: "flex-start", flexWrap: "wrap" }}>
             <div>
               <strong>
                 {planName[s.plan] ?? s.plan}
@@ -875,7 +954,7 @@ export function AccountView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<t
               <div className="small muted">
                 {s.status === "trialing" && s.trialEnd && `Free trial ends ${fmtDate(s.trialEnd, { dateStyle: "long" })}, then ${money(s.amount, s.currency)}/${s.plan === "plus_annual" ? "year" : "month"}. `}
                 {s.status === "active" && s.installmentsTotal && `${s.installmentsPaid} of ${s.installmentsTotal} installments paid. Next ${money(s.amount, s.currency)} on ${fmtDate(s.currentPeriodEnd, { dateStyle: "long" })}. `}
-                {s.status === "active" && !s.installmentsTotal && `Renews ${fmtDate(s.currentPeriodEnd, { dateStyle: "long" })} at ${money(s.amount, s.currency)}. `}
+                {s.status === "active" && !s.installmentsTotal && `Renews ${fmtDate(s.currentPeriodEnd, { dateStyle: "long" })} at ${money(s.amount, s.currency)}${s.credit ? ` (${money(s.credit, s.currency)} credit applies)` : ""}. We email you before each renewal. `}
                 {s.status === "completed" && "Paid in full. "}
                 {s.status === "canceled" && `Canceled — access until ${fmtDate(s.currentPeriodEnd, { dateStyle: "long" })}. Progress saved. `}
                 {s.status === "paused" && "Paused — progress saved. "}
@@ -905,6 +984,46 @@ export function AccountView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<t
                 </form>
               )}
             </div>
+            {s.changes.length > 0 && (
+              <details className="acc plan-change" style={{ flexBasis: "100%" }}>
+                <summary>Change plan</summary>
+                <div className="stack" style={{ ["--gap" as string]: "12px" }}>
+                  {s.changes.map((q) => (
+                    <form key={q.to} method="post" action={`/api/v1/commerce/subscriptions/${s.id}/change`} className="panel stack" style={{ ["--gap" as string]: "8px" }}>
+                      <input type="hidden" name="to" value={q.to} />
+                      <strong>
+                        {q.to === "plus_annual" ? "Switch to annual billing" : q.to === "plus_monthly" ? "Switch to Scholarion Plus monthly" : "Switch to a single program subscription"} — {money(q.newAmount, q.currency)}/{q.interval}
+                      </strong>
+                      {q.to === "program_monthly" && (
+                        <div className="field" style={{ margin: 0 }}>
+                          <label htmlFor={`prog-${s.id}`}>Program</label>
+                          <select id={`prog-${s.id}`} name="productId" required defaultValue="">
+                            <option value="" disabled>
+                              Choose a program
+                            </option>
+                            {vm.programs.map((p) => (
+                              <option key={p.id} value={p.id}>
+                                {p.title}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                      <p className="small" style={{ margin: 0 }}>
+                        {q.explanation}
+                      </p>
+                      <p className="small" style={{ margin: 0 }}>
+                        <strong>Due today: {money(q.chargeToday, q.currency)}</strong>
+                        {q.creditToNextBill > 0 && <> · credit on next bill: {money(q.creditToNextBill, q.currency)}</>}
+                      </p>
+                      <div>
+                        <button className="btn btn-primary btn-sm">Confirm change (sandbox)</button>
+                      </div>
+                    </form>
+                  ))}
+                </div>
+              </details>
+            )}
           </div>
         ))}
         <p className="tiny muted" style={{ marginTop: 10 }}>
@@ -923,6 +1042,25 @@ export function AccountView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<t
                     <div className="tiny muted">
                       {fmtDate(o.createdAt)} · {o.id}
                     </div>
+                    <div className="row" style={{ ["--gap" as string]: "8px", marginTop: 4 }}>
+                      <a className="tiny" href={`/api/v1/commerce/orders/${o.id}/invoice`} download>
+                        Download receipt (PDF)<span className="sr-only"> for {o.description}</span>
+                      </a>
+                      {o.refundRequest?.status === "pending" && <span className="tiny">Refund requested — in review</span>}
+                      {o.refundRequest?.status === "denied" && <span className="tiny">Refund request declined</span>}
+                    </div>
+                    {o.refund.eligible && (
+                      <details className="tiny">
+                        <summary>Request a refund</summary>
+                        <form method="post" action={`/api/v1/commerce/orders/${o.id}/refund`} className="stack" style={{ ["--gap" as string]: "6px", marginTop: 6 }}>
+                          <label htmlFor={`rf-${o.id}`}>Reason (optional)</label>
+                          <textarea id={`rf-${o.id}`} name="reason" rows={2} maxLength={1000} />
+                          <div>
+                            <button className="btn btn-outline btn-sm">Send to review</button>
+                          </div>
+                        </form>
+                      </details>
+                    )}
                   </td>
                   <td className="num mono">
                     {money(o.amount, o.currency)}
@@ -943,8 +1081,18 @@ export function AccountView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<t
             <ul className="item-list">
               {vm.aid.map((a) => (
                 <li key={a.id} className="li small" style={{ justifyContent: "space-between" }}>
-                  <span>{a.product?.title}</span>
-                  <StatusBadge status={a.status === "submitted" ? "In review" : a.status === "approved" ? `Approved ${a.discountPercent}%` : "Declined"} />
+                  <span>
+                    {a.product?.title}
+                    {a.status === "approved" && (a.discountPercent ?? 100) < 100 && a.product && (
+                      <>
+                        <br />
+                        <a className="tiny" href={`/learn/${a.product.slug}?enroll=1`}>
+                          Use your {a.discountPercent}% discount at checkout
+                        </a>
+                      </>
+                    )}
+                  </span>
+                  <StatusBadge status={a.status === "submitted" ? "In review" : a.status === "approved" ? `Approved ${a.discountPercent}% off` : "Declined"} />
                 </li>
               ))}
             </ul>
@@ -957,6 +1105,18 @@ export function AccountView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<t
           {vm.user.name} · {vm.user.email}
         </p>
         <p className="small muted">Data export and deletion requests are handled by Scholarion Identity; until it's connected, use the Help Center to request them.</p>
+      </section>
+      <section id="recommendations" className="card card-pad" style={{ marginTop: 20 }}>
+        <h2 style={{ fontFamily: "var(--font-sans)", fontSize: "1.1rem" }}>Personalised recommendations</h2>
+        <p className="small">
+          {vm.recommendationsOn ? "On. Suggestions on your dashboard use your onboarding answers and enrollments, and say why they were picked." : "Off. We don't suggest programs based on your answers or enrollments."}{" "}
+          <a href="/app/onboarding">Edit your answers</a>
+        </p>
+        <form method="post" action="/api/v1/me/recommendations">
+          <input type="hidden" name="enabled" value={vm.recommendationsOn ? "off" : "on"} />
+          <input type="hidden" name="back" value="/app/account#recommendations" />
+          <button className="btn btn-outline btn-sm">{vm.recommendationsOn ? "Turn off recommendations" : "Turn on recommendations"}</button>
+        </form>
       </section>
     </AppShell>
   );
@@ -1115,15 +1275,17 @@ export function NotificationsView({ viewer, notices, flash }: { viewer: V; notic
   );
 }
 
-export function OnboardingView({ viewer }: { viewer: V }) {
+export function OnboardingView({ viewer, vm }: { viewer: V; vm: ReturnType<typeof onboardingVM> }) {
+  const cur = vm.current;
   return (
     <AppShell viewer={viewer} current="/app">
       <div style={{ maxWidth: 640 }}>
         <h1 className="page-title">Welcome, {viewer.name.split(" ")[0]}! Let's personalise your learning.</h1>
+        <p className="muted">Your answers only shape the “Recommended next” suggestions on your dashboard. Each suggestion says which answer it came from.</p>
         <form method="post" action="/api/v1/me/onboarding" className="panel">
           <div className="field">
             <label htmlFor="goal">Your main goal</label>
-            <select id="goal" name="goal">
+            <select id="goal" name="goal" defaultValue={cur?.goal || "Start a new career"}>
               <option>Start a new career</option>
               <option>Grow in my current role</option>
               <option>Build AI skills</option>
@@ -1131,8 +1293,21 @@ export function OnboardingView({ viewer }: { viewer: V }) {
             </select>
           </div>
           <div className="field">
+            <label htmlFor="role">
+              Role you're aiming for <span className="hint">(optional)</span>
+            </label>
+            <select id="role" name="role" defaultValue={cur?.role ?? ""}>
+              <option value="">Not sure yet</option>
+              {vm.roles.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="field">
             <label htmlFor="level">Experience level</label>
-            <select id="level" name="level">
+            <select id="level" name="level" defaultValue={cur?.level || "Beginner"}>
               <option>Beginner</option>
               <option>Intermediate</option>
               <option>Advanced</option>
@@ -1142,12 +1317,16 @@ export function OnboardingView({ viewer }: { viewer: V }) {
             <label htmlFor="topics">
               Topics <span className="hint">(comma-separated, e.g. Python, agentic AI)</span>
             </label>
-            <input id="topics" name="topics" type="text" />
+            <input id="topics" name="topics" type="text" defaultValue={cur?.topics.join(", ") ?? ""} />
           </div>
           <div className="field">
             <label htmlFor="hours">Hours per week</label>
-            <input id="hours" name="hoursPerWeek" type="number" min={1} max={40} defaultValue={5} />
+            <input id="hours" name="hoursPerWeek" type="number" min={1} max={40} defaultValue={cur?.hoursPerWeek ?? 5} />
           </div>
+          <input type="hidden" name="recommendations" value="off" />
+          <label className="check small" style={{ marginBottom: 12 }}>
+            <input type="checkbox" name="recommendations" defaultChecked={vm.recommendationsOn} /> Show personalised recommendations on my dashboard
+          </label>
           <div className="row">
             <button className="btn btn-primary">Save and continue</button>
             <a href="/app">Skip for now</a>

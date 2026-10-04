@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Icon } from "./icons";
 import { SearchBox } from "./client/SearchBox";
 import { SupportChat } from "./client/SupportChat";
+import { ThemeToggle } from "./client/ThemeToggle";
 import { LOCALES, requestPrefs, t, type MessageKey } from "@/i18n";
 import { REGIONS } from "@/platform/pricing";
 
@@ -110,6 +111,7 @@ export function PublicHeader({ viewer, current }: { viewer: Viewer | null; curre
               {LOCALES.find((l) => l.code === requestPrefs().locale)?.name} · {REGIONS[requestPrefs().region].currency}
             </a>
           </nav>
+          <ThemeToggle compact idBase="theme-hdr" />
         </div>
       </div>
       <header className="site-header">
@@ -227,6 +229,7 @@ export function Footer() {
         </p>
         <div className="row between small" style={{ flexWrap: "wrap" }}>
           <span>© 2026 Scholarion Academy · Haven Digital Systems</span>
+          <ThemeToggle idBase="theme-ftr" />
           <PrefsForm />
         </div>
       </div>
@@ -337,6 +340,7 @@ export function AppShell({ viewer, current, children }: { viewer: Viewer; curren
             <SearchBox placeholder={t("top.search")} />
           </div>
           <div className="row" style={{ marginLeft: "auto", gap: 16 }}>
+            <ThemeToggle compact idBase="theme-app" />
             <a href="/app/notifications" className="btn btn-ghost btn-sm bell" aria-label={viewer.unread ? `${t("top.notifications")}, ${t("top.unread", { n: viewer.unread })}` : t("top.notifications")}>
               <Icon name="bell" size={18} />
               {!!viewer.unread && (

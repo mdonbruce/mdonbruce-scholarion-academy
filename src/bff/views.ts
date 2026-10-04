@@ -1,5 +1,5 @@
 import { requestPrefs } from "@/i18n";
-import { installment } from "@/platform/pricing";
+import { installment, REGIONS } from "@/platform/pricing";
 import {
   capabilities,
   catalog,
@@ -25,11 +25,14 @@ import {
   content,
   studio,
   teams,
+  library,
+  recommend,
   type Item,
   type Product,
   type User,
 } from "@/platform";
-import type { SearchFilters } from "@/platform/catalog";
+import { DURATION_BUCKETS, type DurationBucket, type SearchFilters } from "@/platform/catalog";
+import type { PlanChangeQuote, PlanChangeTarget } from "@/platform/commerce";
 import { sha256 } from "@/platform/util";
 
 /**
@@ -50,6 +53,7 @@ export function homeVM() {
     newest: catalog.rail("new", 6),
     programCount: catalog.all().filter((p) => p.type !== "course" && p.type !== "guided_project").length,
     plans: commerce.plansSummary(requestPrefs().region),
+    pathway: pathwayVM(),
   };
 }
 
@@ -64,9 +68,23 @@ export function exploreVM(sp: Record<string, string | string[] | undefined>) {
     freeToAudit: sp.free === "1",
     plusEligible: sp.plus === "1",
     format: (sp.format as "live" | "self_paced") || undefined,
+    language: (Array.isArray(sp.language) ? sp.language[0] : sp.language) || undefined,
+    skills: arr("skill"),
+    duration: arr("duration").filter((d): d is DurationBucket => d in DURATION_BUCKETS),
+    subtitles: arr("subtitles"),
     sort: (sp.sort as never) || "relevance",
   };
-  return { filters, result: catalog.search(filters) };
+  return { filters, result: catalog.search(filters), durationLabels: Object.fromEntries(Object.entries(DURATION_BUCKETS).map(([k, v]) => [k, v.label])) as Record<string, string> };
+}
+
+/** Public educator profile: only catalog facts and confirmed bio/qualifications. */
+export function educatorVM(slug: string) {
+  ensurePlatform();
+  const e = catalog.educator(slug);
+  if (!e) return null;
+  const programs = e.products.filter((p) => p.type !== "course" && p.type !== "guided_project");
+  const courses = e.products.filter((p) => p.type === "course" || p.type === "guided_project");
+  return { ...e, programs, courses };
 }
 
 export function productVM(slug: string, userId: string | null) {
@@ -80,6 +98,10 @@ export function productVM(slug: string, userId: string | null) {
   const firstCourse = product.courseIds[0] ?? (isCourse ? product.id : null);
   return {
     product,
+    educatorHref: `/educators/${catalog.educatorSlug(product.educator)}`,
+    saved: library.isSaved(userId, product.id),
+    aidDiscount: userId ? commerce.aidDiscountFor(userId, product.id) : null,
+    guided: product.type === "guided_project" ? guidedVM(product, userId) : null,
     modules,
     courses: catalog.courses(product.id).filter((c) => c.id !== product.id),
     includedIn: catalog.includedIn(product.id),
@@ -103,6 +125,28 @@ export function productVM(slug: string, userId: string | null) {
   };
 }
 
+/** Guided project specifics: what you'll build, the lab workspace, time, prerequisites, launch. */
+function guidedVM(product: Product, userId: string | null) {
+  const lab = catalog.items(product.id).find((i) => i.kind === "lab" && i.lab);
+  const prerequisites = getDb()
+    .pathway.filter((e) => e.to === product.id && e.type === "prerequisite")
+    .map((e) => catalog.get(e.from))
+    .filter((p): p is Product => !!p)
+    .map((p) => ({ title: p.title, slug: p.slug }));
+  const canLaunch = !!userId && !!lab && entitlements.check(userId, "lab.launch", product.id).allow;
+  return {
+    labItemId: lab?.id ?? null,
+    steps: lab?.lab?.instructions ?? [],
+    starterFile: lab?.lab?.starterFile ?? null,
+    minutes: lab?.lab?.timeLimitMinutes ?? Math.round(product.hours * 60),
+    resourceClass: lab?.lab?.resourceClass ?? null,
+    autograded: !!lab?.lab?.tests.length,
+    prerequisites,
+    canLaunch,
+    itemHref: lab ? `/app/course/${product.id}/item/${lab.id}` : null,
+  };
+}
+
 export function pathwayVM() {
   ensurePlatform();
   const { nodes, edges } = catalog.pathway();
@@ -123,22 +167,28 @@ export function dashboardVM(userId: string) {
     next,
     live: live.sessionsFor(userId).filter((s) => s.session.startsAt >= nowIso()).slice(0, 2),
     recommendations: recommendationsFor(userId),
+    recommendationsOn: recommend.enabled(userId),
+    onboarded: !!user.onboarding,
     ssoOffer: sso ? { id: sso.id, name: sso.name, domain: sso.domain } : null,
     unverifiedEmail: user.emailVerifiedAt ? null : user.email,
     orgs: teams.membershipsOf(userId).map((m) => ({ id: m.org.id, name: m.org.name })),
   };
 }
 
-function recommendationsFor(userId: string) {
-  const enrolled = new Set(lms.enrollmentsFor(userId).flatMap((e) => [e.productId, e.courseId]));
-  const out: { product: Product; because: string }[] = [];
-  for (const e of lms.enrollmentsFor(userId)) {
-    const src = catalog.get(e.productId);
-    for (const p of catalog.nextSteps(e.productId)) {
-      if (!enrolled.has(p.id) && !out.some((o) => o.product.id === p.id)) out.push({ product: p, because: `Because you're taking ${src?.title}` });
-    }
-  }
-  return out.slice(0, 3);
+/** Explainable recommendations from onboarding answers and enrollments (empty when turned off). */
+export function recommendationsFor(userId: string) {
+  return recommend.forUser(userId, 4).map((r) => ({ product: r.product, because: r.because, reasons: r.reasons }));
+}
+
+/** My Learning: saved list and explicit completions. */
+export function myLearningVM(userId: string) {
+  ensurePlatform();
+  return { saved: library.saved(userId), completed: library.completed(userId) };
+}
+
+export function onboardingVM(user: User) {
+  ensurePlatform();
+  return { roles: catalog.roles(), current: user.onboarding ?? null, recommendationsOn: !user.recommendationsOff };
 }
 
 export function courseHomeVM(userId: string, courseId: string) {
@@ -224,6 +274,7 @@ export function itemVM(userId: string, courseId: string, itemId: string) {
     tutorEnabled: entitlements.check(userId, "content.view", courseId).allow,
     canView: entitlements.check(userId, "content.view", courseId).allow,
     threads: item.kind === "discussion" && !locked ? community.threads(item.id, userId) : [],
+    notes: item.kind === "video" && !locked ? library.notes(userId, item.id).map((n) => ({ id: n.id, kind: n.kind, atSec: n.atSec, text: n.text })) : [],
     peer: item.project?.peerReview && !locked ? peerVM(userId, item.id) : null,
   };
 }
@@ -278,12 +329,20 @@ export function verifyVM(id: string) {
 
 export function accountVM(user: User) {
   ensurePlatform();
+  const targets: PlanChangeTarget[] = ["plus_monthly", "program_monthly", "plus_annual"];
   return {
     user: { id: user.id, name: user.name, email: user.email },
-    subscriptions: commerce.subscriptionsFor(user.id).map((s) => ({ ...s, product: s.productId ? catalog.get(s.productId) : null })),
-    orders: commerce.ordersFor(user.id),
+    subscriptions: commerce.subscriptionsFor(user.id).map((s) => ({
+      ...s,
+      product: s.productId ? catalog.get(s.productId) : null,
+      // Only the changes that apply to this subscription, each with its proration disclosure.
+      changes: targets.map((to) => commerce.quoteChange(s.id, user.id, to)).filter((q): q is PlanChangeQuote => q.allowed),
+    })),
+    orders: commerce.ordersFor(user.id).map((o) => ({ ...o, refund: commerce.refundEligibility(o), refundRequest: getDb().refundRequests.filter((r) => r.orderId === o.id).at(-1) ?? null })),
     aid: commerce.aidFor(user.id).map((a) => ({ ...a, product: catalog.get(a.productId) })),
     plans: commerce.plansSummary(requestPrefs().region),
+    programs: catalog.all().filter((p) => p.format === "self_paced" && ["professional_certificate", "specialization", "bundle"].includes(p.type)).map((p) => ({ id: p.id, title: p.title })),
+    recommendationsOn: !user.recommendationsOff,
     now: nowIso(),
   };
 }
@@ -400,7 +459,13 @@ export function checkoutVM(id: string, userId: string) {
   ensurePlatform();
   const cs = commerce.getCheckout(id, userId);
   if (!cs) return null;
-  return { cs, product: cs.productId ? catalog.get(cs.productId) : null };
+  return { cs, product: cs.productId ? catalog.get(cs.productId) : null, canUseCoupon: cs.status === "open" && !cs.trialEndsAt && !cs.aidDiscountPercent };
+}
+
+/** Staff → Commerce (platform admins). Everything here is sandbox. */
+export function commerceAdminVM() {
+  ensurePlatform();
+  return { settings: commerce.settings(), coupons: commerce.coupons(), refunds: commerce.refundQueue(), regions: Object.values(REGIONS), now: nowIso() };
 }
 
 export function aidApplyVM(slug: string) {

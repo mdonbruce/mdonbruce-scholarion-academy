@@ -129,6 +129,9 @@ function noticeHref(template: string, data: Record<string, unknown>): string {
     cancellation: "/app/account",
     trial_started: "/app/account",
     trial_ending: "/app/account",
+    renewal_upcoming: "/app/account",
+    plan_changed: "/app/account",
+    refund_denied: "/app/account",
     credential_issued: "/app/credentials",
     deadline: "/app/calendar",
     live_reminder: "/app/live",
@@ -166,6 +169,20 @@ export function registerHavenRoute(): void {
   subscribe("havenroute", "trial.ending", (e) =>
     email(e, "trial_ending", "Reminder: your trial ends soon", `Your Scholarion Plus trial ends on ${fmtDate(e.data.trialEnd)}. On that date we'll charge ${money(Number(e.data.amount), typeof e.data.currency === "string" ? e.data.currency : undefined)} (sandbox). To avoid the charge, cancel before then: ${publicUrl()}/app/account`),
   );
+  subscribe("havenroute", "subscription.renewal_upcoming", (e) =>
+    email(
+      e,
+      "renewal_upcoming",
+      "Your subscription renews soon",
+      `Your ${e.data.plan === "plus_annual" ? "annual Scholarion Plus plan" : e.data.plan === "plus_monthly" ? "Scholarion Plus subscription" : "program subscription"} renews on ${fmtDate(e.data.renewsAt)} and we'll charge ${money(Number(e.data.amount), typeof e.data.currency === "string" ? e.data.currency : undefined)} (sandbox). To stop it, cancel before then in Account → Billing: ${publicUrl()}/app/account`,
+    ),
+  );
+  subscribe("havenroute", "subscription.plan_changed", (e) =>
+    email(e, "plan_changed", "Your plan changed", `Your plan change is done. Charged today: ${money(Number(e.data.chargeToday), typeof e.data.currency === "string" ? e.data.currency : undefined)} (sandbox). See the prorated invoice in Account → Billing: ${publicUrl()}/app/account`),
+  );
+  subscribe("havenroute", "refund.denied", (e) =>
+    email(e, "refund_denied", "Your refund request was reviewed", `We reviewed your refund request for order ${e.data.orderId} and weren't able to approve it.${e.data.note ? ` Note from our team: ${e.data.note}` : ""} Reply to this email or open a ticket in the Help Center if you have questions.`),
+  );
   subscribe("havenroute", "order.paid", (e) => email(e, "receipt", "Your Scholarion receipt", `Payment received: ${money(Number(e.data.amount), typeof e.data.currency === "string" ? e.data.currency : undefined)} (sandbox). Order ${e.data.orderId}.`));
   subscribe("havenroute", "subscription.renewed", (e) => email(e, "renewal_receipt", "Your subscription renewed", `We charged ${money(Number(e.data.amount), typeof e.data.currency === "string" ? e.data.currency : undefined)} (sandbox). Your access continues until ${fmtDate(e.data.periodEnd)}.`));
   subscribe("havenroute", "subscription.canceled", (e) => email(e, "cancellation", "Your subscription is canceled", `You won't be charged again. You keep access until ${fmtDate(e.data.accessUntil)}, and your progress is saved.`));
@@ -176,7 +193,11 @@ export function registerHavenRoute(): void {
       e,
       "aid_decision",
       `Financial aid decision: ${p?.title ?? "your program"}`,
-      e.data.decision === "approved" ? `Good news — your application was approved at ${e.data.discountPercent}% off. You now have full access: ${publicUrl()}/app` : "Thank you for applying. We weren't able to approve this application. You can still audit eligible courses for free.",
+      e.data.decision === "approved"
+        ? Number(e.data.discountPercent) >= 100
+          ? `Good news — your application was approved at ${e.data.discountPercent}% off. You now have full access: ${publicUrl()}/app`
+          : `Good news — your application was approved at ${e.data.discountPercent}% off. The discount is applied automatically when you check out from the program page: ${publicUrl()}/learn/${p?.slug ?? ""}`
+        : "Thank you for applying. We weren't able to approve this application. You can still audit eligible courses for free.",
     );
   });
   subscribe("havenroute", "credential.issued", (e) => {

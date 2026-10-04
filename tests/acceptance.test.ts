@@ -74,6 +74,96 @@ describe("2 · Plus trial lifecycle (sandbox)", () => {
   });
 });
 
+describe("2b · Plus: cancelling takes no more steps than signing up", () => {
+  it("counts learner actions for signup vs cancel", () => {
+    const u = newLearner();
+    // Each entry is one learner action (one form submit in the UI).
+    const signup: (() => unknown)[] = [];
+    let csId = "";
+    let subId = "";
+    signup.push(() => (csId = commerce.createCheckout({ userId: u.id, plan: "plus_monthly", productId: null, idempotencyKey: "steps" }).id)); // Plus page → "Start free trial"
+    signup.push(() => (subId = commerce.confirmSandboxPayment(csId, u.id).subscription!.id)); // checkout → confirm
+    for (const step of signup) step();
+    const cancel: (() => unknown)[] = [() => commerce.cancel(subId, u.id)]; // Account → "Cancel subscription"
+    for (const step of cancel) step();
+    assert.ok(cancel.length <= signup.length, `cancel ${cancel.length} steps vs signup ${signup.length}`);
+    assert.equal(commerce.subscriptionsFor(u.id)[0].status, "canceled");
+  });
+});
+
+/** Reference solutions for the COP1047C labs (used only by the autograder in tests). */
+const LAB_SOLUTIONS: Record<string, string> = {
+  itm_cop1047c_m1_lab: "def greet(name):\n    return f'Hello, {name}!'\n",
+  itm_cop1047c_m2_lab: "def area(width, height):\n    return width * height\n\ndef format_area(value):\n    return f'{value:.2f} sq ft'\n",
+  itm_cop1047c_m3_lab: "def letter_grade(score):\n    if score >= 90: return 'A'\n    if score >= 80: return 'B'\n    if score >= 70: return 'C'\n    if score >= 60: return 'D'\n    return 'F'\n",
+  itm_cop1047c_m4_lab: "def sum_to(n):\n    total = 0\n    for i in range(1, n + 1):\n        total += i\n    return total\n",
+  itm_cop1047c_m5_lab: LAB_M5_SOLUTION,
+  itm_cop1047c_m6_lab: "def safe_int(text, default=0):\n    try:\n        return int(text)\n    except ValueError:\n        return default\n",
+  itm_cop1047c_m7_lab: "def average(values):\n    if not values:\n        return 0\n    return round(sum(values) / len(values), 1)\n",
+  itm_cop1047c_m8_lab: "def initials(full_name):\n    return ''.join(p[0].upper() for p in full_name.split())\n",
+  itm_cop1047c_m9_lab: "def word_counts(text):\n    counts = {}\n    for w in text.lower().split():\n        counts[w] = counts.get(w, 0) + 1\n    return counts\n",
+  itm_cop1047c_m10_lab: "class Patient:\n    def __init__(self, first, last, birth_year):\n        self.first = first\n        self.last = last\n        self.birth_year = birth_year\n    def full_name(self):\n        return f'{self.first} {self.last}'\n    def age(self, year):\n        return year - self.birth_year\n",
+};
+
+describe("3b · a fresh subscriber completes a certificate program end to end", () => {
+  it("subscribes, passes labs via the autograder, peer reviews, earns and verifies the credential", () => {
+    const program = catalog.get("prd_cert_python")!;
+    assert.equal(program.type, "professional_certificate");
+    const [me, peerA, peerB] = [newLearner(), newLearner(), newLearner()];
+    // Subscribe (sandbox) to the program; classmates use Plus for the peer-review cohort.
+    const cs = commerce.createCheckout({ userId: me.id, plan: "program_monthly", productId: program.id, idempotencyKey: "fresh-sub" });
+    commerce.confirmSandboxPayment(cs.id, me.id);
+    lms.enroll(me.id, program.id, "full");
+    for (const p of [peerA, peerB]) {
+      commerce.confirmSandboxPayment(commerce.createCheckout({ userId: p.id, plan: "plus_monthly", productId: null, idempotencyKey: `plus-${p.id}` }).id, p.id);
+      lms.enroll(p.id, "prd_cop1047c", "full");
+    }
+    const items = catalog.items("prd_cop1047c").filter((i) => i.graded);
+
+    // Labs: real autograder runs.
+    for (const lab of items.filter((i) => i.kind === "lab")) {
+      const s = cloudlab.launch(me.id, lab.id);
+      const r = cloudlab.grade(s.id, me.id, LAB_SOLUTIONS[lab.id]);
+      assert.equal(r.score, r.max, `${lab.id}: ${JSON.stringify(r.feedback)} ${r.stderr}`);
+    }
+    // Quizzes: submitted through the LMS like the quiz player does.
+    for (const q of items.filter((i) => i.kind === "quiz")) {
+      const a = lms.startAttempt(me.id, q.id);
+      const res = lms.submitAttempt(me.id, a.id, Object.fromEntries(q.quiz!.questions.map((x) => [x.id, x.answer])));
+      assert.ok(res.passed);
+    }
+    // Peer-reviewed project: everyone submits, then each reviews the other two.
+    const peerItem = items.find((i) => i.project?.peerReview)!;
+    const rubric = peerItem.project!.rubric;
+    const cohort = [me, peerA, peerB];
+    for (const u of cohort) lms.submitProject(u.id, peerItem.id, `Mini project write-up from ${u.name} with code and output.`);
+    for (const reviewer of cohort) {
+      for (const author of cohort.filter((x) => x.id !== reviewer.id)) {
+        const sub = lms.latestSubmission(author.id, peerItem.id)!;
+        lms.submitPeerReview({ reviewerId: reviewer.id, submissionId: sub.id, scores: Object.fromEntries(rubric.map((c) => [c.criterion, c.points - 1])), comment: "Clear structure and working code; consider more tests." });
+      }
+    }
+    assert.equal(lms.grade(me.id, peerItem.id)?.source, "peer");
+    // Remaining projects, capstone and participation are graded by course staff.
+    for (const p of items.filter((i) => (i.kind === "project" || i.kind === "capstone") && !i.project?.peerReview)) {
+      const sub = lms.submitProject(me.id, p.id, "Project submission with code, explanation and screenshots.");
+      const max = p.project!.rubric.reduce((a, c) => a + c.points, 0);
+      lms.gradeSubmission(sub.id, Math.round(max * 0.9), max, "Well done.");
+    }
+    for (const d of items.filter((i) => i.kind === "discussion" && !lms.grade(me.id, i.id))) {
+      lms.postGrade({ userId: me.id, itemId: d.id, score: 9, max: 10, source: "instructor" });
+    }
+
+    const gb = lms.gradebook(me.id, "prd_cop1047c");
+    assert.ok(gb.allGraded && gb.current! >= 70, `grade ${gb.current}`);
+    const creds = credentials.forUser(me.id);
+    const cert = creds.find((c) => c.productId === program.id);
+    assert.ok(cert, "program certificate issued to the fresh subscriber");
+    assert.equal(credentials.verify(cert.id).status, "valid");
+    assert.ok(cx.outbox(me.email).some((e) => e.template === "credential_issued"));
+  });
+});
+
 describe("3 · learning to credential", () => {
   it("autogrades a lab, passes the course, issues and verifies a signed credential", () => {
     const amara = "usr_amara";

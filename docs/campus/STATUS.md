@@ -2,9 +2,9 @@
 
 Generated 2026-10-04 by `scripts/campus-docs.ts`. Environment: local + staging only (demonstration data, sandbox payments).
 
-**Capabilities:** 30 LIVE · 0 CONNECTED · 3 SIMULATED · 8 DISABLED · 2 PLANNED
+**Capabilities:** 32 LIVE · 0 CONNECTED · 3 SIMULATED · 8 DISABLED · 2 PLANNED
 
-## Tabs (52)
+## Tabs (54)
 
 A tab is OPERATIONAL when it has persisted resources, enforced authorization, audited writes, an API surface (REST + operations + GraphQL), a working screen, and a passing test. Tabs that depend on outside services report the connector state honestly.
 
@@ -60,6 +60,8 @@ A tab is OPERATIONAL when it has persisted resources, enforced authorization, au
 | 48 | Capability Status | Platform | OPERATIONAL | status board test |
 | 49 | Proctored Assessment Support | Student Success | OPERATIONAL | proctor suite (10 tests) |
 | 50 | Program Studio | Academy & Commerce | OPERATIONAL | programs suite (Tab 50) |
+| 53 | Assessment & Project Studio | Intelligence | OPERATIONAL | labs suite (Tab 53: generators, approvals, QTI, simulated labs) |
+| 54 | Agentic Cloud Labs | Intelligence | OPERATIONAL | labs suite (Tab 54: workspaces, bounded autonomous runner, permissions, traces, rubric grading, 2 attempts) |
 | 52 | Module Library & Catalog Consolidation | Academy & Commerce | OPERATIONAL | agentic suite (Tab 52: hub, library, policies, consolidation) |
 | 51 | LMS Parity Status | Platform | OPERATIONAL | programs suite (Tab 51) |
 
@@ -87,6 +89,8 @@ A tab is OPERATIONAL when it has persisted resources, enforced authorization, au
 | Catalog | Product types, catalog hub, recommender, Catalog Copy Checker | LIVE | platform acceptance 2–3, 10 (tests/campus-*.test.ts) | — |
 | Catalog | Academy program pages (#1, #12, #13, #14, #26) generated from catalog data, brochure PDF, apply → admission → sandbox seat, inquiries, prerequisite self-check, pass/no-pass completion | LIVE | programs suite (tests/campus-*.test.ts) | — |
 | Catalog | Agentic AI hub (tabs, filters, rails from real data, learning paths, 9-question quiz, comparison, credential explainer, ItemList JSON-LD); programs #15–#25 and self-paced #28–#38 with batches, pay-later, audit access, autograded Cloud Lab notebooks, stacking certificates | LIVE | agentic suite (tests/campus-*.test.ts) | — |
+| Curriculum | Assessment & Project Studio: labs, in-class activities, quizzes with 3× item banks (QTI 2.1), practice exercises, mini-projects, real-world projects and senior capstones — Four Project Pillars, alignment tables, student/instructor editions, AI DRAFT with two-person approval; simulated Student/Instructor labs (10-question worksheet, instructor control panel) and application demos | LIVE | labs suite (Tab 53) (tests/campus-*.test.ts) | — |
+| Cloud Lab | Agentic Cloud Labs: saved workspaces with history, bounded autonomous agent runner (declarative agent specs; nothing learner-written is executed), per-tool permissions with violation tracking, evaluation traces, rubric auto-grading posted to the gradebook with pass/no-pass, two graded attempts (best counts) | LIVE | labs suite (Tab 54) (tests/campus-*.test.ts) | — |
 | Catalog | Shared module library, policy approval gate (refund / deferral / batch change) and catalog consolidation report with product-owner decision | LIVE | agentic suite (Tab 52) (tests/campus-*.test.ts) | — |
 | Pathways | Prerequisite / stacks / waives / mutually-exclusive rules, transfer credit, consolidation report | LIVE | platform acceptance 4 (tests/campus-*.test.ts) | — |
 | Commerce | Checkout, coupons, installments, subscriptions, seats, invoices, refunds | SIMULATED | Sandbox only; policy engine tested | Payment provider and go-live decision. |

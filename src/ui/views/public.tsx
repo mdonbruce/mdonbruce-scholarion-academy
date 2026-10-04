@@ -1,11 +1,12 @@
 import { ReviewsSection, Stars } from "../components/reviews";
 import { formatMoney } from "@/platform/pricing";
 import { t } from "@/i18n";
-import type { aidApplyVM, checkoutVM, exploreVM, homeVM, pathwayVM, productVM, verifyVM, Viewer } from "@/bff/views";
+import type { aidApplyVM, checkoutVM, educatorVM, exploreVM, homeVM, pathwayVM, productVM, verifyVM, Viewer } from "@/bff/views";
 import type { HelpArticle, Product } from "@/platform/types";
 import { fmtDate, fmtDateTime, ProductCard, TYPE_LABEL } from "../components/cards";
 import { Flash, PublicPage } from "../components/chrome";
 import { EnrollModal } from "../components/client/EnrollModal";
+import { PricingCalculator } from "../components/client/PricingCalculator";
 import { Icon, KIND_ICON } from "../components/icons";
 import { BuySeatsPanel } from "./teams";
 import type { teamsQuote } from "@/bff/views";
@@ -158,6 +159,21 @@ export function HomeView({ viewer, vm }: { viewer: Viewer; vm: ReturnType<typeof
         </div>
       </section>
 
+      <section className="section container" aria-labelledby="paths-title">
+        <div className="row between" style={{ alignItems: "flex-end" }}>
+          <div>
+            <h2 id="paths-title" className="section-title">
+              Learning paths
+            </h2>
+            <p className="lede" style={{ margin: 0 }}>
+              Four pathways. Programs stack from foundations to advanced and leadership certificates. All are non-credit professional training.
+            </p>
+          </div>
+          <a href="/programs">Open the full program map</a>
+        </div>
+        <PathwayDiagram vm={vm.pathway} />
+      </section>
+
       <section className="section container grid g2">
         <div className="card card-pad">
           <span className="badge badge-blue">Scholarion Plus</span>
@@ -246,6 +262,22 @@ export function ExploreView({ viewer, vm }: { viewer: Viewer; vm: ReturnType<typ
       ))}
     </fieldset>
   );
+  // Multi-select facets (OR within a facet); counts are before that facet's own filter.
+  const multi = (name: string, legend: string, counts: Record<string, number>, selected: string[], label: (v: string) => string) =>
+    Object.keys(counts).length === 0 && selected.length === 0 ? null : (
+      <fieldset style={{ border: 0, padding: 0, margin: "0 0 18px" }}>
+        <legend className="small" style={{ fontWeight: 700, marginBottom: 6 }}>
+          {legend}
+        </legend>
+        {[...new Set([...selected, ...Object.keys(counts)])].map((v) => (
+          <label key={v} className="check small" style={{ marginBottom: 6 }}>
+            <input type="checkbox" name={name} value={v} defaultChecked={selected.includes(v)} /> {label(v)} <span className="muted">({counts[v] ?? 0})</span>
+          </label>
+        ))}
+      </fieldset>
+    );
+  // Most common skills first; anything already selected always stays visible.
+  const topSkills = Object.fromEntries(Object.entries(r.facets.skills).slice(0, 12));
   return (
     <PublicPage viewer={viewer} current="/explore">
       <div className="container section" style={{ paddingTop: 32 }}>
@@ -274,6 +306,20 @@ export function ExploreView({ viewer, vm }: { viewer: Viewer; vm: ReturnType<typ
             {facet("type", r.facets.type, (v) => TYPE_LABEL[v] ?? v)}
             {facet("level", r.facets.level, (v) => v)}
             {facet("track", r.facets.track, (v) => v)}
+            {multi("duration", "Duration", r.facets.duration, f.duration ?? [], (v) => vm.durationLabels[v] ?? v)}
+            {multi("skill", "Skills", topSkills, f.skills ?? [], (v) => v)}
+            <div className="field">
+              <label htmlFor="language">Language</label>
+              <select id="language" name="language" defaultValue={f.language ?? ""}>
+                <option value="">Any</option>
+                {Object.entries(r.facets.language).map(([v, n]) => (
+                  <option key={v} value={v}>
+                    {v} ({n})
+                  </option>
+                ))}
+              </select>
+            </div>
+            {multi("subtitles", "Subtitles", r.facets.subtitles, f.subtitles ?? [], (v) => v)}
             <button className="btn btn-primary btn-block">Apply filters</button>
             <a className="btn btn-ghost btn-block" href="/explore" style={{ marginTop: 8 }}>
               Clear
@@ -352,7 +398,12 @@ export function ProductView({ viewer, vm, flash, openEnroll }: { viewer: Viewer;
           <h1 style={{ fontSize: "clamp(2rem,4vw,2.8rem)", margin: "12px 0 6px" }}>{p.title}</h1>
           <p style={{ fontSize: "1.1rem" }}>{p.tagline}</p>
           <p className="small" style={{ color: "#c9d4f0" }}>
-            By {p.educator} · {p.level} · {p.durationLabel} · {p.language} · Subtitles: {p.subtitles.join(", ")} · No ratings yet
+            By{" "}
+            <a href={vm.educatorHref} className="on-dark-link">
+              {p.educator}
+            </a>{" "}
+            · {p.level} · {p.durationLabel} · {p.language} · Subtitles: {p.subtitles.join(", ")}
+            {vm.reviews.summary.count === 0 ? " · No ratings yet" : ""}
           </p>
         </div>
       </section>
@@ -373,6 +424,7 @@ export function ProductView({ viewer, vm, flash, openEnroll }: { viewer: Viewer;
                 ))}
               </ul>
             </section>
+            {vm.guided && <GuidedProjectPanel p={p} g={vm.guided} signedIn={!!viewer} />}
             <section>
               <h2 className="section-title">About</h2>
               <p>{p.description}</p>
@@ -528,6 +580,17 @@ export function ProductView({ viewer, vm, flash, openEnroll }: { viewer: Viewer;
             </section>
           </div>
           <aside className="card card-pad sticky-enroll stack" aria-label="Enroll">
+            {vm.aidDiscount !== null && (
+              <div className="notice notice-ok small" role="status" style={{ margin: 0 }}>
+                Your approved financial aid: <strong>{vm.aidDiscount}% off</strong>. It's applied automatically at checkout.
+              </div>
+            )}
+            {vm.guided?.canLaunch && (
+              <form method="post" action="/api/v1/labs/launch">
+                <input type="hidden" name="productId" value={p.id} />
+                <button className="btn btn-primary btn-block">Launch Cloud Lab</button>
+              </form>
+            )}
             {vm.continueHref ? (
               <>
                 <span className={`badge ${vm.access === "full" ? "badge-green" : "badge-blue"}`}>{vm.access === "full" ? "Full access" : vm.access === "audit" ? "Auditing" : "Enrolled"}</span>
@@ -544,6 +607,19 @@ export function ProductView({ viewer, vm, flash, openEnroll }: { viewer: Viewer;
                 </p>
               </>
             )}
+            {viewer ? (
+              <form method="post" action={vm.saved ? `/api/v1/me/saved/${p.id}/remove` : "/api/v1/me/saved"}>
+                <input type="hidden" name="productId" value={p.id} />
+                <input type="hidden" name="back" value={`/learn/${p.slug}`} />
+                <button className="btn btn-ghost btn-sm btn-block">
+                  <Icon name="star" size={16} /> {vm.saved ? "Saved — remove from My Learning" : "Save for later"}
+                </button>
+              </form>
+            ) : (
+              <a className="btn btn-ghost btn-sm btn-block" href={`/login?next=${encodeURIComponent(`/learn/${p.slug}`)}`}>
+                Sign in to save for later
+              </a>
+            )}
             <hr className="divider" style={{ margin: "4px 0" }} />
             <a href={`/financial-aid/apply?product=${p.slug}`} className="small">
               Financial aid available
@@ -556,9 +632,92 @@ export function ProductView({ viewer, vm, flash, openEnroll }: { viewer: Viewer;
   );
 }
 
+/** Guided project specifics: what you'll build, a split-screen preview of the lab workspace, time, prerequisites and launch. */
+function GuidedProjectPanel({ p, g, signedIn }: { p: Product; g: NonNullable<NonNullable<ReturnType<typeof productVM>>["guided"]>; signedIn: boolean }) {
+  return (
+    <section className="stack guided" aria-labelledby="gp-build">
+      <h2 id="gp-build" className="section-title">
+        What you'll build
+      </h2>
+      <p style={{ margin: 0 }}>{p.whatYoullLearn.length ? `${p.whatYoullLearn.join(", ")}.` : p.tagline}</p>
+      {g.steps.length > 0 && (
+        <ol className="gp-steps">
+          {g.steps.map((s) => (
+            <li key={s}>{s}</li>
+          ))}
+        </ol>
+      )}
+      <figure className="lab-preview" aria-labelledby="gp-preview-cap">
+        <figcaption id="gp-preview-cap" className="small">
+          <strong>Cloud Lab workspace preview.</strong> The lab opens in your browser as a split screen. Nothing to install.
+        </figcaption>
+        <div className="lab-split">
+          <div className="lab-pane">
+            <div className="lab-pane-head">Left: task instructions</div>
+            <p className="small" style={{ margin: 0 }}>
+              The steps above, one at a time, with the AI Tutor available for hints (it won't write the graded code for you).
+            </p>
+          </div>
+          <div className="lab-pane lab-pane-code">
+            <div className="lab-pane-head">Right: code editor{g.starterFile ? ` — ${g.starterFile}` : ""}</div>
+            <ul className="small" style={{ margin: 0, paddingLeft: 18 }}>
+              <li>Starter file with the functions to complete</li>
+              <li>
+                <strong>Run</strong> shows your program's output
+              </li>
+              {g.autograded && (
+                <li>
+                  <strong>Grade</strong> runs the autograder and shows which checks pass
+                </li>
+              )}
+              <li>Your code saves as you go</li>
+            </ul>
+          </div>
+        </div>
+      </figure>
+      <dl className="grid g3 gp-facts">
+        <div className="card card-pad small">
+          <dt className="muted tiny">Time</dt>
+          <dd>About {g.minutes >= 60 ? `${Math.round((g.minutes / 60) * 10) / 10} hours` : `${g.minutes} minutes`} in the lab</dd>
+        </div>
+        <div className="card card-pad small">
+          <dt className="muted tiny">Prerequisites</dt>
+          <dd>
+            {g.prerequisites.length
+              ? g.prerequisites.map((x, i) => (
+                  <span key={x.slug}>
+                    {i > 0 && ", "}
+                    <a href={`/learn/${x.slug}`}>{x.title}</a>
+                  </span>
+                ))
+              : `None recorded. Level: ${p.level}.`}
+          </dd>
+        </div>
+        <div className="card card-pad small">
+          <dt className="muted tiny">Assessment</dt>
+          <dd>{g.autograded ? "Autograded lab; pass to earn the badge" : "Instructor-reviewed"}</dd>
+        </div>
+      </dl>
+      <div className="row">
+        {g.canLaunch ? (
+          <form method="post" action="/api/v1/labs/launch">
+            <input type="hidden" name="productId" value={p.id} />
+            <button className="btn btn-primary">Launch Cloud Lab</button>
+          </form>
+        ) : (
+          <p className="small muted" style={{ margin: 0 }}>
+            {signedIn ? "Launching needs full access: buy this project, use Scholarion Plus, or check the options in the Enroll panel." : "Sign in and choose an access option to launch the Cloud Lab."}
+          </p>
+        )}
+      </div>
+    </section>
+  );
+}
+
 /* ======================= Programs stack ======================= */
 
-export function ProgramsView({ viewer, vm }: { viewer: Viewer; vm: ReturnType<typeof pathwayVM> }) {
+/** The "How the programs stack" lanes, shared by /programs and the home page. */
+export function PathwayDiagram({ vm, headingLevel = 3 }: { vm: ReturnType<typeof pathwayVM>; headingLevel?: 2 | 3 }) {
   const lanes: [string, string, string, Product[], string[]][] = [
     ["Foundation path", "Build core skills in data, AI and prompting.", "lane-foundation", vm.foundation, ["Work with data confidently", "Build and evaluate AI models", "Design effective prompts", "Prepare for agentic development"]],
     ["Builder path", "Develop, design and deploy agentic systems.", "lane-builder", vm.builder, ["Build single and multi-agent systems", "Integrate tools and external APIs", "Work with enterprise data platforms", "Deploy, monitor and secure AI systems"]],
@@ -566,6 +725,66 @@ export function ProgramsView({ viewer, vm }: { viewer: Viewer; vm: ReturnType<ty
     ["Leadership path", "Apply AI to business and lead teams.", "lane-leadership", vm.leadership, ["Lead AI-driven transformation", "Align AI with organizational goals", "Manage risk, ethics and governance", "Deliver a real implementation plan"]],
   ];
   const edgesFrom = (id: string) => vm.edges.filter((e) => e.from === id && e.type !== "includes");
+  const H = headingLevel === 2 ? "h2" : "h3";
+  return (
+    <div className="stack" style={{ marginTop: 24, ["--gap" as string]: "14px" }}>
+      {lanes.map(([title, sub, cls, nodes, outcomes]) => (
+        <section key={title} className={`pathway ${cls}`} style={{ padding: 10, borderRadius: "var(--radius)" }} aria-label={title}>
+          <div className="lane">
+            <H className="lane-title" style={{ color: "var(--lane)", textTransform: "uppercase", fontSize: "1rem", margin: 0, fontFamily: "var(--font-sans)" }}>
+              {title}
+            </H>
+            <div className="small">{sub}</div>
+          </div>
+          {nodes.slice(0, 3).map((n) => (
+            <a key={n.id} href={`/learn/${n.slug}`} className={`node ${n.status === "legacy" ? "legacy" : ""}`}>
+              <span>
+                <span className="no">{n.code}</span> <strong>{n.title}</strong>
+              </span>
+              <span className="tiny muted">{n.whatYoullLearn.join(" · ")}</span>
+              <span className="tiny">
+                {n.durationLabel} · {n.level}
+              </span>
+              {edgesFrom(n.id).map((e, i) => (
+                <span key={i} className="tiny" style={{ color: "var(--lane)" }}>
+                  → {vm.products[e.to]?.code}
+                  {e.note ? ` · ${e.note}` : e.type === "stacks_into" ? " · stacks into" : ` · ${e.type.replace("_", " ")}`}
+                </span>
+              ))}
+            </a>
+          ))}
+          {Array.from({ length: Math.max(0, 3 - nodes.length) }).map((_, i) => (
+            <div key={i} aria-hidden="true" />
+          ))}
+          <div className="lane" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+            <strong className="small">{title.replace(" path", "")} outcomes</strong>
+            <ul className="tiny" style={{ paddingLeft: 16, margin: "6px 0 0" }}>
+              {outcomes.map((o) => (
+                <li key={o}>{o}</li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      ))}
+      {vm.advanced.length > 3 && (
+        <div className="grid g3 lane-advanced" style={{ padding: 10, borderRadius: "var(--radius)" }}>
+          {vm.advanced.slice(3).map((n) => (
+            <a key={n.id} href={`/learn/${n.slug}`} className="card card-pad" style={{ textDecoration: "none", color: "inherit", border: "2px solid var(--lane)" }}>
+              <strong>
+                <span style={{ color: "var(--lane)" }}>{n.code}</span> {n.title}
+              </strong>
+              <div className="tiny muted">
+                {n.durationLabel} · {n.level} {n.status === "legacy" ? "· legacy" : ""}
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function ProgramsView({ viewer, vm }: { viewer: Viewer; vm: ReturnType<typeof pathwayVM> }) {
   return (
     <PublicPage viewer={viewer} current="/programs">
       <div className="container section" style={{ paddingTop: 32 }}>
@@ -580,58 +799,7 @@ export function ProgramsView({ viewer, vm }: { viewer: Viewer; vm: ReturnType<ty
           </div>
           <span className="small muted">Powered by Scholarion · All programs are non-credit professional training.</span>
         </div>
-        <div className="stack" style={{ marginTop: 24, ["--gap" as string]: "14px" }}>
-          {lanes.map(([title, sub, cls, nodes, outcomes]) => (
-            <div key={title} className={`pathway ${cls}`} style={{ padding: 10, borderRadius: "var(--radius)" }}>
-              <div className="lane">
-                <strong style={{ color: "var(--lane)", textTransform: "uppercase" }}>{title}</strong>
-                <div className="small">{sub}</div>
-              </div>
-              {nodes.slice(0, 3).map((n) => (
-                <a key={n.id} href={`/learn/${n.slug}`} className={`node ${n.status === "legacy" ? "legacy" : ""}`}>
-                  <span>
-                    <span className="no">{n.code}</span> <strong>{n.title}</strong>
-                  </span>
-                  <span className="tiny muted">{n.whatYoullLearn.join(" · ")}</span>
-                  <span className="tiny">
-                    {n.durationLabel} · {n.level}
-                  </span>
-                  {edgesFrom(n.id).map((e, i) => (
-                    <span key={i} className="tiny" style={{ color: "var(--lane)" }}>
-                      → {vm.products[e.to]?.code}
-                      {e.note ? ` · ${e.note}` : e.type === "stacks_into" ? " · stacks into" : ` · ${e.type.replace("_", " ")}`}
-                    </span>
-                  ))}
-                </a>
-              ))}
-              {Array.from({ length: Math.max(0, 3 - nodes.length) }).map((_, i) => (
-                <div key={i} aria-hidden="true" />
-              ))}
-              <div className="lane" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-                <strong className="small">{title.replace(" path", "")} outcomes</strong>
-                <ul className="tiny" style={{ paddingLeft: 16, margin: "6px 0 0" }}>
-                  {outcomes.map((o) => (
-                    <li key={o}>{o}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ))}
-          {vm.advanced.length > 3 && (
-            <div className="grid g3 lane-advanced" style={{ padding: 10, borderRadius: "var(--radius)" }}>
-              {vm.advanced.slice(3).map((n) => (
-                <a key={n.id} href={`/learn/${n.slug}`} className="card card-pad" style={{ textDecoration: "none", color: "inherit", border: "2px solid var(--lane)" }}>
-                  <strong>
-                    <span style={{ color: "var(--lane)" }}>{n.code}</span> {n.title}
-                  </strong>
-                  <div className="tiny muted">
-                    {n.durationLabel} · {n.level} {n.status === "legacy" ? "· legacy" : ""}
-                  </div>
-                </a>
-              ))}
-            </div>
-          )}
-        </div>
+        <PathwayDiagram vm={vm} headingLevel={2} />
       </div>
     </PublicPage>
   );
@@ -740,6 +908,7 @@ export function PricingView({ viewer, plans }: { viewer: Viewer; plans: ReturnTy
             12 months of Plus monthly costs {money(plans.plusMonthly * 12, plans.currency)}. Annual costs {money(plans.plusAnnual, plans.currency)}
             {plans.annualSavings > 0 ? ` — ${money(plans.annualSavings, plans.currency)} less.` : "."}
           </p>
+          <PricingCalculator plusMonthly={plans.plusMonthly} plusAnnual={plans.plusAnnual} currency={plans.currency} trialDays={plans.trialDays} refundDays={plans.refundDays} />
         </div>
       </div>
     </PublicPage>
@@ -1115,10 +1284,11 @@ export function SignupView({ next, error }: { next?: string; error?: string }) {
 
 /* ======================= Checkout (sandbox) ======================= */
 
-export function CheckoutView({ viewer, vm }: { viewer: Viewer; vm: NonNullable<ReturnType<typeof checkoutVM>> }) {
+export function CheckoutView({ viewer, vm, flash = {} }: { viewer: Viewer; vm: NonNullable<ReturnType<typeof checkoutVM>>; flash?: FlashProps }) {
   const { cs, product } = vm;
   const title = cs.plan === "plus_monthly" ? "Scholarion Plus — monthly" : cs.plan === "plus_annual" ? "Scholarion Plus — annual" : product?.title ?? "Purchase";
-  const dueToday = cs.trialEndsAt ? 0 : cs.installmentAmount ?? cs.amount;
+  const firstPayment = cs.trialEndsAt ? 0 : cs.installmentAmount ?? cs.amount;
+  const dueToday = cs.dueToday ?? firstPayment;
   return (
     <PublicPage viewer={viewer}>
       <div className="container section" style={{ maxWidth: 760 }}>
@@ -1126,6 +1296,7 @@ export function CheckoutView({ viewer, vm }: { viewer: Viewer; vm: NonNullable<R
           <strong>Sandbox checkout.</strong> No card is collected and nothing is charged. In staging this page hands off to a PCI-compliant processor's hosted checkout.
         </div>
         <h1 className="page-title">Review and confirm</h1>
+        <Flash {...flash} />
         <div className="card card-pad">
           <table className="table">
             <tbody>
@@ -1133,6 +1304,15 @@ export function CheckoutView({ viewer, vm }: { viewer: Viewer; vm: NonNullable<R
                 <th scope="row">Plan</th>
                 <td>{title}</td>
               </tr>
+              {cs.aidDiscountPercent && cs.listAmount !== undefined && (
+                <tr>
+                  <th scope="row">Financial aid</th>
+                  <td>
+                    Approved: <strong>{cs.aidDiscountPercent}% off</strong>. List price {money(cs.listAmount, cs.currency)}
+                    {cs.plan === "program_monthly" ? "/month" : ""}; your price is below{cs.plan === "program_monthly" ? " for every monthly payment" : ""}.
+                  </td>
+                </tr>
+              )}
               <tr>
                 <th scope="row">Price</th>
                 <td className="mono">
@@ -1170,9 +1350,25 @@ export function CheckoutView({ viewer, vm }: { viewer: Viewer; vm: NonNullable<R
                 <th scope="row">Refunds</th>
                 <td>{cs.refundPolicy}</td>
               </tr>
+              {!!cs.discount && (
+                <tr>
+                  <th scope="row">Code {cs.couponCode}</th>
+                  <td className="mono">
+                    −{money(cs.discount, cs.currency)} ({cs.couponPercent}% off today's payment only)
+                  </td>
+                </tr>
+              )}
               <tr>
                 <th scope="row">Tax</th>
-                <td>Calculated by the tax engine in staging (sandbox: none)</td>
+                <td>
+                  {cs.taxRate ? (
+                    <>
+                      <span className="mono">{money(cs.tax ?? 0, cs.currency)}</span> — simulated {cs.taxRate}% rate for your region ({cs.region ?? "US"}), set by staff in the sandbox
+                    </>
+                  ) : (
+                    `Simulated rate for your region (${cs.region ?? "US"}): 0% — no tax configured in the sandbox`
+                  )}
+                </td>
               </tr>
               <tr>
                 <th scope="row">Due today</th>
@@ -1182,6 +1378,27 @@ export function CheckoutView({ viewer, vm }: { viewer: Viewer; vm: NonNullable<R
               </tr>
             </tbody>
           </table>
+          {vm.canUseCoupon && (
+            <div className="coupon-box">
+              {cs.couponCode ? (
+                <form method="post" action={`/api/v1/commerce/checkout-sessions/${cs.id}/coupon`} className="row">
+                  <span className="small">
+                    Code <strong>{cs.couponCode}</strong> applied.
+                  </span>
+                  <input type="hidden" name="remove" value="1" />
+                  <button className="btn btn-ghost btn-sm">Remove code</button>
+                </form>
+              ) : (
+                <form method="post" action={`/api/v1/commerce/checkout-sessions/${cs.id}/coupon`} className="row" style={{ alignItems: "flex-end" }}>
+                  <div className="field" style={{ margin: 0 }}>
+                    <label htmlFor="coupon">Have a code?</label>
+                    <input id="coupon" name="code" autoComplete="off" style={{ textTransform: "uppercase", width: 200 }} />
+                  </div>
+                  <button className="btn btn-outline btn-sm">Apply</button>
+                </form>
+              )}
+            </div>
+          )}
           <form method="post" action={`/api/v1/commerce/checkout-sessions/${cs.id}/confirm`} style={{ marginTop: 16 }}>
             <button className="btn btn-primary btn-block" disabled={cs.status === "paid"}>
               {cs.status === "paid" ? "Already confirmed" : cs.trialEndsAt ? "Start free trial (sandbox)" : `Pay ${money(dueToday, cs.currency)} (sandbox)`}
@@ -1191,6 +1408,80 @@ export function CheckoutView({ viewer, vm }: { viewer: Viewer; vm: NonNullable<R
             Nothing else is added to your order. By confirming you agree to the renewal terms above.
           </p>
         </div>
+      </div>
+    </PublicPage>
+  );
+}
+
+/* ======================= Educator profile ======================= */
+
+export function EducatorView({ viewer, vm }: { viewer: Viewer; vm: NonNullable<ReturnType<typeof educatorVM>> }) {
+  return (
+    <PublicPage viewer={viewer}>
+      <div className="container section" style={{ paddingTop: 32, maxWidth: 980 }}>
+        <nav className="crumbs" aria-label="Breadcrumb">
+          <a href="/">Home</a> › <a href="/explore">Explore</a> › <span aria-current="page">{vm.name}</span>
+        </nav>
+        <span className="badge badge-blue">Educator</span>
+        <h1 className="page-title" style={{ marginTop: 8 }}>
+          {vm.name}
+        </h1>
+        {vm.bio ? <p className="lede">{vm.bio}</p> : <p className="muted">No biography has been confirmed for this educator yet.</p>}
+        <p className="small muted">
+          In the current catalog: {vm.courses.length} course{vm.courses.length === 1 ? "" : "s"} or guided project{vm.courses.length === 1 ? "" : "s"} · {vm.programs.length} program{vm.programs.length === 1 ? "" : "s"}.
+        </p>
+        {vm.qualifications.length > 0 && (
+          <section style={{ marginTop: 20 }} aria-labelledby="edu-quals">
+            <h2 id="edu-quals" className="section-title">
+              Confirmed qualifications
+            </h2>
+            <ul>
+              {vm.qualifications.map((q) => (
+                <li key={q}>{q}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {vm.courses.length > 0 && (
+          <section style={{ marginTop: 24 }} aria-labelledby="edu-courses">
+            <h2 id="edu-courses" className="section-title">
+              Courses and guided projects
+            </h2>
+            <div className="grid g3" style={{ marginTop: 12 }}>
+              {vm.courses.map((p) => (
+                <ProductCard key={p.id} p={p} />
+              ))}
+            </div>
+          </section>
+        )}
+        {vm.programs.length > 0 && (
+          <section style={{ marginTop: 24 }} aria-labelledby="edu-programs">
+            <h2 id="edu-programs" className="section-title">
+              Programs
+            </h2>
+            <div className="grid g3" style={{ marginTop: 12 }}>
+              {vm.programs.map((p) => (
+                <ProductCard key={p.id} p={p} />
+              ))}
+            </div>
+          </section>
+        )}
+        <section style={{ marginTop: 24 }} aria-labelledby="edu-creds">
+          <h2 id="edu-creds" className="section-title">
+            Credentials awarded through these courses
+          </h2>
+          <p className="small muted">Non-credit professional training credentials, digitally signed and verifiable.</p>
+          <ul className="item-list">
+            {vm.credentials.map((c) => (
+              <li key={c.title} className="li small">
+                <span className="kind">
+                  <Icon name="award" size={16} />
+                </span>
+                <a href={`/learn/${c.productSlug}`}>{c.title}</a> <span className="muted">· {c.kind === "badge" ? "Digital badge" : "Certificate"}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
       </div>
     </PublicPage>
   );

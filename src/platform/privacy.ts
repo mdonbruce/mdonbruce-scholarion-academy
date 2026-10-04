@@ -37,6 +37,10 @@ export const privacy = {
       financialAid: mine(db.aid),
       liveApplications: mine(db.applications),
       liveAttendance: mine(db.attendance),
+      savedForLater: mine(db.saved),
+      videoNotes: mine(db.videoNotes).map((n) => ({ itemId: n.itemId, kind: n.kind, atSec: n.atSec, text: n.text, createdAt: n.createdAt })),
+      refundRequests: mine(db.refundRequests),
+      recommendationsOff: !!u.recommendationsOff,
       organizations: teams.membershipsOf(userId).map((m) => ({ organization: m.org.name, via: m.member.via, joinedAt: m.member.joinedAt })),
       supportTickets: db.tickets.filter((t) => t.userId === userId).map((t) => ({ subject: t.subject, body: t.body, createdAt: t.createdAt, status: t.status })),
       notifications: mine(db.notices).map((n) => ({ title: n.title, createdAt: n.createdAt, readAt: n.readAt ?? null })),
@@ -92,6 +96,8 @@ export const privacy = {
     db.aid = drop(db.aid);
     db.applications = drop(db.applications);
     db.attendance = drop(db.attendance);
+    db.saved = drop(db.saved);
+    db.videoNotes = drop(db.videoNotes);
     for (const s of db.submissions) if (s.userId === userId) {
       s.text = "[deleted]";
       delete s.fileName;

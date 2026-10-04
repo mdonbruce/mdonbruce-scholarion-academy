@@ -248,6 +248,17 @@ STRIDE-style notes per tab. Cross-cutting controls first.
 - Price tampering → fees always read from the catalog; checkout quotes server-side
 - Inquiry spam → per-email rate limit; same-origin forms
 
+## 53. Assessment & Project Studio
+
+- Unreviewed AI text reaching learners → AI DRAFT label, two-person approval, items created unpublished
+- Answer keys leaking → instructor edition, item bank and QTI export are staff-only
+
+## 54. Agentic Cloud Labs
+
+- Arbitrary code execution → learners author a declarative agent spec interpreted by Scholarion's engine; nothing they write is executed
+- Agent overreach → per-tool allow/deny, per-task caps, step and tool-call budgets
+- Grade gaming → hidden test tasks in graded attempts; best-of-two posted automatically
+
 ## 52. Module Library & Catalog Consolidation
 
 - Unapproved refund terms shown to learners → policies display only after product-owner approval

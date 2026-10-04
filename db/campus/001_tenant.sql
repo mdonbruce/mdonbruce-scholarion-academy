@@ -2194,6 +2194,101 @@ CREATE TABLE IF NOT EXISTS catalog_policies (
   state text
 );
 
+-- Assessment draft (tab: assessment-studio)
+CREATE TABLE IF NOT EXISTS assessment_drafts (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  offering_id text,
+  week text,
+  kind text,
+  title text,
+  content jsonb,
+  sme_slots numeric,
+  copy_flags text[],
+  sme_approved_by text,
+  id_approved_by text,
+  state text,
+  published_ref text,
+  published_at timestamptz,
+  course_id text,
+  module_id text
+);
+
+-- Agentic Cloud Lab (tab: agentic-cloud-labs)
+CREATE TABLE IF NOT EXISTS agent_labs (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  title text NOT NULL,
+  "key" text,
+  scenario text,
+  course_id text,
+  assignment_id text,
+  spec jsonb,
+  starter_code text,
+  reference_code text,
+  max_attempts numeric,
+  pass_mark numeric,
+  rubric jsonb,
+  autonomous boolean,
+  state text
+);
+
+-- Agent lab workspace (tab: agentic-cloud-labs)
+CREATE TABLE IF NOT EXISTS agent_workspaces (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  lab_id text,
+  user_id text,
+  files jsonb,
+  versions jsonb,
+  saved_at timestamptz
+);
+
+-- Agent lab run (tab: agentic-cloud-labs)
+CREATE TABLE IF NOT EXISTS agent_lab_runs (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  lab_id text,
+  user_id text,
+  mode text,
+  attempt numeric,
+  code text,
+  score numeric,
+  max numeric,
+  passed boolean,
+  criteria jsonb,
+  task_results jsonb,
+  violations numeric,
+  traces jsonb,
+  autonomous boolean
+);
+
+-- Extra attempt grant (tab: agentic-cloud-labs)
+CREATE TABLE IF NOT EXISTS agent_lab_grants (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  lab_id text,
+  user_id text,
+  extra_attempts numeric,
+  reason text,
+  granted_by text
+);
+
 -- Catalog consolidation report (tab: module-library)
 CREATE TABLE IF NOT EXISTS consolidation_reports (
   id text PRIMARY KEY,

@@ -1843,3 +1843,68 @@ details.acc > div {
 .campus-hub-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
 .campus-hub-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; align-items: end; }
 .campus-rail { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; list-style: none; padding: 0; }
+
+/* ===== Site gaps: theme toggle, facets, guided projects, calculator, notes, My Learning, commerce admin ===== */
+.theme-toggle { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: 0.8rem; }
+.theme-toggle .theme-label { font-weight: 600; margin-right: 2px; }
+.theme-toggle.compact .theme-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.theme-btn { min-height: 26px; min-width: 26px; padding: 2px 8px; border: 1px solid currentColor; border-radius: 999px; background: transparent; color: inherit; font: inherit; cursor: pointer; line-height: 1.2; }
+.theme-btn[aria-pressed="true"] { font-weight: 700; box-shadow: inset 0 0 0 1px currentColor; text-decoration: underline; text-underline-offset: 2px; }
+.theme-btn[aria-pressed="true"]::before { content: "✓ "; }
+.theme-btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.utility .theme-toggle, .site-footer .theme-toggle { color: #dbe4fb; }
+.topbar .theme-toggle { color: var(--text-2); }
+@media (max-width: 640px) { .topbar .theme-toggle { display: none; } .utility .theme-toggle { font-size: 0.72rem; } }
+
+.on-dark-link { color: #fff; text-decoration: underline; text-underline-offset: 2px; }
+.on-dark-link:hover { color: #fbf1da; }
+
+.guided .gp-steps { margin: 0; padding-left: 22px; }
+.guided .gp-steps li { margin-bottom: 4px; }
+.lab-preview { margin: 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 12px; }
+.lab-preview figcaption { margin-bottom: 10px; }
+.lab-split { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 10px; }
+.lab-pane { border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 10px; background: var(--surface-2); }
+.lab-pane-code { background: #0d1530; color: #dbe4ff; border-color: #0d1530; }
+.lab-pane-code .small, .lab-pane-code li { color: #dbe4ff; }
+.lab-pane-head { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+@media (max-width: 720px) { .lab-split { grid-template-columns: 1fr; } }
+.gp-facts { margin: 0; }
+.gp-facts dd { margin: 4px 0 0; font-weight: 600; }
+
+.calc { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px; }
+.calc-table th { text-align: left; width: 34%; }
+.calc-result { font-weight: 700; margin: 10px 0 6px; }
+
+.coupon-box { margin-top: 14px; padding: 12px; border: 1px dashed var(--border-strong); border-radius: var(--radius-sm); }
+
+.video-notes .vn-title { font-family: var(--font-sans); font-size: 1.05rem; margin: 0 0 4px; }
+.video-notes textarea { width: 100%; }
+.vn-list { list-style: none; margin: 0; padding: 0; }
+.vn-list li { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.vn-kind { border: 1px solid var(--border-strong); border-radius: 999px; padding: 0 8px; color: var(--text-2); }
+.vn-text { flex: 1; min-width: 160px; overflow-wrap: anywhere; }
+
+.ml-h, .ca-h { font-family: var(--font-sans); font-size: 1.15rem; margin: 0 0 10px; }
+.plan-change { margin-top: 8px; width: 100%; }
+.label-like { display: block; font-weight: 600; font-size: 0.9rem; }
+
+.mind-map ul { list-style: none; margin: 0; padding-left: 18px; border-left: 2px solid var(--border-strong); }
+.mind-map > ul { padding-left: 0; border-left: 0; }
+.mind-map li { margin: 4px 0; }
+.mind-map .mm-root { font-weight: 800; }
+.mind-map .mm-branch { font-weight: 700; }
+.mind-map .mm-leaf::before { content: "– "; color: var(--text-3); }
+.audio-script { margin: 0; padding-left: 20px; }
+.audio-script li { margin-bottom: 4px; }
+.studio-preview { max-height: 320px; overflow: auto; background: var(--surface-2); padding: 10px; border-radius: 6px; }
+
+:root[data-contrast="high"] .theme-btn, :root[data-contrast="high"] .vn-kind { border-width: 2px; }
+:root[data-contrast="high"] a { text-decoration: underline; }
+
+/* Assessment Studio and Agentic Cloud Labs */
+.campus-sme { background: var(--warn-bg, #fff4e0); border-radius: 4px; padding: 0 3px; }
+.draft-label { display: inline-block; border: 1px solid currentColor; border-radius: 999px; padding: 1px 10px; font-size: 0.8rem; font-weight: 600; color: var(--text-2); }
+.campus-trace { padding-left: 1.2em; }
+.campus-trace li { margin: 2px 0; }
+.campus-agentlab textarea.mono, .campus-agentlab pre.mono, textarea.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.85rem; width: 100%; }

@@ -5,6 +5,10 @@ import { isLocale, LOCALE_COOKIE, localeFromAcceptLanguage } from "@/i18n";
 import "@/ui/styles/globals.css";
 import { PwaRegister } from "@/ui/components/client/PwaRegister";
 
+// Per-viewer display choice (set by the ThemeToggle); read here so the first paint matches.
+const THEME_COOKIE = "sch_theme";
+const CONTRAST_COOKIE = "sch_contrast";
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.SCHOLARION_PUBLIC_URL ?? "http://localhost:3000"),
   title: { default: "Scholarion Academy — Learn. Earn. Build Your Future.", template: "%s · Scholarion Academy" },
@@ -26,8 +30,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const [jar, h] = await Promise.all([cookies(), headers()]);
   const c = jar.get(LOCALE_COOKIE)?.value;
   const lang = isLocale(c) ? c : localeFromAcceptLanguage(h.get("accept-language"));
+  const theme = jar.get(THEME_COOKIE)?.value;
+  const contrast = jar.get(CONTRAST_COOKIE)?.value;
   return (
-    <html lang={lang}>
+    <html lang={lang} data-theme={theme === "light" || theme === "dark" ? theme : undefined} data-contrast={contrast === "high" ? "high" : undefined}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />

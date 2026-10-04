@@ -12,6 +12,7 @@ const PRIMARY: [string, string][] = [
   ["dashboard", "Dashboard"],
   ["courses", "Courses"],
   ["calendar", "Calendar"],
+  ["agent-labs", "Agentic Cloud Labs"],
   ["inbox", "Inbox"],
   ["notifications", "Notifications"],
   ["search", "Search"],

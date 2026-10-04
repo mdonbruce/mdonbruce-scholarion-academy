@@ -1,6 +1,6 @@
 import "../index";
 import { broker, CampusError, log, metrics, nowIso, relay, resolveTenant, token, type Row, type TenantContext, type TenantStore } from "../core";
-import { actorFor, cookieName, effectiveRoles, resolveSession, sessionRow, signIn, signOut, type Actor } from "../iam";
+import { actorFor, cookieName, effectiveRoles, hasAny, resolveSession, sessionRow, signIn, signOut, type Actor } from "../iam";
 import { actorHas } from "../permissions";
 import * as entity from "../entity";
 import { ENTITY, TABS } from "../registry";
@@ -15,6 +15,8 @@ import { exportCourse } from "../services/content";
 import { submit } from "../services/assessment";
 import { verifyCredential } from "../services/success";
 import { brochurePdf } from "../services/programs";
+import { simLabFileName, simLabHtml } from "../services/simlab";
+import { draftView, qtiXml } from "../services/assess";
 import { redeemQrLogin, startMasquerade, stopMasquerade, activeGlobalAnnouncements } from "../services/admin";
 import { resolveApiToken, rateLimit, refreshToken, exchangeCode, scopeAllows } from "../services/integration";
 import * as lti from "../services/lti";
@@ -327,6 +329,23 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     const ids = [...url.searchParams.getAll("ids[]"), ...(url.searchParams.get("ids")?.split(",") ?? [])].filter(Boolean).slice(0, 200);
     if (!ids.length) throw new CampusError("invalid", "Choose files to download.", 422);
     return new Response(new Uint8Array(zipFiles(store, a, ids)), { status: 200, headers: { "content-type": "application/zip", "content-disposition": 'attachment; filename="files.zip"', "cache-control": "no-store" } });
+  }
+  // Simulated Module labs as downloadable/viewable HTML (instructor edition is staff-only).
+  if (rest[0] === "sim-labs" && rest[1] && rest[2] && method === "GET") {
+    const edition = rest[2].replace(/\.html$/, "") as "student" | "instructor" | "app";
+    if (!["student", "instructor", "app"].includes(edition)) throw new CampusError("not_found", "Unknown edition", 404);
+    const teaches = Object.values(a.courseRoles ?? {}).some((r) => r.includes("instructor") || r.includes("ta"));
+    if (edition === "instructor" && !teaches && !hasAny(a, ["admin", "designer"])) throw new CampusError("forbidden", "The instructor edition contains answer keys and is for course staff.", 403);
+    const module = url.searchParams.get("module") ?? "";
+    const html = simLabHtml(rest[1], edition, { module, program: url.searchParams.get("program") ?? undefined });
+    const name = simLabFileName(rest[1], edition, module);
+    return new Response(html, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "content-disposition": `${url.searchParams.get("download") ? "attachment" : "inline"}; filename="${name}"`, "cache-control": "no-store", "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'", "x-content-type-options": "nosniff" } });
+  }
+  if (rest[0] === "assess" && rest[1] && (rest[2] === "qti.xml" || rest[2] === "item-bank.json") && method === "GET") {
+    if (rest[2] === "qti.xml") return new Response(qtiXml(store, a, rest[1]), { status: 200, headers: { "content-type": "application/xml; charset=utf-8", "content-disposition": `attachment; filename="${rest[1]}-qti21.xml"`, "cache-control": "no-store" } });
+    const v = draftView(store, a, rest[1], "instructor");
+    if (!v.bank) throw new CampusError("not_found", "This draft has no item bank.", 404);
+    return new Response(JSON.stringify(v.bank, null, 2), { status: 200, headers: { "content-type": "application/json; charset=utf-8", "content-disposition": `attachment; filename="${rest[1]}-item-bank.json"`, "cache-control": "no-store" } });
   }
   if (rest[0] === "courses" && rest[2] === "export" && method === "GET") {
     const bytes = exportCourse(store, a, rest[1]);

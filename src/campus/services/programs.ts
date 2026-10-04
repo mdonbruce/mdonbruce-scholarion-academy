@@ -4,6 +4,7 @@ import { addPublishCheck } from "../entity";
 import { createUser, hasAny, type Actor } from "../iam";
 import { PROGRAMS, P26_QUIZ, TRADEMARK_NOTICE, type ProgramSpec, type QuizItem, type WeekSpec } from "../academy/programs-data";
 import { LEARNING_PATHS, LIBRARY, P15_CHECKS, PROGRAMS_2, type LibraryModule } from "../academy/programs-data-2";
+import { PROGRAMS_3 } from "../academy/programs-data-3";
 import { DECIDED_BY, DECISIONS, decisionIso } from "../academy/decisions";
 import { audit, notify, requireTenant } from "./common";
 import { copyCheck } from "./claims";
@@ -453,7 +454,7 @@ export function ensurePrograms(store: TenantStore) {
   ensureLibrary(store);
   ensurePolicies(store);
   const x: Ctx = { store, slug: t.slug, root, staff: [lead.id, ...instructors], pos: 0 };
-  const all = [...PROGRAMS, ...PROGRAMS_2];
+  const all = [...PROGRAMS, ...PROGRAMS_2, ...PROGRAMS_3];
   for (const spec of all) loadProgram(x, spec);
   // Waivers and transfer rules recorded in the consolidation table.
   for (const spec of all) {

@@ -115,7 +115,7 @@ export const authoring = {
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   },
 
-  createCourse(userId: string, input: { title: string; tagline?: string; level?: string; description?: string; skills?: string }): Product {
+  createCourse(userId: string, input: { title: string; tagline?: string; level?: string; description?: string; skills?: string; plusEligible?: boolean }): Product {
     if (!isInstructor(userId)) throw new PlatformError("forbidden", "Only instructors can create courses.", 403);
     const title = input.title.trim();
     if (title.length < 4) throw new PlatformError("title_required", "Give the course a title of at least 4 characters.");
@@ -136,7 +136,8 @@ export const authoring = {
       roles: [],
       whatYoullLearn: [],
       freeToAudit: true,
-      plusEligible: true,
+      // Included in Scholarion Plus unless the author turns it off (toggle in Course details).
+      plusEligible: input.plusEligible ?? true,
       format: "self_paced",
       status: "draft",
       courseIds: [],
@@ -168,6 +169,7 @@ export const authoring = {
     if (f.roles !== undefined) p.roles = f.roles.split(",").map((s) => s.trim()).filter(Boolean);
     if (f.whatYoullLearn !== undefined) p.whatYoullLearn = lines(f.whatYoullLearn);
     if (f.freeToAudit !== undefined) p.freeToAudit = f.freeToAudit === "on" || f.freeToAudit === "true";
+    if (f.plusEligible !== undefined) p.plusEligible = f.plusEligible === "on" || f.plusEligible === "true";
     if (p.review?.state === "changes_requested") {
       /* keep the note visible until resubmitted */
     }

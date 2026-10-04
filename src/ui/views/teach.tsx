@@ -178,6 +178,22 @@ export function TeachCourseView({ viewer, vm, flash }: { viewer: V; vm: NonNulla
                     <input id="c-skills" name="skills" defaultValue={p.skills.join(", ")} />
                   </div>
                 </div>
+                <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
+                  <legend className="small" style={{ fontWeight: 700 }}>
+                    Access
+                  </legend>
+                  <input type="hidden" name="freeToAudit" value="false" />
+                  <label className="check small">
+                    <input type="checkbox" name="freeToAudit" defaultChecked={p.freeToAudit} /> Free to audit (videos and readings at no cost)
+                  </label>
+                  <input type="hidden" name="plusEligible" value="false" />
+                  <label className="check small">
+                    <input type="checkbox" name="plusEligible" defaultChecked={p.plusEligible} /> Included in Scholarion Plus
+                  </label>
+                  <p className="hint tiny" style={{ margin: "4px 0 0" }}>
+                    Off: Plus subscribers need to buy this course separately. Existing purchases are not affected.
+                  </p>
+                </fieldset>
                 <div>
                   <button className="btn btn-primary btn-sm">Save details</button>
                 </div>

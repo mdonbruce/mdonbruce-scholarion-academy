@@ -5,6 +5,7 @@ import { ensureAgents, ensureStandardTemplate } from "./services/ai";
 import { ensureProctorDefaults } from "./services/proctor";
 import { ensurePrograms } from "./services/programs";
 import { ensureConsolidationDecision } from "./services/hub";
+import { ensureAgentLabs } from "./services/agentlabs";
 import { ensureCloudLabTool } from "./services/lti";
 import { issueCredential, rebuildIndex, recomputeSignals } from "./services/success";
 import { setGrade } from "./services/grading";
@@ -389,7 +390,6 @@ function seedAcademy(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
   const o1 = store.insert("offerings", { id: `off_${t.slug}_1r`, code: "#1-R", title: "Python & Tooling Refresher", productType: "short_course", currency: "USD", aidEligible: false, state: "published", format: "online", courseId: c1.id, summary: "Python basics, data structures, notebooks and Git for AI work — the optional Week 0 of Program #1, also available on its own.", level: "beginner", hours: 15, skills: ["python", "notebooks"], price: 49, inPlus: true, selfPaced: true }, "off");
   const o32 = off("#37.2", "Supervised and Unsupervised Learning", "short_course", { courseId: c32.id, summary: "Train and evaluate supervised models, and explain their limits in a capstone report.", level: "intermediate", hours: 20, skills: ["python", "ml", "evaluation"], moduleKeys: ["ml-m1", "ml-m2", "ml-m3"], price: 129, inPlus: true, selfPaced: true, credentialTemplateId: tpl.id });
   const o15 = off("#18", "Certificate in Artificial Intelligence with Python (TensorFlow & PyTorch)", "cohort_program", { courseId: c15.id, summary: "Neural networks and PyTorch with live sessions and graded labs.", level: "intermediate", hours: 30, skills: ["deep-learning", "pytorch", "ml"], moduleKeys: ["dl-m1", "dl-m2"], price: 399, earlyBirdPrice: 349, earlyBirdEndsAt: iso(14), format: "live" });
-  off("#5", "Prompting and Evaluation Guided Project", "guided_project", { summary: "A two-hour project: write prompts and measure their quality.", level: "beginner", hours: 2, skills: ["agents", "evaluation"], price: 19, inPlus: true, selfPaced: true });
   store.insert("offering_sections", { offeringId: o15.id, code: "DL-OCT", startsAt: iso(10, 15), endsAt: iso(52, 15), timeZone: "Africa/Lagos", capacity: 20, registrationClosesAt: iso(8, 23), schedule: "Tue/Thu 16:00–18:00 WAT", seatsTaken: 0 }, "osec");
   store.insert("offering_sections", { offeringId: o15.id, code: "DL-JAN", startsAt: iso(95, 15), endsAt: iso(137, 15), timeZone: "Africa/Lagos", capacity: 2, registrationClosesAt: iso(90, 23), schedule: "Sat 10:00–14:00 WAT", seatsTaken: 0 }, "osec");
   for (const [from, to, kind, moduleKey] of [[o32, o15, "waives", "p18-w5"]] as const) store.insert("pathway_edges", { fromId: from.id, toId: to.id, kind, moduleKey }, "pe");
@@ -400,6 +400,7 @@ function seedAcademy(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
   store.insert("global_announcements", { title: "Staging environment", body: "Demonstration site with fictional data. Payments are sandbox only.", roles: [], startsAt: iso(-30), endsAt: iso(365), dismissedBy: [] }, "gan");
   ensurePrograms(store);
   ensureConsolidationDecision(store);
+  ensureAgentLabs(store);
   ensureAgents(store);
   ensureProctorDefaults(store);
   ensureStandardTemplate(store);

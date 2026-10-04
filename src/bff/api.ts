@@ -1,7 +1,8 @@
 import QR from "./qr";
 import { isLocale, LOCALE_COOKIE, REGION_COOKIE } from "@/i18n";
-import { isRegion } from "@/platform/pricing";
+import { formatMoney, isRegion } from "@/platform/pricing";
 import { certificatePdf } from "./certificate-pdf";
+import { invoicePdf } from "./invoice-pdf";
 import {
   capabilities,
   catalog,
@@ -26,12 +27,16 @@ import {
   teams,
   tickAll,
   tutor,
+  library,
+  recommend,
   type Action,
   type PlanCode,
   type TutorMode,
   type User,
 } from "@/platform";
 import { DAY, PlatformError } from "@/platform/util";
+import { DURATION_BUCKETS, type DurationBucket } from "@/platform/catalog";
+import type { PlanChangeTarget } from "@/platform/commerce";
 import { body, currentUser, errorResponse, json, mfaCookie, prefCookie, readCookie, MFA_COOKIE, redirect, redirectWithCookies, safeRedirect, sameOrigin, sessionCookie, withQuery } from "./http";
 
 /**
@@ -156,11 +161,33 @@ on(
   "POST",
   "me/onboarding",
   (c) => {
-    identity.saveOnboarding(c.user!.id, { goal: c.data.goal ?? "", level: c.data.level ?? "Beginner", topics: (c.data.topics ?? "").split(",").map((t) => t.trim()).filter(Boolean), hoursPerWeek: Number(c.data.hoursPerWeek) || 5 });
-    return redirect("/app");
+    const roles = catalog.roles();
+    const role = roles.includes(c.data.role ?? "") ? c.data.role : undefined;
+    const hours = Math.min(40, Math.max(1, Math.round(Number(c.data.hoursPerWeek) || 5)));
+    identity.saveOnboarding(c.user!.id, { goal: (c.data.goal ?? "").slice(0, 80), level: ["Beginner", "Intermediate", "Advanced"].includes(c.data.level ?? "") ? c.data.level! : "Beginner", role, topics: (c.data.topics ?? "").split(",").map((t) => t.trim().slice(0, 40)).filter(Boolean).slice(0, 10), hoursPerWeek: hours });
+    if (c.data.recommendations !== undefined) recommend.setEnabled(c.user!.id, c.data.recommendations === "on" || c.data.recommendations === "true");
+    return redirect(withQuery("/app", { notice: "Thanks — your recommendations now use your answers." }));
   },
   "user",
 );
+
+on("POST", "me/recommendations", (c) => {
+  const on = c.data.enabled === "on" || c.data.enabled === "true";
+  recommend.setEnabled(c.user!.id, on);
+  return redirect(withQuery(back(c, "/app/account"), { notice: on ? "Personalised recommendations are on." : "Personalised recommendations are off. We won't suggest programs based on your answers or enrollments." }));
+}, "user");
+
+/* ---------------- My Learning: saved & completed ---------------- */
+
+on("GET", "me/learning", (c) => json({ saved: library.saved(c.user!.id).map((s) => ({ slug: s.product.slug, title: s.product.title, savedAt: s.savedAt })), completed: library.completed(c.user!.id).map((x) => ({ slug: x.product.slug, title: x.product.title, completedAt: x.completedAt, credentialId: x.credentialId })) }), "user");
+on("POST", "me/saved", (c) => {
+  const p = library.save(c.user!.id, c.data.productId ?? "");
+  return c.data.redirect || c.data.back ? redirect(withQuery(back(c, `/learn/${p.slug}`), { notice: `Saved. Find ${p.title} in My Learning.` })) : json({ saved: true });
+}, "user");
+on("POST", "me/saved/:productId/remove", (c) => {
+  library.unsave(c.user!.id, c.params.productId);
+  return c.data.redirect || c.data.back ? redirect(withQuery(back(c, "/app/courses"), { notice: "Removed from your saved list." })) : json({ saved: false });
+}, "user");
 
 /* ---------------- Catalog ---------------- */
 
@@ -176,9 +203,18 @@ on("GET", "catalog/products", (c) => {
       freeToAudit: u.searchParams.get("free") === "1",
       plusEligible: u.searchParams.get("plus") === "1",
       format: (u.searchParams.get("format") as "live" | "self_paced") || undefined,
+      language: u.searchParams.get("language") || undefined,
+      skills: list("skill"),
+      duration: list("duration").filter((d): d is DurationBucket => d in DURATION_BUCKETS),
+      subtitles: list("subtitles"),
       sort: (u.searchParams.get("sort") as never) || undefined,
     }),
   );
+});
+on("GET", "catalog/educators/:slug", (c) => {
+  const e = catalog.educator(c.params.slug);
+  if (!e) throw new PlatformError("not_found", "Educator not found", 404);
+  return json({ name: e.name, slug: e.slug, bio: e.bio, qualifications: e.qualifications, credentials: e.credentials, products: e.products.map((p) => ({ slug: p.slug, title: p.title, type: p.type })) });
 });
 on("GET", "catalog/suggest", (c) => json({ suggestions: catalog.suggest(new URL(c.req.url).searchParams.get("q") ?? "") }));
 on("GET", "catalog/products/:slug", (c) => {
@@ -242,6 +278,15 @@ on(
   },
   "user",
 );
+on("GET", "lms/items/:id/notes", (c) => json({ notes: library.notes(c.user!.id, c.params.id) }), "user");
+on("POST", "lms/items/:id/notes", (c) => {
+  const n = library.addNote(c.user!.id, c.params.id, { atSec: Number(c.data.atSec), text: c.data.text, kind: c.data.kind });
+  return c.data.redirect ? redirect(withQuery(back(c, "/app"), { notice: n.kind === "bookmark" ? "Bookmark added." : "Note saved." })) : json({ note: n });
+}, "user");
+on("POST", "lms/notes/:id/delete", (c) => {
+  library.deleteNote(c.user!.id, c.params.id);
+  return c.data.redirect ? redirect(withQuery(back(c, "/app"), { notice: "Deleted." })) : json({ ok: true });
+}, "user");
 on("GET", "lms/courses/:id/gradebook", (c) => json(lms.gradebook(c.user!.id, c.params.id)), "user");
 on("GET", "lms/me/dashboard", (c) => json(lms.dashboard(c.user!.id)), "user");
 
@@ -260,6 +305,18 @@ on(
   },
   "user",
 );
+/** Guided project "Launch": opens the Cloud Lab for entitled learners (enrolls them on first launch). */
+on("POST", "labs/launch", (c) => {
+  const product = catalog.get(c.data.productId ?? "");
+  if (!product) throw new PlatformError("not_found", "Project not found", 404);
+  const item = catalog.items(product.id).find((i) => i.kind === "lab");
+  if (!item) throw new PlatformError("not_found", "This project has no lab.", 404);
+  const d = entitlements.check(c.user!.id, "lab.launch", product.id);
+  if (!d.allow) return redirect(withQuery(`/learn/${product.slug}`, { enroll: "1", error: "Choose an access option to launch the Cloud Lab." }));
+  if (!lms.enrollment(c.user!.id, item.courseId)) lms.enroll(c.user!.id, product.id, "full");
+  cloudlab.launch(c.user!.id, item.id);
+  return redirect(withQuery(`/app/course/${item.courseId}/item/${item.id}`, { notice: "Cloud Lab workspace ready. Your work saves as you go." }));
+}, "user");
 on("PUT", "labs/sessions/:id", (c) => json({ ok: !!cloudlab.saveCode(c.params.id, c.user!.id, c.data.code ?? "") }), "user");
 on("POST", "labs/sessions/:id/run", (c) => json(cloudlab.run(c.params.id, c.user!.id, c.data.code)), "user");
 on("POST", "labs/sessions/:id/grade", (c) => json(cloudlab.grade(c.params.id, c.user!.id, c.data.code)), "user");
@@ -313,6 +370,40 @@ on(
   },
   "user",
 );
+on("POST", "commerce/checkout-sessions/:id/coupon", (c) => {
+  try {
+    if (c.data.remove === "1") commerce.removeCoupon(c.params.id, c.user!.id);
+    else commerce.applyCoupon(c.params.id, c.user!.id, c.data.code ?? "");
+  } catch (err) {
+    if (err instanceof PlatformError) return redirect(withQuery(`/checkout/${c.params.id}`, { error: err.message }));
+    throw err;
+  }
+  return redirect(withQuery(`/checkout/${c.params.id}`, { notice: c.data.remove === "1" ? "Code removed." : "Code applied to today's payment (sandbox)." }));
+}, "user");
+const CHANGE_TARGETS: PlanChangeTarget[] = ["plus_monthly", "program_monthly", "plus_annual"];
+on("GET", "commerce/subscriptions/:id/quote", (c) => {
+  const to = new URL(c.req.url).searchParams.get("to") as PlanChangeTarget;
+  if (!CHANGE_TARGETS.includes(to)) throw new PlatformError("invalid_plan", "Choose a plan.");
+  return json({ quote: commerce.quoteChange(c.params.id, c.user!.id, to) });
+}, "user");
+on("POST", "commerce/subscriptions/:id/change", (c) => {
+  const to = c.data.to as PlanChangeTarget;
+  if (!CHANGE_TARGETS.includes(to)) throw new PlatformError("invalid_plan", "Choose a plan.");
+  const { subscription, quote } = commerce.changePlan(c.params.id, c.user!.id, to, c.data.productId || null);
+  if (subscription.productId) lms.enroll(c.user!.id, subscription.productId, "full");
+  return redirect(withQuery("/app/account", { notice: `Plan changed (sandbox). Charged today: ${formatMoney(quote.chargeToday, quote.currency)}${quote.creditToNextBill ? `; ${formatMoney(quote.creditToNextBill, quote.currency)} credit on your next bill` : ""}. The invoice is under Receipts.` }));
+}, "user");
+on("GET", "commerce/orders/:id/invoice", async (c) => {
+  const order = getDb().orders.find((o) => o.id === c.params.id);
+  if (!order || (order.userId !== c.user!.id && !identity.hasRole(c.user!, "support_agent", "platform_admin"))) throw new PlatformError("not_found", "Order not found", 404);
+  const buyer = identity.getUser(order.userId);
+  const pdf = await invoicePdf({ order, buyerName: buyer?.name ?? "Learner", buyerEmail: buyer?.email ?? "" });
+  return new Response(new Uint8Array(pdf), { headers: { "content-type": "application/pdf", "content-disposition": `attachment; filename="scholarion-receipt-${order.id}.pdf"`, "cache-control": "private, no-store" } });
+}, "user");
+on("POST", "commerce/orders/:id/refund", (c) => {
+  commerce.requestOrderRefund(c.params.id, c.user!.id, c.data.reason ?? "");
+  return redirect(withQuery("/app/account", { notice: "Refund request sent. A person reviews it and we'll email you the decision." }));
+}, "user");
 on(
   "POST",
   "commerce/subscriptions/:id/:action",
@@ -631,10 +722,25 @@ on(
     const days = Math.max(0, Math.min(400, Number(c.data.days) || 0));
     getDb().clockOffsetMs += days * DAY;
     const r = tickAll();
-    return redirect(withQuery("/admin", { notice: `Sandbox clock +${days} days. Reminders ${r.commerce.reminders}, conversions ${r.commerce.converted}, renewals ${r.commerce.renewed}, expiries ${r.commerce.expired}, deadline notices ${r.lms}, live reminders ${r.live}.` }));
+    return redirect(withQuery("/admin", { notice: `Sandbox clock +${days} days. Reminders ${r.commerce.reminders}, renewal notices ${r.commerce.renewalNotices}, conversions ${r.commerce.converted}, renewals ${r.commerce.renewed}, expiries ${r.commerce.expired}, deadline notices ${r.lms}, live reminders ${r.live}.` }));
   },
   "admin",
 );
+/* ---------------- Commerce admin (sandbox; platform admins) ---------------- */
+
+const CA = "/admin/commerce";
+on("POST", "admin/commerce/settings", (c) => (commerce.updateSettings(c.user!.id, c.data), redirect(withQuery(CA, { notice: "Sandbox price book and billing settings saved. New checkouts use them." }))), "admin");
+on("POST", "admin/commerce/coupons", (c) => {
+  const k = commerce.createCoupon(c.user!.id, { code: c.data.code ?? "", percentOff: Number(c.data.percentOff), expiresInDays: c.data.expiresInDays ? Number(c.data.expiresInDays) : null, maxRedemptions: c.data.maxRedemptions ? Number(c.data.maxRedemptions) : null });
+  return redirect(withQuery(CA, { notice: `Code ${k.code} created (${k.percentOff}% off today's payment).` }) + "#coupons");
+}, "admin");
+on("POST", "admin/commerce/coupons/:code/expire", (c) => (commerce.expireCoupon(c.params.code), redirect(withQuery(CA, { notice: `Code ${c.params.code.toUpperCase()} expired.` }) + "#coupons")), "admin");
+on("POST", "admin/commerce/refunds/:id/:decision", (c) => {
+  const d = c.params.decision === "approve" ? "approved" : c.params.decision === "deny" ? "denied" : null;
+  if (!d) throw new PlatformError("not_found", "Unknown decision", 404);
+  commerce.decideRefund(c.params.id, c.user!.id, d, c.data.note ?? "");
+  return redirect(withQuery(CA, { notice: d === "approved" ? "Refund approved (sandbox). Access from that order has ended and the learner was emailed." : "Refund denied. The learner was emailed." }) + "#refunds");
+}, "admin");
 on("POST", "admin/studio/:id/approve", (c) => (studio.approve(c.params.id, c.user!.id), redirect(withQuery("/admin/studio", { notice: "Published to learners." }))), "staff");
 on("POST", "admin/studio/generate", (c) => (studio.generate(c.data.courseId, Number(c.data.moduleNo)), redirect("/admin/studio")), "staff");
 on(

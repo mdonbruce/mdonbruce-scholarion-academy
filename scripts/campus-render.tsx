@@ -10,7 +10,7 @@ import path from "node:path";
 import type { ReactElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import "../src/campus";
-import { broker, type TenantStore } from "../src/campus/core";
+import { broker, relay, type TenantStore } from "../src/campus/core";
 import { actorFor, type Actor } from "../src/campus/iam";
 import { ensureCampusSeed } from "../src/campus/seed";
 import { TABS } from "../src/campus/registry";
@@ -24,6 +24,10 @@ import { openItem, moduleStates } from "../src/campus/services/curriculum";
 import { proctorAsk, saveReadiness } from "../src/campus/services/proctor";
 import { applyToProgram, programIndex, reviewProgramApplication, selfCheck } from "../src/campus/services/programs";
 import { ProgramIndexView, ProgramPageView } from "../src/campus/ui/views/program";
+import { generateDraft } from "../src/campus/services/assess";
+import { runLab } from "../src/campus/services/agentlabs";
+import { simLabHtml } from "../src/campus/services/simlab";
+import { SIM_SCENARIOS } from "../src/campus/academy/sim-scenarios";
 
 process.env.CAMPUS_LOGS = "0";
 process.env.CLOUDLAB_LOCAL_RUNNER ??= "1";
@@ -199,6 +203,27 @@ page("demo", "student1", "calendar?view=week", "Calendar — week");
   save("academy-verify-lookup.html", "Verify a credential", "public", <PublicFrame tenant={t}><VerifyLookupView tenant={t} /></PublicFrame>);
 }
 page("academy", "admin", "t/module-library", "Module Library & Catalog Consolidation");
+{
+  const d = as("academy", "designer");
+  const q = generateDraft(d.store, d.actor, { offeringId: "off_academy_15", week: "3", kind: "quiz", n: 10 });
+  generateDraft(as("academy", "designer").store, d.actor, { offeringId: "off_academy_15", week: "3", kind: "real_world_project" });
+  page("academy", "admin", `t/assessment-studio?program=off_academy_15&draft=${q.id}`, "Assessment & Project Studio — quiz draft");
+  // Learner in the Agentic Cloud Lab with a practice run and a graded attempt.
+  const s4 = as("academy", "student4");
+  checkout(s4.store, s4.actor, { offeringId: "off_academy_32", sandboxCard: "tok_sandbox_visa" });
+  relay(broker.connect({ tenantId: broker.tenant("academy")!.id, slug: "academy", via: "path", traceId: "render" }));
+  const lab = as("academy", "admin").store.list("agent_labs", (l) => l.scenario === "haven-guest-services")[0];
+  runLab(as("academy", "student4").store, as("academy", "student4").actor, lab.id, "practice");
+  const g = runLab(as("academy", "student4").store, as("academy", "student4").actor, lab.id, "graded", String(lab.referenceCode));
+  page("academy", "student4", `agent-labs/${lab.id}?run=${g.runId}`, "Agentic Cloud Lab — workspace and traces");
+  for (const sc of SIM_SCENARIOS) for (const ed of ["student", "instructor", "app"] as const) {
+    const file = `simlab-${sc.key}-${ed}.html`;
+    fs.writeFileSync(path.join(OUT, file), simLabHtml(sc.key, ed, { module: "3" }));
+    index.push({ file, title: `${sc.title} — ${ed === "app" ? "Simulated Application Demo" : ed === "instructor" ? "Instructor Lab" : "Student Lab"}`, who: ed === "instructor" ? "instructor" : "public" });
+  }
+}
+page("academy", "instructor", "t/agentic-cloud-labs", "Agentic Cloud Labs — instructor");
+page("academy", "student1", "agent-labs", "Agentic Cloud Labs — my labs");
 page("academy", "instructor", "courses/crs_academy_p15/modules", "#15 course shell (weekends)");
 page("academy", "instructor", "courses/crs_academy_p32/modules", "#32 self-paced course (modules)");
 page("academy", "instructor", "courses/crs_academy_p26/modules", "#26 course shell (modules)");

@@ -1,6 +1,6 @@
 import { getDb } from "./store";
 import type { Item, Level, Module, PathwayEdge, Product, ProductType, Track } from "./types";
-import { editDistance } from "./util";
+import { editDistance, slugify } from "./util";
 
 /** Catalog & Pathways (Integration Spec §5). Source of truth for every product page and rail. */
 
@@ -26,8 +26,35 @@ export interface SearchFilters {
   format?: "self_paced" | "live";
   track?: Track[];
   language?: string;
+  /** Any of these skills (OR). */
+  skills?: string[];
+  /** Any of these length buckets (see DURATION_BUCKETS). */
+  duration?: DurationBucket[];
+  /** Any of these subtitle languages. */
+  subtitles?: string[];
   sort?: "relevance" | "newest" | "shortest";
 }
+
+export type DurationBucket = "short" | "medium" | "long";
+/** Length buckets by total learning hours. */
+export const DURATION_BUCKETS: Record<DurationBucket, { label: string; test: (hours: number) => boolean }> = {
+  short: { label: "Under 5 hours", test: (h) => h < 5 },
+  medium: { label: "5–40 hours", test: (h) => h >= 5 && h <= 40 },
+  long: { label: "More than 40 hours", test: (h) => h > 40 },
+};
+export function durationBucket(hours: number): DurationBucket {
+  return (Object.keys(DURATION_BUCKETS) as DurationBucket[]).find((k) => DURATION_BUCKETS[k].test(hours)) ?? "long";
+}
+
+/**
+ * Educator profiles. Only confirmed facts go here; a profile without a record shows its
+ * catalog-derived courses and nothing else. Individual instructors are added once confirmed.
+ */
+export const EDUCATOR_PROFILES: Record<string, { bio: string; qualifications?: string[] }> = {
+  "Scholarion Academy": {
+    bio: "Scholarion Academy is the training arm of the Scholarion platform. The courses and programs below are designed, built and maintained by the Scholarion Academy instructional team. Individual instructor profiles are listed here only once they are confirmed.",
+  },
+};
 
 export interface SearchResult {
   items: Product[];
@@ -39,6 +66,10 @@ export interface SearchResult {
     track: Record<string, number>;
     freeToAudit: number;
     plusEligible: number;
+    skills: Record<string, number>;
+    duration: Record<string, number>;
+    subtitles: Record<string, number>;
+    language: Record<string, number>;
   };
   expandedTerms: string[];
   didYouMean?: string;
@@ -127,6 +158,9 @@ export const catalog = {
       if (f.format && p.format !== f.format) return false;
       if (f.track?.length && (!p.track || !f.track.includes(p.track))) return false;
       if (f.language && p.language !== f.language) return false;
+      if (f.skills?.length && !p.skills.some((s) => f.skills!.includes(s))) return false;
+      if (f.duration?.length && !f.duration.includes(durationBucket(p.hours))) return false;
+      if (f.subtitles?.length && !p.subtitles.some((s) => f.subtitles!.includes(s))) return false;
       return true;
     });
 
@@ -134,12 +168,13 @@ export const catalog = {
     else if (f.sort === "shortest") scored.sort((a, b) => a.p.hours - b.p.hours);
     else scored.sort((a, b) => b.s - a.s || a.p.title.localeCompare(b.p.title));
 
-    const count = (key: (p: Product) => string | undefined) =>
+    const count = (key: (p: Product) => string | string[] | undefined) =>
       facetBase.reduce<Record<string, number>>((acc, p) => {
         const k = key(p);
-        if (k) acc[k] = (acc[k] ?? 0) + 1;
+        for (const v of Array.isArray(k) ? [...new Set(k)] : k ? [k] : []) acc[v] = (acc[v] ?? 0) + 1;
         return acc;
       }, {});
+    const byCount = (r: Record<string, number>) => Object.fromEntries(Object.entries(r).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])));
 
     let didYouMean: string | undefined;
     if (raw.length && scored.length === 0) {
@@ -168,6 +203,10 @@ export const catalog = {
         track: count((p) => p.track),
         freeToAudit: facetBase.filter((p) => p.freeToAudit).length,
         plusEligible: facetBase.filter((p) => p.plusEligible).length,
+        skills: byCount(count((p) => p.skills)),
+        duration: Object.fromEntries((Object.keys(DURATION_BUCKETS) as DurationBucket[]).map((b) => [b, facetBase.filter((p) => durationBucket(p.hours) === b).length]).filter(([, n]) => n)),
+        subtitles: byCount(count((p) => p.subtitles)),
+        language: byCount(count((p) => p.language)),
       },
       expandedTerms: terms.filter((t) => !raw.includes(t)),
       didYouMean,
@@ -253,6 +292,25 @@ export const catalog = {
     const weeks = Math.max(1, Math.ceil(p.hours / hoursPerWeek));
     if (weeks < 6) return `~${weeks} weeks at ${hoursPerWeek} hrs/week`;
     return `~${Math.round(weeks / 4.3)} months at ${hoursPerWeek} hrs/week`;
+  },
+
+  /** Educators derived from the catalog (product.educator), with their published products. */
+  educators(): { slug: string; name: string; products: Product[] }[] {
+    const map = new Map<string, Product[]>();
+    for (const p of this.all()) map.set(p.educator, [...(map.get(p.educator) ?? []), p]);
+    return [...map.entries()].map(([name, products]) => ({ slug: slugify(name), name, products })).sort((a, b) => a.name.localeCompare(b.name));
+  },
+
+  educatorSlug(name: string): string {
+    return slugify(name);
+  },
+
+  educator(slug: string) {
+    const e = this.educators().find((x) => x.slug === slug);
+    if (!e) return undefined;
+    const profile = EDUCATOR_PROFILES[e.name];
+    const credentials = [...new Map(e.products.map((p) => [p.credential.title, { title: p.credential.title, kind: p.credential.kind, productSlug: p.slug }])).values()];
+    return { ...e, bio: profile?.bio ?? null, qualifications: profile?.qualifications ?? [], credentials };
   },
 
   skills(): string[] {
