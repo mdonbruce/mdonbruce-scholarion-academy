@@ -1,4 +1,5 @@
 import { broker } from "../../core";
+import { tickPlans } from "../plans";
 import { ecoTick } from "./discovery";
 
 /**
@@ -17,6 +18,11 @@ export function startEcoScheduler(intervalMs = 60_000) {
     try {
       for (const t of broker.tenants().filter((x) => x.status === "active" && x.kind !== "validation")) {
         const store = broker.connect({ tenantId: t.id, slug: t.slug, via: "path", traceId: "eco-scheduler" });
+        try {
+          tickPlans(store); // subscription reminders, renewals and period ends (sandbox)
+        } catch (e) {
+          console.error(`[plans] ${t.slug}:`, (e as Error).message);
+        }
         if (!store.list("eco_schedules", () => true).length) continue;
         await ecoTick(store, 5).catch((e) => console.error(`[eco-scheduler] ${t.slug}:`, (e as Error).message));
       }

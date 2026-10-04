@@ -167,6 +167,7 @@ export function PublicFrame({ tenant, children }: { tenant: Tenant; children: Re
           <a href={`/campus/${tenant.slug}/catalog`}>Catalog</a>
           <a href={`/campus/${tenant.slug}/programs`}>Programs</a>
           <a href={`/campus/${tenant.slug}/agentic-ai`}>Agentic AI</a>
+          <a href={`/campus/${tenant.slug}/pricing`}>Pricing</a>
           <a href={`/campus/${tenant.slug}/signin`} className="btn btn-primary btn-sm">
             Sign in
           </a>
@@ -178,7 +179,16 @@ export function PublicFrame({ tenant, children }: { tenant: Tenant; children: Re
         </p>
         {children}
       </main>
-      {tenant.flags.powered_by !== false && <footer className="container tiny muted campus-powered">Powered by Scholarion</footer>}
+      <footer className="container tiny campus-public-foot">
+        <nav aria-label="Footer" className="row">
+          <a href={`/campus/${tenant.slug}/pricing`}>Plans and pricing</a>
+          <a href={`/campus/${tenant.slug}/plus`}>Scholaris Plus</a>
+          <a href={`/campus/${tenant.slug}/financial-aid`}>Financial aid</a>
+          <a href={`/campus/${tenant.slug}/verify`}>Verify a credential</a>
+          <a href={`/campus/${tenant.slug}/changelog`}>What changed</a>
+        </nav>
+        {tenant.flags.powered_by !== false && <p className="muted campus-powered">Powered by Scholarion</p>}
+      </footer>
     </div>
   );
 }

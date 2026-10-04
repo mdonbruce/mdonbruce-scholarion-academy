@@ -18,6 +18,7 @@ import { labNotebook } from "../../services/tutor";
 import { ProctorPanel } from "./proctor";
 import { CampaignsPanel } from "./campaigns";
 import { DesignPanel } from "./design";
+import { AidQueuePanel } from "./market";
 import { isDesignProgram } from "../../academy/design";
 import { studioOverview, programIndex } from "../../services/programs";
 import { PARITY, paritySummary, SECTION_TITLES } from "../../parity";
@@ -190,6 +191,8 @@ function Bespoke({ t, tab }: { t: T; tab: string }) {
         return <AssessmentStudio t={t} />;
       case "agentic-cloud-labs":
         return <AgenticLabsPanel t={t} />;
+      case "commerce":
+        return hasAny(t.actor, ["admin", "registrar", "advisor"]) ? <AidQueuePanel store={t.store} actor={t.actor} slug={t.slug} here={t.here} /> : null;
       case "campaigns":
         if (!hasAny(t.actor, ["admin", "designer", "advisor"])) return null;
         return t.store.list("campaigns", (c) => c.key === "genai-2027").length ? <CampaignsPanel store={t.store} actor={t.actor} slug={t.slug} here={t.here} /> : <Empty title="No campaigns yet.">Campaigns are created with a program launch (the Scholaris AI Academy has the GenAI program kit).</Empty>;

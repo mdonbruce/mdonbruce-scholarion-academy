@@ -69,7 +69,7 @@ describe("Course standard per program", () => {
     const o = s.get("offerings", offeringIdFor("academy", "#10"))!;
     const ann = s.list("announcements", (x) => x.courseId === o.courseId && !!x.auto);
     assert.equal(ann.length, 10);
-    const lab = s.list("assignments", (x) => x.courseId === o.courseId && (x.tags as string[] | undefined)?.includes("lab"))[0];
+    const lab = s.list("assignments", (x) => x.courseId === o.courseId && !!(x.tags as string[] | undefined)?.includes("lab"))[0];
     assert.equal(lab.aiPolicy, "Allowed with disclosure");
     const quiz = s.list("quizzes", (x) => x.courseId === o.courseId)[0];
     assert.equal(quiz.state, "unpublished"); // items await SME authoring; never published empty

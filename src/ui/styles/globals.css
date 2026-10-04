@@ -1968,3 +1968,7 @@ details.acc > div {
 @media (max-width:800px){.eco-sources{columns:1}}
 .doc-formats{display:inline-flex;flex-wrap:wrap;align-items:center;gap:0 2px;margin-left:8px;color:var(--muted,#4a5672)}
 .doc-formats a{display:inline-block;min-height:24px;min-width:24px;padding:2px 4px;line-height:20px}
+.campus-public-foot{margin-top:24px;padding:16px 0;border-top:1px solid var(--line,#dfe3ec)}
+.campus-public-foot nav{gap:4px 16px}
+.campus-public-foot a,.enroll-options a{display:inline-block;min-height:24px;padding:2px 0;line-height:20px}
+.terms-box{background:var(--surface-2,#f4f6fb);border-left:3px solid var(--primary,#0b1f4d);padding:8px 12px}

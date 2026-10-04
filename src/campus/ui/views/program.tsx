@@ -1,6 +1,7 @@
 import type { Tenant, TenantStore } from "../../core";
 import { Formats } from "../../../ui/components/formats";
 import { CampaignOptIn } from "./campaigns";
+import { EnrollOptions } from "./market";
 import { GENAI } from "../../academy/genai-program";
 import { facultyByName } from "../../../brand/faculty";
 import { FacultyCard } from "../../../ui/components/faculty";
@@ -568,6 +569,7 @@ export function ProgramPageView({ tenant, store, actor, slug, sp }: { tenant: Te
             ))}
           </ol>
         )}
+        <EnrollOptions store={store} slug={tenant.slug} offeringId={p.offeringId} actor={actor} here={`${here}#apply`} />
         {p.selfPaced && !enrolled ? (
           !actor ? (
             <p>

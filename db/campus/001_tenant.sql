@@ -1889,10 +1889,21 @@ CREATE TABLE IF NOT EXISTS subscriptions (
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   user_id text,
+  kind text,
   plan text,
+  offering_id text,
   state text,
+  price numeric,
+  currency text,
+  period text,
+  trial_ends_at timestamptz,
+  current_period_end timestamptz,
   renews_at timestamptz,
-  price numeric
+  cancel_at_period_end boolean,
+  pause_until timestamptz,
+  charged_at timestamptz,
+  disclosure jsonb,
+  notices jsonb
 );
 
 -- Seat license (tab: commerce)
@@ -2931,6 +2942,41 @@ CREATE TABLE IF NOT EXISTS studio_outputs (
   status text,
   bytes numeric,
   checksum text
+);
+
+-- Plan settings (tab: commerce)
+CREATE TABLE IF NOT EXISTS plan_settings (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  "key" text,
+  values jsonb,
+  updated_by text
+);
+
+-- Financial aid application (tab: commerce)
+CREATE TABLE IF NOT EXISTS aid_applications (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  user_id text,
+  offering_id text,
+  background text,
+  need text,
+  goals text,
+  commitment boolean,
+  requested_pct numeric,
+  state text,
+  approved_pct numeric,
+  decision_due_at timestamptz,
+  decided_by text,
+  decided_at timestamptz,
+  decision_note text,
+  coupon_code text
 );
 
 -- Design sign-off (tab: program-studio)

@@ -26,6 +26,7 @@ import { proctorAsk, saveReadiness } from "../src/campus/services/proctor";
 import { applyToProgram, programIndex, reviewProgramApplication, selfCheck } from "../src/campus/services/programs";
 import { ProgramIndexView, ProgramPageView } from "../src/campus/ui/views/program";
 import { PublicChangelog } from "../src/campus/ui/views/ecohub";
+import { AidView, PlusView, PricingView } from "../src/campus/ui/views/market";
 import { kitAssets } from "../src/campus/services/campaigns";
 import { generateDraft } from "../src/campus/services/assess";
 import { runLab } from "../src/campus/services/agentlabs";
@@ -196,6 +197,12 @@ page("demo", "student1", "calendar?view=week", "Calendar — week");
   const t = broker.tenant("academy")!;
   const pub = broker.connect({ tenantId: t.id, slug: "academy", via: "path", traceId: "render" });
   save("academy-programs-index.html", "Programs", "public", <PublicFrame tenant={t}><ProgramIndexView tenant={t} store={pub} /></PublicFrame>);
+  save("academy-public-pricing.html", "Plans and pricing", "public", <PublicFrame tenant={t}><PricingView tenant={t} store={pub} actor={null} /></PublicFrame>);
+  save("academy-public-plus.html", "Scholaris Plus", "public", <PublicFrame tenant={t}><PlusView tenant={t} store={pub} actor={null} /></PublicFrame>);
+  {
+    const s7 = as("academy", "student6");
+    save("academy-financial-aid.html", "Financial aid — apply", "student6@academy", <PublicFrame tenant={t}><AidView tenant={t} store={s7.store} actor={s7.actor} sp={{}} /></PublicFrame>);
+  }
   for (const p of programIndex(pub)) save(`academy-program-${p.slug}.html`, `${p.code} ${p.title}`, "public", <PublicFrame tenant={t}><ProgramPageView tenant={t} store={pub} actor={null} slug={p.slug} sp={{}} /></PublicFrame>);
   // #26 as a signed-in learner: self-check passed, applied, admitted → seat reservation step.
   const s5 = as("academy", "student5");
@@ -329,6 +336,9 @@ page("academy", "admin", "t/pathways?run=pathways.consolidation_report", "Consol
 {
   // Tab 60 — Program Marketing & Campaigns, with the kit files themselves.
   page("academy", "admin", "t/campaigns", "Tab 60 — Program Marketing & Campaigns");
+  page("academy", "admin", "t/commerce", "Commerce — financial aid queue and plan settings");
+  page("academy", "student1", "account", "Account — subscriptions and financial aid");
+  page("academy", "designer", "t/program-studio", "Program Studio — design packages for #1–#11");
   const ca = as("academy", "admin");
   const cmp = ca.store.list("campaigns", (c) => c.key === "genai-2027")[0];
   for (const x of kitAssets(ca.store, cmp).filter((k) => k.kind === "html")) {

@@ -1,4 +1,5 @@
 import { broker, CampusError, metrics, nowIso, nowMs, registerConsumer, sha256, token, type Row, type TenantStore } from "../core";
+import { entitlementFor, plusEligible } from "./plans";
 import { addPublishCheck } from "../entity";
 import { hasAny, type Actor } from "../iam";
 import { audit, notify, requireTenant } from "./common";
@@ -234,21 +235,22 @@ export function consolidationReport(store: TenantStore, a: Actor) {
 
 const TAX_RATES: Record<string, number> = { USD: 0, EUR: 0.2, GBP: 0.2, NGN: 0.075, INR: 0.18 }; // SIMULATED rates for the sandbox
 
-function couponFor(store: TenantStore, code: string | undefined, offeringId: string) {
+function couponFor(store: TenantStore, code: string | undefined, offeringId: string, userId?: string) {
   if (!code) return null;
   const c = store.list("coupons", (x) => String(x.code).toUpperCase() === code.trim().toUpperCase())[0];
   if (!c) throw new CampusError("coupon_invalid", "That coupon code isn't valid.", 422);
   if (c.expiresAt && String(c.expiresAt) < nowIso()) throw new CampusError("coupon_expired", "That coupon has expired.", 422);
   if (c.maxRedemptions && Number(c.redemptions ?? 0) >= Number(c.maxRedemptions)) throw new CampusError("coupon_used_up", "That coupon has been fully used.", 422);
   if (c.offeringId && c.offeringId !== offeringId) throw new CampusError("coupon_invalid", "That coupon is for a different offering.", 422);
+  if (c.userId && c.userId !== userId) throw new CampusError("coupon_invalid", userId ? "That code belongs to another account." : "Sign in to use your financial aid code.", 422);
   return c;
 }
 
-export function quote(store: TenantStore, input: { offeringId: string; coupon?: string; plan?: "full" | "installments" | "pay_later"; installments?: number; sectionId?: string }) {
+export function quote(store: TenantStore, input: { offeringId: string; coupon?: string; plan?: "full" | "installments" | "pay_later"; installments?: number; sectionId?: string; userId?: string }) {
   const o = store.get("offerings", input.offeringId);
   if (!o || o.state !== "published") throw new CampusError("not_found", "Offering not found", 404);
   const p = priceNow(o);
-  const c = couponFor(store, input.coupon, o.id);
+  const c = couponFor(store, input.coupon, o.id, input.userId);
   const discount = c ? Math.min(p.price, Math.round((c.percentOff ? (p.price * Number(c.percentOff)) / 100 : Number(c.amountOff ?? 0)) * 100) / 100) : 0;
   const net = Math.round((p.price - discount) * 100) / 100;
   const tax = Math.round(net * (TAX_RATES[p.currency] ?? 0) * 100) / 100;
@@ -281,7 +283,7 @@ export function checkout(store: TenantStore, a: Actor, input: { offeringId: stri
   if (!path.allowed) throw new CampusError("pathway_blocked", path.blockers.join(" "), 409, { blockers: path.blockers });
   if (store.list("offering_enrollments", (e) => e.userId === a.id && e.offeringId === o.id && e.state === "active" && e.source !== "audit").length) throw new CampusError("already_enrolled", "You're already enrolled.", 409);
   programCheckoutGuard(store, a.id, o, input.sectionId ?? null);
-  const q = quote(store, input);
+  const q = quote(store, { ...input, userId: a.id });
   return store.tx(() => {
     let sec: Row | undefined;
     let state = "active";
@@ -331,11 +333,12 @@ export function subscribe(store: TenantStore, a: Actor, plan = "Scholaris Plus")
 
 /** Subscription entitlement: enroll in an offering included in the plan, without an order. */
 export function enrollWithSubscription(store: TenantStore, a: Actor, offeringId: string) {
-  const sub = store.list("subscriptions", (s) => s.userId === a.id && s.state === "active" && String(s.renewsAt) > nowIso())[0];
   const o = store.get("offerings", offeringId);
   if (!o || o.state !== "published") throw new CampusError("not_found", "Offering not found", 404);
+  const legacy = store.list("subscriptions", (s) => s.userId === a.id && !s.kind && s.state === "active" && String(s.renewsAt) > nowIso())[0];
+  const sub = entitlementFor(store, a.id, o) ?? legacy;
   if (!sub) throw new CampusError("no_subscription", "You need an active subscription.", 402);
-  if (!o.inPlus) throw new CampusError("not_included", "This offering isn't included in your subscription.", 403);
+  if (sub === legacy ? !o.inPlus : !(sub.kind === "program_monthly" ? sub.offeringId === o.id : plusEligible(o))) throw new CampusError("not_included", "This offering isn't included in your subscription.", 403);
   const path = evaluatePathway(store, a.id, o.id);
   if (!path.allowed) throw new CampusError("pathway_blocked", path.blockers.join(" "), 409);
   return store.tx(() => enrollInOffering(store, a.id, o, { sectionId: null, source: "subscription", state: "active", waived: path.waivedModules }));

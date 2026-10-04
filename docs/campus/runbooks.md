@@ -522,7 +522,7 @@ Quotes, coupons and referrals, early-bird, installments, subscriptions, corporat
 - **Typical failures:** Checkout refused (sold out, aid ineligible, coupon expired).
 - **Recovery:** Join the waitlist / choose another cohort; check coupon window.
 - **Resources:** `coupons`, `orders`, `subscriptions`, `seat_licenses`, `invoices`, `refund_requests`, `offering_enrollments`
-- **Operations:** `commerce.quote`, `commerce.checkout`, `commerce.subscribe`, `commerce.cancel_subscription`, `commerce.enroll_with_subscription`, `commerce.assign_seat`, `commerce.invoice_seats`, `commerce.refund`, `commerce.reset_deadlines`, `analytics.commerce`, `commerce.batch_change`, `commerce.audit`
+- **Operations:** `commerce.quote`, `commerce.checkout`, `commerce.subscribe`, `commerce.cancel_subscription`, `commerce.enroll_with_subscription`, `commerce.assign_seat`, `commerce.invoice_seats`, `commerce.refund`, `commerce.reset_deadlines`, `analytics.commerce`, `commerce.batch_change`, `commerce.audit`, `plans.options`, `plans.quote`, `plans.settings_view`, `plans.settings`, `plans.start`, `plans.cancel`, `plans.pause`, `plans.resume`, `plans.switch`, `plans.refund`, `plans.mine`, `plans.tick`, `aid.apply`, `aid.queue`, `aid.decide`, `aid.mine`
 - **Who sees it:** admin, student
 
 ## 44. AI Tutor

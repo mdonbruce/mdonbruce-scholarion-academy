@@ -7,6 +7,7 @@ import { TabPage } from "./tab";
 import { AgentLabsList, AgentLabWorkspace } from "./agentlabs";
 import { LearnArea } from "./learn";
 import { EcoHub } from "./ecohub";
+import { AccountPlans } from "./market";
 
 type SP = Record<string, string | undefined>;
 
@@ -27,7 +28,12 @@ export function CampusPage({ store, actor, slug, path, sp }: { store: TenantStor
       case "search":
         return <SearchView store={store} actor={actor} slug={slug} sp={sp} />;
       case "account":
-        return <AccountView store={store} actor={actor} slug={slug} />;
+        return (
+          <>
+            <AccountView store={store} actor={actor} slug={slug} />
+            <AccountPlans store={store} actor={actor} slug={slug} />
+          </>
+        );
       case "t":
         return <TabPage store={store} actor={actor} slug={slug} tabSlug={path[1] ?? ""} sp={sp} />;
       case "hub":
