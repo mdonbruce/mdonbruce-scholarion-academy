@@ -191,6 +191,12 @@ function Bespoke({ t, tab }: { t: T; tab: string }) {
         return <AssessmentStudio t={t} />;
       case "agentic-cloud-labs":
         return <AgenticLabsPanel t={t} />;
+      case "curriculum-intelligence":
+        return (
+          <p className="notice notice-info">
+            Work in the Curriculum Intelligence workspace: <a href={`/campus/${t.slug}/cci/dashboard`}>open it</a>.
+          </p>
+        );
       case "commerce":
         return hasAny(t.actor, ["admin", "registrar", "advisor"]) ? <AidQueuePanel store={t.store} actor={t.actor} slug={t.slug} here={t.here} /> : null;
       case "campaigns":

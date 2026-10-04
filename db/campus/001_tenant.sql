@@ -2944,6 +2944,97 @@ CREATE TABLE IF NOT EXISTS studio_outputs (
   checksum text
 );
 
+-- CCI draft (tab: curriculum-intelligence)
+CREATE TABLE IF NOT EXISTS cci_drafts (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  kind text,
+  title text,
+  payload jsonb,
+  state text,
+  created_by text
+);
+
+-- Improvement proposal (tab: curriculum-intelligence)
+CREATE TABLE IF NOT EXISTS cci_proposals (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  target text,
+  title text,
+  rationale text,
+  signal text,
+  expected_impact text,
+  diff jsonb,
+  state text,
+  release_version text,
+  created_by text,
+  requested_by text,
+  history jsonb,
+  apply_to text
+);
+
+-- Framework pack (tab: curriculum-intelligence)
+CREATE TABLE IF NOT EXISTS cci_framework_packs (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  name text,
+  source text,
+  content_version text,
+  published_on text,
+  items jsonb,
+  verified_by text,
+  loaded_by text,
+  checksum text
+);
+
+-- Exchange package (tab: curriculum-intelligence)
+CREATE TABLE IF NOT EXISTS cci_packages (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  direction text,
+  source_name text,
+  owner text,
+  partner_label text,
+  title text,
+  content_version text,
+  license text,
+  credit_status text,
+  manifest jsonb,
+  steps jsonb,
+  alignment_audit jsonb,
+  state text,
+  checksum text,
+  submitted_by text,
+  approvals jsonb
+);
+
+-- Freshness ticket (tab: curriculum-intelligence)
+CREATE TABLE IF NOT EXISTS cci_freshness_tickets (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  "key" text,
+  subject text,
+  reason text,
+  impact jsonb,
+  state text,
+  opened_at timestamptz
+);
+
 -- Plan settings (tab: commerce)
 CREATE TABLE IF NOT EXISTS plan_settings (
   id text PRIMARY KEY,

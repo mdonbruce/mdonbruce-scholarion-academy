@@ -693,6 +693,18 @@ Scheduled, bounded discovery and maintenance: cron schedules in America/New_York
 - **Operations:** `eco.automation`, `eco.schedule_save`, `eco.schedule_pause`, `eco.schedule_resume`, `eco.run_now`, `eco.tick`, `eco.job`, `eco.job_create`, `eco.source_add`, `eco.source_toggle`, `eco.schemas`, `eco.validate`
 - **Who sees it:** admin
 
+## 61. Curriculum & Course Intelligence
+
+AI drafts, humans decide: curriculum knowledge graph, Program Design Studio with overlap analysis, alignment matrix and coverage heatmaps (Bloom fit, orphans, scaffolding), skills and roles map, standards mapper over human-loaded framework packs (evidence for review only), pathways and consolidation, course health from aggregated learning data, assessment intelligence (item difficulty and discrimination), freshness sentinel with impact analysis, accessibility audit, proposal → review → versioned-release workflow with separation of duties, the governed Curriculum Exchange (curriculum packages only — never learner data) and program review reports.
+
+- **Purpose:** Keep every program aligned, current, accessible and honest, with a human decision at every step.
+- **Depends on:** Program catalog and design packages, LMS learning data (aggregated), Free Education Resource Hub verification dates, human-loaded framework packs.
+- **Typical failures:** Signals with too little data (shown as not measured); a package fails a pipeline check (rejected with the reason).
+- **Recovery:** Collect more data or fix the package and resubmit; proposals go back to revision.
+- **Resources:** `cci_drafts`, `cci_proposals`, `cci_framework_packs`, `cci_packages`, `cci_freshness_tickets`
+- **Operations:** `cci.dashboard`, `cci.graph`, `cci.draft_program`, `cci.alignment`, `cci.skills`, `cci.load_framework`, `cci.evidence_pack`, `cci.overlap`, `cci.course_health`, `cci.item_analysis`, `cci.freshness_scan`, `cci.accessibility`, `cci.propose`, `cci.propose_from_signals`, `cci.advance`, `cci.exchange_import`, `cci.exchange_export`, `cci.exchange_approve`, `cci.exchange_audit`
+- **Who sees it:** admin, designer, instructor, registrar
+
 ## 60. Program Marketing & Campaigns
 
 Launch kit for the 9-weekend GenAI, Agentic AI & AI Agents program (#39): program and free Day 1 flyers with the approved faculty photo, landing outline, LinkedIn/Instagram/WhatsApp copy, 60-second promo script, three-email sequence with unsubscribe links, all 18 sessions in seven time zones (.md/.csv/.ics), Copy Checker flags on every asset, consented opt-in audiences, email sends held until a provider is configured, a manual channel checklist with platform rules (never auto-posted), the meeting-platform duration check and the Scholarion_GenAI_Agentic_Program/ folder export.

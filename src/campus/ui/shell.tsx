@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { hasAny } from "../iam";
 import type { Tenant, TenantStore } from "../core";
 import type { Actor } from "../iam";
 import { visibleTabs } from "../http/router";
@@ -46,7 +47,7 @@ export function CampusShell({ tenant, store, actor, current, children }: { tenan
         </a>
         <nav aria-label="Main">
           <ul className="sidenav">
-            {PRIMARY.map(([path, label]) => (
+            {[...PRIMARY, ...(hasAny(actor, ["admin", "designer", "instructor", "registrar"]) ? ([["cci", "Curriculum Intelligence"]] as [string, string][]) : [])].map(([path, label]) => (
               <li key={path}>
                 <a href={`/campus/${slug}/${path}`} aria-current={current === path || current.startsWith(`${path}/`) ? "page" : undefined}>
                   {label}

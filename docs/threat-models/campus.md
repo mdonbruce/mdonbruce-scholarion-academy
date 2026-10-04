@@ -290,6 +290,12 @@ STRIDE-style notes per tab. Cross-cutting controls first.
 - SSRF → only configured trusted hosts; private and internal addresses are refused
 - Runaway agents → per-job request and runtime budgets, leases and retry limits; agents can't add credentials, enable billing or share learner data
 
+## 61. Curriculum & Course Intelligence
+
+- Unreviewed AI content → AI DRAFT label, proposal workflow, creator can't approve
+- Learner data leaving the Academy → every exchange package is scanned for learner and personal data and blocked
+- Invented standards or compliance claims → framework packs are loaded and verified by people; outputs say evidence for review
+
 ## 60. Program Marketing & Campaigns
 
 - Spam → opt-in only, consent wording stored, one-click unsubscribe, no repeat sends

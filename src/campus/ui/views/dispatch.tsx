@@ -8,6 +8,7 @@ import { AgentLabsList, AgentLabWorkspace } from "./agentlabs";
 import { LearnArea } from "./learn";
 import { EcoHub } from "./ecohub";
 import { AccountPlans } from "./market";
+import { CciWorkspace } from "./cci";
 
 type SP = Record<string, string | undefined>;
 
@@ -36,6 +37,8 @@ export function CampusPage({ store, actor, slug, path, sp }: { store: TenantStor
         );
       case "t":
         return <TabPage store={store} actor={actor} slug={slug} tabSlug={path[1] ?? ""} sp={sp} />;
+      case "cci":
+        return <CciWorkspace store={store} actor={actor} slug={slug} section={path[1] ?? "dashboard"} sp={sp} />;
       case "hub":
         return <EcoHub store={store} actor={actor} slug={slug} section={path[1] ?? "overview"} sp={sp} />;
       case "learn":

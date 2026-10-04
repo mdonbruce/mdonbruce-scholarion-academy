@@ -339,6 +339,7 @@ page("academy", "admin", "t/pathways?run=pathways.consolidation_report", "Consol
   page("academy", "admin", "t/commerce", "Commerce — financial aid queue and plan settings");
   page("academy", "student1", "account", "Account — subscriptions and financial aid");
   page("academy", "designer", "t/program-studio", "Program Studio — design packages for #1–#11");
+  for (const [sec, title] of [["dashboard", "Dashboard"], ["programs", "Programs & Design Studio"], ["alignment?program=%232", "Alignment Matrix (#2)"], ["skills", "Skills & Roles Map"], ["standards", "Standards Mapper"], ["pathways", "Pathways & Consolidation"], ["health", "Course Health"], ["assessment", "Assessment Lab"], ["freshness", "Freshness"], ["accessibility", "Accessibility"], ["proposals", "Proposals & Approvals"], ["exchange", "Curriculum Exchange"], ["reports", "Reports"]] as const) page("academy", "designer", `cci/${sec}`, `Curriculum Intelligence — ${title}`);
   const ca = as("academy", "admin");
   const cmp = ca.store.list("campaigns", (c) => c.key === "genai-2027")[0];
   for (const x of kitAssets(ca.store, cmp).filter((k) => k.kind === "html")) {

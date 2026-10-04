@@ -21,6 +21,7 @@ import { gradebookCsv as gradedCsv } from "../services/graded";
 import { bundleZip, moduleStudioBundle, readOutput } from "../services/studio";
 import * as camp from "../services/campaigns";
 import * as designPkg from "../services/design";
+import * as cciSvc from "../services/cci";
 import { attachDoc, officeResponse } from "../../documents/http";
 import * as eco from "../services/ecosystem";
 import * as wsp from "../services/workspace";
@@ -265,6 +266,10 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     return isForm(req) ? redirect(`/campus/${tenant.slug}/signin`, [sessionCookie(tenant.tenantId, "", 0)]) : json({ data: { ok: true } }, 200, { "set-cookie": sessionCookie(tenant.tenantId, "", 0) });
   }
   const actor = requireActor(c);
+  if (rest[0] === "cci" && rest[1] === "reports" && rest[2] && method === "GET") {
+    const code = `#${decodeURIComponent(rest[2]).replace(/\.html$/, "").replace(/^#?p?/i, "")}`;
+    return new Response(cciSvc.programReviewHtml(store, requireActor(c), code), { status: 200, headers: { "content-type": "text/html; charset=utf-8", "content-disposition": `inline; filename="program-review-${code.replace("#", "p")}.html"`, "cache-control": "no-store", "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'" } });
+  }
   if (rest[0] === "programs" && rest[1] && rest[2] === "design-package.zip" && method === "GET") {
     const pk = designPkg.designPackage(store, requireActor(c), decodeURIComponent(rest[1]));
     return new Response(new Uint8Array(pk.zip), { status: 200, headers: { "content-type": "application/zip", "content-disposition": `attachment; filename="${pk.root}.zip"`, "cache-control": "no-store" } });

@@ -248,6 +248,10 @@
       "description": "Scheduled, bounded discovery and maintenance: cron schedules in America/New_York (jobs daily 6:00, resources Monday 7:00, terms review monthly, link checks daily 5:00, integration health every six hours), durable jobs with unique period keys, leases, request/runtime budgets, checkpoints, backoff with jitter and dead-letter, run-now/pause/resume, trusted-source adapters (official pages, RSS/Atom, public job-board API — no arbitrary-URL proxy), automatic publication of evidence-backed records, the versioned Scholarion Integration JSON Schema (Draft 2020-12) with semantic checks, and the API integration layer."
     },
     {
+      "name": "Curriculum & Course Intelligence",
+      "description": "AI drafts, humans decide: curriculum knowledge graph, Program Design Studio with overlap analysis, alignment matrix and coverage heatmaps (Bloom fit, orphans, scaffolding), skills and roles map, standards mapper over human-loaded framework packs (evidence for review only), pathways and consolidation, course health from aggregated learning data, assessment intelligence (item difficulty and discrimination), freshness sentinel with impact analysis, accessibility audit, proposal → review → versioned-release workflow with separation of duties, the governed Curriculum Exchange (curriculum packages only — never learner data) and program review reports."
+    },
+    {
       "name": "Program Marketing & Campaigns",
       "description": "Launch kit for the 9-weekend GenAI, Agentic AI & AI Agents program (#39): program and free Day 1 flyers with the approved faculty photo, landing outline, LinkedIn/Instagram/WhatsApp copy, 60-second promo script, three-email sequence with unsubscribe links, all 18 sessions in seven time zones (.md/.csv/.ics), Copy Checker flags on every asset, consented opt-in audiences, email sends held until a provider is configured, a manual channel checklist with platform rules (never auto-posted), the meeting-platform duration check and the Scholarion_GenAI_Agentic_Program/ folder export."
     },
@@ -34399,6 +34403,931 @@
         }
       }
     },
+    "/r/cci_drafts": {
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "List curriculum drafts (ai draft)",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CciDrafts"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Create a cci draft",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/cci_drafts/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Get a cci draft",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Update a cci draft (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Delete (tombstone) a cci draft",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/cci_proposals": {
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "List improvement proposals",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CciProposals"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Create a improvement proposal",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/cci_proposals/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Get a improvement proposal",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Update a improvement proposal (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Delete (tombstone) a improvement proposal",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/cci_framework_packs": {
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "List standards framework packs (loaded and verified by people)",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CciFrameworkPacks"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Create a framework pack",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/cci_framework_packs/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Get a framework pack",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Update a framework pack (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Delete (tombstone) a framework pack",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/cci_packages": {
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "List curriculum exchange packages",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CciPackages"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Create a exchange package",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/cci_packages/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Get a exchange package",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Update a exchange package (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Delete (tombstone) a exchange package",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/cci_freshness_tickets": {
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "List freshness tickets",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CciFreshnessTickets"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Create a freshness ticket",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/cci_freshness_tickets/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Get a freshness ticket",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Update a freshness ticket (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "summary": "Delete (tombstone) a freshness ticket",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/r/plan_settings": {
       "get": {
         "tags": [
@@ -60932,6 +61861,725 @@
         }
       }
     },
+    "/q/cci.dashboard": {
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.dashboard",
+        "summary": "Catalog health: design gates, proposals awaiting review, freshness tickets, exchange packages.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/cci.graph": {
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.graph",
+        "summary": "Curriculum knowledge graph summary (programs, competencies, assessments, skills, tools, sources).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/cci.draft_program": {
+      "post": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.draft_program",
+        "summary": "Program Design Studio: AI-draft a program (outcomes, sequence, pathway placement, overlap report, workload, capstone, claims-checked catalog copy).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "audience": {
+                    "type": "string"
+                  },
+                  "level": {
+                    "type": "string"
+                  },
+                  "weeks": {
+                    "type": "number"
+                  },
+                  "delivery": {
+                    "type": "string"
+                  },
+                  "skills": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "title",
+                  "audience",
+                  "weeks",
+                  "skills"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/cci.alignment": {
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.alignment",
+        "summary": "Alignment matrix and coverage heatmap for a program.",
+        "parameters": [
+          {
+            "name": "program",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/cci.skills": {
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.skills",
+        "summary": "Skills and roles map across programs.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/cci.load_framework": {
+      "post": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.load_framework",
+        "summary": "Load a framework pack exactly as published (name, official source, version, date, items, verifier).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "string"
+                  },
+                  "publishedOn": {
+                    "type": "string"
+                  },
+                  "items": {
+                    "type": "string"
+                  },
+                  "verifiedBy": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "source",
+                  "version",
+                  "publishedOn",
+                  "items",
+                  "verifiedBy"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/cci.evidence_pack": {
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.evidence_pack",
+        "summary": "Crosswalk a program to a loaded framework pack (evidence for review, with gaps).",
+        "parameters": [
+          {
+            "name": "program",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "packId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/cci.overlap": {
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.overlap",
+        "summary": "Overlap analyzer across all programs.",
+        "parameters": [
+          {
+            "name": "threshold",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/cci.course_health": {
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.course_health",
+        "summary": "Course health: completion, drop-off, mastery, alerts and an explainable score.",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/cci.item_analysis": {
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.item_analysis",
+        "summary": "Assessment intelligence: item difficulty and discrimination, AI-use policy coverage.",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/cci.freshness_scan": {
+      "post": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.freshness_scan",
+        "summary": "Freshness Sentinel: open tickets for stale or unavailable tools with impact analysis.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/cci.accessibility": {
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.accessibility",
+        "summary": "Accessibility audit (structure, alt text, color-only cues, captions).",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/cci.propose": {
+      "post": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.propose",
+        "summary": "Create an improvement proposal (AI DRAFT diff with rationale).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "target": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "type": "string"
+                  },
+                  "expectedImpact": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "target",
+                  "title",
+                  "rationale"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/cci.propose_from_signals": {
+      "post": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.propose_from_signals",
+        "summary": "Turn alignment and freshness signals into AI-drafted proposals.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/cci.advance": {
+      "post": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.advance",
+        "summary": "Approve a proposal to the next review stage, or return it for revision.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "proposalId": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "approve",
+                      "return"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "proposalId",
+                  "action"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/cci.exchange_import": {
+      "post": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.exchange_import",
+        "summary": "Import a curriculum package manifest (quarantine, scan, schema, licence, no learner data).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "manifest": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "manifest"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/cci.exchange_export": {
+      "post": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.exchange_export",
+        "summary": "Export an Academy program as a curriculum package (needs an Exchange Approver).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "program": {
+                    "type": "string"
+                  },
+                  "partnerLabel": {
+                    "type": "string"
+                  },
+                  "keepScholarionBranding": {
+                    "type": "boolean"
+                  },
+                  "rebrandDecisionRef": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "program"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/cci.exchange_approve": {
+      "post": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.exchange_approve",
+        "summary": "Approve an exchange package as the owning side's Exchange Approver.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "packageId": {
+                    "type": "string"
+                  },
+                  "side": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "packageId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/cci.exchange_audit": {
+      "get": {
+        "tags": [
+          "Curriculum & Course Intelligence"
+        ],
+        "operationId": "cci.exchange_audit",
+        "summary": "Exchange audit: packages, approvals and confirmation that no learner data crossed.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/q/plans.options": {
       "get": {
         "tags": [
@@ -70446,6 +72094,248 @@
           }
         ],
         "description": "Studio output (tab: course-studio)"
+      },
+      "CciDrafts": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "description": "Kind",
+                "type": "string"
+              },
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "payload": {
+                "description": "Draft"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              },
+              "createdBy": {
+                "description": "Created by",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "CCI draft (tab: curriculum-intelligence)"
+      },
+      "CciProposals": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "target": {
+                "description": "Target",
+                "type": "string"
+              },
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "rationale": {
+                "description": "Rationale",
+                "type": "string"
+              },
+              "signal": {
+                "description": "Signal",
+                "type": "string"
+              },
+              "expectedImpact": {
+                "description": "Expected impact",
+                "type": "string"
+              },
+              "diff": {
+                "description": "Diff (before / after)"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              },
+              "releaseVersion": {
+                "description": "Released version",
+                "type": "string"
+              },
+              "createdBy": {
+                "description": "Created by",
+                "type": "string"
+              },
+              "requestedBy": {
+                "description": "Requested by",
+                "type": "string"
+              },
+              "history": {
+                "description": "Review history"
+              },
+              "applyTo": {
+                "description": "Applies to",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Improvement proposal (tab: curriculum-intelligence)"
+      },
+      "CciFrameworkPacks": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "Name",
+                "type": "string"
+              },
+              "source": {
+                "description": "Official source",
+                "type": "string",
+                "format": "uri"
+              },
+              "version": {
+                "description": "Version",
+                "type": "string"
+              },
+              "publishedOn": {
+                "description": "Published",
+                "type": "string"
+              },
+              "items": {
+                "description": "Items"
+              },
+              "verifiedBy": {
+                "description": "Verified by",
+                "type": "string"
+              },
+              "loadedBy": {
+                "description": "Loaded by",
+                "type": "string"
+              },
+              "checksum": {
+                "description": "Checksum",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Framework pack (tab: curriculum-intelligence)"
+      },
+      "CciPackages": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "direction": {
+                "description": "Import / export",
+                "type": "string"
+              },
+              "sourceName": {
+                "description": "Source",
+                "type": "string"
+              },
+              "owner": {
+                "description": "Owner",
+                "type": "string"
+              },
+              "partnerLabel": {
+                "description": "Partner",
+                "type": "string"
+              },
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "version": {
+                "description": "Version",
+                "type": "string"
+              },
+              "license": {
+                "description": "Licence",
+                "type": "string"
+              },
+              "creditStatus": {
+                "description": "Credit status",
+                "type": "string"
+              },
+              "manifest": {
+                "description": "Manifest"
+              },
+              "steps": {
+                "description": "Pipeline checks"
+              },
+              "alignmentAudit": {
+                "description": "Alignment audit"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              },
+              "checksum": {
+                "description": "Checksum",
+                "type": "string"
+              },
+              "submittedBy": {
+                "description": "Submitted by",
+                "type": "string"
+              },
+              "approvals": {
+                "description": "Approvals"
+              }
+            }
+          }
+        ],
+        "description": "Exchange package (tab: curriculum-intelligence)"
+      },
+      "CciFreshnessTickets": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "key": {
+                "description": "Key",
+                "type": "string"
+              },
+              "subject": {
+                "description": "Subject",
+                "type": "string"
+              },
+              "reason": {
+                "description": "Reason",
+                "type": "string"
+              },
+              "impact": {
+                "description": "Impact analysis"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              },
+              "openedAt": {
+                "description": "Opened",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Freshness ticket (tab: curriculum-intelligence)"
       },
       "PlanSettings": {
         "allOf": [
