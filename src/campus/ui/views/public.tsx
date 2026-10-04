@@ -192,7 +192,7 @@ export function CatalogView({ tenant, store, actor, sp }: { tenant: Tenant; stor
                   </p>
                   {o.nextCohort && (
                     <p className="tiny">
-                      Next cohort {fmt(o.nextCohort.startsAt)} ({o.nextCohort.timeZone}) · {o.nextCohort.seatsLeft} seats left · registration closes {fmt(o.nextCohort.closesAt)}
+                      Next cohort {fmt(o.nextCohort.startsAt)} ({String(o.nextCohort.timeZone)}) · {o.nextCohort.seatsLeft} seats left · registration closes {fmt(o.nextCohort.closesAt)}
                     </p>
                   )}
                   <p className="tiny muted">Aid: {o.aidEligible ? "eligible (approved)" : "not eligible for federal aid (non-credit)"}</p>

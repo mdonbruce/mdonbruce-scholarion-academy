@@ -294,7 +294,7 @@ function ListOf({ c, table, staff }: { c: C; table: string; staff: boolean }) {
       ) : (
         <EntityTable slug={c.slug} table={table} rows={rows} back={here} manage={{ publish: staff, archive: staff }} />
       )}
-      {(staff || (table === "discussion_topics" && c.course.studentsCreateDiscussions)) && (
+      {(staff || (table === "discussion_topics" && !!c.course.studentsCreateDiscussions)) && (
         <details className="card card-pad">
           <summary>New {d.label.toLowerCase()}</summary>
           {table === "discussion_topics" && !staff ? <OpForm slug={c.slug} op={OPERATIONS["discussion.create_student_topic"]} back={here} values={{ courseId: String(c.course.id) }} hide={["courseId"]} /> : <EntityForm slug={c.slug} table={table} back={here} fixed={{ courseId: String(c.course.id) }} />}
@@ -781,7 +781,7 @@ function Gradebook({ c }: { c: C }) {
             {g.rows.map((r) => (
               <tr key={r.userId}>
                 <th scope="row">
-                  {r.name} <span className="tiny muted">{r.section ?? ""}</span>
+                  {r.name} <span className="tiny muted">{String(r.section ?? "")}</span>
                 </th>
                 {g.columns.map((col) => {
                   const cell = r.cells[col.id] as { score: number | null; status: string; posted: boolean; assigned?: boolean };

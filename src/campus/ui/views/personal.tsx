@@ -447,7 +447,7 @@ export function SearchView({ store, actor, slug, sp }: { store: TenantStore; act
         <ul className="item-list">
           {results.map((r, i) => (
             <li key={i}>
-              <a href={`/campus/${slug}/${r.href}`}>{r.title}</a> <span className="tiny muted">{r.kind}</span>
+              <a href={`/campus/${slug}/${String(r.href)}`}>{String(r.title)}</a> <span className="tiny muted">{String(r.kind)}</span>
               <p className="small muted">{r.snippet}</p>
             </li>
           ))}
