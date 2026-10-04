@@ -1,4 +1,6 @@
 import crypto from "node:crypto";
+import { downloadUrl } from "../../services/files";
+import { acceptAttr, attachmentsFor, formatList, formatsFor } from "../../services/uploads";
 import { Formats } from "../../../ui/components/formats";
 import { CampusError, type TenantStore } from "../../core";
 import type { Actor } from "../../iam";
@@ -615,6 +617,7 @@ function ItemPanel({ t, itemId }: { t: Ctx; itemId: string }) {
           {lastSub.infraReason && <> — {lastSub.infraReason} This did not use an attempt.</>}
         </div>
       )}
+      <WorkUpload t={t} itemId={it.id} kind={it.kind} courseId={t.v.course.id} learner={learner} here={here} />
       {isProject ? (
         <ProjectSubmit t={t} it={it} workspaces={workspaces} here={here} />
       ) : (
@@ -1437,3 +1440,70 @@ function Instructor({ t }: { t: Ctx }) {
 }
 
 export { AI801_TOPICS };
+
+
+/** Upload work for any item (mini lab, worksheet, quiz or project): files or a Colab/Codelab/GitHub link. */
+function WorkUpload({ t, itemId, kind, courseId, learner, here }: { t: { store: TenantStore; actor: Actor; slug: string }; itemId: string; kind: string; courseId: string; learner: boolean; here: string }) {
+  const k = String(kind).replace(/[^a-z]/g, "");
+  const exts = formatsFor(k === "minilab" ? "minilab" : k === "project" ? "project" : "assignment");
+  const mine = attachmentsFor(t.store, t.actor, itemId);
+  return (
+    <section className="card card-pad stack work-upload" aria-labelledby={`wu-${itemId}`}>
+      <h4 id={`wu-${itemId}`}>Upload your work</h4>
+      <p className="tiny muted">
+        Accepted: {formatList(exts)} (up to 10 MB), or a link to a Google Colab notebook, Codelab, GitHub repository or shared document. Uploads go to your instructor as evidence; they don't use an attempt or change an automatic score.
+      </p>
+      {learner && (
+        <div className="grid g2">
+          <form method="post" action={api(t.slug, "upload")} encType="multipart/form-data" className="stack">
+            <Hidden values={{ back: here, gradedItemId: itemId, courseId, notice: "Work uploaded for your instructor." }} />
+            <label htmlFor={`wu-file-${itemId}`}>File</label>
+            <input id={`wu-file-${itemId}`} name="file" type="file" required accept={acceptAttr(exts)} />
+            <label htmlFor={`wu-note-${itemId}`}>Note (optional)</label>
+            <input id={`wu-note-${itemId}`} name="note" />
+            <div>
+              <button className="btn btn-outline btn-sm" type="submit">
+                Upload file
+              </button>
+            </div>
+          </form>
+          <form method="post" action={api(t.slug, "a/graded.attach_link")} className="stack">
+            <Hidden values={{ back: here, itemId, notice: "Link submitted for your instructor." }} />
+            <label htmlFor={`wu-url-${itemId}`}>Colab, Codelab, GitHub or document link</label>
+            <input id={`wu-url-${itemId}`} name="url" type="url" required placeholder="https://colab.research.google.com/…" />
+            <div>
+              <button className="btn btn-outline btn-sm" type="submit">
+                Submit link
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+      {mine.length > 0 && (
+        <ul className="small">
+          {mine.map((m) => (
+            <li key={m.id}>
+              {m.learner ? `${m.learner}: ` : ""}
+              {m.fileId ? (
+                <>
+                  <a href={signedLink(t.store, t.actor, m.fileId)}>{m.fileName}</a> (<a href={api(t.slug, `files/${m.fileId}/preview`)}>preview</a>)
+                </>
+              ) : (
+                <a href={String(m.url)}>{m.linkKind}</a>
+              )} · {fmt(m.at, true)}
+              {m.note ? ` — ${m.note}` : ""}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function signedLink(store: TenantStore, actor: Actor, fileId: string) {
+  try {
+    return downloadUrl(store, actor, fileId).url;
+  } catch {
+    return "#";
+  }
+}

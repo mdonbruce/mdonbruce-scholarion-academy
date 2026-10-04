@@ -1,4 +1,5 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { formatsFor } from "./uploads";
 import { broker, CampusError, metrics, nowIso, nowMs, registerConsumer, type Row, type TenantStore } from "../core";
 import { addPublishCheck } from "../entity";
 import { createUser, hasAny, type Actor } from "../iam";
@@ -240,7 +241,7 @@ function loadProgram(x: Ctx, spec: ProgramSpec) {
     }
     if (w.kind !== "capstone" && w.kind !== "midterm") {
       const ed = design && wp ? activityEditions(spec, design, wp) : null;
-      const act = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `In-Class Activity — ${unit} ${w.week}: ${w.title}`, instructions: ed ? ed.student : ACTIVITY_BODY(w).join("\n\n"), points: 10, groupId: groups[bk].act.id, dueAt: due, submissionTypes: ["file"], allowedExtensions: ["docx", "pdf"], state: "published", gradingType: "points", ...(design ? { aiPolicy: AI_POLICY.activity, designStatus: DRAFT } : {}) }, "asg");
+      const act = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `In-Class Activity — ${unit} ${w.week}: ${w.title}`, instructions: ed ? ed.student : ACTIVITY_BODY(w).join("\n\n"), points: 10, groupId: groups[bk].act.id, dueAt: due, submissionTypes: ["file"], allowedExtensions: formatsFor("activity"), state: "published", gradingType: "points", ...(design ? { aiPolicy: AI_POLICY.activity, designStatus: DRAFT } : {}) }, "asg");
       itemOf(x, c, m, "assignment", act.id, act.title as string, w.optional ? null : "submit");
       if (ed) {
         const ie = x.store.insert("pages", { courseId: c.id, moduleId: m.id, title: `Instructor edition — ${unit} ${w.week} activity`, blocks: mdBlocks(ed.instructor, `Instructor edition — ${unit} ${w.week} activity`), html: renderBlocks(x.store, mdBlocks(ed.instructor, `Instructor edition — ${unit} ${w.week} activity`), c.id), position: 2, state: "unpublished", audience: "instructors" }, "pg");
@@ -249,18 +250,18 @@ function loadProgram(x: Ctx, spec: ProgramSpec) {
     }
     if (w.sessions) {
       w.sessions.forEach((title, i) => {
-        const a = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `Session lab ${wk}${i === 0 ? "A" : "B"}: ${title.split(":")[0]}`, instructions: `${title}.\n\nComplete the session checkpoint in the Cloud Lab and submit your notebook. If you missed the live session, review the recording first — a submitted lab counts as attendance.`, points: 10, groupId: groups[bk].lab.id, dueAt: dayOf(start, weekStart + 5 + i, 23, 59), submissionTypes: ["file", "url"], allowedExtensions: ["ipynb", "py", "pdf"], state: "published", gradingType: "points", tags: ["session_lab"] }, "asg");
+        const a = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `Session lab ${wk}${i === 0 ? "A" : "B"}: ${title.split(":")[0]}`, instructions: `${title}.\n\nComplete the session checkpoint in the Cloud Lab and submit your notebook. If you missed the live session, review the recording first — a submitted lab counts as attendance.`, points: 10, groupId: groups[bk].lab.id, dueAt: dayOf(start, weekStart + 5 + i, 23, 59), submissionTypes: ["file", "url"], allowedExtensions: formatsFor("lab"), state: "published", gradingType: "points", tags: ["session_lab"] }, "asg");
         itemOf(x, c, m, "assignment", a.id, a.title as string, "submit");
       });
     }
     if (w.dual) {
-      const a = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `Lab ${w.week}: ${w.title} (PyTorch or TensorFlow/Keras)`, instructions: "Choose the PyTorch or TensorFlow/Keras starter notebook, complete the TODOs and submit. Both versions are graded on the same rubric.", points: 10, groupId: groups[bk].lab.id, dueAt: due, submissionTypes: ["file", "url"], allowedExtensions: ["ipynb", "py"], state: "published", gradingType: "points", tags: ["lab", "dual_framework"] }, "asg");
+      const a = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `Lab ${w.week}: ${w.title} (PyTorch or TensorFlow/Keras)`, instructions: "Choose the PyTorch or TensorFlow/Keras starter notebook, complete the TODOs and submit. Both versions are graded on the same rubric.", points: 10, groupId: groups[bk].lab.id, dueAt: due, submissionTypes: ["file", "url"], allowedExtensions: formatsFor("lab"), state: "published", gradingType: "points", tags: ["lab", "dual_framework"] }, "asg");
       itemOf(x, c, m, "assignment", a.id, a.title as string, "submit");
     }
     if (w.labs) {
       w.labs.forEach((lab, i) => {
         const day = i === 0 ? 3 : 4;
-        const a = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `Lab ${wk}${i === 0 ? "A" : "B"}: ${lab}`, instructions: `Guided 90-minute lab (${i === 0 ? "Thursday" : "Friday"}). Open the Student Starter notebook with TODOs in the Cloud Lab, complete the checkpoints and submit the notebook. Checkpoints are met at 7/10 or above.`, points: 10, groupId: groups[bk].lab.id, dueAt: dayOf(start, weekStart + day + 2, 23, 59), submissionTypes: ["file", "url"], allowedExtensions: ["ipynb", "py", "pdf"], state: "published", gradingType: "points", tags: ["lab"] }, "asg");
+        const a = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `Lab ${wk}${i === 0 ? "A" : "B"}: ${lab}`, instructions: `Guided 90-minute lab (${i === 0 ? "Thursday" : "Friday"}). Open the Student Starter notebook with TODOs in the Cloud Lab, complete the checkpoints and submit the notebook. Checkpoints are met at 7/10 or above.`, points: 10, groupId: groups[bk].lab.id, dueAt: dayOf(start, weekStart + day + 2, 23, 59), submissionTypes: ["file", "url"], allowedExtensions: formatsFor("lab"), state: "published", gradingType: "points", tags: ["lab"] }, "asg");
         itemOf(x, c, m, "assignment", a.id, a.title as string, "submit");
       });
     }
@@ -280,7 +281,7 @@ function loadProgram(x: Ctx, spec: ProgramSpec) {
     }
     for (const p of spec.projects.filter((pp) => weekNo(pp.week) === wk && (pp.week === w.week || !spec.curriculum.some((y) => y.week === pp.week)))) {
       const rb = p.requirements ? rubricFor(store, c.id, `${p.name} rubric`, p.requirements) : null;
-      const a = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `${p.kind === "capstone" ? "Capstone" : p.kind === "midterm" ? "Midterm project" : "Project"}: ${p.name}`, instructions: `${p.description}\n\nSkills practiced: ${p.skills.join(", ")}.${p.requirements ? `\n\nRequired: ${p.requirements.join("; ")}.` : ""}\n\nUse the synthetic datasets in Program resources; never real personal or financial data.`, points: rb ? p.requirements!.length * 5 : 20, groupId: groups[bk].proj.id, dueAt: due, submissionTypes: ["file", "url"], rubricId: rb?.id ?? null, state: "published", gradingType: "points", tags: [p.kind] }, "asg");
+      const a = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `${p.kind === "capstone" ? "Capstone" : p.kind === "midterm" ? "Midterm project" : "Project"}: ${p.name}`, instructions: `${p.description}\n\nSkills practiced: ${p.skills.join(", ")}.${p.requirements ? `\n\nRequired: ${p.requirements.join("; ")}.` : ""}\n\nUse the synthetic datasets in Program resources; never real personal or financial data.`, points: rb ? p.requirements!.length * 5 : 20, groupId: groups[bk].proj.id, dueAt: due, submissionTypes: ["file", "url"], allowedExtensions: formatsFor("project"), rubricId: rb?.id ?? null, state: "published", gradingType: "points", tags: [p.kind] }, "asg");
       itemOf(x, c, m, "assignment", a.id, a.title as string, "submit");
     }
     if (design) {
@@ -295,7 +296,7 @@ function loadProgram(x: Ctx, spec: ProgramSpec) {
         const grp = a.kind === "lab" ? groups[bk].lab : a.kind === "assignment" ? groups[bk].asg : groups[bk].proj;
         const policy = AI_POLICY_TEXT[a.aiPolicy];
         const steps = a.kind === "assignment" ? `\n\nWalkthrough:\n1. Load the larger synthetic dataset from Program resources and read its data card.\n2. Reproduce this week's technique on a 10% sample and check it by hand.\n3. Scale to the full dataset; record time, cost or errors.\n4. Compare results with a simple baseline.\n5. Write up decisions, evidence and one limitation.` : a.kind === "lab" ? `\n\n${design.notebooks ? `Open Week_${String(w.week).padStart(2, "0")}_Lab_Starter_TODO.ipynb in the Cloud Lab and complete each TODO; the instructor solution is released after the due date.` : "Follow the lab tool walkthrough and compare with the completed reference build."}` : "";
-        const asg = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: a.title, instructions: `${a.description}${steps}\n\nCompetencies: ${a.outcomes.join(", ")}.\n\nAI-use policy (${a.aiPolicy}): ${policy}\n\n${DRAFT}`, points: a.kind === "final_practical" ? 30 : a.kind === "project" ? 20 : 10, groupId: grp.id, dueAt: due, submissionTypes: ["file", "url"], allowedExtensions: a.kind === "lab" ? ["ipynb", "py", "pdf"] : ["docx", "pdf", "zip", "ipynb"], state: "published", gradingType: "points", tags: [a.kind], aiPolicy: a.aiPolicy, competencies: a.outcomes }, "asg");
+        const asg = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: a.title, instructions: `${a.description}${steps}\n\nCompetencies: ${a.outcomes.join(", ")}.\n\nAI-use policy (${a.aiPolicy}): ${policy}\n\n${DRAFT}`, points: a.kind === "final_practical" ? 30 : a.kind === "project" ? 20 : 10, groupId: grp.id, dueAt: due, submissionTypes: ["file", "url"], allowedExtensions: formatsFor(a.kind === "lab" ? "lab" : a.kind === "assignment" ? "assignment" : "project"), state: "published", gradingType: "points", tags: [a.kind], aiPolicy: a.aiPolicy, competencies: a.outcomes }, "asg");
         itemOf(x, c, m, "assignment", asg.id, asg.title as string, "submit");
       }
     }

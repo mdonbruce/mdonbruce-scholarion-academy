@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { acceptAttr, formatList, formatsFor } from "../../services/uploads";
 import { Formats } from "../../../ui/components/formats";
 import { facultyByName } from "../../../brand/faculty";
 import { FacultyCard } from "../../../ui/components/faculty";
@@ -466,8 +467,8 @@ function AssignmentDetail({ c, staff }: { c: C; staff: boolean }) {
               {types.includes("url") && (
                 <form method="post" action={api(c.slug, "a/submission.create")} className="row">
                   <Hidden values={{ back: here, assignmentId: String(a.id), mode: "url" }} />
-                  <label htmlFor="sub-url">Website address</label>
-                  <input id="sub-url" name="url" type="url" required />
+                  <label htmlFor="sub-url">Link (Google Colab notebook, Codelab, GitHub or shared document)</label>
+                  <input id="sub-url" name="url" type="url" required placeholder="https://colab.research.google.com/…" />
                   <button className="btn btn-primary btn-sm" type="submit">
                     Submit link
                   </button>
@@ -476,8 +477,11 @@ function AssignmentDetail({ c, staff }: { c: C; staff: boolean }) {
               {types.includes("file") && (
                 <form method="post" action={api(c.slug, "upload")} encType="multipart/form-data" className="row">
                   <Hidden values={{ back: here, assignmentId: String(a.id), courseId: String(c.course.id) }} />
-                  <label htmlFor="sub-file">File</label>
-                  <input id="sub-file" name="file" type="file" required />
+                  <label htmlFor="sub-file">Upload your work</label>
+                  <input id="sub-file" name="file" type="file" required accept={acceptAttr(((a.allowedExtensions as string[] | undefined) ?? []).length ? (a.allowedExtensions as string[]) : formatsFor("assignment"))} aria-describedby="sub-file-types" />
+                  <span id="sub-file-types" className="tiny muted">
+                    Accepted: {formatList(((a.allowedExtensions as string[] | undefined) ?? []).length ? (a.allowedExtensions as string[]) : formatsFor("assignment"))} · up to 10 MB
+                  </span>
                   <button className="btn btn-primary btn-sm" type="submit">
                     Upload and submit
                   </button>
@@ -1044,11 +1048,28 @@ function Files({ c, staff }: { c: C; staff: boolean }) {
       {staff ? <EntityTable slug={c.slug} table="files" rows={rows} back={here} manage={{ publish: false, archive: true }} columns={["name", "state", "mime", "size", "published", "usageRights"]} /> : rows.length ? (
         <ul className="item-list">
           {rows.map((f) => (
-            <li key={String(f.id)}>{String(f.name)}</li>
+            <li key={String(f.id)}>
+              {String(f.name)} · <a href={api(c.slug, `files/${f.id}/preview`)}>Preview<span className="sr-only"> {String(f.name)}</span></a>
+            </li>
           ))}
         </ul>
       ) : (
         <Empty title="No files." />
+      )}
+      {staff && rows.some((f) => f.state === "available") && (
+        <details>
+          <summary className="small">Preview files</summary>
+          <ul className="small">
+            {rows
+              .filter((f) => f.state === "available")
+              .slice(0, 60)
+              .map((f) => (
+                <li key={String(f.id)}>
+                  <a href={api(c.slug, `files/${f.id}/preview`)}>{String(f.name)}</a>
+                </li>
+              ))}
+          </ul>
+        </details>
       )}
       {staff && (
         <section className="card card-pad">

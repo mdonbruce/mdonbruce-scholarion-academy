@@ -1026,9 +1026,9 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.11",
   "feature": "File preview",
-  "status": "NOT_STARTED",
-  "evidence": "router objects (download only)",
-  "gap": "no inline preview"
+  "status": "DONE",
+  "evidence": "uploads.ts:previewFile, router files/:id/preview (PDF and images inline; Word, Excel, PowerPoint, notebooks, CSV, Markdown and code rendered as safe HTML)",
+  "gap": ""
  },
  {
   "section": "3.11",

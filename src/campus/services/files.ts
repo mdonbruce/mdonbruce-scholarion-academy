@@ -83,6 +83,7 @@ export function sniff(bytes: Buffer): string {
   if (hex.startsWith("ffd8ff")) return "image/jpeg";
   if (hex.startsWith("47494638")) return "image/gif";
   if (hex.startsWith("504b0304")) return "application/zip";
+  if (hex.startsWith("d0cf11e0a1b11ae1")) return "application/x-cfb"; // legacy Office (.doc, .xls, .ppt)
   if (hex.startsWith("4d5a")) return "application/x-msdownload";
   if (bytes.subarray(0, 4).toString() === "WEBV") return "text/vtt";
   if (hex.startsWith("000000") && bytes.subarray(4, 8).toString() === "ftyp") return "video/mp4";
@@ -92,7 +93,8 @@ export function sniff(bytes: Buffer): string {
 
 const COMPATIBLE: Record<string, string[]> = {
   "application/zip": ["application/zip", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/epub+zip"],
-  "text/plain": ["text/plain", "text/csv", "text/markdown", "text/x-python", "application/json", "text/vtt", "text/html", "application/xml", "text/xml"],
+  "text/plain": ["text/plain", "text/csv", "text/markdown", "text/x-python", "text/x-python-script", "application/x-python-code", "application/x-ipynb+json", "text/x-r", "application/sql", "text/x-sql", "application/json", "text/vtt", "text/html", "application/xml", "text/xml"],
+  "application/x-cfb": ["application/msword", "application/vnd.ms-excel", "application/vnd.ms-powerpoint"],
 };
 
 /** Scanner consumer: quarantine → scan → promote or reject. */

@@ -41,6 +41,7 @@ import * as design from "../services/design";
 import * as plans from "../services/plans";
 import * as cci from "../services/cci";
 import * as comms from "../services/comms";
+import * as uploads from "../services/uploads";
 import { isStaff, requireTenant } from "../services/common";
 import { decideSupportGrant, grantRole, requestSupportGrant, revokeRole } from "../iam";
 
@@ -699,6 +700,9 @@ qry("programs.quality_gate", "program-studio", "Quality gate for a program's cou
 cmd("programs.publish_shells", "program-studio", "Publish a program's course shells (after the quality gate).", [P("offeringId")], ({ store, actor, args }) => prog.publishProgramShells(store, actor, args.s("offeringId")));
 qry("programs.design", "program-studio", "Program design package for #1–#11: course standard, alignment matrix with Bloom levels, workload, credential rules, career hooks and the extended quality gate.", [P("program")], ({ store, actor, args }) => design.designSummary(store, actor, args.s("program")));
 cmd("programs.design_signoff", "program-studio", "Sign off a program design as instructional designer or subject-matter expert (one person can't sign both).", [P("program"), P("kind", "string", true, { options: ["designer", "sme"] }), P("note")], ({ store, actor, args }) => design.signOff(store, actor, args.s("program"), args.s("kind") as "designer" | "sme", args.s("note")));
+cmd("graded.attach_link", "learning-area", "Submit a link to your work (Google Colab notebook, Codelab, GitHub repository or shared document) for an item.", [P("itemId"), P("url"), opt("note")], ({ store, actor, args }) => uploads.attachWork(store, actor, { itemId: args.s("itemId"), url: args.s("url"), note: args.so("note") }));
+qry("graded.attachments", "learning-area", "Files and links uploaded for an item (yours; staff see everyone's).", [P("itemId")], ({ store, actor, args }) => uploads.attachmentsFor(store, actor, args.s("itemId")));
+qry("submission.formats", "assessment", "File formats accepted for assignments, projects, labs and mini labs.", [], () => ({ formats: uploads.SUBMISSION_FORMATS, byKind: uploads.FORMATS_BY_KIND, links: "Google Colab, Codelab, GitHub, Kaggle or a shared document (https)" }));
 // Tab 62 — CX & Live Sessions Hub.
 qry("comms.connectors", "communications", "Connector hub: status, plan limits and last verification for each communications connector.", [], ({ store, actor }) => comms.connectorHub(store, actor));
 qry("comms.segment_preview", "communications", "Preview how a class block splits under the 40-minute engine.", [P("totalMinutes", "number"), opt("kind"), opt("licensedHost", "boolean")], ({ args }) => comms.segmentPlan(args.n("totalMinutes"), { kind: (args.so("kind") as "class" | "one_to_one" | "office_hours" | undefined) ?? "class", licensedHost: args.b("licensedHost") }));

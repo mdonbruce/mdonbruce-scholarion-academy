@@ -34407,6 +34407,191 @@
         }
       }
     },
+    "/r/graded_attachments": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "List uploaded work (files and links)",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GradedAttachments"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Create a uploaded work",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/graded_attachments/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Get a uploaded work",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Update a uploaded work (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Delete (tombstone) a uploaded work",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/r/comms_connectors": {
       "get": {
         "tags": [
@@ -63729,6 +63914,107 @@
         }
       }
     },
+    "/a/graded.attach_link": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "graded.attach_link",
+        "summary": "Submit a link to your work (Google Colab notebook, Codelab, GitHub repository or shared document) for an item.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "note": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "itemId",
+                  "url"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/graded.attachments": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "graded.attachments",
+        "summary": "Files and links uploaded for an item (yours; staff see everyone's).",
+        "parameters": [
+          {
+            "name": "itemId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/submission.formats": {
+      "get": {
+        "tags": [
+          "Assessment"
+        ],
+        "operationId": "submission.formats",
+        "summary": "File formats accepted for assignments, projects, labs and mini labs.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/q/comms.connectors": {
       "get": {
         "tags": [
@@ -74924,6 +75210,57 @@
           }
         ],
         "description": "Studio output (tab: course-studio)"
+      },
+      "GradedAttachments": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "itemId": {
+                "description": "Item",
+                "type": "string"
+              },
+              "courseId": {
+                "description": "Course",
+                "type": "string"
+              },
+              "userId": {
+                "description": "Learner",
+                "type": "string"
+              },
+              "fileId": {
+                "description": "File",
+                "type": "string"
+              },
+              "fileName": {
+                "description": "File name",
+                "type": "string"
+              },
+              "url": {
+                "description": "Link (Colab, Codelab, GitHub, document)",
+                "type": "string",
+                "format": "uri"
+              },
+              "linkKind": {
+                "description": "Link kind",
+                "type": "string"
+              },
+              "note": {
+                "description": "Note",
+                "type": "string"
+              },
+              "at": {
+                "description": "Uploaded",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Uploaded work (tab: learning-area)"
       },
       "CommsConnectors": {
         "allOf": [

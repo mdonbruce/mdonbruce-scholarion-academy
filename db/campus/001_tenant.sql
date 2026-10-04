@@ -2944,6 +2944,24 @@ CREATE TABLE IF NOT EXISTS studio_outputs (
   checksum text
 );
 
+-- Uploaded work (tab: learning-area)
+CREATE TABLE IF NOT EXISTS graded_attachments (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  item_id text,
+  course_id text,
+  user_id text,
+  file_id text,
+  file_name text,
+  url text,
+  link_kind text,
+  note text,
+  at timestamptz
+);
+
 -- Comms connector (tab: communications)
 CREATE TABLE IF NOT EXISTS comms_connectors (
   id text PRIMARY KEY,

@@ -701,19 +701,35 @@ function ProjectPanel({ vm, back }: { vm: NonNullable<ReturnType<typeof itemVM>>
             : vm.peer && !vm.peer.needsStaff
               ? "waiting for peer reviews."
               : "waiting for course staff to grade it."}
+          {last.file && (
+            <div className="small">
+              File: <a href={`/api/v1/lms/submissions/${last.id}/file`}>{last.file.name}</a> ({Math.max(1, Math.round(last.file.size / 1024))} KB)
+            </div>
+          )}
+          {last.url && (
+            <div className="small">
+              Link: <a href={last.url}>{last.url}</a>
+            </div>
+          )}
           {last.status === "graded" && last.feedback && <div className="small" style={{ whiteSpace: "pre-line", marginTop: 6 }}>{last.feedback}</div>}
         </div>
       )}
       {vm.peer && <PeerPanel peer={vm.peer} submitted={!!last} back={back} />}
-      <form method="post" action="/api/v1/lms/submissions" className="panel">
+      <form method="post" action="/api/v1/lms/submissions" className="panel" encType="multipart/form-data">
         <h2 style={{ fontFamily: "var(--font-sans)", fontSize: "1.1rem" }}>Submission</h2>
         <input type="hidden" name="itemId" value={vm.item.id} />
         <input type="hidden" name="back" value={back} />
         <div className="field">
           <label htmlFor="file">
-            Files <span className="hint">(.py and a short PDF report; file storage connects with the LMS)</span>
+            Upload your work <span className="hint">(Word, Excel, PowerPoint, PDF, Jupyter/Colab notebook, Python, R, SQL, CSV, ZIP — up to 10 MB)</span>
           </label>
-          <input id="file" name="file" type="file" accept=".py,.pdf,.zip,.csv" />
+          <input id="file" name="file" type="file" accept=".docx,.doc,.xlsx,.xls,.pptx,.pdf,.ipynb,.py,.r,.sql,.csv,.json,.md,.txt,.zip,.png,.jpg" />
+        </div>
+        <div className="field">
+          <label htmlFor="url">
+            Or a link <span className="hint">(Google Colab notebook, Codelab, GitHub repository or shared document)</span>
+          </label>
+          <input id="url" name="url" type="url" placeholder="https://colab.research.google.com/…" />
         </div>
         <div className="field">
           <label htmlFor="text">Notes for the grader</label>

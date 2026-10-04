@@ -1,3 +1,4 @@
+import { attachWork, mimeFor, previewFile } from "../services/uploads";
 import "../index";
 import { broker, CampusError, log, metrics, nowIso, relay, resolveTenant, token, type Row, type TenantContext, type TenantStore } from "../core";
 import { actorFor, cookieName, effectiveRoles, hasAny, resolveSession, sessionRow, signIn, signOut, type Actor } from "../iam";
@@ -266,6 +267,11 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     return isForm(req) ? redirect(`/campus/${tenant.slug}/signin`, [sessionCookie(tenant.tenantId, "", 0)]) : json({ data: { ok: true } }, 200, { "set-cookie": sessionCookie(tenant.tenantId, "", 0) });
   }
   const actor = requireActor(c);
+  if (rest[0] === "files" && rest[1] && rest[2] === "preview" && method === "GET") {
+    const pv = previewFile(store, requireActor(c), rest[1]);
+    if (pv.kind === "inline") return new Response(new Uint8Array(pv.bytes), { status: 200, headers: { "content-type": pv.mime, "content-disposition": `inline; filename="${pv.name.replace(/[^A-Za-z0-9._-]/g, "_")}"`, "cache-control": "private, no-store", "x-content-type-options": "nosniff", "content-security-policy": "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; object-src 'self'" } });
+    return new Response(pv.html, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "private, no-store", "x-content-type-options": "nosniff", "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'" } });
+  }
   if (rest[0] === "cci" && rest[1] === "reports" && rest[2] && method === "GET") {
     const code = `#${decodeURIComponent(rest[2]).replace(/\.html$/, "").replace(/^#?p?/i, "")}`;
     return new Response(cciSvc.programReviewHtml(store, requireActor(c), code), { status: 200, headers: { "content-type": "text/html; charset=utf-8", "content-disposition": `inline; filename="program-review-${code.replace("#", "p")}.html"`, "cache-control": "no-store", "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'" } });
@@ -319,14 +325,18 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     const file = body.file as File | undefined;
     if (!file || typeof file === "string" || typeof (file as Blob).arrayBuffer !== "function") throw new CampusError("invalid", "Choose a file to upload.", 422);
     const bytes = Buffer.from(await (file as Blob).arrayBuffer());
-    const purpose = (String(body.purpose ?? "") || (body.assignmentId ? "submission" : body.courseId ? "course" : "personal")) as "course" | "submission" | "personal";
-    const r = requestUpload(store, a, { name: file.name, mime: file.type || "application/octet-stream", size: bytes.length, courseId: (body.courseId as string) || null, folderId: (body.folderId as string) || null, purpose });
+    const purpose = (String(body.purpose ?? "") || (body.assignmentId || body.gradedItemId ? "submission" : body.courseId ? "course" : "personal")) as "course" | "submission" | "personal";
+    const r = requestUpload(store, a, { name: file.name, mime: mimeFor(file.name, file.type), size: bytes.length, courseId: (body.courseId as string) || null, folderId: (body.folderId as string) || null, purpose });
     receiveUpload(store, String(r.file.id), bytes);
     const scanned = scanFile(store, String(r.file.id));
     if (scanned?.state !== "available") throw new CampusError("blocked", `The file didn't pass the safety scan (${scanned?.state ?? "unknown"}).`, 422);
     if (body.assignmentId) {
       const sub = submit(store, a, String(body.assignmentId), { mode: "file", fileId: String(r.file.id) });
       return ok(c, { fileId: r.file.id, submissionId: sub.id }, 201, {}, "Submitted.");
+    }
+    if (body.gradedItemId) {
+      const at = attachWork(store, a, { itemId: String(body.gradedItemId), fileId: String(r.file.id), note: (body.note as string) || undefined });
+      return ok(c, { fileId: r.file.id, attachmentId: at.id }, 201, {}, "Work uploaded for your instructor.");
     }
     return ok(c, { fileId: r.file.id }, 201, {}, "Uploaded and scanned.");
   }

@@ -54,7 +54,7 @@ Assignments, quizzes with snapshots and seeded randomization, question banks, at
 - **Typical failures:** Attempt start refused; submission blocked by scan.
 - **Recovery:** Check availability, attempt count, accommodations; re-scan file; idempotent resubmit.
 - **Resources:** `assignments`, `quizzes`, `question_banks`, `questions`, `attempts`, `submissions`
-- **Operations:** `submission.create`, `submission.mine`, `peer.assign`, `peer.complete`, `peer.mine`, `quiz.start`, `quiz.attempt`, `quiz.autosave`, `quiz.finish`, `quiz.submit`, `quiz.grade_question`, `quiz.moderate`, `quiz.regrade`, `quiz.item_analysis`, `quiz.manual_queue`, `assignments.bulk_dates`
+- **Operations:** `submission.create`, `submission.mine`, `peer.assign`, `peer.complete`, `peer.mine`, `quiz.start`, `quiz.attempt`, `quiz.autosave`, `quiz.finish`, `quiz.submit`, `quiz.grade_question`, `quiz.moderate`, `quiz.regrade`, `quiz.item_analysis`, `quiz.manual_queue`, `assignments.bulk_dates`, `submission.formats`
 - **Who sees it:** admin, instructor, ta, designer, student
 
 ## 5. Gradebook
@@ -642,7 +642,7 @@ Scholarion's own hosted learning area for each course: dashboard, modules and to
 - **Typical failures:** Grading environment unavailable (submission marked infra_failed, no attempt used); gradebook post failure (posting_failed, retried automatically); attempts exhausted (409).
 - **Recovery:** Learner resubmits after an infra failure; staff or the scheduler run graded.retry; instructor grants an extra attempt in the item settings.
 - **Resources:** `graded_items`, `graded_item_versions`, `graded_submissions`, `passbook`, `lab_workspaces`, `workspace_snapshots`, `workspace_policies`, `workspace_agent_runs`, `workspace_teams`, `projection_locks`
-- **Operations:** `learn.overview`, `learn.sections`, `graded.view`, `graded.practice`, `graded.submit`, `graded.submit_project`, `graded.review`, `graded.gradebook`, `graded.regrade`, `graded.retry`, `workspace.templates`, `workspace.mine`, `workspace.launch`, `workspace.get`, `workspace.files`, `workspace.read`, `workspace.write`, `workspace.command`, `workspace.save`, `workspace.stop`, `workspace.resume`, `workspace.reset`, `workspace.snapshot`, `workspace.agent_run`, `workspace.agent_stop`, `workspace.agent_runs`, `workspace.pause`, `workspace.unpause`, `workspace.policy`, `workspace.set_policy`, `workspace.progress`, `projection.state`, `projection.lock`, `projection.set_pin`, `projection.unlock`
+- **Operations:** `learn.overview`, `learn.sections`, `graded.view`, `graded.practice`, `graded.submit`, `graded.submit_project`, `graded.review`, `graded.gradebook`, `graded.regrade`, `graded.retry`, `workspace.templates`, `workspace.mine`, `workspace.launch`, `workspace.get`, `workspace.files`, `workspace.read`, `workspace.write`, `workspace.command`, `workspace.save`, `workspace.stop`, `workspace.resume`, `workspace.reset`, `workspace.snapshot`, `workspace.agent_run`, `workspace.agent_stop`, `workspace.agent_runs`, `workspace.pause`, `workspace.unpause`, `workspace.policy`, `workspace.set_policy`, `workspace.progress`, `projection.state`, `projection.lock`, `projection.set_pin`, `projection.unlock`, `graded.attach_link`, `graded.attachments`
 - **Who sees it:** admin, designer, instructor, ta, student
 
 ## 56. Course Studio (Master Studio Generator)

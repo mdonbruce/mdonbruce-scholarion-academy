@@ -70,15 +70,24 @@ export function isForm(req: Request): boolean {
   return ct.includes("application/x-www-form-urlencoded") || ct.includes("multipart/form-data");
 }
 
+/** Uploaded files from a multipart form, keyed by field name (read with filesOf(c.data)). */
+const UPLOADS = new WeakMap<Record<string, string>, Map<string, File>>();
+export const filesOf = (data: Record<string, string>) => UPLOADS.get(data) ?? new Map<string, File>();
+
 export async function body(req: Request): Promise<Record<string, string>> {
   if (req.method === "GET" || req.method === "HEAD") return {};
   if (isForm(req)) {
     const fd = await req.formData();
     const out: Record<string, string> = {};
+    const files = new Map<string, File>();
     fd.forEach((v, k) => {
       if (typeof v === "string") out[k] = v;
-      else out[k] = (v as File).name;
+      else {
+        out[k] = (v as File).name;
+        if ((v as File).size > 0) files.set(k, v as File);
+      }
     });
+    if (files.size) UPLOADS.set(out, files);
     return out;
   }
   try {

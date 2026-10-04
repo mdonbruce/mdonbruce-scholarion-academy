@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { publish } from "./bus";
 import { catalog } from "./catalog";
 import { entitlements } from "./entitlements";
@@ -198,13 +199,23 @@ export const lms = {
 
   /* ---------------- Projects ---------------- */
 
-  submitProject(userId: string, itemId: string, text: string, fileName?: string): Submission {
+  submitProject(userId: string, itemId: string, text: string, fileName?: string, upload?: { name: string; type: string; bytes: Buffer }, url?: string): Submission {
     const item = catalog.item(itemId);
     if (!item?.project) throw new PlatformError("not_found", "Project not found", 404);
     const d = entitlements.check(userId, "item.graded", item.courseId);
     if (!d.allow) throw new PlatformError(d.reason ?? "needs_upgrade", "Projects need full access.", 403);
     if (text.trim().length < 20) throw new PlatformError("too_short", "Add a short description of your submission (at least 20 characters).");
-    const s: Submission = { id: newId("sbm"), userId, itemId, text: text.trim(), fileName, createdAt: nowIso(), status: "submitted" };
+    let file: Submission["file"];
+    if (upload && upload.bytes.length) {
+      const ext = upload.name.split(".").pop()?.toLowerCase() ?? "";
+      if (!SITE_FORMATS.includes(ext)) throw new PlatformError("type_not_allowed", `Accepted files: ${SITE_FORMATS.map((x) => `.${x}`).join(", ")}.`, 422);
+      if (upload.bytes.length > 10 * 1024 * 1024) throw new PlatformError("too_large", "Files must be under 10 MB.", 413);
+      if (upload.bytes.subarray(0, 2).toString("latin1") === "MZ") throw new PlatformError("blocked", "Executable files can't be uploaded.", 422);
+      if (ext === "pdf" && upload.bytes.subarray(0, 4).toString("latin1") !== "%PDF") throw new PlatformError("blocked", "That file isn't a real PDF.", 422);
+      file = { name: upload.name.slice(0, 200), type: upload.type || "application/octet-stream", size: upload.bytes.length, sha256: createHash("sha256").update(upload.bytes).digest("hex"), dataB64: upload.bytes.toString("base64") };
+    }
+    if (url && !/^https:\/\/[^\s]+$/.test(url)) throw new PlatformError("invalid", "Use a full https:// link (Google Colab, Codelab, GitHub or a shared document).", 422);
+    const s: Submission = { id: newId("sbm"), userId, itemId, text: text.trim(), fileName: file?.name ?? fileName, ...(file ? { file } : {}), ...(url ? { url } : {}), createdAt: nowIso(), status: "submitted" };
     getDb().submissions.push(s);
     this.recordProgress(userId, itemId, "completed");
     publish("lms.submission.created", "lms", `user/${userId}`, { userId, itemId, submissionId: s.id });
@@ -463,3 +474,6 @@ export const lms = {
     return [...new Set(this.enrollmentsFor(userId).map((e) => e.productId))].map((id) => catalog.get(id)).filter((p): p is Product => !!p);
   },
 };
+
+/** Files accepted for project and lab submissions on the site. */
+export const SITE_FORMATS = ["docx", "doc", "xlsx", "xls", "pptx", "pdf", "ipynb", "py", "r", "sql", "csv", "json", "md", "txt", "zip", "png", "jpg"];

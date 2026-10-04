@@ -38,7 +38,7 @@ import {
 import { DAY, PlatformError } from "@/platform/util";
 import { DURATION_BUCKETS, type DurationBucket } from "@/platform/catalog";
 import type { PlanChangeTarget } from "@/platform/commerce";
-import { body, currentUser, errorResponse, json, mfaCookie, prefCookie, readCookie, MFA_COOKIE, redirect, redirectWithCookies, safeRedirect, sameOrigin, sessionCookie, withQuery } from "./http";
+import { body, filesOf, currentUser, errorResponse, json, mfaCookie, prefCookie, readCookie, MFA_COOKIE, redirect, redirectWithCookies, safeRedirect, sameOrigin, sessionCookie, withQuery } from "./http";
 
 /**
  * Academy BFF — the only door the browser uses (Integration Spec §2, rule 1).
@@ -264,12 +264,19 @@ on("POST", "lms/attempts/:id/submit", (c) => json(lms.submitAttempt(c.user!.id, 
 on(
   "POST",
   "lms/submissions",
-  (c) => {
-    lms.submitProject(c.user!.id, c.data.itemId, c.data.text ?? "", c.data.file || undefined);
+  async (c) => {
+    const f = filesOf(c.data).get("file");
+    const upload = f ? { name: f.name, type: f.type, bytes: Buffer.from(await f.arrayBuffer()) } : undefined;
+    lms.submitProject(c.user!.id, c.data.itemId, c.data.text ?? "", c.data.file || undefined, upload, c.data.url || undefined);
     return redirect(withQuery(back(c, "/app"), { notice: "Submitted. Course staff will grade it and you'll be notified." }));
   },
   "user",
 );
+on("GET", "lms/submissions/:id/file", (c) => {
+  const s = getDb().submissions.find((x) => x.id === c.params.id);
+  if (!s?.file || (s.userId !== c.user!.id && !identity.hasRole(c.user!, "instructor", "support_agent", "platform_admin"))) throw new PlatformError("not_found", "File not found", 404);
+  return new Response(new Uint8Array(Buffer.from(s.file.dataB64, "base64")), { headers: { "content-type": s.file.type || "application/octet-stream", "content-disposition": `attachment; filename="${s.file.name.replace(/[^A-Za-z0-9._-]/g, "_")}"`, "cache-control": "private, no-store", "x-content-type-options": "nosniff" } });
+}, "user");
 on(
   "POST",
   "lms/deadlines/reset",

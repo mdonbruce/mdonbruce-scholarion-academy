@@ -258,7 +258,7 @@ export function AdminGradingView({ viewer, vm, flash }: { viewer: V; vm: ReturnT
           <section key={s.id} className="card card-pad">
             <strong>{s.item?.title}</strong>
             <div className="tiny muted">
-              {s.learner} · {fmtDateTime(s.createdAt)} {s.fileName ? `· ${s.fileName}` : ""}
+              {s.learner} · {fmtDateTime(s.createdAt)} {s.file ? <>· <a href={`/api/v1/lms/submissions/${s.id}/file`}>{s.file.name}</a></> : s.fileName ? `· ${s.fileName}` : ""} {s.url ? <>· <a href={s.url}>link</a></> : null}
             </div>
             <p className="small">{s.text}</p>
             {s.needsStaff && (

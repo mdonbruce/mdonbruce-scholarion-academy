@@ -446,6 +446,10 @@ export interface Submission {
   itemId: ID;
   text: string;
   fileName?: string;
+  /** Uploaded work (scanned); bytes kept with the submission in this environment. */
+  file?: { name: string; type: string; size: number; sha256: string; dataB64: string };
+  /** Link to a Google Colab notebook, Codelab, GitHub repository or shared document. */
+  url?: string;
   createdAt: ISODate;
   status: "submitted" | "graded";
   score?: number;
