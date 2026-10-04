@@ -74,7 +74,7 @@ describe("Academy programs #1, #12, #13, #14, #26 (Tab 50)", () => {
     assert.equal(store.list("assignments", (a) => a.courseId === c26 && /^Lab \d+[AB]:/.test(String(a.title))).length, 12);
     assert.equal(store.list("quizzes", (q) => q.courseId === c26 && q.state === "published").length, 6);
     assert.equal(store.list("calendar_events", (e) => e.courseId === c26).length, 20);
-    assert.ok(store.list("modules", (m) => m.courseId === c26 && m.sequential).length >= 7);
+    assert.ok(store.list("modules", (m) => m.courseId === c26 && !!m.sequential).length >= 7);
   });
 
   it("builds the website page from the catalog: fees, cohorts, JSON-LD, honest credential and social proof rules", () => {
@@ -176,7 +176,7 @@ describe("Academy programs #1, #12, #13, #14, #26 (Tab 50)", () => {
     for (const g of storeOf("academy").list("grades", (x) => x.userId === uid && /^Capstone:/.test(String(storeOf("academy").get("assignments", String(x.assignmentId))?.title)))) storeOf("academy").tx(() => storeOf("academy").update("grades", g.id, { score: 35 }));
     const done = academy.evaluateCompletion(storeOf("academy"), as("academy", "registrar").actor, uid, P26);
     assert.equal(done.completed, true, JSON.stringify(done.checks));
-    assert.ok(done.credential);
+    assert.ok("credential" in done && done.credential);
   });
 
   it("#13 bundle badge is issued when both courses are completed", () => {
