@@ -1,6 +1,6 @@
 {
   "name": "scholarion-academy",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Scholarion Academy website, learner app and BFF, wired to Scholarion platform services (local mocks until each real service is CONNECTED).",
   "license": "UNLICENSED",

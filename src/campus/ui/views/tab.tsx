@@ -20,7 +20,8 @@ import { CampaignsPanel } from "./campaigns";
 import { DesignPanel } from "./design";
 import { AidQueuePanel } from "./market";
 import { AcceptancePanel, BridgePanel, DepartmentsPanel, VoicePanel } from "./governed";
-import { AppsPanel, ForeignImportPanel, OutcomesPanel, TermAccessPanel } from "./structure";
+import { AccountAdminPanel } from "./adminx";
+import { AppsPanel, ForeignImportPanel, GroupFilesPanel, OutcomesPanel, TermAccessPanel } from "./structure";
 import { isDesignProgram } from "../../academy/design";
 import { studioOverview, programIndex } from "../../services/programs";
 import { PARITY, paritySummary, SECTION_TITLES } from "../../parity";
@@ -189,7 +190,7 @@ function Bespoke({ t, tab }: { t: T; tab: string }) {
       case "cloud-lab":
         return <CloudLab t={t} />;
       case "groups":
-        return t.sp.setId ? <GroupSet t={t} /> : null;
+        return t.sp.setId ? <GroupSet t={t} /> : <GroupFilesPanel store={t.store} actor={t.actor} slug={t.slug} here={t.here} sp={t.sp} />;
       case "observers":
         return <Observers t={t} />;
       case "helpdesk":
@@ -457,10 +458,7 @@ function AdminConsole({ t }: { t: T }) {
           <OpForm slug={t.slug} op={OPERATIONS["admin.flag"]} back={t.here} />
         </section>
       </div>
-      <section className="card card-pad">
-        <h2 className="card-title">Recent audit</h2>
-        <Result value={t.store.auditLog(25).map((a) => ({ at: fmt(a.at, true), actor: a.actorId, realActor: a.realActorId ?? "", action: a.action, resource: a.resource, outcome: a.outcome }))} />
-      </section>
+      <AccountAdminPanel store={t.store} actor={t.actor} slug={t.slug} here={t.here} sp={t.sp} />
     </div>
   );
 }

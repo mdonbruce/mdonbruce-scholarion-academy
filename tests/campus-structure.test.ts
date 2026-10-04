@@ -272,7 +272,8 @@ describe("Registry invariants", () => {
   it("no entity declares the same field twice (base fields plus extensions)", async () => {
     const { ENTITIES } = await import("../src/campus/registry");
     for (const e of ENTITIES) {
-      const names = e.fields.map((f) => f.name);
+      // Compare the SQL column names the schema generator produces (row `version` maps to content_version).
+      const names = e.fields.map((f) => (f.name === "version" ? "content_version" : f.name.replace(/([A-Z])/g, "_$1").toLowerCase()));
       const dup = names.filter((n, i) => names.indexOf(n) !== i);
       assert.deepEqual(dup, [], `${e.table} repeats ${dup.join(", ")}`);
     }

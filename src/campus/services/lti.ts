@@ -400,3 +400,89 @@ export function labSessionsFor(store: TenantStore, a: Actor, courseId: string) {
   if (!hasAny(a, ["admin", "instructor", "ta"], courseId)) throw new CampusError("forbidden", "Only graders can see lab sessions.", 403);
   return store.list("lab_sessions", (s) => s.courseId === courseId);
 }
+
+/* ---------------- LTI Proctoring Services (parity §3.12) ---------------- */
+
+const AP = "https://purl.imsglobal.org/spec/lti-ap/claim/";
+
+/**
+ * Start proctoring: the platform signs an LtiStartProctoring message for the quiz's proctoring
+ * tool. The tool checks the student, then returns an LtiStartAssessment message to
+ * `start_assessment_url`; only then may the attempt start. The tool must be registered and
+ * enabled by the school — nothing is enabled by default.
+ */
+export function proctorLaunch(store: TenantStore, a: Actor, quizId: string) {
+  const quiz = store.get("quizzes", quizId);
+  if (!quiz || quiz.state !== "published") throw new CampusError("not_found", "Quiz not available", 404);
+  const courseId = String(quiz.courseId);
+  if (!hasAny(a, ["student"], courseId)) throw new CampusError("forbidden", "Only enrolled students start proctoring.", 403);
+  if (!quiz.proctoringToolId) throw new CampusError("invalid", "This quiz doesn't use a proctoring tool.", 422);
+  const tool = store.get("tool_registrations", String(quiz.proctoringToolId));
+  if (!tool) throw new CampusError("not_found", "Proctoring tool not registered", 404);
+  if (!tool.enabled) throw new CampusError("tool_disabled", `${tool.name} is turned off for this school.`, 423);
+  const key = rsaKey(store, "lti_platform");
+  const iss = platformIssuer(store);
+  const now = Math.floor(nowMs() / 1000);
+  const jti = id("jti");
+  const nonce = token(12);
+  const sessionData = token(16);
+  const attempt = store.list("attempts", (x) => x.quizId === quizId && x.userId === a.id).length + 1;
+  const c = store.get("courses", courseId)!;
+  const base = `${iss}/api/campus/v1/t/${broker.tenant(store.tenantId)!.slug}`;
+  const claims: Record<string, unknown> = {
+    iss,
+    aud: tool.clientId,
+    sub: pseudonym(store.tenantId, a.id),
+    iat: now,
+    exp: now + 300,
+    nonce,
+    jti,
+    [`${CLAIM}message_type`]: "LtiStartProctoring",
+    [`${CLAIM}version`]: LTI_VERSION,
+    [`${CLAIM}deployment_id`]: tool.deploymentId ?? `dep-${tool.id}`,
+    [`${CLAIM}target_link_uri`]: tool.launchUrl,
+    [`${CLAIM}resource_link`]: { id: quizId, title: quiz.title },
+    [`${CLAIM}context`]: { id: courseId, label: c.code, title: c.title },
+    [`${CLAIM}roles`]: ltiRoles(a, courseId),
+    [`${AP}attempt_number`]: String(attempt),
+    [`${AP}start_assessment_url`]: `${base}/a/lti.proctor_start_assessment`,
+    [`${AP}session_data`]: sessionData,
+  };
+  const idToken = signJwt(claims, String(key.privatePem), String(key.kid));
+  return store.tx(() => {
+    store.insert("lti_launches", { jti, nonce, userId: a.id, toolId: tool.id, assignmentId: quizId, courseId, kind: "proctoring", sessionData: sha256(sessionData), attemptNumber: attempt, expiresAt: new Date((now + 900) * 1000).toISOString(), usedAt: null }, "ll");
+    audit(store, a, "lti.proctor_launch", `quizzes/${quizId}`, String(tool.clientId));
+    return { idToken, launchUrl: String(tool.launchUrl), attemptNumber: attempt };
+  });
+}
+
+/** The tool hands the student back with a signed LtiStartAssessment; this clears the quiz to start. */
+export function proctorStartAssessment(store: TenantStore, a: Actor, jwt: string) {
+  const d = decodeJwt(jwt);
+  const tool = store.list("tool_registrations", (t) => t.clientId === d.payload.iss)[0];
+  if (!tool) throw new CampusError("invalid_token", "Unknown tool", 401);
+  const p = verifyJwt(jwt, toolPublicPem(store, tool), { aud: platformIssuer(store) });
+  if (p[`${CLAIM}message_type`] !== "LtiStartAssessment") throw new CampusError("invalid_token", "Not a start-assessment message", 401);
+  const quizId = String((p[`${CLAIM}resource_link`] as { id?: string })?.id ?? "");
+  const sd = String(p[`${AP}session_data`] ?? "");
+  const rec = store.list("lti_launches", (l) => l.kind === "proctoring" && l.toolId === tool.id && l.userId === a.id && l.assignmentId === quizId && l.sessionData === sha256(sd))[0];
+  if (!rec || rec.usedAt || String(rec.expiresAt) < nowIso()) throw new CampusError("invalid_token", "Proctoring session expired or was already used. Start again from the quiz.", 401);
+  if (String(p[`${AP}attempt_number`] ?? "") !== String(rec.attemptNumber)) throw new CampusError("invalid_token", "Attempt number doesn't match.", 401);
+  return store.tx(() => {
+    store.update("lti_launches", rec.id, { usedAt: nowIso() });
+    const ex = store.list("proctor_readiness", (r) => r.quizId === quizId && r.userId === a.id)[0];
+    const vals = { complete: true, completedAt: nowIso(), checks: { lti_proctoring: tool.name } };
+    if (ex) store.update("proctor_readiness", ex.id, vals);
+    else store.insert("proctor_readiness", { courseId: rec.courseId, userId: a.id, quizId, ...vals }, "prd");
+    audit(store, a, "lti.proctor_start", `quizzes/${quizId}`, String(tool.clientId));
+    return { quizId, cleared: true };
+  });
+}
+
+/** Sign an LtiStartAssessment as the built-in test tool (tests and the sandbox tool page). */
+export function cloudLabStartAssessment(store: TenantStore, launchToken: string) {
+  const req = decodeJwt(launchToken).payload;
+  const k = rsaKey(store, "lti_tool");
+  const now = Math.floor(nowMs() / 1000);
+  return signJwt({ iss: CLOUD_LAB_CLIENT_ID, aud: platformIssuer(store), iat: now, exp: now + 300, nonce: token(8), [`${CLAIM}message_type`]: "LtiStartAssessment", [`${CLAIM}version`]: LTI_VERSION, [`${CLAIM}resource_link`]: req[`${CLAIM}resource_link`], [`${AP}session_data`]: req[`${AP}session_data`], [`${AP}attempt_number`]: req[`${AP}attempt_number`] }, String(k.privatePem), String(k.kid));
+}

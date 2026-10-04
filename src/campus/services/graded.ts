@@ -436,7 +436,7 @@ export function courseGradebook(store: TenantStore, a: Actor, courseId: string) 
   const items = store.list("graded_items", (i) => i.courseId === courseId && !!i.published);
   const isStaff = staff(a, courseId);
   if (!isStaff && !learner(a, courseId)) throw new CampusError("forbidden", "Not in this course.", 403);
-  const users = isStaff ? [...new Set(store.list("enrollments", (e) => e.courseId === courseId && e.role === "student" && e.state === "active").map((e) => String(e.userId)))] : [a.id];
+  const users = isStaff ? [...new Set(store.list("enrollments", (e) => e.courseId === courseId && e.role === "student" && e.state === "active" && e.source !== "student_view").map((e) => String(e.userId)))] : [a.id];
   const rows = users.map((uid) => ({
     userId: uid,
     name: String(store.get("users", uid)?.name ?? uid),

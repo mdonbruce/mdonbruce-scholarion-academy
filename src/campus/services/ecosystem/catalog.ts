@@ -589,7 +589,7 @@ export function scheduleLiveSession(store: TenantStore, a: Actor, input: { cours
   return store.tx(() => {
     const s = store.insert(T.sessions, { courseId: input.courseId, title: String(input.title ?? "Live session").slice(0, 200), providerId: p.id, provider: p.name, startsAt: iso(start), endsAt: iso(t), totalMinutes: total, providerLimitMinutes: limit, blocks, createdBy: a.id, recordingNote: "Recording is not assumed. Link a recording here only if the provider's plan supports it and participants are informed.", asyncMaterials: `/campus/{tenant}/learn/${input.courseId}/lecture-studio` }, "elive");
     for (const b of blocks) store.insert("calendar_events", { courseId: input.courseId, title: `${s.title} — ${b.label}`, startsAt: b.startsAt, endsAt: iso(Date.parse(b.startsAt) + b.minutes * 60_000), location: b.joinUrl ?? `${p.name} (join link added by the instructor)`, recurrence: "none", liveSessionId: s.id }, "ce");
-    const learners = store.list("enrollments", (e) => e.courseId === input.courseId && e.role === "student" && e.state === "active").map((e) => String(e.userId));
+    const learners = store.list("enrollments", (e) => e.courseId === input.courseId && e.role === "student" && e.state === "active" && e.source !== "student_view").map((e) => String(e.userId));
     notify(store, learners, "live", `Live session scheduled: ${s.title}`, `${blocks.length} block(s) on ${p.name}, starting ${iso(start).slice(0, 16).replace("T", " ")} UTC. Lecture materials stay available in the learning area.`, `/campus/{tenant}/hub/live?course=${input.courseId}`, input.courseId);
     audit(store, a, "eco.live.schedule", `${T.sessions}/${s.id}`, `${blocks.length} blocks`);
     return s;

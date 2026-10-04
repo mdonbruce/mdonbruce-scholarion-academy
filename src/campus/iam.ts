@@ -27,6 +27,8 @@ export interface Actor {
   masqueradedBy?: { id: string; name: string; expiresAt: string };
   /** The Student View test student for a course. */
   testStudentOf?: string;
+  /** Sub-account admin: account ids this person administers (admin inside those accounts' courses only). */
+  accountAdminOf?: string[];
 }
 
 export const ANONYMOUS_ID = "anonymous";
@@ -47,7 +49,10 @@ export function verifyPassword(pw: string, stored: string): boolean {
 export function actorFor(store: TenantStore, userId: string, mfa = false): Actor {
   const u = store.get("users", userId);
   if (!u || u.status !== "active") throw new CampusError("unauthenticated", "Please sign in.", 401);
-  const grants = store.list("role_grants", (g) => g.userId === userId && !g.revokedAt && (!g.expiresAt || String(g.expiresAt) > nowIso()));
+  const allGrants = store.list("role_grants", (g) => g.userId === userId && !g.revokedAt && (!g.expiresAt || String(g.expiresAt) > nowIso()));
+  // Account-scoped grants (sub-account admins) never become tenant-wide roles.
+  const grants = allGrants.filter((g) => g.scope !== "account");
+  const accountAdminOf = allGrants.filter((g) => g.scope === "account" && g.role === "admin" && g.accountId).map((g) => String(g.accountId));
   const roles = grants.map((g) => g.role as Role);
   const customRoles = grants.filter((g) => g.customRole).map((g) => g.customRole as string);
   const courseRoles: Record<string, Role[]> = {};
@@ -56,6 +61,13 @@ export function actorFor(store: TenantStore, userId: string, mfa = false): Actor
     const end = e.endAt as string | undefined;
     if ((start && start > nowIso()) || (end && end < nowIso())) continue;
     (courseRoles[e.courseId as string] ??= []).push(e.role as Role);
+  }
+  if (accountAdminOf.length) {
+    const under = accountSubtree(store, accountAdminOf);
+    for (const c of store.list("courses", (x) => !!x.accountId && under.has(String(x.accountId)))) {
+      const list = (courseRoles[c.id] ??= []);
+      if (!list.includes("admin")) list.push("admin");
+    }
   }
   let supportGrant: Actor["supportGrant"];
   if (roles.includes("support")) {
@@ -74,7 +86,22 @@ export function actorFor(store: TenantStore, userId: string, mfa = false): Actor
     mfa,
     customRoles,
     testStudentOf: (u.testStudentOf as string | undefined) ?? undefined,
+    accountAdminOf: accountAdminOf.length ? accountAdminOf : undefined,
   };
+}
+
+/** The given accounts and every sub-account below them. */
+export function accountSubtree(store: TenantStore, roots: string[]): Set<string> {
+  const out = new Set<string>(roots);
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const acc of store.list("accounts")) if (acc.parentId && out.has(String(acc.parentId)) && !out.has(acc.id)) {
+      out.add(acc.id);
+      grew = true;
+    }
+  }
+  return out;
 }
 
 /** Roles that apply tenant-wide. Teaching roles (student, instructor, ta, observer) only apply inside a course they are enrolled in. */
@@ -88,7 +115,8 @@ export function effectiveRoles(a: Actor, courseId?: string | null): Role[] {
     for (const x of a.courseRoles[courseId] ?? []) r.add(x);
   } else {
     for (const x of a.roles) r.add(x);
-    for (const list of Object.values(a.courseRoles)) for (const x of list) r.add(x);
+    // Course-scoped admin (sub-account admins) never counts as tenant-wide admin.
+    for (const list of Object.values(a.courseRoles)) for (const x of list) if (x !== "admin") r.add(x);
   }
   // Support staff only gain access while a time-boxed grant is active.
   if (r.has("support") && !a.supportGrant) r.delete("support");
@@ -139,6 +167,19 @@ export function grantRole(store: TenantStore, by: Actor, userId: string, role: R
     const g = store.insert("role_grants", { userId, role, scope: "tenant", grantedBy: by.id, expiresAt: expiresAt ?? null }, "rg");
     store.emit("identity.role.granted", `user/${userId}`, { userId, role });
     store.audit({ actorId: by.id, actorRoles: by.roles, action: "role_grant.create", resource: `user/${userId}`, outcome: "allowed", reason: role });
+    return g;
+  });
+}
+
+/** Sub-account admin: admin rights only inside courses under this account (and its sub-accounts). */
+export function grantAccountAdmin(store: TenantStore, by: Actor, userId: string, accountId: string, expiresAt?: string) {
+  authorize(store, by, "role_grant.create", ["admin"], { resource: `user/${userId}` });
+  if (!store.get("users", userId)) throw new CampusError("not_found", "User not found", 404);
+  if (!store.get("accounts", accountId)) throw new CampusError("not_found", "Account not found", 404);
+  return store.tx(() => {
+    const g = store.insert("role_grants", { userId, role: "admin", scope: "account", accountId, grantedBy: by.id, expiresAt: expiresAt ?? null }, "rg");
+    store.emit("identity.role.granted", `user/${userId}`, { userId, role: "admin", accountId });
+    store.audit({ actorId: by.id, actorRoles: by.roles, action: "role_grant.create", resource: `user/${userId}`, outcome: "allowed", reason: `admin of account ${accountId}` });
     return g;
   });
 }
@@ -216,9 +257,11 @@ export function resolveSession(store: TenantStore, secret: string | null | undef
   try {
     const real = actorFor(store, s.userId as string, !!s.mfa);
     const mq = s.masqueradeId ? store.get("masquerades", s.masqueradeId as string) : undefined;
-    if (mq && !mq.endedAt && String(mq.expiresAt) > nowIso() && real.roles.includes("admin")) {
-      // Acting as another user: their permissions, with every audit record stamped with the admin.
-      const target = actorFor(store, mq.targetUserId as string, false);
+    const studentView = (t: Actor) => !!mq?.studentView && !!t.testStudentOf && hasAny(real, ["admin", "instructor", "designer", "ta"], t.testStudentOf);
+    const target = mq && !mq.endedAt && String(mq.expiresAt) > nowIso() ? actorFor(store, mq.targetUserId as string, false) : undefined;
+    if (mq && target && (real.roles.includes("admin") || studentView(target))) {
+      // Acting as another user: their permissions, with every audit record stamped with the real person.
+      // Course staff may act only as their own course's test student (Student View).
       store.realActorId = real.id;
       return { ...target, masqueradedBy: { id: real.id, name: real.name, expiresAt: String(mq.expiresAt) } };
     }

@@ -87,7 +87,7 @@ export interface Tenant {
   /** Verified hosts that resolve to this tenant. */
   domains: { host: string; verified: boolean }[];
   realm: { protocol: "oidc" | "saml" | "local"; issuer: string; mfaRequiredForStaff: boolean; jit: boolean };
-  theme: { primary: string; accent: string; logoText: string };
+  theme: { primary: string; accent: string; logoText: string; logoUrl?: string | null; customCss?: string | null };
   flags: Record<string, boolean>;
   createdAt: string;
   suspendedAt?: string;

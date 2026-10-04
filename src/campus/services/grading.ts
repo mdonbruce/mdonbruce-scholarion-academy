@@ -52,19 +52,21 @@ export function dueFor(store: TenantStore, item: Row, userId: string): string | 
 }
 
 /** Late penalty from the course policy: X% per day late, never below the floor. */
-export function latePenalty(store: TenantStore, item: Row, userId: string, raw: number): { score: number; daysLate: number; penaltyPct: number } {
+export function latePenalty(store: TenantStore, item: Row, userId: string, raw: number): { score: number; daysLate: number; hoursLate: number; penaltyPct: number } {
   const sub = latestSubmission(store, item.id, userId);
   const due = dueFor(store, item, userId);
-  const policy = (course(store, item.courseId as string).latePolicy as { latePctPerDay?: number; floorPct?: number } | undefined) ?? {};
-  if (!sub || !due || !policy.latePctPerDay) return { score: raw, daysLate: 0, penaltyPct: 0 };
+  const policy = (course(store, item.courseId as string).latePolicy as { latePctPerDay?: number; latePctPerHour?: number; floorPct?: number } | undefined) ?? {};
+  if (!sub || !due || !(policy.latePctPerDay || policy.latePctPerHour)) return { score: raw, daysLate: 0, hoursLate: 0, penaltyPct: 0 };
   const lateMs = toMs(sub.createdAt) - toMs(due);
-  if (lateMs <= 0) return { score: raw, daysLate: 0, penaltyPct: 0 };
+  if (lateMs <= 0) return { score: raw, daysLate: 0, hoursLate: 0, penaltyPct: 0 };
   const daysLate = Math.ceil(lateMs / 86400_000);
+  const hoursLate = Math.ceil(lateMs / 3600_000);
   const pts = Number(item.points ?? 0);
-  const penaltyPct = Math.min(100, daysLate * policy.latePctPerDay);
+  // Per-hour deduction takes precedence when set; otherwise per day.
+  const penaltyPct = Math.min(100, policy.latePctPerHour ? hoursLate * Number(policy.latePctPerHour) : daysLate * Number(policy.latePctPerDay));
   const floor = ((policy.floorPct ?? 0) / 100) * pts;
   const score = Math.max(Math.min(raw, raw - (penaltyPct / 100) * pts), Math.min(raw, floor));
-  return { score: Math.round(score * 100) / 100, daysLate, penaltyPct };
+  return { score: Math.round(score * 100) / 100, daysLate, hoursLate, penaltyPct: Math.round(penaltyPct * 100) / 100 };
 }
 
 export interface SetGradeInput {
@@ -76,7 +78,7 @@ export interface SetGradeInput {
   lateOverrideDays?: number;
   rubric?: { ratings: Record<string, number>; comments?: Record<string, string> };
   ifVersion?: number;
-  source?: "manual" | "quiz" | "lti" | "peer" | "curve" | "default" | "csv" | "checkpoints" | "attendance";
+  source?: "manual" | "quiz" | "lti" | "peer" | "curve" | "default" | "csv" | "checkpoints" | "attendance" | "missing_policy";
   comment?: string;
   /** Keep the grade unposted until a teacher posts it (external tool scores). */
   holdForReview?: boolean;
@@ -133,7 +135,7 @@ export function setGrade(store: TenantStore, a: Actor | null, input: SetGradeInp
   }
   return store.tx(() => {
     let score = raw === undefined ? ((existing?.enteredScore as number) ?? null) : raw;
-    let late = { daysLate: 0, penaltyPct: 0 };
+    let late: { daysLate: number; hoursLate?: number; penaltyPct: number } = { daysLate: 0, penaltyPct: 0 };
     if (score !== null && !input.excused && input.lateOverrideDays === undefined) {
       const lp = latePenalty(store, item, input.userId, score);
       late = lp;
@@ -154,6 +156,7 @@ export function setGrade(store: TenantStore, a: Actor | null, input: SetGradeInp
       excused: input.excused ?? existing?.excused ?? false,
       status: input.status ?? (input.excused ? "excused" : late.daysLate ? "late" : (existing?.status as string) ?? "none"),
       daysLate: late.daysLate,
+      hoursLate: late.hoursLate ?? null,
       latePenaltyPct: late.penaltyPct,
       rubricAssessment,
       source: input.source ?? "manual",
@@ -303,7 +306,7 @@ export function computeTotals(store: TenantStore, courseId: string, userId: stri
   const override = store.list("final_overrides", (o) => o.courseId === courseId && o.userId === userId)[0];
   const scheme = c.gradingSchemeId ? store.get("grading_schemes", c.gradingSchemeId as string) : undefined;
   const letter = finalPct === null ? null : letterFor(scheme, finalPct);
-  return { userId, items: results, groups: groupTotals, finalPct: finalPct === null ? null : Math.round(finalPct * 100) / 100, letter, override: override?.grade ?? null, hideTotals: !!c.hideTotals };
+  return { userId, items: results, groups: groupTotals, finalPct: finalPct === null ? null : Math.round(finalPct * 100) / 100, letter, gpa: gpaFor(scheme, (override?.grade as string) ?? letter), override: override?.grade ?? null, hideTotals: !!c.hideTotals };
 }
 
 export function letterFor(scheme: Row | undefined, pct: number): string {
@@ -314,7 +317,41 @@ export function letterFor(scheme: Row | undefined, pct: number): string {
     { label: "D", min: 60 },
     { label: "F", min: 0 },
   ]).slice().sort((a, b) => b.min - a.min);
+  if (scheme?.kind === "pass_fail") {
+    // Pass/fail: the lowest non-zero band is the pass mark.
+    const pass = bands.filter((b) => b.min > 0).pop()?.min ?? 60;
+    return pct >= pass ? "Pass" : "Fail";
+  }
   return bands.find((b) => pct >= b.min)?.label ?? bands[bands.length - 1].label;
+}
+
+const DEFAULT_GPA: Record<string, number> = { "A+": 4, A: 4, "A-": 3.7, "B+": 3.3, B: 3, "B-": 2.7, "C+": 2.3, C: 2, "C-": 1.7, "D+": 1.3, D: 1, "D-": 0.7, F: 0 };
+
+/** Grade points for a letter: the band's own gpa value, else the standard 4-point table (gpa schemes), else null. */
+export function gpaFor(scheme: Row | undefined, letter: string | null): number | null {
+  if (!letter || scheme?.kind === "pass_fail") return null;
+  const band = ((scheme?.bands as { label: string; gpa?: number }[]) ?? []).find((b) => b.label === letter);
+  if (band && typeof band.gpa === "number") return band.gpa;
+  if (scheme?.kind === "gpa" || !scheme) return DEFAULT_GPA[letter] ?? null;
+  return null;
+}
+
+/** Credit-weighted GPA across a student's courses that have a final grade with grade points. */
+export function gpaSummary(store: TenantStore, userId: string) {
+  const rows: { courseId: string; code: string; credits: number; letter: string; points: number }[] = [];
+  for (const e of store.list("enrollments", (x) => x.userId === userId && x.role === "student" && x.state !== "deleted")) {
+    const c = store.get("courses", String(e.courseId));
+    if (!c || c.hideTotals) continue;
+    const t = computeTotals(store, c.id, userId);
+    const scheme = c.gradingSchemeId ? store.get("grading_schemes", String(c.gradingSchemeId)) : undefined;
+    const letter = t.override ?? t.letter;
+    const gp = gpaFor(scheme, letter as string | null);
+    if (gp === null || t.finalPct === null) continue;
+    rows.push({ courseId: c.id, code: String(c.code), credits: Number(c.credits ?? 0) || 0, letter: String(letter), points: gp });
+  }
+  const cred = rows.reduce((s, r) => s + r.credits, 0);
+  const gpa = cred > 0 ? Math.round((rows.reduce((s, r) => s + r.points * r.credits, 0) / cred) * 100) / 100 : null;
+  return { gpa, credits: cred, courses: rows, note: "Current grades in progress — not an official transcript GPA." };
 }
 
 export function setFinalOverride(store: TenantStore, a: Actor, courseId: string, userId: string, grade: string | null) {
@@ -656,6 +693,8 @@ registerConsumer({
 /** Job: emit `student.missing` once per missing item (feeds observer alerts and analytics). */
 export function missingJob(store: TenantStore) {
   let n = 0;
+  // Missing-score policy: the missing grade is stored (with history), not only computed in totals.
+  const toStore: { assignmentId: string; userId: string; score: number }[] = [];
   store.tx(() => {
     for (const c of store.list("courses", (x) => x.state === "published")) {
       for (const e of activeStudents(store, c.id)) {
@@ -665,10 +704,19 @@ export function missingJob(store: TenantStore) {
           if (store.list("job_marks", (m) => m.key === key).length) continue;
           store.insert("job_marks", { key }, "jm");
           store.emit("student.missing", `users/${e.userId}`, { userId: e.userId, assignmentId: r.id, title: r.title, courseId: c.id });
+          if (r.score !== null && r.score !== undefined && store.get("assignments", r.id)) toStore.push({ assignmentId: r.id, userId: String(e.userId), score: r.score });
           n++;
         }
       }
     }
   });
+  for (const m of toStore) {
+    if (store.list("grades", (g) => g.assignmentId === m.assignmentId && g.userId === m.userId).length) continue;
+    try {
+      setGrade(store, null, { assignmentId: m.assignmentId, userId: m.userId, score: m.score, status: "missing", source: "missing_policy" });
+    } catch {
+      /* closed grading period or removed enrollment: leave it computed only */
+    }
+  }
   return n;
 }

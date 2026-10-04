@@ -45,6 +45,9 @@ import { scheduleLiveSession as ecoSchedule } from "../src/campus/services/ecosy
 import { AI801_LAB_KEY, submitProject } from "../src/campus/academy/ai801-seed";
 import { AI801_MINILABS, AI801_QUIZ } from "../src/campus/academy/ai801";
 import { SIM_SCENARIOS } from "../src/campus/academy/sim-scenarios";
+import { RegisterView, PublicPortfolioView } from "../src/campus/ui/views/register";
+import { setAccountSettings } from "../src/campus/services/accountcfg";
+import { setPortfolioPublic } from "../src/campus/services/portfolio";
 
 process.env.CAMPUS_LOGS = "0";
 process.env.CLOUDLAB_LOCAL_RUNNER ??= "1";
@@ -182,6 +185,19 @@ page("demo", "registrar", "t/registration", "Registration (registrar)");
   page("demo", "student1", `${C}/quizzes/qz_demo_proctored`, "Proctored quiz: pre-test checklist");
   saveReadiness(as("demo", "student3").store, as("demo", "student3").actor, "qz_demo_proctored", ["id", "webcam", "mic"]);
   page("demo", "instructor", "t/proctor-support", "Proctored support (instructor)");
+}
+page("demo", "instructor", `${C}/analytics`, "Course analytics with message-from-chart");
+page("demo", "instructor", `${C}/grades?view=individual`, "Gradebook — individual view");
+{
+  const dt = broker.tenant("demo")!;
+  const adm = as("demo", "admin");
+  setAccountSettings(adm.store, adm.actor, { selfRegistration: "approval", termsUrl: "/campus/demo/changelog", trustedDomains: ["*.example.edu"], ipFilters: [{ name: "Lab", ranges: ["10.1.0.0/16"] }] });
+  save("demo-public-register.html", "Request an account", "public", <PublicFrame tenant={dt}><RegisterView tenant={dt} sp={{}} /></PublicFrame>);
+  const st = as("demo", "student1");
+  const pf = st.store.insert("portfolios", { userId: st.actor.id, title: "Kofi's programming portfolio", summary: "Small programs from CS-101." }, "pf");
+  st.store.insert("portfolio_pages", { userId: st.actor.id, portfolioId: pf.id, section: "Projects", title: "Greeter", body: "Asks for a name and greets the user." }, "pfp");
+  const on = setPortfolioPublic(st.store, st.actor, pf.id, true);
+  save("demo-public-portfolio.html", "Public portfolio", "public", <PublicFrame tenant={dt}><PublicPortfolioView tenant={dt} token={on.token!} /></PublicFrame>);
 }
 page("demo", "advisor", "t/advising", "Advising");
 page("demo", "parent", "t/observers", "Observers");

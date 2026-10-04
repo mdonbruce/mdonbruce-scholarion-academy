@@ -359,7 +359,7 @@ export function observerSummary(store: TenantStore, a: Actor, studentId: string)
   const grades = observerCanSee(store, a.id, studentId, "grade_summary");
   const attendance = observerCanSee(store, a.id, studentId, "attendance_summary");
   store.audit({ actorId: a.id, actorRoles: a.roles, action: "observer.summary", resource: `users/${studentId}`, outcome: grades || attendance ? "allowed" : "denied", reason: grades || attendance ? undefined : "no_consent" });
-  const courses = store.list("enrollments", (e) => e.userId === studentId && e.role === "student" && e.state === "active").map((e) => {
+  const courses = store.list("enrollments", (e) => e.userId === studentId && e.role === "student" && e.state === "active" && e.source !== "student_view").map((e) => {
     const c = course(store, e.courseId as string);
     const t = grades ? computeTotals(store, c.id, studentId) : null;
     return {

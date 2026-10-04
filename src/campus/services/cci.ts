@@ -217,7 +217,7 @@ export function courseHealth(store: TenantStore, a: Actor, courseId: string) {
   requireStaff(a);
   const c = store.get("courses", courseId);
   if (!c) throw new CampusError("not_found", "Course not found", 404);
-  const learners = store.list("enrollments", (e) => e.courseId === courseId && e.role === "student" && e.state === "active").map((e) => String(e.userId));
+  const learners = store.list("enrollments", (e) => e.courseId === courseId && e.role === "student" && e.state === "active" && e.source !== "student_view").map((e) => String(e.userId));
   const mods = store.list("modules", (m) => m.courseId === courseId && m.state === "published").sort((x, y) => Number(x.position) - Number(y.position));
   const items = store.list("module_items", (i) => i.courseId === courseId && !!i.requirement);
   const prog = store.list("module_progress", (p) => p.courseId === courseId);

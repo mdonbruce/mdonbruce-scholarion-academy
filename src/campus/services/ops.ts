@@ -7,6 +7,8 @@ import { overdueJob } from "./sis";
 import { digestJob, retentionJob } from "./success";
 import { deliverWebhooks } from "./integration";
 import { backupTenant, restoreDrill } from "./admin";
+import { recordingRetentionJob } from "./calendar";
+import { runQueuedJobs } from "./accountcfg";
 
 /**
  * Operations (Tab 28, platform operators): scheduled jobs, SLOs, health, incidents,
@@ -36,6 +38,8 @@ export async function runJobs(store: TenantStore) {
   out.missing = missingJob(store);
   out.overdue = overdueJob(store);
   out.retention = retentionJob(store);
+  out.recordings = recordingRetentionJob(store);
+  out.backgroundJobs = runQueuedJobs(store).length;
   out.digestDaily = digestJob(store, "daily");
   out.ecosystem = await ecoTick(store);
   out.relayed = relay(store);

@@ -51,9 +51,9 @@ import { recordView } from "../services/dashboard";
  * rate-limited). Admins may act as another user (?as_user_id=) — every request is audited.
  */
 
-const PUBLIC_OPS = new Set(["catalog.hub", "catalog.recommender_questions", "catalog.recommend", "commerce.quote", "programs.index", "programs.page", "programs.self_check_questions", "agentic.hub", "agentic.quiz_questions", "agentic.recommend", "eco.changelog", "plans.options", "plans.quote", "plans.settings_view", "readiness.questions", "readiness.score"]);
+const PUBLIC_OPS = new Set(["catalog.hub", "catalog.recommender_questions", "catalog.recommend", "commerce.quote", "programs.index", "programs.page", "programs.self_check_questions", "agentic.hub", "agentic.quiz_questions", "agentic.recommend", "eco.changelog", "plans.options", "plans.quote", "plans.settings_view", "readiness.questions", "readiness.score", "admin.legal_links"]);
 /** Commands anyone may send (same-origin forms or JSON); the signed-in user is attached when present. */
-const PUBLIC_CMDS = new Set(["programs.inquire", "programs.self_check", "campaign.subscribe"]);
+const PUBLIC_CMDS = new Set(["programs.inquire", "programs.self_check", "campaign.subscribe", "accounts.self_register"]);
 
 type Body = Record<string, unknown>;
 
@@ -322,6 +322,13 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     return ok(c, { id: a.id, name: a.name, email: a.email, roles: a.roles, courseRoles: a.courseRoles, masqueradedBy: a.masqueradedBy ?? null, platformOperator: a.platformOperator, realUserId: real?.userId ?? a.id, announcements: activeGlobalAnnouncements(store, a) });
   }
   if (route === "tabs" && method === "GET") return ok(c, visibleTabs(store, a));
+  if (route === "lti/proctor" && method === "POST") {
+    // LTI proctoring hand-off: a page whose only button posts the signed launch to the tool.
+    const r = lti.proctorLaunch(store, a, String(body.quizId ?? ""));
+    const e = (x: string) => x.replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]!);
+    const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Continue to proctoring</title><style>body{font:16px/1.5 system-ui,sans-serif;max-width:560px;margin:48px auto;padding:0 16px}button{font:inherit;padding:10px 18px;border-radius:8px;border:0;background:#0b1f4d;color:#fff}</style></head><body><h1>Continue to the proctoring tool</h1><p>Your school uses a proctoring tool for this quiz (attempt ${r.attemptNumber}). Continue to verify your setup; the tool sends you back to start the quiz.</p><form method="post" action="${e(r.launchUrl)}"><input type="hidden" name="id_token" value="${e(r.idToken)}"><button type="submit">Continue</button></form></body></html>`;
+    return new Response(html, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", "x-content-type-options": "nosniff", "content-security-policy": `default-src 'none'; style-src 'unsafe-inline'; form-action ${new URL(r.launchUrl).origin}; frame-ancestors 'none'` } });
+  }
   if (route === "upload" && method === "POST") {
     // Browser upload: signed-upload flow done server-side (quarantine → scan → promote), optional submission.
     const file = body.file as File | undefined;
@@ -337,8 +344,8 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
       const r = importStandards(store, a, { csv: bytes.toString("utf8"), courseId: (body.courseId as string) || null, dryRun: body.dryRun === "true" || body.dryRun === "on", source: (body.source as string) || file.name });
       return ok(c, r, r.dryRun ? 200 : 201, {}, `${r.dryRun ? "Dry run" : "Imported"}: ${r.outcomes.create} new and ${r.outcomes.update} updated outcomes, ${r.groups.create + r.groups.update} folders, ${r.issues.length} issue(s).`);
     }
-    const purpose = (String(body.purpose ?? "") || (body.assignmentId || body.gradedItemId ? "submission" : body.courseId ? "course" : "personal")) as "course" | "submission" | "personal";
-    const r = requestUpload(store, a, { name: file.name, mime: mimeFor(file.name, file.type), size: bytes.length, courseId: (body.courseId as string) || null, folderId: (body.folderId as string) || null, purpose });
+    const purpose = (String(body.purpose ?? "") || (body.groupId ? "group" : body.assignmentId || body.gradedItemId ? "submission" : body.courseId ? "course" : "personal")) as "course" | "submission" | "personal" | "group";
+    const r = requestUpload(store, a, { name: file.name, mime: mimeFor(file.name, file.type), size: bytes.length, courseId: (body.courseId as string) || null, folderId: (body.folderId as string) || null, purpose, groupId: (body.groupId as string) || null });
     receiveUpload(store, String(r.file.id), bytes);
     const scanned = scanFile(store, String(r.file.id));
     if (scanned?.state !== "available") throw new CampusError("blocked", `The file didn't pass the safety scan (${scanned?.state ?? "unknown"}).`, 422);

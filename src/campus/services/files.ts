@@ -30,6 +30,17 @@ export function verifySignature(tenantId: string, op: "put" | "get", fileId: str
   if (want !== sig) throw new CampusError("bad_signature", "Invalid signature", 403);
 }
 
+/** Group file quota: the group's own limit, else the account's group default, else 50 MB. */
+export function groupQuota(store: TenantStore, groupId: string): { used: number; limit: number } {
+  const g = store.get("groups", groupId);
+  if (!g) throw new CampusError("not_found", "Group not found", 404);
+  const c = store.get("courses", String(g.courseId));
+  const acc = c?.accountId ? store.get("accounts", c.accountId as string) : store.list("accounts", (a) => !a.parentId)[0];
+  const limit = Number(g.quotaMb ?? acc?.groupQuotaMb ?? 50) * 1024 * 1024;
+  const used = store.list("files", (f) => f.groupId === groupId).reduce((s, f) => s + Number(f.size ?? 0), 0);
+  return { used, limit };
+}
+
 function quotaBytes(store: TenantStore, courseId?: string | null, userId?: string): { used: number; limit: number } {
   if (courseId) {
     const c = store.get("courses", courseId);
@@ -43,13 +54,26 @@ function quotaBytes(store: TenantStore, courseId?: string | null, userId?: strin
 }
 
 /** Step 1: ask for an upload slot (returns a signed PUT URL). */
-export function requestUpload(store: TenantStore, a: Actor, input: { name: string; mime: string; size: number; courseId?: string | null; folderId?: string | null; purpose?: "course" | "submission" | "personal" | "application" }) {
+export function requestUpload(store: TenantStore, a: Actor, input: { name: string; mime: string; size: number; courseId?: string | null; folderId?: string | null; purpose?: "course" | "submission" | "personal" | "application" | "group"; groupId?: string | null }) {
   const name = String(input.name ?? "").trim().slice(0, 200);
   if (!name) throw new CampusError("invalid", "File name is required.", 422);
   const size = Number(input.size);
   if (!(size > 0) || size > MAX_BYTES) throw new CampusError("too_large", `Files must be under ${MAX_BYTES / 1024 / 1024} MB.`, 413);
   const ext = name.split(".").pop()?.toLowerCase() ?? "";
   if (BLOCKED_EXT.includes(ext)) throw new CampusError("blocked_type", "Executable files can't be uploaded.", 415);
+  if (input.purpose === "group" || input.groupId) {
+    const g = store.get("groups", String(input.groupId ?? ""));
+    if (!g) throw new CampusError("not_found", "Group not found", 404);
+    const member = ((g.memberIds as string[]) ?? []).includes(a.id);
+    if (!member && !isStaff(a, String(g.courseId))) throw new CampusError("forbidden", "Only group members can add group files.", 403);
+    const gq = groupQuota(store, g.id);
+    if (gq.used + size > gq.limit) throw new CampusError("quota_exceeded", `This group's storage is full (${Math.round(gq.limit / 1024 / 1024)} MB).`, 507);
+    return store.tx(() => {
+      const f = store.insert("files", { name, mime: input.mime || "application/octet-stream", size, ownerId: a.id, courseId: null, groupId: g.id, groupCourseId: g.courseId, folderId: null, purpose: "group", state: "pending_upload", objectKey: null, published: false }, "fil");
+      audit(store, a, "files.request_upload", `files/${f.id}`, `group ${g.id}`);
+      return { file: f, upload: signUrl(store.tenantId, "put", f.id) };
+    });
+  }
   const courseId = input.courseId || null;
   if (courseId && input.purpose !== "submission") requireCourse(store, a, courseId, ["admin", "instructor", "ta", "designer"], "files.upload");
   if (courseId && input.purpose === "submission" && !hasAny(a, ["student"], courseId)) throw new CampusError("forbidden", "You're not a student in this course.", 403);
@@ -130,6 +154,10 @@ registerConsumer({ name: "file-scanner", types: ["files.uploaded"], handle: (sto
 export function canDownload(store: TenantStore, a: Actor, f: Row): boolean {
   if (f.state !== "available") return false;
   if (f.ownerId === a.id) return true;
+  if (f.groupId) {
+    const g = store.get("groups", String(f.groupId));
+    return !!g && (((g.memberIds as string[]) ?? []).includes(a.id) || isStaff(a, String(g.courseId)));
+  }
   const courseId = (f.courseId ?? f.submissionCourseId) as string | null;
   if (!courseId) return a.roles.includes("admin");
   if (isStaff(a, courseId)) return true;

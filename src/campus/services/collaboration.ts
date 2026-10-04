@@ -95,6 +95,7 @@ export function deletePost(store: TenantStore, a: Actor, postId: string) {
   const p = store.get("posts", postId);
   if (!p) throw new CampusError("not_found", "Post not found", 404);
   if (p.authorId !== a.id && !isStaff(a, p.courseId as string)) throw new CampusError("forbidden", "You can only delete your own posts.", 403);
+  if (p.authorId === a.id && !isStaff(a, p.courseId as string) && course(store, p.courseId as string).studentsDeletePosts === false) throw new CampusError("forbidden", "Deleting posts is turned off in this course.", 403);
   return store.tx(() => {
     const out = store.update("posts", postId, { body: "", deletedBody: true, deletedAt: nowIso(), deletedBy: a.id });
     audit(store, a, "posts.delete", `posts/${postId}`);

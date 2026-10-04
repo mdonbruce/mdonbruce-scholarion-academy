@@ -1,4 +1,5 @@
 import { assertParticipation } from "./terms";
+import { ipAllowed } from "./accountcfg";
 import { CampusError, hmac, nowIso, nowMs, type Row, type TenantStore } from "../core";
 import { registerHooks } from "../entity";
 import { hasAny, type Actor } from "../iam";
@@ -301,7 +302,7 @@ export function startAttempt(store: TenantStore, a: Actor, quizId: string, opts:
   if (d.lockAt && d.lockAt < now) throw new CampusError("closed", "This quiz is closed.", 423);
   if (quiz.accessCode && opts.accessCode !== quiz.accessCode) throw new CampusError("access_code", "Enter the access code your instructor gave you.", 403);
   const ipf = (quiz.ipFilter as string[]) ?? [];
-  if (ipf.length && !ipf.some((p) => (opts.ip ?? "").startsWith(p))) throw new CampusError("ip_blocked", "This quiz can only be taken from an approved location.", 403);
+  if (ipf.length && !ipAllowed(store, ipf, opts.ip ?? "")) throw new CampusError("ip_blocked", "This quiz can only be taken from an approved location.", 403);
   const mine = store.list("attempts", (x) => x.quizId === quizId && x.userId === a.id);
   const open = mine.find((x) => x.state === "in_progress");
   if (open) return attemptView(store, a, open.id);

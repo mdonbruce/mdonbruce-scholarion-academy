@@ -6,6 +6,23 @@ import { visibleTabs } from "../http/router";
 import { activeGlobalAnnouncements, helpLinks } from "../services/admin";
 import { myNotifications } from "../services/success";
 import { api, Hidden } from "./kit";
+import { broker } from "../core";
+import { legalLinks } from "../services/accountcfg";
+
+/** Logo image when the school set one, otherwise initials from the logo text. */
+function BrandMark({ tenant }: { tenant: Tenant }) {
+  if (tenant.theme.logoUrl) return <img className="campus-logo campus-logo-img" src={tenant.theme.logoUrl} alt="" width={36} height={36} />;
+  return (
+    <span className="campus-logo" aria-hidden="true">
+      {tenant.theme.logoText.split(/\s+/).map((w) => w[0]).slice(0, 2).join("")}
+    </span>
+  );
+}
+
+/** School CSS, already sanitized and scoped under .campus-custom when it was saved. */
+function SchoolCss({ tenant }: { tenant: Tenant }) {
+  return tenant.theme.customCss ? <style data-school-css="">{tenant.theme.customCss}</style> : null;
+}
 
 /** Campus chrome: tenant-branded global navigation, role-filtered tab groups, act-as banner. */
 
@@ -35,15 +52,14 @@ export function CampusShell({ tenant, store, actor, current, children }: { tenan
   const prof = store.list("profiles", (p) => p.userId === actor.id)[0];
   const a11y = [prof?.highContrast && "a11y-contrast", prof?.dyslexiaFont && "a11y-dyslexia", prof?.underlineLinks && "a11y-underline", prof?.reducedMotion && "a11y-reduce-motion"].filter(Boolean).join(" ");
   return (
-    <div className={`app campus ${a11y}`.trim()} style={theme} data-tenant={slug} lang={String(prof?.language ?? "en")}>
+    <div className={`app campus campus-custom ${a11y}`.trim()} style={theme} data-tenant={slug} lang={String(prof?.language ?? "en")}>
+      <SchoolCss tenant={tenant} />
       <a className="skip-link" href="#main">
         Skip to content
       </a>
       <aside className="sidebar campus-sidebar" aria-label={`${tenant.name} navigation`}>
         <a className="brand campus-brand" href={`/campus/${slug}/dashboard`}>
-          <span className="campus-logo" aria-hidden="true">
-            {tenant.theme.logoText.split(/\s+/).map((w) => w[0]).slice(0, 2).join("")}
-          </span>
+          <BrandMark tenant={tenant} />
           <span className="brand-word">{tenant.theme.logoText}</span>
         </a>
         <nav aria-label="Main">
@@ -152,17 +168,22 @@ export function CampusShell({ tenant, store, actor, current, children }: { tenan
 
 /** Minimal branded frame for public tenant pages (catalog, verification, sign-in). */
 export function PublicFrame({ tenant, children }: { tenant: Tenant; children: ReactNode }) {
+  let legal: { termsUrl: string | null; privacyUrl: string | null; selfRegistration: boolean } = { termsUrl: null, privacyUrl: null, selfRegistration: false };
+  try {
+    legal = legalLinks(broker.connect({ tenantId: tenant.id, slug: tenant.slug, via: "path", traceId: "public-frame" }));
+  } catch {
+    /* footer links are optional */
+  }
   const theme = { "--primary": tenant.theme.primary, "--accent": tenant.theme.accent } as never;
   return (
-    <div className="campus-public" style={theme}>
+    <div className="campus-public campus-custom" style={theme}>
+      <SchoolCss tenant={tenant} />
       <a className="skip-link" href="#main">
         Skip to content
       </a>
       <header className="campus-public-head">
         <a className="brand campus-brand" href={`/campus/${tenant.slug}`}>
-          <span className="campus-logo" aria-hidden="true">
-            {tenant.theme.logoText.split(/\s+/).map((w) => w[0]).slice(0, 2).join("")}
-          </span>
+          <BrandMark tenant={tenant} />
           <span className="brand-word">{tenant.theme.logoText}</span>
         </a>
         <nav aria-label="Public" className="row">
@@ -189,6 +210,9 @@ export function PublicFrame({ tenant, children }: { tenant: Tenant; children: Re
           <a href={`/campus/${tenant.slug}/readiness`}>Where should I start?</a>
           <a href={`/campus/${tenant.slug}/verify`}>Verify a credential</a>
           <a href={`/campus/${tenant.slug}/changelog`}>What changed</a>
+          {legal.termsUrl && <a href={legal.termsUrl}>Terms of use</a>}
+          {legal.privacyUrl && <a href={legal.privacyUrl}>Privacy policy</a>}
+          {legal.selfRegistration && <a href={`/campus/${tenant.slug}/register`}>Request an account</a>}
         </nav>
         {tenant.flags.powered_by !== false && <p className="muted campus-powered">Powered by Scholarion</p>}
       </footer>

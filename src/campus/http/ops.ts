@@ -32,6 +32,8 @@ import * as graded from "../services/graded";
 import * as studio from "../services/studio";
 import * as bridge from "../services/bridge";
 import * as oc from "../services/outcomes";
+import * as qt from "../services/quiztools";
+import { gpaSummary } from "../services/grading";
 import * as termsvc from "../services/terms";
 import * as apps from "../services/apps";
 import * as lmsimp from "../services/lmsimport";
@@ -51,8 +53,10 @@ import * as plans from "../services/plans";
 import * as cci from "../services/cci";
 import * as comms from "../services/comms";
 import * as uploads from "../services/uploads";
+import * as acfg from "../services/accountcfg";
+import * as pfo from "../services/portfolio";
 import { isStaff, requireTenant } from "../services/common";
-import { decideSupportGrant, grantRole, requestSupportGrant, revokeRole } from "../iam";
+import { decideSupportGrant, grantAccountAdmin, grantRole, requestSupportGrant, revokeRole } from "../iam";
 
 /**
  * Named workflow operations (commands and queries) exposed over REST
@@ -147,6 +151,7 @@ function qry(name: string, tab: string, summary: string, params: Param[], run: O
 /* 1 Identity */
 qry("me", "identity", "Who am I: roles, course roles, act-as state.", [], ({ actor }) => ({ id: actor.id, name: actor.name, email: actor.email, roles: actor.roles, courseRoles: actor.courseRoles, mfa: actor.mfa, masqueradedBy: actor.masqueradedBy ?? null, platformOperator: actor.platformOperator }));
 cmd("roles.grant", "identity", "Grant a tenant role (optionally until a date).", [P("userId"), P("role", "string", true, { options: ["admin", "registrar", "advisor", "support", "designer"] }), opt("expiresAt", "date")], ({ store, actor, args }) => store.tx(() => grantRole(store, actor, args.s("userId"), args.s("role") as never, args.so("expiresAt"))));
+cmd("roles.grant_account_admin", "identity", "Make someone an admin of one sub-account: admin rights only in courses under it.", [P("userId"), P("accountId"), opt("expiresAt", "date")], ({ store, actor, args }) => grantAccountAdmin(store, actor, args.s("userId"), args.s("accountId"), args.so("expiresAt")));
 cmd("roles.revoke", "identity", "Revoke a role grant.", [P("grantId")], ({ store, actor, args }) => store.tx(() => revokeRole(store, actor, args.s("grantId"))));
 cmd("support.request", "identity", "Support staff: request time-boxed access.", [P("reason", "text"), opt("ticketId"), opt("targetUserId"), opt("hours", "number")], ({ store, actor, args }) => store.tx(() => requestSupportGrant(store, actor, { reason: args.s("reason"), ticketId: args.so("ticketId"), targetUserId: args.so("targetUserId"), hours: args.has("hours") ? args.n("hours") : undefined })));
 cmd("support.decide", "identity", "Admin: approve or deny a support access request.", [P("grantId"), P("approve", "boolean")], ({ store, actor, args }) => store.tx(() => decideSupportGrant(store, actor, args.s("grantId"), args.b("approve"))));
@@ -197,7 +202,7 @@ cmd("quiz.finish", "assessment", "Save answers and submit the attempt.", [P("att
   asm.autosave(store, actor, args.s("attemptId"), args.j("answers"), args.n("version"));
   return asm.submitAttempt(store, actor, args.s("attemptId"));
 });
-cmd("page.save_text", "curriculum", "Save a page from the text editor (headings, lists, images with alt text, links, tables).", [P("pageId"), P("text", "text"), opt("title"), opt("ifVersion", "number")], ({ store, actor, args }) => entity.update(store, actor, "pages", args.s("pageId"), { blocks: cur.markupToBlocks(args.s("text")), ...(args.has("title") ? { title: args.s("title") } : {}) }, args.has("ifVersion") ? args.n("ifVersion") : undefined));
+cmd("page.save_text", "curriculum", "Save a page from the text editor (headings, lists, images with alt text, links, tables).", [P("pageId"), P("text", "text"), opt("title"), opt("ifVersion", "number")], ({ store, actor, args }) => cur.savePageText(store, actor, args.s("pageId"), args.s("text"), args.so("title"), args.has("ifVersion") ? args.n("ifVersion") : undefined) ?? entity.update(store, actor, "pages", args.s("pageId"), { blocks: cur.markupToBlocks(args.s("text")), ...(args.has("title") ? { title: args.s("title") } : {}) }, args.has("ifVersion") ? args.n("ifVersion") : undefined));
 cmd("quiz.submit", "assessment", "Submit an attempt (idempotent).", [P("attemptId")], ({ store, actor, args }) => asm.submitAttempt(store, actor, args.s("attemptId")));
 cmd("quiz.grade_question", "assessment", "Score a manually graded question.", [P("attemptId"), P("questionId"), P("points", "number")], ({ store, actor, args }) => asm.gradeQuestion(store, actor, args.s("attemptId"), args.s("questionId"), args.n("points")));
 cmd("quiz.moderate", "assessment", "Extra time, an extra attempt, or reopen for one student.", [P("quizId"), P("userId"), P("action", "string", true, { options: ["extend", "extra_attempt", "reopen"] }), opt("minutes", "number")], ({ store, actor, args }) => asm.moderate(store, actor, args.s("quizId"), args.s("userId"), args.s("action") as never, args.n("minutes", 10)));
@@ -254,7 +259,13 @@ qry("inbox.list", "collaboration", "Inbox, unread, starred, sent, archived or su
 qry("inbox.conversation", "collaboration", "One conversation.", [P("conversationId")], ({ store, actor, args }) => col.conversationView(store, actor, args.s("conversationId")));
 
 /* 7 Files */
-cmd("files.request_upload", "files", "Step 1: get a signed upload URL (file goes to quarantine).", [P("name"), P("mime"), P("size", "number"), opt("courseId"), opt("folderId"), opt("purpose", "string", { options: ["course", "submission", "personal", "application"] })], ({ store, actor, args }) => fil.requestUpload(store, actor, { name: args.s("name"), mime: args.s("mime"), size: args.n("size"), courseId: args.so("courseId"), folderId: args.so("folderId"), purpose: args.so("purpose") as never }));
+cmd("files.request_upload", "files", "Step 1: get a signed upload URL (file goes to quarantine).", [P("name"), P("mime"), P("size", "number"), opt("courseId"), opt("folderId"), opt("purpose", "string", { options: ["course", "submission", "personal", "application", "group"] }), opt("groupId")], ({ store, actor, args }) => fil.requestUpload(store, actor, { name: args.s("name"), mime: args.s("mime"), size: args.n("size"), courseId: args.so("courseId"), folderId: args.so("folderId"), purpose: args.so("purpose") as never, groupId: args.so("groupId") }));
+qry("groups.quota", "files", "A group's file storage: used and limit.", [P("groupId")], ({ store, actor, args }) => {
+  const g = store.get("groups", args.s("groupId"));
+  if (!g || (!((g.memberIds as string[]) ?? []).includes(actor.id) && !isStaff(actor, String(g.courseId)))) throw new CampusError("forbidden", "Group members and course staff only.", 403);
+  const q = fil.groupQuota(store, g.id);
+  return { usedBytes: q.used, limitBytes: q.limit, files: store.list("files", (f) => f.groupId === g.id).map((f) => ({ id: f.id, name: f.name, size: f.size, state: f.state })) };
+});
 qry("files.download_url", "files", "Signed short-lived download URL.", [P("fileId")], ({ store, actor, args }) => fil.downloadUrl(store, actor, args.s("fileId")));
 cmd("files.publish", "files", "Publish or unpublish a file (needs usage rights).", [P("fileId"), opt("published", "boolean")], ({ store, actor, args }) => fil.setFilePublished(store, actor, args.s("fileId"), args.b("published", true)));
 cmd("files.bulk", "files", "Bulk move/delete/publish files.", [P("courseId"), P("action", "string", true, { options: ["move", "delete", "publish", "unpublish"] }), P("fileIds", "list"), opt("folderId")], ({ store, actor, args }) => fil.bulkFiles(store, actor, args.s("courseId"), args.s("action") as never, args.l("fileIds"), args.so("folderId")));
@@ -371,6 +382,8 @@ cmd("ai.draft_feedback", "gradebook", "Draft feedback for a submission (never sc
 
 /* 24 Cloud Lab / LTI */
 cmd("lti.launch", "cloud-lab", "Launch the tool for an assignment (signed LTI 1.3 id_token).", [P("assignmentId")], ({ store, actor, args }) => lti.launch(store, actor, args.s("assignmentId")));
+cmd("lti.proctor_launch", "assessment", "Start the quiz's proctoring tool (signed LtiStartProctoring).", [P("quizId")], ({ store, actor, args }) => lti.proctorLaunch(store, actor, args.s("quizId")));
+cmd("lti.proctor_start_assessment", "assessment", "The proctoring tool's signed LtiStartAssessment; clears the quiz to start.", [P("JWT", "text")], ({ store, actor, args }) => lti.proctorStartAssessment(store, actor, args.s("JWT")));
 cmd("lab.open", "cloud-lab", "Open the Cloud Lab for an assignment (signed launch, verified by the tool).", [P("assignmentId")], ({ store, actor, args }) => {
   const l = lti.launch(store, actor, args.s("assignmentId"));
   return lti.toolReceiveLaunch(store, l.idToken);
@@ -400,6 +413,40 @@ qry("audit.log", "tenant-admin", "Recent audit records.", [opt("limit", "number"
   requireTenant(store, actor, ["admin"], "audit.read");
   return store.auditLog(Math.min(args.n("limit", 200), 1000));
 });
+qry("audit.search", "tenant-admin", "Audit log filtered by type (grade changes, sign-ins, enrollments…), course, user, outcome and dates.", [opt("type", "string", { options: [...acfg.AUDIT_TYPES] }), opt("courseId"), opt("userId"), opt("outcome", "string", { options: ["allowed", "denied", "error"] }), opt("from", "date"), opt("to", "date"), opt("text"), opt("limit", "number")], ({ store, actor, args }) => acfg.auditSearch(store, actor, { type: args.so("type"), courseId: args.so("courseId"), userId: args.so("userId"), outcome: args.so("outcome"), from: args.so("from"), to: args.so("to"), text: args.so("text"), limit: args.has("limit") ? args.n("limit") : undefined }));
+qry("audit.search_export_csv", "tenant-admin", "Filtered audit log as CSV.", [opt("type"), opt("courseId"), opt("userId"), opt("outcome"), opt("from", "date"), opt("to", "date"), opt("text")], ({ store, actor, args }) => acfg.auditSearchCsv(store, actor, { type: args.so("type"), courseId: args.so("courseId"), userId: args.so("userId"), outcome: args.so("outcome"), from: args.so("from"), to: args.so("to"), text: args.so("text") }));
+qry("audit.auth_log", "tenant-admin", "Sign-in log: successes and failures.", [opt("userId"), opt("limit", "number")], ({ store, actor, args }) => acfg.authLog(store, actor, { userId: args.so("userId"), limit: args.has("limit") ? args.n("limit") : undefined }));
+qry("admin.account_settings", "tenant-admin", "Account settings: trusted domains, IP filters, terms/privacy links, self-registration.", [], ({ store, actor }) => {
+  requireTenant(store, actor, ["admin"], "tenant.account_settings");
+  return acfg.accountSettings(store);
+});
+cmd("admin.account_settings.set", "tenant-admin", "Update account settings. Lists are one per line; IP filters as `Name: 10.0.0.0/8, 192.168.1.10`.", [opt("trustedDomains", "text"), opt("ipFilters", "text"), opt("termsUrl"), opt("privacyUrl"), opt("selfRegistration", "string", { options: ["off", "approval"] }), opt("selfRegistrationDomains", "text")], ({ store, actor, args }) => {
+  const lines = (k: string) => args.s(k).split(/[\n,]+/).map((x) => x.trim()).filter(Boolean);
+  const input: Partial<acfg.AccountSettings> = {};
+  if (args.has("trustedDomains")) input.trustedDomains = lines("trustedDomains");
+  if (args.has("ipFilters")) input.ipFilters = args.s("ipFilters").split(/\n+/).map((l) => l.trim()).filter(Boolean).map((l) => {
+    const [name, ranges = ""] = l.split(":");
+    return { name: name.trim(), ranges: ranges.split(",").map((r) => r.trim()).filter(Boolean) };
+  });
+  if (args.has("termsUrl")) input.termsUrl = args.s("termsUrl");
+  if (args.has("privacyUrl")) input.privacyUrl = args.s("privacyUrl");
+  if (args.has("selfRegistration")) input.selfRegistration = args.s("selfRegistration") as never;
+  if (args.has("selfRegistrationDomains")) input.selfRegistrationDomains = lines("selfRegistrationDomains");
+  return acfg.setAccountSettings(store, actor, input);
+});
+qry("admin.legal_links", "tenant-admin", "Terms and privacy links (public).", [], ({ store }) => acfg.legalLinks(store));
+cmd("accounts.self_register", "tenant-admin", "Ask for an account (when self-registration is on). An admin approves each request.", [P("name"), P("email")], ({ store, args }) => acfg.selfRegister(store, { name: args.s("name"), email: args.s("email") }));
+cmd("self_registrations.decide", "tenant-admin", "Approve or decline a self-registration request.", [P("id"), P("approve", "boolean")], ({ store, actor, args }) => acfg.decideSelfRegistration(store, actor, args.s("id"), args.b("approve")));
+cmd("admin.theme_extras", "tenant-admin", "Logo image and custom CSS (sanitized and scoped to the campus).", [opt("logoUrl"), opt("customCss", "text")], ({ store, actor, args }) => acfg.setThemeExtras(store, actor, { logoUrl: args.has("logoUrl") ? args.s("logoUrl") : undefined, customCss: args.has("customCss") ? args.s("customCss") : undefined }));
+cmd("jobs.enqueue_report", "tenant-admin", "Queue an account report as a background job.", [P("kind", "string", true, { options: [...suc.REPORT_KINDS] })], ({ store, actor, args }) => acfg.enqueueJob(store, actor, "report", { kind: args.s("kind") }));
+cmd("jobs.enqueue_sis_import", "tenant-admin", "Queue a SIS CSV import as a background job.", [P("kind", "string", true, { options: ["users", "terms", "courses", "sections", "enrollments", "groups", "xlists"] }), P("csv", "text"), opt("diffing", "boolean")], ({ store, actor, args }) => acfg.enqueueJob(store, actor, "sis_import", { kind: args.s("kind"), csv: args.s("csv"), diffing: args.b("diffing") }));
+qry("jobs.status", "tenant-admin", "Background jobs with state, progress and issues.", [opt("jobId")], ({ store, actor, args }) => acfg.jobStatus(store, actor, args.so("jobId")));
+cmd("identity_providers.configure", "tenant-admin", "Record a SAML, OIDC or LDAP provider (no secrets; not connected from here).", [P("kind", "string", true, { options: ["saml", "oidc", "ldap"] }), P("name"), P("config", "json"), opt("jitProvisioning", "boolean"), opt("id")], ({ store, actor, args }) => acfg.configureIdp(store, actor, { kind: args.s("kind"), name: args.s("name"), config: args.j("config") as Record<string, unknown>, jitProvisioning: args.b("jitProvisioning"), id: args.so("id") }));
+cmd("identity_providers.test", "tenant-admin", "Check a provider's configuration (no live connection here).", [P("id")], ({ store, actor, args }) => acfg.testIdp(store, actor, args.s("id")));
+qry("roles.account_admins", "identity", "Sub-account admins.", [], ({ store, actor }) => acfg.accountAdmins(store, actor));
+cmd("portfolios.set_public", "credentials", "Turn my portfolio's public link on or off (off removes the link).", [P("portfolioId"), P("on", "boolean")], ({ store, actor, args }) => pfo.setPortfolioPublic(store, actor, args.s("portfolioId"), args.b("on")));
+cmd("live_recordings.add", "live", "Add a recording to a live session (deleted after the session's retention days).", [P("liveSessionId"), P("fileId"), opt("title"), opt("durationMinutes", "number"), opt("captions", "text")], ({ store, actor, args }) => cal.addLiveRecording(store, actor, { liveSessionId: args.s("liveSessionId"), fileId: args.s("fileId"), title: args.so("title"), durationMinutes: args.has("durationMinutes") ? args.n("durationMinutes") : undefined, captions: args.so("captions") }));
+qry("live_recordings.for_course", "live", "Recordings in a course, with their delete-after dates.", [P("courseId")], ({ store, actor, args }) => cal.liveRecordings(store, actor, args.s("courseId")));
 qry("outbox.status", "tenant-admin", "Outbox events (pending, delivered, dead).", [opt("status")], ({ store, actor, args }) => {
   requireTenant(store, actor, ["admin"], "outbox.read");
   return store.outbox().filter((e) => !args.has("status") || e.status === args.s("status")).slice(-200).reverse();
@@ -452,6 +499,12 @@ cmd("groups.import_csv", "groups", "Import group memberships from CSV (group_nam
 
 /* 34 Reports */
 cmd("reports.run", "reports", "Run an account report (CSV).", [P("kind", "string", true, { options: [...suc.REPORT_KINDS] })], ({ store, actor, args }) => suc.runReport(store, actor, args.s("kind") as never));
+qry("reports.result_export_csv", "reports", "Download a finished report run as CSV.", [P("reportId")], ({ store, actor, args }) => {
+  requireTenant(store, actor, ["admin", "registrar"], "reports.read");
+  const run = store.get("report_runs", args.s("reportId"));
+  if (!run) throw new CampusError("not_found", "Report not found", 404);
+  return String(run.csv ?? "");
+});
 
 /* 35 Dashboard, 40 Account */
 qry("dashboard", "dashboard", "Dashboard: cards, to-do, coming up, recent feedback, grades.", [], ({ store, actor }) => dsh.dashboard(store, actor));
@@ -469,6 +522,17 @@ qry("observers.mine", "observers", "Students I observe.", [], ({ store, actor })
 
 /* 37 Content */
 cmd("content.copy", "content", "Copy a course's content (with date adjustment).", [P("sourceCourseId"), P("targetCourseId"), opt("shiftDays", "number"), opt("removeDates", "boolean"), opt("only", "list"), opt("idempotencyKey")], ({ store, actor, args }) => cnt.copyCourse(store, actor, args.s("sourceCourseId"), args.s("targetCourseId"), { shift: { days: args.has("shiftDays") ? args.n("shiftDays") : undefined, remove: args.b("removeDates") }, only: args.l("only").length ? args.l("only") : undefined, idempotencyKey: args.so("idempotencyKey") }));
+qry("quizzes.student_analysis", "assessment", "Every attempt's answers and points per question (anonymous surveys stay anonymous).", [P("quizId")], ({ store, actor, args }) => qt.studentAnalysis(store, actor, args.s("quizId")));
+qry("quizzes.student_analysis_export_csv", "assessment", "Student analysis as CSV.", [P("quizId")], ({ store, actor, args }) => qt.studentAnalysisCsv(store, actor, args.s("quizId")));
+qry("quizzes.outcomes_analysis", "assessment", "Per outcome aligned to the quiz: students, average and how many reached mastery.", [P("quizId")], ({ store, actor, args }) => qt.outcomesAnalysis(store, actor, args.s("quizId")));
+cmd("question_banks.share", "assessment", "Share (or stop sharing) a question bank with every course in the account.", [P("bankId"), P("shared", "boolean")], ({ store, actor, args }) => qt.shareBank(store, actor, args.s("bankId"), args.b("shared")));
+qry("question_banks.for_course", "assessment", "Banks a course can draw from: its own and banks shared in its account.", [P("courseId")], ({ store, actor, args }) => qt.banksFor(store, actor, args.s("courseId")));
+cmd("quizzes.add_pool", "assessment", "Draw N questions (optionally by tag) from an own or shared bank.", [P("quizId"), P("bankId"), P("pick", "number"), opt("tag")], ({ store, actor, args }) => qt.addPool(store, actor, args.s("quizId"), { bankId: args.s("bankId"), pick: args.n("pick"), tag: args.so("tag") }));
+qry("grades.gpa", "gradebook", "Credit-weighted grade points across courses (current grades, not an official transcript). Students see their own.", [opt("userId")], ({ store, actor, args }) => {
+  const userId = args.so("userId") ?? actor.id;
+  if (userId !== actor.id && !actor.roles.some((r) => ["admin", "registrar", "advisor"].includes(r))) throw new CampusError("forbidden", "You can only see your own grade points.", 403);
+  return gpaSummary(store, userId);
+});
 qry("outcomes.tree", "outcomes", "Outcome folders, outcomes and mastery scales (account-level, plus a course's own when courseId is given).", [opt("courseId")], ({ store, actor, args }) => oc.outcomeTree(store, actor, args.so("courseId") ?? null));
 cmd("outcomes.group_create", "outcomes", "Create an outcome folder (account-level, or in a course).", [P("title"), opt("parentId"), opt("courseId"), opt("description", "text")], ({ store, actor, args }) => oc.createGroup(store, actor, { title: args.s("title"), parentId: args.so("parentId") ?? null, courseId: args.so("courseId") ?? null, description: args.so("description") }));
 cmd("outcomes.move", "outcomes", "Move a folder or outcome into another folder (or to the root).", [P("kind", "string", true, { options: ["group", "outcome"] }), P("id"), opt("toGroupId")], ({ store, actor, args }) => oc.moveItem(store, actor, { kind: args.s("kind") as "group", id: args.s("id"), toGroupId: args.so("toGroupId") || null }));

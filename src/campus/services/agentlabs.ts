@@ -458,7 +458,7 @@ export function runDetail(store: TenantStore, a: Actor, runId: string) {
 export function labRoster(store: TenantStore, a: Actor, labId: string) {
   const lab = labRow(store, labId);
   if (roleIn(a, lab) !== "staff") throw new CampusError("forbidden", "Course staff only.", 403);
-  const learners = store.list("enrollments", (e) => e.courseId === lab.courseId && e.role === "student" && e.state === "active").map((e) => String(e.userId));
+  const learners = store.list("enrollments", (e) => e.courseId === lab.courseId && e.role === "student" && e.state === "active" && e.source !== "student_view").map((e) => String(e.userId));
   return [...new Set(learners)].map((uid) => {
     const runs = store.list("agent_lab_runs", (r) => r.labId === lab.id && r.userId === uid).sort((x, y) => String(y.createdAt).localeCompare(String(x.createdAt)));
     const graded = runs.filter((r) => r.mode === "graded");

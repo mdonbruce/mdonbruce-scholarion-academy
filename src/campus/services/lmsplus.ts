@@ -177,7 +177,7 @@ export function courseStatistics(store: TenantStore, a: Actor, courseId: string)
   const bytes = store.list("files", (f) => f.courseId === courseId).reduce((s, f) => s + Number(f.size ?? 0), 0);
   return {
     course: { id: c.id, code: c.code, title: c.title, state: c.state, concludedAt: c.concludedAt ?? null },
-    students: store.list("enrollments", (e) => e.courseId === courseId && e.role === "student" && e.state === "active").length,
+    students: store.list("enrollments", (e) => e.courseId === courseId && e.role === "student" && e.state === "active" && e.source !== "student_view").length,
     items: { modules: count("modules"), pages: count("pages"), assignments: count("assignments"), quizzes: count("quizzes"), discussions: count("discussion_topics"), announcements: count("announcements"), files: count("files") },
     submissions: count("submissions"),
     discussionPosts: store.list("posts", (p) => store.get("discussion_topics", String(p.topicId))?.courseId === courseId).length,

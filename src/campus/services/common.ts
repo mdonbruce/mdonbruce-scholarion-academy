@@ -38,7 +38,8 @@ export function requireTenant(store: TenantStore, a: Actor, roles: Role[], actio
 }
 
 export function activeStudents(store: TenantStore, courseId: string, sectionId?: string): Row[] {
-  return store.list("enrollments", (e) => e.courseId === courseId && e.role === "student" && e.state === "active" && (!sectionId || e.sectionId === sectionId));
+  // The Student View test student never counts as a real student (roster, gradebook, analytics, reports).
+  return store.list("enrollments", (e) => e.courseId === courseId && e.role === "student" && e.state === "active" && e.source !== "student_view" && (!sectionId || e.sectionId === sectionId));
 }
 
 export function userName(store: TenantStore, userId: string) {

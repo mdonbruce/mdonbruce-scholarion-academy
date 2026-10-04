@@ -4,6 +4,7 @@ import { outcomeTree } from "../../services/outcomes";
 import { periodsForCourse, termAccessSummary } from "../../services/terms";
 import { PLACEMENTS, placementsFor } from "../../services/apps";
 import { api, Chip, Hidden } from "../kit";
+import { groupQuota } from "../../services/files";
 
 type P = { store: TenantStore; actor: Actor; slug: string; here: string; sp: Record<string, string | undefined> };
 
@@ -354,4 +355,49 @@ export function CoursePeriodsNote({ store, courseId }: { store: TenantStore; cou
       Grading periods ({r.source}): {r.periods.map((p) => String(p.name)).join(" · ")}
     </p>
   ) : null;
+}
+
+/** My groups: shared group files with the group's storage quota. */
+export function GroupFilesPanel({ store, actor, slug, here }: P) {
+  const mine = store.list("groups", (g) => ((g.memberIds as string[]) ?? []).includes(actor.id) || hasAny(actor, ["admin", "instructor", "ta"], String(g.courseId)));
+  if (!mine.length) return null;
+  return (
+    <section className="card card-pad stack" aria-labelledby="gf-h">
+      <h2 id="gf-h" className="card-title">
+        Group files
+      </h2>
+      {mine.slice(0, 20).map((g) => {
+        const q = groupQuota(store, g.id);
+        const files = store.list("files", (f) => f.groupId === g.id && f.state === "available");
+        const pct = Math.min(100, Math.round((q.used / q.limit) * 100));
+        return (
+          <details key={g.id}>
+            <summary>
+              {String(g.name)} <span className="tiny muted">· {String(store.get("courses", String(g.courseId))?.code ?? "")} · {files.length} file(s) · {pct}% of {Math.round(q.limit / 1024 / 1024)} MB</span>
+            </summary>
+            <div className="stack">
+              <progress max={100} value={pct} aria-label={`${String(g.name)} storage used`} />
+              <ul className="item-list small">
+                {files.map((f) => (
+                  <li key={f.id}>
+                    <a href={api(slug, `files/${f.id}/preview`)}>{String(f.name)}</a> <span className="tiny muted">{Math.ceil(Number(f.size ?? 0) / 1024)} KB · {String(store.get("users", String(f.ownerId))?.name ?? "")}</span>
+                  </li>
+                ))}
+              </ul>
+              <form method="post" action={api(slug, "upload")} encType="multipart/form-data" className="row wrap">
+                <Hidden values={{ back: here, groupId: g.id, purpose: "group" }} />
+                <label className="sr-only" htmlFor={`gf-${g.id}`}>
+                  Add a file to {String(g.name)}
+                </label>
+                <input id={`gf-${g.id}`} type="file" name="file" required />
+                <button className="btn btn-outline btn-sm" type="submit">
+                  Upload
+                </button>
+              </form>
+            </div>
+          </details>
+        );
+      })}
+    </section>
+  );
 }

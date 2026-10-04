@@ -1,10 +1,11 @@
+import * as quiztools from "../../services/quiztools";
 import type { ReactNode } from "react";
 import { acceptAttr, formatList, formatsFor } from "../../services/uploads";
 import { Formats } from "../../../ui/components/formats";
 import { facultyByName } from "../../../brand/faculty";
 import { FacultyCard } from "../../../ui/components/faculty";
 import { CampusError, type Row, type TenantStore } from "../../core";
-import type { Actor } from "../../iam";
+import { hasAny, type Actor } from "../../iam";
 import * as entity from "../../entity";
 import { ENTITY } from "../../registry";
 import * as cur from "../../services/curriculum";
@@ -107,7 +108,7 @@ export function CourseView({ store, actor, slug, courseId, rest, sp }: { store: 
   }
   const c: C = { store, actor, slug, course, sp, rest };
   const nav = cur.courseNav(store, actor, courseId);
-  const tab = rest[0] ?? (course.homeType === "syllabus" ? "syllabus" : course.homeType === "assignments" ? "assignments" : "modules");
+  const tab = rest[0] ?? (course.homeType === "syllabus" ? "syllabus" : course.homeType === "assignments" ? "assignments" : course.homeType === "front_page" || course.homeType === "activity" ? "home" : "modules");
   const staff = isStaff(actor, courseId);
   let body: ReactNode;
   try {
@@ -153,7 +154,7 @@ export function CourseView({ store, actor, slug, courseId, rest, sp }: { store: 
           <ul>
             {nav.map((n) => (
               <li key={n.tab}>
-                <a href={`${base(c)}/${n.tab === "home" ? "modules" : n.tab}`} aria-current={tab === n.tab || (n.tab === "home" && tab === "modules") ? "page" : undefined} className={n.hidden ? "muted" : undefined}>
+                <a href={`${base(c)}/${n.tab === "home" ? (course.homeType === "front_page" || course.homeType === "activity" ? "home" : "modules") : n.tab}`} aria-current={tab === n.tab || (n.tab === "home" && tab === "modules") ? "page" : undefined} className={n.hidden ? "muted" : undefined}>
                   {n.label}
                   {n.hidden && <span className="sr-only"> (hidden from students)</span>}
                 </a>
@@ -179,6 +180,7 @@ export function CourseView({ store, actor, slug, courseId, rest, sp }: { store: 
 function renderTab(c: C, tab: string, staff: boolean): ReactNode {
   switch (tab) {
     case "home":
+      return <CourseHome c={c} staff={staff} />;
     case "modules":
       return <Modules c={c} staff={staff} />;
     case "items":
@@ -214,7 +216,7 @@ function renderTab(c: C, tab: string, staff: boolean): ReactNode {
     case "library":
       return <ListOf c={c} table="reading_items" staff={staff} />;
     case "analytics":
-      return staff ? <Result value={courseAnalytics(c.store, c.actor, String(c.course.id))} /> : <Result value={studentAnalytics(c.store, c.actor, String(c.course.id), c.actor.id)} />;
+      return staff ? <StaffAnalytics c={c} /> : <Result value={studentAnalytics(c.store, c.actor, String(c.course.id), c.actor.id)} />;
     case "settings":
       return <Settings c={c} />;
     case "tutor":
@@ -344,6 +346,144 @@ function ListOf({ c, table, staff }: { c: C; table: string; staff: boolean }) {
   );
 }
 
+/** Course analytics with charts; every assignment bar can message the students behind it. */
+function StaffAnalytics({ c }: { c: C }) {
+  const an = courseAnalytics(c.store, c.actor, String(c.course.id));
+  const here = `${base(c)}/analytics`;
+  const maxWeek = Math.max(1, ...an.weekly.map((w) => w.views + w.participations));
+  const canMessage = hasAny(c.actor, ["admin", "instructor", "ta"], String(c.course.id));
+  return (
+    <div className="stack">
+      <p className="tiny muted">{an.note}</p>
+      <section className="card card-pad stack" aria-labelledby="an-wk">
+        <h2 id="an-wk" className="card-title">
+          Weekly activity
+        </h2>
+        {an.weekly.length ? (
+          <table className="table small chart-table">
+            <caption className="sr-only">Page views and participations per week</caption>
+            <thead>
+              <tr>
+                <th scope="col">Week of</th>
+                <th scope="col">Views</th>
+                <th scope="col">Participations</th>
+                <th scope="col" aria-hidden="true"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {an.weekly.map((w) => (
+                <tr key={w.week}>
+                  <th scope="row">{w.week}</th>
+                  <td>{w.views}</td>
+                  <td>{w.participations}</td>
+                  <td aria-hidden="true" style={{ width: "45%" }}>
+                    <span className="bar" style={{ width: `${(w.views / maxWeek) * 100}%` }} />
+                    <span className="bar bar-alt" style={{ width: `${(w.participations / maxWeek) * 100}%` }} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className="small">No activity yet.</p>
+        )}
+      </section>
+      <section className="card card-pad stack" aria-labelledby="an-as">
+        <h2 id="an-as" className="card-title">
+          Assignments
+        </h2>
+        <p className="tiny muted">{an.students} student(s). Choose a bar's message button to write to the students it counts.</p>
+        <ul className="item-list">
+          {an.assignments.map((x) => (
+            <li key={String(x.id)} className="stack">
+              <div>
+                <strong>{String(x.title)}</strong> <span className="tiny muted">· average {x.avgPct === null ? "—" : `${x.avgPct}%`} · on time {x.onTime} · late {x.late} · missing {x.missing}</span>
+              </div>
+              <div aria-hidden="true" className="bar-track">
+                <span className="bar" style={{ width: `${x.avgPct ?? 0}%` }} />
+              </div>
+              {canMessage && (
+                <details>
+                  <summary className="small">Message students from this chart</summary>
+                  <form method="post" action={api(c.slug, "a/grades.message_students_who")} className="stack">
+                    <Hidden values={{ back: here, assignmentId: String(x.id), notice: "Message sent." }} />
+                    <div className="row wrap">
+                      <div className="field">
+                        <label htmlFor={`mw-c-${x.id}`}>Who</label>
+                        <select id={`mw-c-${x.id}`} name="criterion" defaultValue="not_submitted">
+                          <option value="not_submitted">Missing — haven't submitted ({x.missing})</option>
+                          <option value="not_graded">Submitted, not graded yet</option>
+                          <option value="scored_below">Scored below…</option>
+                          <option value="scored_above">Scored above…</option>
+                        </select>
+                      </div>
+                      <div className="field">
+                        <label htmlFor={`mw-v-${x.id}`}>Score % (for below/above)</label>
+                        <input id={`mw-v-${x.id}`} name="value" type="number" min={0} max={100} defaultValue={60} />
+                      </div>
+                    </div>
+                    <div className="field">
+                      <label htmlFor={`mw-s-${x.id}`}>Subject</label>
+                      <input id={`mw-s-${x.id}`} name="subject" required defaultValue={`About ${String(x.title)}`} />
+                    </div>
+                    <div className="field">
+                      <label htmlFor={`mw-b-${x.id}`}>Message</label>
+                      <textarea id={`mw-b-${x.id}`} name="body" rows={3} required />
+                    </div>
+                    <button className="btn btn-outline btn-sm" type="submit">
+                      Send
+                    </button>
+                  </form>
+                </details>
+              )}
+            </li>
+          ))}
+        </ul>
+        <p>
+          <a className="btn btn-ghost btn-sm" href={`${api(c.slug, "q/analytics.export_csv")}?courseId=${String(c.course.id)}`}>
+            Download CSV
+          </a>
+        </p>
+      </section>
+    </div>
+  );
+}
+
+/** Course home: the chosen front page, or a recent-activity stream; anything else falls back to modules. */
+function CourseHome({ c, staff }: { c: C; staff: boolean }) {
+  const cid = String(c.course.id);
+  if (c.course.homeType === "front_page") {
+    const fp = c.store.list("pages", (p) => p.courseId === cid && !!p.frontPage && (staff || p.state === "published"))[0];
+    if (fp) return <PageDetail c={{ ...c, rest: ["pages", fp.id] }} staff={staff} />;
+    return (
+      <div className="stack">
+        {staff && <p className="notice notice-info small">The home page is set to a front page, but no page is marked as the front page yet. Edit a page and turn on “Front page”.</p>}
+        <Modules c={c} staff={staff} />
+      </div>
+    );
+  }
+  if (c.course.homeType === "activity") {
+    const items = cur.courseActivity(c.store, c.actor, cid, 30);
+    return (
+      <section className="stack" aria-labelledby="ch-act">
+        <h2 id="ch-act">Recent activity</h2>
+        {items.length ? (
+          <ul className="item-list">
+            {items.map((x) => (
+              <li key={`${x.kind}-${x.id}`}>
+                <span className="badge">{x.kind}</span> <a href={`${base(c)}/${x.path}`}>{x.title}</a> <span className="tiny muted">· {fmt(x.at, true)}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <Empty title="Nothing new yet" />
+        )}
+      </section>
+    );
+  }
+  return <Modules c={c} staff={staff} />;
+}
+
 function PageDetail({ c, staff }: { c: C; staff: boolean }) {
   const p = entity.read(c.store, c.actor, "pages", String(c.rest[1])) as Row;
   const here = `${base(c)}/pages/${p.id}`;
@@ -402,6 +542,22 @@ function PageDetail({ c, staff }: { c: C; staff: boolean }) {
             </ul>
           </details>
         </>
+      )}
+      {!staff && cur.canEditPage(c.actor, p) && p.state === "published" && (
+        <details className="card card-pad" open={!!c.sp.edit}>
+          <summary>Edit this page</summary>
+          <p className="tiny muted">Your teacher lets students edit this page. Every save is kept as a revision.</p>
+          <form method="post" action={api(c.slug, "a/page.save_text")} className="stack">
+            <Hidden values={{ back: here, pageId: p.id, ifVersion: String(p.version), notice: "Page saved." }} />
+            <div className="field">
+              <label htmlFor="pg-stext">Content</label>
+              <textarea id="pg-stext" name="text" rows={12} defaultValue={cur.blocksToMarkup((p.blocks as cur.Block[]) ?? [])} />
+            </div>
+            <button className="btn btn-primary btn-sm" type="submit">
+              Save page
+            </button>
+          </form>
+        </details>
       )}
     </article>
   );
@@ -519,6 +675,16 @@ function QuizDetail({ c, staff }: { c: C; staff: boolean }) {
         </p>
         <h3>Item analysis</h3>
         <Result value={asm.itemAnalysis(c.store, c.actor, String(q.id))} />
+        {q.snapshot ? (
+          <>
+            <h3>Student analysis</h3>
+            <p className="small">
+              Every attempt's answers and points per question. <a href={api(c.slug, `q/quizzes.student_analysis_export_csv?quizId=${String(q.id)}`)}>Download CSV</a>
+            </p>
+            <h3>Outcomes analysis</h3>
+            <QuizOutcomes c={c} quizId={String(q.id)} />
+          </>
+        ) : null}
         <h3>Moderate</h3>
         <OpForm slug={c.slug} op={OPERATIONS["quiz.moderate"]} back={here} values={{ quizId: String(q.id) }} hide={["quizId"]} />
       </div>
@@ -538,6 +704,12 @@ function QuizDetail({ c, staff }: { c: C; staff: boolean }) {
           <p className="notice notice-info" role="status">
             Time limit {String(view.attempt.timeLimitMin)} minutes · submit by {fmt(view.attempt.deadline, true)}
           </p>
+          {view.quiz.calculator && view.quiz.calculator !== "none" ? (
+            <details className="card card-pad">
+              <summary>{view.quiz.calculator === "scientific" ? "Scientific" : "Basic"} calculator</summary>
+              <iframe title="Calculator" src={`/campus/${c.slug}/calculator?mode=${view.quiz.calculator === "scientific" ? "scientific" : "basic"}`} style={{ width: "100%", height: 130, border: 0 }} />
+            </details>
+          ) : null}
           {view.questions.map((qq, i) => (
             <fieldset key={qq.id} className="card card-pad">
               <legend>
@@ -567,6 +739,15 @@ function QuizDetail({ c, staff }: { c: C; staff: boolean }) {
       ) : (
         <>
         {q.proctored ? <PretestChecklist slug={c.slug} store={c.store} actor={c.actor} quizId={String(q.id)} back={here} /> : null}
+        {q.proctoringToolId && !staff ? (
+          <form method="post" action={api(c.slug, "lti/proctor")} className="row">
+            <Hidden values={{ quizId: String(q.id) }} />
+            <button className="btn btn-outline" type="submit">
+              Start proctoring
+            </button>
+            <span className="tiny muted">Your school's proctoring tool checks your setup first, then sends you back here.</span>
+          </form>
+        ) : null}
         <form method="post" action={api(c.slug, "a/quiz.start")}>
           <Hidden values={{ back: here, quizId: String(q.id) }} />
           {q.accessCode ? (
@@ -735,7 +916,7 @@ function StudentGrades({ c }: { c: C }) {
   return (
     <form method="get" className="stack">
       <p>
-        Total: <strong>{t.finalPct === null ? "—" : `${t.finalPct}%`}</strong> {t.letter && <span className="badge">{t.letter}</span>} {Object.keys(whatIf).length > 0 && <span className="badge badge-blue">What-If (not saved)</span>}
+        Total: <strong>{t.finalPct === null ? "—" : `${t.finalPct}%`}</strong> {t.letter && <span className="badge">{t.letter}</span>} {t.gpa !== null && t.gpa !== undefined && <span className="tiny muted">· {t.gpa.toFixed(2)} grade points</span>} {Object.keys(whatIf).length > 0 && <span className="badge badge-blue">What-If (not saved)</span>}
       </p>
       <div className="table-wrap" tabIndex={0} role="region" aria-label="Scrollable table">
         <table className="table">
@@ -784,11 +965,51 @@ function StudentGrades({ c }: { c: C }) {
           </li>
         ))}
       </ul>
+      <RubricFeedback c={c} />
     </form>
   );
 }
 
+/** Posted rubric assessments for the signed-in student. "Hide score total" hides points, keeping the ratings. */
+function RubricFeedback({ c }: { c: C }) {
+  const graded = c.store.list("grades", (g) => g.courseId === c.course.id && g.userId === c.actor.id && !!g.posted && !!g.rubricAssessment);
+  if (!graded.length) return null;
+  return (
+    <section className="stack" aria-label="Rubric feedback">
+      <h3>Rubric feedback</h3>
+      {graded.map((g) => {
+        const ra = g.rubricAssessment as { rubricId: string; ratings: Record<string, number>; comments?: Record<string, string> };
+        const rb = c.store.get("rubrics", ra.rubricId);
+        if (!rb) return null;
+        const hide = !!rb.hideScoreTotal;
+        const crit = (rb.criteria as { id: string; name: string; bands: { label: string; points: number }[] }[]) ?? [];
+        const total = crit.reduce((s, cr) => s + (ra.ratings[cr.id] ?? 0), 0);
+        return (
+          <details key={g.id} className="card card-pad">
+            <summary>
+              {String(c.store.get("assignments", String(g.assignmentId))?.title ?? "Assignment")} {!hide && <span className="tiny muted">· rubric total {total}</span>}
+            </summary>
+            <ul className="small">
+              {crit.map((cr) => {
+                const v = ra.ratings[cr.id];
+                const band = cr.bands.find((b) => b.points === v);
+                return (
+                  <li key={cr.id}>
+                    <strong>{cr.name}:</strong> {band?.label ?? (v === undefined ? "not rated" : "")} {!hide && v !== undefined ? `(${v} pts)` : ""} {ra.comments?.[cr.id] ? `— ${ra.comments[cr.id]}` : ""}
+                  </li>
+                );
+              })}
+            </ul>
+            {hide && <p className="tiny muted">Your instructor hides rubric point totals; your ratings and comments are shown.</p>}
+          </details>
+        );
+      })}
+    </section>
+  );
+}
+
 function Gradebook({ c }: { c: C }) {
+  if (c.sp.view === "individual") return <IndividualGradebook c={c} />;
   const cid = String(c.course.id);
   const g = grading.gradebookGrid(c.store, c.actor, cid, { sectionId: c.sp.sectionId });
   const here = `${base(c)}/grades`;
@@ -814,6 +1035,9 @@ function Gradebook({ c }: { c: C }) {
           Export CSV
         </a>
         <Formats href={api(c.slug, `q/grades.export_csv?courseId=${cid}`)} name="Gradebook" />
+        <a className="btn btn-ghost btn-sm" href={`${base(c)}/grades?view=individual`}>
+          Individual view
+        </a>
       </div>
       <div className="table-wrap campus-gradebook" role="region" aria-label="Gradebook" tabIndex={0}>
         <table className="table">
@@ -1159,12 +1383,23 @@ function StudentViewInfo({ c }: { c: C }) {
           </li>
         ))}
       </ul>
-      <form method="post" action={api(c.slug, "a/course.student_view")}>
-        <Hidden values={{ back: `${base(c)}/student-view`, courseId: String(c.course.id), reset: "true" }} />
-        <button className="btn btn-outline btn-sm" type="submit">
-          Reset test student
-        </button>
-      </form>
+      <p className="tiny muted">The test student never appears in the roster, gradebook, analytics or reports.</p>
+      <div className="row wrap">
+        {!c.actor.masqueradedBy && (
+          <form method="post" action={api(c.slug, "auth/masquerade")}>
+            <Hidden values={{ back: `${base(c)}`, userId: u.id, reason: "Student View" }} />
+            <button className="btn btn-primary btn-sm" type="submit">
+              Enter Student View
+            </button>
+          </form>
+        )}
+        <form method="post" action={api(c.slug, "a/course.student_view")}>
+          <Hidden values={{ back: `${base(c)}/student-view`, courseId: String(c.course.id), reset: "true" }} />
+          <button className="btn btn-outline btn-sm" type="submit">
+            Reset test student
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
@@ -1265,6 +1500,128 @@ function Tutor({ c }: { c: C }) {
           </button>
         </form>
       </details>
+    </div>
+  );
+}
+
+function QuizOutcomes({ c, quizId }: { c: C; quizId: string }) {
+  const r = quiztools.outcomesAnalysis(c.store, c.actor, quizId);
+  if (!r.outcomes.length) return <p className="small">No questions in this quiz are aligned to outcomes{r.unaligned ? ` (${r.unaligned} unaligned)` : ""}.</p>;
+  return (
+    <div className="table-wrap" tabIndex={0} role="region" aria-label="Outcomes analysis">
+      <table className="table">
+        <thead>
+          <tr>
+            <th scope="col">Outcome</th>
+            <th scope="col">Questions</th>
+            <th scope="col">Students</th>
+            <th scope="col">Average</th>
+            <th scope="col">Reached mastery</th>
+          </tr>
+        </thead>
+        <tbody>
+          {r.outcomes.map((o) => (
+            <tr key={o.outcomeId}>
+              <td>
+                <strong>{o.code}</strong> {o.title}
+              </td>
+              <td>{o.questions}</td>
+              <td>{o.students}</td>
+              <td>{o.averagePct === null ? "—" : `${o.averagePct}%`}</td>
+              <td>{o.masteredPct === null ? "—" : `${o.mastered} (${o.masteredPct}%) at ≥${o.thresholdPct}%`}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/** Individual gradebook view: one student at a time, with previous/next navigation. */
+function IndividualGradebook({ c }: { c: C }) {
+  const cid = String(c.course.id);
+  const grid = grading.gradebookGrid(c.store, c.actor, cid, { sectionId: c.sp.sectionId });
+  const students = grid.rows.map((r) => ({ userId: String(r.userId), name: String(r.name) }));
+  if (!students.length) return <p className="small">No students in this course yet.</p>;
+  const idx = Math.max(0, students.findIndex((s) => s.userId === c.sp.student));
+  const st = students[idx];
+  const t = grading.computeTotals(c.store, cid, st.userId, { includeUnposted: true });
+  const link = (i: number) => `${base(c)}/grades?view=individual&student=${students[(i + students.length) % students.length].userId}`;
+  return (
+    <div className="stack">
+      <nav className="row" aria-label="Student navigation">
+        <a className="btn btn-ghost btn-sm" href={link(idx - 1)}>
+          ← Previous student
+        </a>
+        <form method="get" className="row">
+          <input type="hidden" name="view" value="individual" />
+          <label htmlFor="ig-st">Student</label>
+          <select id="ig-st" name="student" defaultValue={st.userId}>
+            {students.map((s) => (
+              <option key={s.userId} value={s.userId}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+          <button className="btn btn-ghost btn-sm">Go</button>
+        </form>
+        <a className="btn btn-ghost btn-sm" href={link(idx + 1)}>
+          Next student →
+        </a>
+        <a className="btn btn-ghost btn-sm" href={`${base(c)}/grades`}>
+          Back to the gradebook
+        </a>
+      </nav>
+      <h2>
+        {st.name} <span className="tiny muted">({idx + 1} of {students.length})</span>
+      </h2>
+      <p>
+        Total (including unposted): <strong>{t.finalPct === null ? "—" : `${t.finalPct}%`}</strong> {t.letter && <span className="badge">{t.letter}</span>} {t.override && <span className="badge badge-amber">override {String(t.override)}</span>}
+      </p>
+      <div className="table-wrap" tabIndex={0} role="region" aria-label={`Grades for ${st.name}`}>
+        <table className="table">
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col">Due</th>
+              <th scope="col">Status</th>
+              <th scope="col">Score</th>
+              <th scope="col">Posted</th>
+              <th scope="col">Grade</th>
+            </tr>
+          </thead>
+          <tbody>
+            {t.items.map((i) => {
+              const gr = c.store.list("grades", (x) => x.assignmentId === i.id && x.userId === st.userId)[0];
+              return (
+                <tr key={i.id} className={i.dropped ? "muted" : undefined}>
+                  <td>{i.title}</td>
+                  <td>{fmt(i.dueAt, true)}</td>
+                  <td>
+                    <Chip s={i.status} />
+                  </td>
+                  <td>{i.score === null ? "—" : `${i.score} / ${i.points}`}</td>
+                  <td>{gr ? (gr.posted ? "yes" : "hidden") : "—"}</td>
+                  <td>
+                    {c.store.get("assignments", i.id) ? (
+                      <a href={`${base(c)}/grader?assignmentId=${i.id}&userId=${st.userId}`}>Open in grader</a>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <ul className="item-list small">
+        {t.groups.map((gp) => (
+          <li key={gp.id}>
+            {gp.name} ({gp.weight}%): {gp.pct === null ? "—" : `${Math.round(gp.pct * 10) / 10}%`}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

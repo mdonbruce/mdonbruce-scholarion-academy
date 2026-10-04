@@ -5,7 +5,7 @@ Generated from the tab registry (`src/campus/registry.ts`). One section per tab.
 Common tools for every tab:
 
 - **Audit log:** Admin Console → Recent audit, or `GET /q/audit.log`. Every denial is recorded with the reason; act-as records carry the real admin.
-- **Outbox:** `GET /q/outbox.status?status=dead`; replay with `POST /a/outbox.replay`. Consumers: file-scanner, media-transcoder, lms-enrollment-projection, observer-alerts, analytics-events, notifications, search-indexer, ai-support-triage, webhook-fanout, bundle-badge, completion-evaluator.
+- **Outbox:** `GET /q/outbox.status?status=dead`; replay with `POST /a/outbox.replay`. Consumers: lms-enrollment-projection, observer-alerts, analytics-events, notifications, search-indexer, file-scanner, media-transcoder, ai-support-triage, webhook-fanout, bundle-badge, completion-evaluator.
 - **Metrics:** `/api/campus/metrics` (Prometheus text). Health: `/api/campus/health`.
 - **Jobs:** `POST /a/ops.run_jobs` (announcements, missing work, overdue holds, retention, digests, outbox relay, webhooks).
 
@@ -18,7 +18,7 @@ Users, role grants, MFA and time-boxed support access.
 - **Typical failures:** Sign-in errors, lockouts, expired grants.
 - **Recovery:** Check login_failures and audit; unlock by waiting 15 min; re-issue grants via admin.
 - **Resources:** `users`, `role_grants`, `support_grants`
-- **Operations:** `me`, `roles.grant`, `roles.revoke`, `support.request`, `support.decide`
+- **Operations:** `me`, `roles.grant`, `roles.grant_account_admin`, `roles.revoke`, `support.request`, `support.decide`, `roles.account_admins`
 - **Who sees it:** admin, support
 
 ## 2. Curriculum
@@ -54,7 +54,7 @@ Assignments, quizzes with snapshots and seeded randomization, question banks, at
 - **Typical failures:** Attempt start refused; submission blocked by scan.
 - **Recovery:** Check availability, attempt count, accommodations; re-scan file; idempotent resubmit.
 - **Resources:** `assignments`, `quizzes`, `question_banks`, `questions`, `attempts`, `submissions`
-- **Operations:** `submission.create`, `submission.mine`, `peer.assign`, `peer.complete`, `peer.mine`, `quiz.start`, `quiz.attempt`, `quiz.autosave`, `quiz.finish`, `quiz.submit`, `quiz.grade_question`, `quiz.moderate`, `quiz.regrade`, `quiz.item_analysis`, `quiz.manual_queue`, `assignments.bulk_dates`, `submission.formats`
+- **Operations:** `submission.create`, `submission.mine`, `peer.assign`, `peer.complete`, `peer.mine`, `quiz.start`, `quiz.attempt`, `quiz.autosave`, `quiz.finish`, `quiz.submit`, `quiz.grade_question`, `quiz.moderate`, `quiz.regrade`, `quiz.item_analysis`, `quiz.manual_queue`, `lti.proctor_launch`, `lti.proctor_start_assessment`, `quizzes.student_analysis`, `quizzes.student_analysis_export_csv`, `quizzes.outcomes_analysis`, `question_banks.share`, `question_banks.for_course`, `quizzes.add_pool`, `assignments.bulk_dates`, `submission.formats`
 - **Who sees it:** admin, instructor, ta, designer, student
 
 ## 5. Gradebook
@@ -66,7 +66,7 @@ Weighted groups, drop rules, late/missing policies, versioned rubrics, posting, 
 - **Typical failures:** 412 on stale edits; unposted grades not visible.
 - **Recovery:** Reload and re-apply edits; post explicitly; check audit for release history.
 - **Resources:** `assignment_groups`, `grades`, `rubrics`, `posting_policies`, `peer_reviews`, `annotations`, `grading_periods`, `grading_period_sets`, `grading_schemes`, `grade_history`, `comment_library`, `submission_comments`, `gradebook_notes`
-- **Operations:** `grader.queue`, `gradebook.grid`, `grades.set`, `grades.post`, `grades.select_provisional`, `grades.final_override`, `grades.curve`, `grades.default`, `grades.message_students_who`, `grades.export_csv`, `grades.import_csv`, `grades.history`, `grades.totals`, `rubric.new_version`, `submission.annotate`, `submission.comment`, `submission.comments`, `ai.draft_feedback`, `grading_periods.set_create`, `grading_periods.add`, `grading_periods.for_course`, `gradebook.cell`, `grades.set_group`
+- **Operations:** `grader.queue`, `gradebook.grid`, `grades.set`, `grades.post`, `grades.select_provisional`, `grades.final_override`, `grades.curve`, `grades.default`, `grades.message_students_who`, `grades.export_csv`, `grades.import_csv`, `grades.history`, `grades.totals`, `rubric.new_version`, `submission.annotate`, `submission.comment`, `submission.comments`, `ai.draft_feedback`, `grades.gpa`, `grading_periods.set_create`, `grading_periods.add`, `grading_periods.for_course`, `gradebook.cell`, `grades.set_group`
 - **Who sees it:** admin, instructor, ta, student, observer
 
 ## 6. Collaboration
@@ -90,7 +90,7 @@ Signed short-lived uploads into quarantine, scan, MIME check, promotion; media r
 - **Typical failures:** Files stuck in quarantine; media can't publish without captions.
 - **Recovery:** Re-run scan; add caption track or record an authorized exception.
 - **Resources:** `files`, `folders`, `media`, `caption_tracks`
-- **Operations:** `files.request_upload`, `files.download_url`, `files.publish`, `files.bulk`
+- **Operations:** `files.request_upload`, `groups.quota`, `files.download_url`, `files.publish`, `files.bulk`
 - **Who sees it:** admin, instructor, ta, designer, student
 
 ## 8. Analytics
@@ -173,8 +173,8 @@ Zoom/Teams sessions through scoped connectors (disabled by default) and attendan
 - **Depends on:** Zoom/Teams connector (tenant consent).
 - **Typical failures:** Connector disabled; imports unreconciled.
 - **Recovery:** Enable connector in Tenant Admin; reconcile imports.
-- **Resources:** `live_sessions`, `attendance`
-- **Operations:** `live.schedule`, `live.import_attendance`, `live.reconcile_attendance`, `live.roll_call`
+- **Resources:** `live_sessions`, `live_recordings`, `attendance`
+- **Operations:** `live.schedule`, `live.import_attendance`, `live.reconcile_attendance`, `live.roll_call`, `live_recordings.add`, `live_recordings.for_course`
 - **Who sees it:** admin, instructor, ta, student (feature flag `live_connectors`)
 
 ## 15. Outcomes & Evidence
@@ -222,7 +222,7 @@ Signed, revocable Open Badges 3.0-shaped certificates and student portfolios.
 - **Typical failures:** Verification shows revoked.
 - **Recovery:** Re-issue after correcting the record.
 - **Resources:** `credentials`, `credential_templates`, `portfolios`, `portfolio_pages`, `artifacts`
-- **Operations:** `credentials.issue`, `credentials.revoke`, `offerings.evaluate_completion`, `credentials.reissue`, `credentials.clr`, `credentials.share`
+- **Operations:** `credentials.issue`, `credentials.revoke`, `portfolios.set_public`, `offerings.evaluate_completion`, `credentials.reissue`, `credentials.clr`, `credentials.share`
 - **Who sees it:** admin, registrar, student, advisor
 
 ## 19. Careers & Placement
@@ -305,8 +305,8 @@ Accounts and sub-accounts, the permission matrix with locks, custom roles, theme
 - **Depends on:** Platform registry.
 - **Typical failures:** Unverified domains don't resolve (expected).
 - **Recovery:** Verify domain; toggle flags.
-- **Resources:** `accounts`, `custom_roles`, `permission_overrides`, `global_announcements`, `feature_options`, `masquerades`, `sis_imports`, `role_templates`
-- **Operations:** `permissions.matrix`, `permissions.set`, `admin.overview`, `admin.theme`, `admin.flag`, `features.matrix`, `features.set`, `admin.add_domain`, `admin.verify_domain`, `global_announcements.active`, `global_announcements.dismiss`, `admin.help_links`, `admin.help_links.get`, `custom_roles.grant`, `audit.log`, `outbox.status`
+- **Resources:** `accounts`, `custom_roles`, `permission_overrides`, `global_announcements`, `feature_options`, `masquerades`, `sis_imports`, `role_templates`, `async_jobs`, `self_registrations`, `identity_providers`
+- **Operations:** `permissions.matrix`, `permissions.set`, `admin.overview`, `admin.theme`, `admin.flag`, `features.matrix`, `features.set`, `admin.add_domain`, `admin.verify_domain`, `global_announcements.active`, `global_announcements.dismiss`, `admin.help_links`, `admin.help_links.get`, `custom_roles.grant`, `audit.log`, `audit.search`, `audit.search_export_csv`, `audit.auth_log`, `admin.account_settings`, `admin.account_settings.set`, `admin.legal_links`, `accounts.self_register`, `self_registrations.decide`, `admin.theme_extras`, `jobs.enqueue_report`, `jobs.enqueue_sis_import`, `jobs.status`, `identity_providers.configure`, `identity_providers.test`, `outbox.status`
 - **Who sees it:** admin
 
 ## 26. Privacy & Compliance
@@ -414,7 +414,7 @@ Enrollment, grade distribution, registration and engagement reports as CSV.
 - **Typical failures:** Empty report.
 - **Recovery:** Check filters; re-run.
 - **Resources:** `report_runs`
-- **Operations:** `reports.run`
+- **Operations:** `reports.run`, `reports.result_export_csv`
 - **Who sees it:** admin, registrar
 
 ## 35. Dashboard & Planner

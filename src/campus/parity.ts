@@ -24,9 +24,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "1",
   "feature": "Account admin / sub-account admin / custom roles",
-  "status": "PARTIAL",
-  "evidence": "registry.ts:custom_roles; admin.ts:grantCustomRole; ops custom_roles.grant",
-  "gap": "role_grants are tenant-scope only; no admin role scoped to a sub-account"
+  "status": "DONE",
+  "evidence": "iam.ts:grantAccountAdmin,actorFor(accountAdminOf→course admin in accountSubtree; never tenant-wide); ops roles.grant_account_admin, roles.account_admins; adminx.tsx Sub-account admins",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "1",
@@ -59,9 +60,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "1",
   "feature": "Student View (fake test student, isolated, resettable)",
-  "status": "PARTIAL",
-  "evidence": "curriculum.ts:studentView; ops course.student_view; course.tsx:StudentViewInfo",
-  "gap": "test student not excluded from roster/gradebook/analytics (activeStudents); teacher can't act as it, only preview"
+  "status": "DONE",
+  "evidence": "common.ts:activeStudents excludes source student_view (and every roster query); admin.ts:startMasquerade Student View for course staff; iam.ts:resolveSession studentView; course.tsx Enter Student View / Reset",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "2",
@@ -179,9 +181,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.1",
   "feature": "Course home page type choice",
-  "status": "PARTIAL",
-  "evidence": "courses.homeType enum; course.tsx:CourseView tab default",
-  "gap": "front_page and activity home types fall back to modules in UI"
+  "status": "DONE",
+  "evidence": "course.tsx:CourseHome (front_page renders the front page; activity uses curriculum.ts:courseActivity)",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "3.1",
@@ -429,9 +432,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.5",
   "feature": "Late/missing policies (missing grade, %/day/hour, floor)",
-  "status": "PARTIAL",
-  "evidence": "grading.ts:latePenalty,computeTotals missingScorePct; courses.latePolicy",
-  "gap": "per-hour deduction missing; missing score computed in totals, not stored as grade"
+  "status": "DONE",
+  "evidence": "grading.ts:latePenalty latePctPerHour/hoursLate; missingJob stores grade via setGrade(source missing_policy)",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "3.5",
@@ -693,9 +697,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.7",
   "feature": "Grading schemes (letter/pass-fail/GPA)",
-  "status": "PARTIAL",
-  "evidence": "grading_schemes entity; grading.ts:letterFor",
-  "gap": "GPA values never computed/shown; kind not used"
+  "status": "DONE",
+  "evidence": "grading.ts:letterFor pass_fail, gpaFor, gpaSummary, computeTotals.gpa; ops grades.gpa; course.tsx StudentGrades grade points",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "3.7",
@@ -735,9 +740,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.7",
   "feature": "Individual gradebook view",
-  "status": "PARTIAL",
-  "evidence": "ops grades.totals(userId), analytics.student",
-  "gap": "no individual-view screen navigating student by student"
+  "status": "DONE",
+  "evidence": "course.tsx:IndividualGradebook (?view=individual&student=, previous/next student)",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "3.7",
@@ -968,9 +974,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.10",
   "feature": "Editing roles",
-  "status": "PARTIAL",
-  "evidence": "pages.editingRoles; curriculum.ts:canEditPage",
-  "gap": "canEditPage never called; students can't edit"
+  "status": "DONE",
+  "evidence": "curriculum.ts:savePageText (canEditPage, published + accessible, body only, revision kept); ops page.save_text; course.tsx student edit form",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "3.10",
@@ -983,9 +990,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.10",
   "feature": "Links auto-update on rename",
-  "status": "PARTIAL",
-  "evidence": "curriculum.ts:renderBlocks resolves titles",
-  "gap": "html stored at write; renaming target doesn't re-render linking pages"
+  "status": "DONE",
+  "evidence": "curriculum.ts:refreshLinkingPages via addAfterWrite on pages/assignments/quizzes/discussion_topics/files/modules; entity.ts:registerHooks composes write hooks",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "3.11",
@@ -1033,9 +1041,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.11",
   "feature": "Quotas (course/user/group)",
-  "status": "PARTIAL",
-  "evidence": "files.ts:quotaBytes",
-  "gap": "no group quota"
+  "status": "DONE",
+  "evidence": "files.ts:groupQuota (group.quotaMb → account.groupQuotaMb → 50 MB), requestUpload purpose group, canDownload group members; ops groups.quota; structure.tsx GroupFilesPanel",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "3.11",
@@ -1061,9 +1070,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.12",
   "feature": "Item banks shared with tags/versions",
-  "status": "PARTIAL",
-  "evidence": "question_banks (course:true); questions.tags,version",
-  "gap": "banks course-scoped, not shareable across courses; version only bumped on regrade"
+  "status": "DONE",
+  "evidence": "quiztools.ts:shareBank,banksFor,addPool; questions.contentRevision bumped on content edits",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "3.12",
@@ -1139,9 +1149,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.12",
   "feature": "Calculator",
-  "status": "PARTIAL",
-  "evidence": "quizzes.calculator; attemptView returns it",
-  "gap": "no calculator rendered in UI"
+  "status": "DONE",
+  "evidence": "calculator.ts:evaluate (recursive-descent, no eval), calculatorHtml; route /campus/[tenant]/calculator (strict CSP); course.tsx quiz iframe",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "3.12",
@@ -1202,16 +1213,18 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.12",
   "feature": "Student analysis",
-  "status": "PARTIAL",
-  "evidence": "itemAnalysis students[]",
-  "gap": "only score per attempt; no per-student response report/CSV"
+  "status": "DONE",
+  "evidence": "quiztools.ts:studentAnalysis,studentAnalysisCsv; ops quizzes.student_analysis(_export_csv)",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "3.12",
   "feature": "Outcomes analysis",
-  "status": "PARTIAL",
-  "evidence": "grading.ts:outcomeResults uses aligned questions",
-  "gap": "no quiz-level outcomes analysis report"
+  "status": "DONE",
+  "evidence": "quiztools.ts:outcomesAnalysis; ops quizzes.outcomes_analysis; course.tsx QuizOutcomes",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "3.12",
@@ -1230,9 +1243,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.12",
   "feature": "Proctoring via LTI",
-  "status": "PARTIAL",
-  "evidence": "quizzes.proctoringToolId; proctor.ts readiness checklist",
-  "gap": "proctoringToolId never used; no LTI proctor launch"
+  "status": "DONE",
+  "evidence": "lti.ts:proctorLaunch (LtiStartProctoring, session_data, attempt_number), proctorStartAssessment (tool-signed LtiStartAssessment, single use → proctor_readiness); router lti/proctor hand-off; course.tsx Start proctoring",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "3.13",
@@ -1311,9 +1325,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.14",
   "feature": "Hide score total",
-  "status": "PARTIAL",
-  "evidence": "rubrics.hideScoreTotal",
-  "gap": "stored/copied only; not applied to student view"
+  "status": "DONE",
+  "evidence": "course.tsx:RubricFeedback honours rubric.hideScoreTotal in the student view",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "3.14",
@@ -1353,9 +1368,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.16",
   "feature": "Recordings with retention",
-  "status": "PARTIAL",
-  "evidence": "live_sessions.recordingRetentionDays, recordings:[]",
-  "gap": "no recording ingest or retention purge job"
+  "status": "DONE",
+  "evidence": "calendar.ts:addLiveRecording (expiresAt from recordingRetentionDays), recordingRetentionJob (ops.runJobs + scheduler); registry live_recordings",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "3.16",
@@ -1395,9 +1411,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.17",
   "feature": "Message from charts",
-  "status": "PARTIAL",
-  "evidence": "grading.ts:messageStudentsWho (gradebook)",
-  "gap": "not wired from analytics views"
+  "status": "DONE",
+  "evidence": "course.tsx:StaffAnalytics per-assignment chart → grades.message_students_who",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "3.17",
@@ -1438,9 +1455,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.19",
   "feature": "Student permission toggles",
-  "status": "PARTIAL",
-  "evidence": "courses.studentsCreateDiscussions; editPost studentsEditPosts",
-  "gap": "only discussion toggles; studentsEditPosts not in registry"
+  "status": "DONE",
+  "evidence": "registry courses.studentsEditPosts/studentsDeletePosts; collaboration.ts editPost/deletePost enforce",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "3.19",
@@ -1679,16 +1697,17 @@ export const PARITY: ParityRow[] = [
  {
   "section": "6",
   "feature": "Shared outcomes/rubrics/banks",
-  "status": "PARTIAL",
-  "evidence": "outcomes (tenant), rubrics courseId blank",
-  "gap": "question banks can't be shared at account level"
+  "status": "DONE",
+  "evidence": "quiztools.ts:shareBank/banksFor (account tree); outcomes account-level (outcomes.ts)",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "6",
   "feature": "Authentication providers (SAML/OIDC/LDAP, MFA policy)",
   "status": "PARTIAL",
-  "evidence": "core.ts realm; iam.ts mfaRequiredForStaff; platform.ts sso SIMULATED",
-  "gap": "no admin config of IdPs; no LDAP; SSO not connected"
+  "evidence": "accountcfg.ts:configureIdp,testIdp (records, no secrets, LDAP TLS required); realm.mfaRequiredForStaff",
+  "gap": "IdP records are configuration only; no SAML/OIDC/LDAP connection from this environment"
  },
  {
   "section": "6",
@@ -1715,16 +1734,18 @@ export const PARITY: ParityRow[] = [
  {
   "section": "6",
   "feature": "Async reports CSV",
-  "status": "PARTIAL",
-  "evidence": "success.ts:runReport; report_runs; ops reports.run",
-  "gap": "runs synchronously, no background job/status"
+  "status": "DONE",
+  "evidence": "accountcfg.ts:enqueueJob,runQueuedJobs,jobStatus (queued→running→completed, progress, issues); ops jobs.enqueue_report, reports.result_export_csv",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "6",
   "feature": "Themes (logo/colors/custom CSS sandboxed)",
-  "status": "PARTIAL",
-  "evidence": "admin.ts:setTheme (contrast-checked)",
-  "gap": "logo text only, no logo image; no custom CSS"
+  "status": "DONE",
+  "evidence": "accountcfg.ts:setThemeExtras (https/campus logo), sanitizeCss (plain rules scoped under .campus-custom; no @, url(), content:, fixed); shell.tsx BrandMark, SchoolCss",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "6",
@@ -1757,16 +1778,18 @@ export const PARITY: ParityRow[] = [
  {
   "section": "6",
   "feature": "Admin tool: logs by grade change/course/auth",
-  "status": "PARTIAL",
-  "evidence": "ops audit.log, grades.history",
-  "gap": "audit.log has no filters by type/course/user; no auth log view"
+  "status": "DONE",
+  "evidence": "accountcfg.ts:auditSearch (type/course/user/outcome/dates/text), auditSearchCsv, authLog; ops audit.search, audit.search_export_csv, audit.auth_log; adminx.tsx",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "6",
   "feature": "Account settings (help links, trusted domains, IP filters, terms/privacy, self-reg)",
-  "status": "PARTIAL",
-  "evidence": "admin.ts:setHelpLinks; addDomain/verifyDomain",
-  "gap": "no trusted domains, IP filters, terms/privacy links or self-registration"
+  "status": "DONE",
+  "evidence": "accountcfg.ts:setAccountSettings, embedAllowed (curriculum embeds), ipAllowed (@named CIDR filters in startAttempt), legalLinks, selfRegister/decideSelfRegistration; /register route; footer links",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "7",
@@ -1801,9 +1824,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "7",
   "feature": "Async job with issue report",
-  "status": "PARTIAL",
-  "evidence": "content_jobs issues/progress",
-  "gap": "jobs run synchronously (progress always 100)"
+  "status": "DONE",
+  "evidence": "accountcfg.ts:enqueueJob sis_import → sis_imports errors kept as job issues, state completed_with_errors",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "7",
@@ -2019,9 +2043,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "11",
   "feature": "Public/private",
-  "status": "PARTIAL",
-  "evidence": "portfolios.public",
-  "gap": "no public portfolio route/view"
+  "status": "DONE",
+  "evidence": "portfolio.ts:setPortfolioPublic (unguessable token; off removes it), publicPortfolio; route /campus/[tenant]/portfolio/[token]",
+  "gap": "",
+  "closedIn": "parity round 2"
  },
  {
   "section": "11",

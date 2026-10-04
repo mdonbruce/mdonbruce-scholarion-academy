@@ -32,11 +32,13 @@ CREATE TABLE IF NOT EXISTS role_grants (
   user_id text NOT NULL,
   role text NOT NULL CHECK (role IN ('admin', 'instructor', 'ta', 'designer', 'student', 'observer', 'advisor', 'registrar', 'support')),
   scope text,
+  account_id text,
   granted_by text,
   expires_at timestamptz,
   revoked_at timestamptz
 );
 CREATE INDEX IF NOT EXISTS role_grants_user_id ON role_grants (user_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS role_grants_account_id ON role_grants (account_id) WHERE deleted_at IS NULL;
 
 -- Support grant (tab: identity)
 CREATE TABLE IF NOT EXISTS support_grants (
@@ -90,6 +92,8 @@ CREATE TABLE IF NOT EXISTS courses (
   language text,
   license text,
   students_create_discussions boolean,
+  students_edit_posts boolean,
+  students_delete_posts boolean,
   blueprint_locks text[],
   pacing boolean,
   start_at timestamptz,
@@ -158,6 +162,7 @@ CREATE TABLE IF NOT EXISTS pages (
   html text,
   "position" numeric,
   state text,
+  last_edited_by text,
   front_page boolean,
   editing_roles text CHECK (editing_roles IN ('teachers', 'teachers_students', 'anyone')),
   todo_date timestamptz,
@@ -307,7 +312,9 @@ CREATE TABLE IF NOT EXISTS question_banks (
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   course_id text NOT NULL,
-  title text NOT NULL
+  title text NOT NULL,
+  shared_with_account boolean,
+  shared_account_id text
 );
 CREATE INDEX IF NOT EXISTS question_banks_course_id ON question_banks (course_id) WHERE deleted_at IS NULL;
 
@@ -329,7 +336,8 @@ CREATE TABLE IF NOT EXISTS questions (
   tags text[],
   config jsonb,
   stimulus_id text,
-  content_version numeric
+  content_version numeric,
+  content_revision numeric
 );
 CREATE INDEX IF NOT EXISTS questions_course_id ON questions (course_id) WHERE deleted_at IS NULL;
 CREATE INDEX IF NOT EXISTS questions_bank_id ON questions (bank_id) WHERE deleted_at IS NULL;
@@ -411,7 +419,11 @@ CREATE TABLE IF NOT EXISTS grades (
   posted_at timestamptz,
   source text,
   rubric_version numeric,
-  moderation_state text
+  moderation_state text,
+  days_late numeric,
+  hours_late numeric,
+  late_penalty_pct numeric,
+  status text
 );
 CREATE INDEX IF NOT EXISTS grades_course_id ON grades (course_id) WHERE deleted_at IS NULL;
 
@@ -603,7 +615,9 @@ CREATE TABLE IF NOT EXISTS files (
   hidden_linkable boolean,
   published boolean,
   purpose text,
-  submission_course_id text
+  submission_course_id text,
+  group_id text,
+  group_course_id text
 );
 CREATE INDEX IF NOT EXISTS files_course_id ON files (course_id) WHERE deleted_at IS NULL;
 CREATE INDEX IF NOT EXISTS files_folder_id ON files (folder_id) WHERE deleted_at IS NULL;
@@ -1044,6 +1058,25 @@ CREATE TABLE IF NOT EXISTS ical_tokens (
   last_used_at timestamptz
 );
 
+-- Session recording (tab: live)
+CREATE TABLE IF NOT EXISTS live_recordings (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  course_id text NOT NULL,
+  live_session_id text,
+  title text,
+  file_id text,
+  duration_minutes numeric,
+  captions text,
+  expires_at timestamptz,
+  state text,
+  purged_at timestamptz
+);
+CREATE INDEX IF NOT EXISTS live_recordings_course_id ON live_recordings (course_id) WHERE deleted_at IS NULL;
+
 -- Live session (tab: live)
 CREATE TABLE IF NOT EXISTS live_sessions (
   id text PRIMARY KEY,
@@ -1296,6 +1329,7 @@ CREATE TABLE IF NOT EXISTS portfolios (
   title text NOT NULL,
   summary text,
   public boolean,
+  public_token text,
   sections text[]
 );
 
@@ -1760,6 +1794,7 @@ CREATE TABLE IF NOT EXISTS groups (
   name text NOT NULL,
   member_ids text[] NOT NULL,
   assignment_id text,
+  quota_mb numeric,
   set_id text,
   leader_id text,
   max_size numeric
@@ -3622,7 +3657,8 @@ CREATE TABLE IF NOT EXISTS accounts (
   parent_id text,
   sis_id text,
   default_time_zone text,
-  quota_mb numeric
+  quota_mb numeric,
+  group_quota_mb numeric
 );
 CREATE INDEX IF NOT EXISTS accounts_parent_id ON accounts (parent_id) WHERE deleted_at IS NULL;
 
@@ -3693,6 +3729,7 @@ CREATE TABLE IF NOT EXISTS masquerades (
   admin_id text,
   target_user_id text,
   reason text,
+  student_view boolean,
   expires_at timestamptz,
   ended_at timestamptz
 );
@@ -3710,6 +3747,53 @@ CREATE TABLE IF NOT EXISTS sis_imports (
   counts jsonb,
   errors jsonb,
   started_by text
+);
+
+-- Background job (tab: tenant-admin)
+CREATE TABLE IF NOT EXISTS async_jobs (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  kind text,
+  params jsonb,
+  state text,
+  progress numeric,
+  result_ref text,
+  issues jsonb,
+  requested_by text,
+  started_at timestamptz,
+  finished_at timestamptz
+);
+
+-- Self-registration request (tab: tenant-admin)
+CREATE TABLE IF NOT EXISTS self_registrations (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  name text,
+  email text,
+  state text,
+  user_id text,
+  decided_by text
+);
+
+-- Identity provider (tab: tenant-admin)
+CREATE TABLE IF NOT EXISTS identity_providers (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  kind text,
+  name text,
+  config jsonb,
+  state text,
+  jit_provisioning boolean,
+  last_test jsonb
 );
 
 -- Module item (tab: curriculum)

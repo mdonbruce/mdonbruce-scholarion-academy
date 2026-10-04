@@ -169,7 +169,7 @@ export function tickSessions(store: TenantStore, at = nowMs()) {
   for (const s of store.list("comms_sessions", (x) => x.state !== "canceled")) {
     const segs = s.segments as Segment[];
     const done = new Set(((s.events as { kind: string }[]) ?? []).map((e) => e.kind));
-    const learners = store.list("enrollments", (e) => e.courseId === s.courseId && e.role === "student" && e.state === "active").map((e) => String(e.userId));
+    const learners = store.list("enrollments", (e) => e.courseId === s.courseId && e.role === "student" && e.state === "active" && e.source !== "student_view").map((e) => String(e.userId));
     const start = Date.parse(String(s.startsAt));
     const card = `/campus/{tenant}/comms/card/${s.id}`;
     store.tx(() => {
@@ -232,7 +232,7 @@ export function failover(store: TenantStore, a: Actor, id: string, reason: strin
   const at = nowMs();
   const to = String(s.backupPlatform) as "zoom" | "webex";
   const segs = (s.segments as Segment[]).map((g) => (Date.parse(g.startsAt) + (g.teachMinutes + g.bufferMinutes) * MIN > at ? { ...g, platform: to, meetingId: meetingId(), passcode: passcode() } : g));
-  const learners = store.list("enrollments", (e) => e.courseId === s.courseId && e.role === "student" && e.state === "active").map((e) => String(e.userId));
+  const learners = store.list("enrollments", (e) => e.courseId === s.courseId && e.role === "student" && e.state === "active" && e.source !== "student_view").map((e) => String(e.userId));
   store.tx(() => {
     store.update("comms_sessions", id, { segments: segs, platform: to, backupPlatform: s.platform });
     logEvent(store, store.get("comms_sessions", id)!, `failover_${at}`, `Moved to ${to}: ${reason}`);
@@ -248,7 +248,7 @@ export function regenerateLink(store: TenantStore, a: Actor, id: string, n: numb
   const s = store.get("comms_sessions", id);
   if (!s) throw new CampusError("not_found", "Session not found", 404);
   const segs = (s.segments as Segment[]).map((g) => (g.n === Number(n) ? { ...g, meetingId: meetingId(), passcode: passcode(), waitingRoom: true, regenerated: (g.regenerated ?? 0) + 1 } : g));
-  const learners = store.list("enrollments", (e) => e.courseId === s.courseId && e.role === "student" && e.state === "active").map((e) => String(e.userId));
+  const learners = store.list("enrollments", (e) => e.courseId === s.courseId && e.role === "student" && e.state === "active" && e.source !== "student_view").map((e) => String(e.userId));
   store.tx(() => {
     store.update("comms_sessions", id, { segments: segs });
     logEvent(store, store.get("comms_sessions", id)!, `regen_${n}_${nowMs()}`, `Part ${n} link regenerated`);
@@ -278,7 +278,7 @@ export function reconcile(store: TenantStore, a: Actor, id: string) {
   if (!s) throw new CampusError("not_found", "Session not found", 404);
   const segs = s.segments as Segment[];
   const scheduled = segs.reduce((x, g) => x + g.teachMinutes, 0);
-  const learners = store.list("enrollments", (e) => e.courseId === s.courseId && e.role === "student" && e.state === "active").map((e) => String(e.userId));
+  const learners = store.list("enrollments", (e) => e.courseId === s.courseId && e.role === "student" && e.state === "active" && e.source !== "student_view").map((e) => String(e.userId));
   const rows = store.list("comms_attendance", (x) => x.sessionId === id);
   const confirmed = store.list("comms_attendance_confirmations", (x) => x.sessionId === id)[0];
   return {

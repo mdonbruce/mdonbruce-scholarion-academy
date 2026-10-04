@@ -21,7 +21,17 @@ export interface Hooks {
 }
 const HOOKS: Record<string, Hooks> = {};
 export function registerHooks(table: string, h: Hooks) {
-  HOOKS[table] = { ...HOOKS[table], ...h };
+  // Write hooks compose with ones other services added, whatever the module load order.
+  const prev = HOOKS[table] ?? {};
+  HOOKS[table] = { ...prev, ...h };
+  if (prev.afterWrite && h.afterWrite) {
+    const [x, y] = [prev.afterWrite, h.afterWrite];
+    HOOKS[table].afterWrite = (store, a, row, op) => { x(store, a, row, op); y(store, a, row, op); };
+  }
+  if (prev.beforeWrite && h.beforeWrite) {
+    const [x, y] = [prev.beforeWrite, h.beforeWrite];
+    HOOKS[table].beforeWrite = (store, a, values, existing) => { x(store, a, values, existing); y(store, a, values, existing); };
+  }
 }
 
 /** Add a publish check without replacing the ones another service registered. */

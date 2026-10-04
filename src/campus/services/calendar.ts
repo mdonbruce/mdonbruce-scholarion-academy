@@ -120,7 +120,7 @@ export function reschedule(store: TenantStore, a: Actor, kind: "assignment" | "q
     return store.tx(() => {
       const out = store.update(table, refId, kind === "assignment" ? { dueAt: at } : { availableUntil: at });
       store.emit(`${table}.updated`, `${table}/${refId}`, { id: refId, courseId: r.courseId, fields: ["dueAt"] });
-      notify(store, store.list("enrollments", (e) => e.courseId === r.courseId && e.role === "student" && e.state === "active").map((e) => e.userId as string), "calendar", `Date changed: ${r.title}`, `Now due ${at.slice(0, 16).replace("T", " ")} UTC`, `/campus/{tenant}/calendar`, r.courseId as string);
+      notify(store, store.list("enrollments", (e) => e.courseId === r.courseId && e.role === "student" && e.state === "active" && e.source !== "student_view").map((e) => e.userId as string), "calendar", `Date changed: ${r.title}`, `Now due ${at.slice(0, 16).replace("T", " ")} UTC`, `/campus/{tenant}/calendar`, r.courseId as string);
       audit(store, a, `${table}.reschedule`, `${table}/${refId}`, at);
       return out;
     });
@@ -220,7 +220,7 @@ export function applyPacing(store: TenantStore, a: Actor, courseId: string) {
   const isBlack = (d: Date) => blackouts.some((b) => d.toISOString().slice(0, 10) >= String(b.startsAt) && d.toISOString().slice(0, 10) <= String(b.endsAt));
   let created = 0;
   store.tx(() => {
-    for (const e of store.list("enrollments", (x) => x.courseId === courseId && x.role === "student" && x.state === "active")) {
+    for (const e of store.list("enrollments", (x) => x.courseId === courseId && x.role === "student" && x.state === "active" && x.source !== "student_view")) {
       const plan = plans.find((p) => p.scope === "student" && p.targetId === e.userId) ?? plans.find((p) => p.scope === "section" && p.targetId === e.sectionId) ?? plans.find((p) => p.scope === "course");
       if (!plan) continue;
       const start = plan.startAt ? new Date(`${plan.startAt}T00:00:00Z`) : new Date(String(e.createdAt));
@@ -258,7 +258,7 @@ export function scheduleLive(store: TenantStore, a: Actor, input: { courseId: st
     const joinUrl = `https://live.scholarion.local/${input.provider}/${sid}?t=${hmac(`${tenant}:live`, sid).slice(0, 16)}`;
     const l = store.insert("live_sessions", { id: sid, courseId: input.courseId, sectionId: input.sectionId ?? null, title: input.title, startsAt: new Date(input.startsAt).toISOString(), minutes: input.minutes, provider: input.provider, joinUrl, meetingOwnerId: a.id, recordingRetentionDays: input.recordingRetentionDays ?? 30, recordings: [] }, "ls");
     store.emit("live_sessions.created", `live_sessions/${l.id}`, { id: l.id, courseId: input.courseId });
-    notify(store, store.list("enrollments", (e) => e.courseId === input.courseId && e.state === "active" && e.role === "student" && (!input.sectionId || e.sectionId === input.sectionId)).map((e) => e.userId as string), "calendar", `Live session: ${input.title}`, String(input.startsAt), `/campus/{tenant}/courses/${input.courseId}/live`, input.courseId);
+    notify(store, store.list("enrollments", (e) => e.courseId === input.courseId && e.state === "active" && e.role === "student" && e.source !== "student_view" && (!input.sectionId || e.sectionId === input.sectionId)).map((e) => e.userId as string), "calendar", `Live session: ${input.title}`, String(input.startsAt), `/campus/{tenant}/courses/${input.courseId}/live`, input.courseId);
     return l;
   });
 }
@@ -315,3 +315,51 @@ export function rollCall(store: TenantStore, a: Actor, sessionId: string, marks:
 }
 
 export { esc };
+
+/* ---------------- Live session recordings with retention (parity §3.16) ---------------- */
+
+/**
+ * Add a recording to a live session. The provider isn't connected here, so staff upload the
+ * file (or attach one already in course files). Its delete-after date comes from the session's
+ * recording retention (days); 0 means recordings aren't kept and are refused.
+ */
+export function addLiveRecording(store: TenantStore, a: Actor, input: { liveSessionId: string; fileId: string; title?: string; durationMinutes?: number; captions?: string }) {
+  const s = store.get("live_sessions", input.liveSessionId);
+  if (!s) throw new CampusError("not_found", "Live session not found", 404);
+  requireCourse(store, a, String(s.courseId), ["admin", "instructor", "ta"], "live_recordings.create");
+  const f = store.get("files", input.fileId);
+  if (!f || (f.courseId !== s.courseId && f.ownerId !== a.id)) throw new CampusError("not_found", "File not found in this course", 404);
+  const days = s.recordingRetentionDays === null || s.recordingRetentionDays === undefined ? 90 : Number(s.recordingRetentionDays);
+  if (days <= 0) throw new CampusError("retention_zero", "This session's recording retention is 0 days, so recordings aren't kept.", 409);
+  if (input.captions && !/^WEBVTT/.test(input.captions.trim())) throw new CampusError("invalid", "Captions must be WebVTT (start with WEBVTT).", 422);
+  return store.tx(() => {
+    const r = store.insert("live_recordings", { courseId: s.courseId, liveSessionId: s.id, title: input.title?.trim() || `${String(s.title)} — recording`, fileId: f.id, durationMinutes: input.durationMinutes ?? Number(s.minutes ?? 0), captions: input.captions ?? null, expiresAt: new Date(Date.parse(nowIso()) + days * 86_400_000).toISOString(), state: "available" }, "lrec");
+    audit(store, a, "live_recordings.create", `live_recordings/${r.id}`, `${days} days`);
+    return r;
+  });
+}
+
+/** Scheduled job: purge recordings past their retention date (file bytes removed, record kept as a tombstone). */
+export function recordingRetentionJob(store: TenantStore) {
+  const now = nowIso();
+  const due = store.list("live_recordings", (r) => r.state === "available" && String(r.expiresAt) <= now);
+  if (!due.length) return { purged: 0 };
+  store.tx(() => {
+    for (const r of due) {
+      const f = r.fileId ? store.get("files", String(r.fileId)) : undefined;
+      if (f) {
+        for (const o of store.list("objects", (x) => x.id === f.objectKey)) store.tombstone("objects", o.id);
+        store.update("files", f.id, { state: "purged", objectKey: null });
+      }
+      store.update("live_recordings", r.id, { state: "purged", purgedAt: now, captions: null });
+      store.emit("live_recordings.purged", `live_recordings/${r.id}`, { id: r.id, courseId: r.courseId });
+      store.audit({ actorId: "system", actorRoles: [], action: "live_recordings.purge", resource: `live_recordings/${r.id}`, outcome: "allowed", reason: "retention" });
+    }
+  });
+  return { purged: due.length };
+}
+
+export function liveRecordings(store: TenantStore, a: Actor, courseId: string) {
+  if (!isStaff(a, courseId) && !hasAny(a, ["student", "observer"], courseId)) throw new CampusError("forbidden", "Not in this course.", 403);
+  return store.list("live_recordings", (r) => r.courseId === courseId).sort((x, y) => String(y.createdAt).localeCompare(String(x.createdAt))).map((r) => ({ id: r.id, title: String(r.title), state: String(r.state), fileId: r.state === "available" ? (r.fileId as string) : null, expiresAt: String(r.expiresAt), hasCaptions: !!r.captions }));
+}

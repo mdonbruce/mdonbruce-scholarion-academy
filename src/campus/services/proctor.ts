@@ -426,7 +426,7 @@ export function proctorOverview(store: TenantStore, a: Actor) {
   const isAdminish = hasAny(a, ["admin", "support"]);
   const quizzes = store.list("quizzes", (q) => !!q.proctored && q.state === "published" && (isAdminish || (a.courseRoles[q.courseId as string] ?? []).some((r) => r === "instructor" || r === "ta")));
   const readinessByQuiz = quizzes.map((q) => {
-    const students = store.list("enrollments", (e) => e.courseId === q.courseId && e.role === "student" && e.state === "active").length;
+    const students = store.list("enrollments", (e) => e.courseId === q.courseId && e.role === "student" && e.state === "active" && e.source !== "student_view").length;
     const complete = store.list("proctor_readiness", (r) => r.quizId === q.id && !!r.complete).length;
     return { quizId: q.id, title: String(q.title), students, complete, pct: students ? Math.round((complete / students) * 100) : 0 };
   });

@@ -83,7 +83,7 @@ export const ENTITIES: EntityDef[] = [
     fields: [req("name", "Name"), req("email", "Email", "email"), f("status", "Status", "enum", { options: ["active", "suspended"] }), f("passwordHash", "Password hash", "string", { secret: true, system: true }), f("mfaSecret", "MFA secret", "string", { secret: true, system: true })],
     perms: { read: ["admin", "registrar", "advisor", "support"], update: ["admin"], archive: ["admin"] } },
   { table: "role_grants", label: "Role grant", plural: "Role grants", tab: "identity", prefix: "rg", titleField: "role", workflow: true,
-    fields: [req("userId", "User", "ref", { ref: "users" }), req("role", "Role", "enum", { options: [...ALL] }), sys("scope", "Scope"), sys("grantedBy", "Granted by"), f("expiresAt", "Expires", "datetime"), sys("revokedAt", "Revoked", "datetime")],
+    fields: [req("userId", "User", "ref", { ref: "users" }), req("role", "Role", "enum", { options: [...ALL] }), sys("scope", "Scope"), f("accountId", "Account (sub-account admins)", "ref", { ref: "accounts" }), sys("grantedBy", "Granted by"), f("expiresAt", "Expires", "datetime"), sys("revokedAt", "Revoked", "datetime")],
     perms: { read: ["admin"] } },
   { table: "support_grants", label: "Support grant", plural: "Support grants", tab: "identity", prefix: "sg", titleField: "reason", workflow: true, owner: "supportUserId", ownerOps: ["read"],
     fields: [sys("supportUserId", "Support user"), req("reason", "Reason", "text"), f("ticketId", "Ticket", "ref", { ref: "tickets" }), f("targetUserId", "Target user", "ref", { ref: "users" }), sys("status", "Status"), sys("hours", "Hours", "number"), sys("expiresAt", "Expires", "datetime"), sys("approvedBy", "Approved by")],
@@ -119,7 +119,7 @@ export const ENTITIES: EntityDef[] = [
     fields: [courseRef, f("moduleId", "Module", "ref", { ref: "modules" }), req("title", "Title"), f("bankId", "Question bank", "ref", { ref: "question_banks" }), req("questionCount", "Questions per attempt", "number", { min: 1, max: 100 }), req("timeLimitMin", "Time limit (minutes)", "number", { min: 1, max: 480 }), req("allowedAttempts", "Allowed attempts", "number", { min: 1, max: 10 }), f("availableFrom", "Available from", "datetime"), f("availableUntil", "Available until", "datetime"), f("points", "Points", "number"), f("groupId", "Assignment group", "ref", { ref: "assignment_groups" }), f("proctoringToolId", "Proctoring tool (LTI, optional)", "ref", { ref: "tool_registrations" }), sys("snapshot", "Published snapshot", "json"), sys("state", "State")],
     perms: { read: ALL, create: TEACH, update: TEACH, archive: TEACH, publish: ["admin", "instructor", "designer"] } },
   { table: "question_banks", label: "Question bank", plural: "Question banks", tab: "assessment", prefix: "qb", titleField: "title", course: true,
-    fields: [courseRef, req("title", "Title")],
+    fields: [courseRef, req("title", "Title"), sys("sharedWithAccount", "Shared with the account", "boolean"), sys("sharedAccountId", "Shared within account")],
     perms: { read: TEACH, create: TEACH, update: TEACH, archive: TEACH } },
   { table: "questions", label: "Question", plural: "Questions", tab: "assessment", prefix: "qn", titleField: "prompt", course: true,
     fields: [courseRef, req("bankId", "Bank", "ref", { ref: "question_banks" }), req("kind", "Kind", "enum", { options: ["multiple_choice", "true_false", "essay", "numeric"] }), req("prompt", "Prompt", "text"), f("choices", "Choices", "tags"), f("answer", "Correct answer", "string", { secret: true, help: "Hidden from students" }), req("points", "Points", "number", { min: 0 }), f("outcomeId", "Outcome", "ref", { ref: "outcomes" })],
@@ -136,7 +136,7 @@ export const ENTITIES: EntityDef[] = [
     fields: [courseRef, req("name", "Name"), req("weight", "Weight %", "number", { min: 0, max: 100 }), f("dropLowest", "Drop lowest", "number", { min: 0, max: 10 }), f("latePenaltyPerDay", "Late penalty % per day", "number", { min: 0, max: 100 }), f("missingScore", "Score for missing work %", "number", { min: 0, max: 100 })],
     perms: { read: ALL, create: TEACH, update: TEACH, archive: TEACH } },
   { table: "grades", label: "Grade entry", plural: "Grade entries", tab: "gradebook", prefix: "gr", titleField: "score", workflow: true, course: true, owner: "userId",
-    fields: [sys("assignmentId", "Assignment"), sys("userId", "Student"), courseRef, sys("score", "Score", "number"), sys("excused", "Excused", "boolean"), sys("posted", "Posted", "boolean"), sys("postedAt", "Posted at", "datetime"), sys("source", "Source"), sys("rubricVersion", "Rubric version", "number"), sys("moderationState", "Moderation")],
+    fields: [sys("assignmentId", "Assignment"), sys("userId", "Student"), courseRef, sys("score", "Score", "number"), sys("excused", "Excused", "boolean"), sys("posted", "Posted", "boolean"), sys("postedAt", "Posted at", "datetime"), sys("source", "Source"), sys("rubricVersion", "Rubric version", "number"), sys("moderationState", "Moderation"), sys("daysLate", "Days late", "number"), sys("hoursLate", "Hours late", "number"), sys("latePenaltyPct", "Late penalty %", "number"), sys("status", "Status")],
     perms: { read: ["admin", "instructor", "ta"] } },
   { table: "rubrics", label: "Rubric", plural: "Rubrics", tab: "gradebook", prefix: "rb", titleField: "title", publishable: true, immutableWhenPublished: true,
     fields: [req("title", "Title"), f("courseId", "Course (blank = shared)", "ref", { ref: "courses" }), req("style", "Style", "enum", { options: ["analytic", "holistic"] }), req("criteria", "Criteria", "json", { help: '[{"id":"c1","name":"Correctness","bands":[{"label":"Excellent","points":10},{"label":"Partial","points":5},{"label":"Missing","points":0}],"outcomeId":"…"}]' }), sys("version", "Version", "number"), sys("previousId", "Previous version"), sys("state", "State")],
@@ -267,6 +267,9 @@ export const ENTITIES: EntityDef[] = [
     perms: { read: [] } },
 
   /* 14 Live classroom */
+  { table: "live_recordings", label: "Session recording", plural: "Session recordings", tab: "live", prefix: "lrec", titleField: "title", course: true,
+    fields: [courseRef, sys("liveSessionId", "Live session"), sys("title", "Title"), sys("fileId", "File"), sys("durationMinutes", "Minutes", "number"), sys("captions", "Captions (WebVTT)", "text"), sys("expiresAt", "Delete after", "datetime"), sys("state", "State (available / purged)"), sys("purgedAt", "Purged", "datetime")],
+    perms: { read: ALL } },
   { table: "live_sessions", label: "Live session", plural: "Live sessions", tab: "live", prefix: "ls", titleField: "title", course: true,
     fields: [courseRef, f("sectionId", "Section", "ref", { ref: "sections" }), req("title", "Title"), req("startsAt", "Starts", "datetime"), req("minutes", "Minutes", "number", { min: 10, max: 480 }), req("provider", "Provider", "enum", { options: ["zoom", "teams"] }), sys("joinUrl", "Join link", "url"), sys("meetingOwnerId", "Meeting owner"), f("recordingRetentionDays", "Recording retention (days)", "number", { min: 0, max: 365 })],
     perms: { read: ALL, create: TEACH, update: TEACH, archive: TEACH } },
@@ -321,7 +324,7 @@ export const ENTITIES: EntityDef[] = [
     fields: [sys("userId", "Holder"), sys("kind", "Kind"), sys("title", "Title"), sys("courseId", "Course"), sys("vc", "Verifiable credential", "json"), sys("revokedAt", "Revoked", "datetime"), sys("revokeReason", "Revoke reason")],
     perms: { read: ["admin", "registrar"] } },
   { table: "portfolios", label: "Portfolio", plural: "Portfolios", tab: "credentials", prefix: "pf", titleField: "title", owner: "userId", ownerOps: ["read", "create", "update", "archive"],
-    fields: [sys("userId", "Owner"), req("title", "Title"), f("summary", "Summary", "text"), f("public", "Public link", "boolean")],
+    fields: [sys("userId", "Owner"), req("title", "Title"), f("summary", "Summary", "text"), sys("public", "Public link", "boolean"), sys("publicToken", "Public link token", "string", { secret: true })],
     perms: { read: ["admin", "advisor"], create: ["student"] } },
   { table: "artifacts", label: "Portfolio artifact", plural: "Portfolio artifacts", tab: "credentials", prefix: "afc", titleField: "title", owner: "userId", ownerOps: ["read", "create", "update", "archive"],
     fields: [sys("userId", "Owner"), req("portfolioId", "Portfolio", "ref", { ref: "portfolios" }), req("title", "Title"), f("description", "Description", "text"), f("submissionId", "From submission", "ref", { ref: "submissions" }), f("credentialId", "From credential", "ref", { ref: "credentials" }), f("url", "Link", "url")],
@@ -440,7 +443,7 @@ export const ENTITIES: EntityDef[] = [
 
   /* 32 Groups & team projects (added) */
   { table: "groups", label: "Group", plural: "Groups", tab: "groups", prefix: "grp", titleField: "name", course: true,
-    fields: [courseRef, req("name", "Name"), req("memberIds", "Members", "tags"), f("assignmentId", "Team assignment", "ref", { ref: "assignments" })],
+    fields: [courseRef, req("name", "Name"), req("memberIds", "Members", "tags"), f("assignmentId", "Team assignment", "ref", { ref: "assignments" }), f("quotaMb", "File quota (MB; blank = account default)", "number", { min: 1, max: 10240 })],
     perms: { read: ALL, create: TEACH, update: TEACH, archive: TEACH } },
 
   /* 33 Library & reading lists (added) */
@@ -471,14 +474,14 @@ extend("courses", [
   f("accountId", "Sub-account", "ref", { ref: "accounts" }), f("termId", "Term", "ref", { ref: "terms" }), f("timeZone", "Time zone"), f("image", "Card image", "url"),
   f("homeType", "Home page", "enum", { options: ["activity", "front_page", "modules", "assignments", "syllabus"] }), f("syllabusBody", "Syllabus description", "text"),
   f("navigation", "Course navigation", "json", { help: '[{"tab":"modules","hidden":false}, …] in display order' }),
-  f("latePolicy", "Late/missing policy", "json", { help: '{"missingScorePct":0,"latePctPerDay":10,"floorPct":50}' }), f("gradingSchemeId", "Grading scheme", "ref", { ref: "grading_schemes" }),
+  f("latePolicy", "Late/missing policy", "json", { help: '{"missingScorePct":0,"latePctPerDay":10,"floorPct":50} — or "latePctPerHour":1 to deduct by the hour' }), f("gradingSchemeId", "Grading scheme", "ref", { ref: "grading_schemes" }),
   f("hideTotals", "Hide totals from students", "boolean"), f("hideDistribution", "Hide grade distribution", "boolean"), f("visibility", "Visibility", "enum", { options: ["course", "institution", "public"] }),
-  f("format", "Format", "enum", { options: ["online", "on_campus", "blended"] }), f("language", "Language"), f("license", "License"), f("studentsCreateDiscussions", "Students can create discussions", "boolean"),
+  f("format", "Format", "enum", { options: ["online", "on_campus", "blended"] }), f("language", "Language"), f("license", "License"), f("studentsCreateDiscussions", "Students can create discussions", "boolean"), f("studentsEditPosts", "Students can edit their own posts (default on)", "boolean"), f("studentsDeletePosts", "Students can delete their own posts (default on)", "boolean"),
   f("blueprintLocks", "Blueprint locked attributes", "tags", { help: "content, points, due_dates, availability, settings" }), f("pacing", "Course pacing", "boolean"), f("startAt", "Participation starts", "datetime"), f("endAt", "Participation ends", "datetime"),
   sys("concludedAt", "Concluded", "datetime"),
 ]);
 extend("modules", [f("moduleKey", "Module key (pathway waivers)"), f("unlockAt", "Lock until", "datetime"), f("prerequisiteModuleIds", "Prerequisite modules", "tags"), f("requireAll", "Require all requirements (else any one)", "boolean"), f("sequential", "Complete items in order", "boolean"), f("assignTo", "Assign to", "json", { help: '{"sections":[],"groups":[],"students":[]} (blank = everyone)' })]);
-extend("pages", [f("frontPage", "Front page", "boolean"), f("editingRoles", "Who can edit", "enum", { options: ["teachers", "teachers_students", "anyone"] }), f("todoDate", "To-do date", "datetime"), f("assignTo", "Assign to", "json")]);
+extend("pages", [sys("lastEditedBy", "Last edited by"), f("frontPage", "Front page", "boolean"), f("editingRoles", "Who can edit", "enum", { options: ["teachers", "teachers_students", "anyone"] }), f("todoDate", "To-do date", "datetime"), f("assignTo", "Assign to", "json")]);
 extend("assignments", [
   f("displayGradeAs", "Display grade as", "enum", { options: ["points", "percent", "complete_incomplete", "letter", "gpa", "not_graded"] }), f("excludeFromFinal", "Exclude from final grade", "boolean"), f("attempts", "Allowed attempts (blank = unlimited)", "number", { min: 1, max: 100 }),
   f("groupSetId", "Group set (group assignment)", "ref", { ref: "group_sets" }), f("gradeIndividually", "Grade group members individually", "boolean"), f("peerReviewMode", "Peer review assignment", "enum", { options: ["manual", "automatic"] }),
@@ -493,7 +496,7 @@ extend("quizzes", [
 ]);
 const q = ENTITIES.find((x) => x.table === "questions")!;
 q.fields.find((x) => x.name === "kind")!.options = ["multiple_choice", "multiple_answer", "true_false", "fill_blank", "multi_blank", "matching", "ordering", "categorization", "hot_spot", "numeric", "formula", "essay", "file_upload", "stimulus", "text"];
-extend("questions", [f("tags", "Tags", "tags"), f("config", "Type settings", "json", { help: 'matching: {"pairs":[["a","1"]]} · ordering: {"order":["x","y"]} · numeric: {"exact":3.14,"margin":0.01} or {"min":1,"max":2} · formula: {"expr":"a*b","vars":{"a":[1,9],"b":[1,9]},"precision":2} · categorization: {"categories":{"Fruit":["apple"]}} · hot_spot: {"x":[10,40],"y":[10,40]} · multi_blank: {"blanks":{"b1":["cat"],"b2":["dog"]}}' }), f("stimulusId", "Stimulus (shared passage)", "ref", { ref: "questions" }), sys("version", "Version", "number")]);
+extend("questions", [f("tags", "Tags", "tags"), f("config", "Type settings", "json", { help: 'matching: {"pairs":[["a","1"]]} · ordering: {"order":["x","y"]} · numeric: {"exact":3.14,"margin":0.01} or {"min":1,"max":2} · formula: {"expr":"a*b","vars":{"a":[1,9],"b":[1,9]},"precision":2} · categorization: {"categories":{"Fruit":["apple"]}} · hot_spot: {"x":[10,40],"y":[10,40]} · multi_blank: {"blanks":{"b1":["cat"],"b2":["dog"]}}' }), f("stimulusId", "Stimulus (shared passage)", "ref", { ref: "questions" }), sys("version", "Version", "number"), sys("contentRevision", "Content version (bumps on every content edit)", "number")]);
 extend("discussion_topics", [
   f("kind", "Replies", "enum", { options: ["threaded", "focused"] }), f("mustPostFirst", "Post before seeing replies", "boolean"), f("allowLiking", "Allow liking", "boolean"), f("onlyGradersLike", "Only graders can like", "boolean"), f("sortByLikes", "Sort by likes", "boolean"),
   f("podcast", "Podcast feed", "boolean"), f("pinned", "Pinned", "boolean"), f("closed", "Closed for comments", "boolean"), f("anonymous", "Anonymity", "enum", { options: ["off", "full", "partial"] }),
@@ -508,7 +511,7 @@ ENTITIES.push({
   fields: [courseRef, req("name", "Name"), f("parentId", "Parent folder", "ref", { ref: "folders" }), f("hidden", "Hidden", "boolean"), f("locked", "Locked", "boolean")],
   perms: { read: ALL, create: TEACH, update: TEACH, archive: TEACH },
 });
-extend("files", [sys("purpose", "Purpose"), sys("submissionCourseId", "Submitted in course")]);
+extend("files", [sys("purpose", "Purpose"), sys("submissionCourseId", "Submitted in course"), sys("groupId", "Group"), sys("groupCourseId", "Group's course")]);
 extend("assignment_groups", [f("dropHighest", "Drop highest", "number", { min: 0 }), f("neverDrop", "Never drop (assignment ids)", "tags")]);
 extend("assignments", [f("finalGraderId", "Moderated: final grader", "ref", { ref: "users" })]);
 extend("outcomes", [f("calculationMethod", "Mastery calculation", "enum", { options: ["decaying_average", "n_mastery", "latest", "highest", "average"] }), f("nMastery", "n (for n-mastery)", "number", { min: 1, max: 10 })]);
@@ -869,7 +872,7 @@ extend("notification_prefs", [f("matrix", "Per-category frequency", "json", { he
 ENTITIES.push(
   /* Admin console */
   { table: "accounts", label: "Account", plural: "Accounts & sub-accounts", tab: "tenant-admin", prefix: "acc", titleField: "name",
-    fields: [req("name", "Name"), f("parentId", "Parent account", "ref", { ref: "accounts" }), f("sisId", "SIS id"), f("defaultTimeZone", "Default time zone"), f("quotaMb", "Default course quota (MB)", "number", { min: 1 })],
+    fields: [req("name", "Name"), f("parentId", "Parent account", "ref", { ref: "accounts" }), f("sisId", "SIS id"), f("defaultTimeZone", "Default time zone"), f("quotaMb", "Default course quota (MB)", "number", { min: 1 }), f("groupQuotaMb", "Default group file quota (MB)", "number", { min: 1, max: 10240 })],
     perms: { read: ["admin"], create: ["admin"], update: ["admin"], archive: ["admin"] } },
   { table: "custom_roles", label: "Custom role", plural: "Custom roles", tab: "tenant-admin", prefix: "cr", titleField: "label",
     fields: [req("key", "Key"), req("label", "Label"), req("baseRole", "Based on", "enum", { options: [...ALL] })],
@@ -884,11 +887,20 @@ ENTITIES.push(
     fields: [req("key", "Feature", "enum", { options: ["course_pacing", "mastery_paths", "faculty_journal", "sms_notifications", "student_annotation", "podcast_feeds"] }), f("accountId", "Account", "ref", { ref: "accounts" }), f("courseId", "Course", "ref", { ref: "courses" }), f("enabled", "On", "boolean"), f("locked", "Lock for children", "boolean")],
     perms: { read: STAFF, create: ["admin", "instructor"], update: ["admin", "instructor"], archive: ["admin"] } },
   { table: "masquerades", label: "Act-as session", plural: "Act-as sessions", tab: "tenant-admin", prefix: "msq", titleField: "targetUserId", workflow: true,
-    fields: [sys("adminId", "Admin"), sys("targetUserId", "Acting as"), sys("reason", "Reason", "text"), sys("expiresAt", "Expires", "datetime"), sys("endedAt", "Ended", "datetime")],
+    fields: [sys("adminId", "Admin"), sys("targetUserId", "Acting as"), sys("reason", "Reason", "text"), sys("studentView", "Student View", "boolean"), sys("expiresAt", "Expires", "datetime"), sys("endedAt", "Ended", "datetime")],
     perms: { read: ["admin"] } },
   { table: "sis_imports", label: "SIS import", plural: "SIS imports", tab: "tenant-admin", prefix: "sis", titleField: "kind", workflow: true,
     fields: [sys("kind", "Kind"), sys("diffing", "Diffing mode", "boolean"), sys("state", "State"), sys("counts", "Counts", "json"), sys("errors", "Errors", "json"), sys("startedBy", "Started by")],
     perms: { read: ["admin", "registrar"] } },
+  { table: "async_jobs", label: "Background job", plural: "Background jobs", tab: "tenant-admin", prefix: "job", titleField: "kind",
+    fields: [sys("kind", "Kind"), sys("params", "Parameters", "json"), sys("state", "State (queued / running / completed / completed_with_errors / failed)"), sys("progress", "Progress %", "number"), sys("resultRef", "Result"), sys("issues", "Issues", "json"), sys("requestedBy", "Requested by"), sys("startedAt", "Started", "datetime"), sys("finishedAt", "Finished", "datetime")],
+    perms: { read: ["admin", "registrar"] } },
+  { table: "self_registrations", label: "Self-registration request", plural: "Self-registration requests", tab: "tenant-admin", prefix: "sreg", titleField: "email",
+    fields: [sys("name", "Name"), sys("email", "Email"), sys("state", "State (pending / approved / declined)"), sys("userId", "User"), sys("decidedBy", "Decided by")],
+    perms: { read: ["admin", "registrar"] } },
+  { table: "identity_providers", label: "Identity provider", plural: "Identity providers (SAML / OIDC / LDAP)", tab: "tenant-admin", prefix: "idp", titleField: "name",
+    fields: [sys("kind", "Kind (saml / oidc / ldap)"), sys("name", "Name"), sys("config", "Configuration (no secrets)", "json"), sys("state", "State (not_connected / disabled)"), sys("jitProvisioning", "Create users on first sign-in", "boolean"), sys("lastTest", "Last connection test", "json")],
+    perms: { read: ["admin"] } },
 
   /* Modules, differentiation, mastery paths, pacing */
   { table: "module_items", label: "Module item", plural: "Module items", tab: "curriculum", prefix: "mi", titleField: "title", course: true, publishable: true,
@@ -1049,7 +1061,7 @@ export const TABS: TabDef[] = [
   { n: 13, slug: "calendar", title: "Calendar & Scheduling", group: "Teaching & Learning", phase: 1, summary: "Projection of due dates, section meetings and personal events; revocable iCal feeds hashed at rest.", entities: ["calendar_events", "ical_tokens", "appointment_groups", "appointment_slots"], nav: ALL,
     runbook: { purpose: "Calendar projections and feeds.", deps: "Assessment, Sections, Live sessions.", failure: "Feed 404 after revocation (expected).", recovery: "Issue a new feed token." },
     threats: ["Feed token leak → hashed at rest, revocable, one user each"] },
-  { n: 14, slug: "live", title: "Live Classroom & Attendance", group: "Teaching & Learning", phase: 2, summary: "Zoom/Teams sessions through scoped connectors (disabled by default) and attendance imports reconciled by staff.", entities: ["live_sessions", "attendance"], nav: ["admin", "instructor", "ta", "student"], flag: "live_connectors",
+  { n: 14, slug: "live", title: "Live Classroom & Attendance", group: "Teaching & Learning", phase: 2, summary: "Zoom/Teams sessions through scoped connectors (disabled by default) and attendance imports reconciled by staff.", entities: ["live_sessions", "live_recordings", "attendance"], nav: ["admin", "instructor", "ta", "student"], flag: "live_connectors",
     runbook: { purpose: "Live sessions and attendance.", deps: "Zoom/Teams connector (tenant consent).", failure: "Connector disabled; imports unreconciled.", recovery: "Enable connector in Tenant Admin; reconcile imports." },
     threats: ["Meeting hijack → owner-scoped links", "False attendance → imports are assertions until reconciled"] },
   { n: 15, slug: "outcomes", title: "Outcomes & Evidence", group: "Student Success", phase: 3, summary: "Outcomes aligned to rubric criteria and questions, mastery rollups and evidence exports (demonstration only). Outcome folders, account- and course-level outcomes, multi-level mastery scales, and standards import/export in the outcomes CSV format (dry run, idempotent by standard ID, per-row issue report).", entities: ["outcomes", "outcome_groups", "mastery_scales", "outcome_imports", "outcome_alignments", "evidence_exports"], nav: ["admin", "designer", "instructor"],
@@ -1084,7 +1096,7 @@ export const TABS: TabDef[] = [
   { n: 24, slug: "cloud-lab", title: "Cloud Lab (LTI 1.3)", group: "Teaching & Learning", phase: 3, summary: "First-party LTI tool: signed launches from assignments, sandboxed runs and AGS score passback as unposted grades.", entities: ["lab_templates", "lab_sessions"], nav: ["admin", "instructor", "ta", "designer", "student"],
     runbook: { purpose: "Sandboxed coding labs.", deps: "LTI keys, local runner (dev) / container runner (staging).", failure: "Runner disabled; launch token expired.", recovery: "Relaunch from the assignment; enable runner." },
     threats: ["Launch forgery → signed id_token with nonce, 5-minute expiry", "Sandbox escape → time and memory limits, no network"] },
-  { n: 25, slug: "tenant-admin", title: "Admin Console", group: "Platform", phase: 0, summary: "Accounts and sub-accounts, the permission matrix with locks, custom roles, themes and domains, feature options, global announcements, SIS import, act-as and connector enablement.", entities: ["accounts", "custom_roles", "permission_overrides", "global_announcements", "feature_options", "masquerades", "sis_imports", "role_templates"], nav: ["admin"],
+  { n: 25, slug: "tenant-admin", title: "Admin Console", group: "Platform", phase: 0, summary: "Accounts and sub-accounts, the permission matrix with locks, custom roles, themes and domains, feature options, global announcements, SIS import, act-as and connector enablement.", entities: ["accounts", "custom_roles", "permission_overrides", "global_announcements", "feature_options", "masquerades", "sis_imports", "role_templates", "async_jobs", "self_registrations", "identity_providers"], nav: ["admin"],
     runbook: { purpose: "Tenant configuration.", deps: "Platform registry.", failure: "Unverified domains don't resolve (expected).", recovery: "Verify domain; toggle flags." },
     threats: ["Domain takeover → only verified hosts resolve"] },
   { n: 26, slug: "privacy", title: "Privacy & Compliance", group: "Platform", phase: 3, summary: "Observer consent, export and erasure requests, retention jobs and legal holds (holds block erasure).", entities: ["consents", "dsr", "retention_policies", "legal_holds"], nav: ["admin", "registrar", "student"],

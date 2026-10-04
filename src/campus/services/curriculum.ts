@@ -1,5 +1,6 @@
 import { CampusError, nowIso, type Row, type TenantStore } from "../core";
-import { registerHooks } from "../entity";
+import { embedAllowed } from "./accountcfg";
+import { addAfterWrite, registerHooks } from "../entity";
 import { hasAny, type Actor } from "../iam";
 import { audit, course, esc, isStaff, requireCourse, toMs } from "./common";
 
@@ -97,6 +98,7 @@ export function renderBlocks(store: TenantStore, blocks: Block[], courseId?: str
           return `<p><a href="${esc(b.href)}" rel="noopener noreferrer">${esc(b.text || b.href)}</a></p>`;
         }
         case "embed":
+          if (b.src && !embedAllowed(store, b.src)) return `<p class="embed-blocked"><a href="${esc(b.src)}" rel="noopener noreferrer">${esc(b.title || b.src)}</a> <span class="muted">(opens outside — not a trusted domain)</span></p>`;
           return `<iframe title="${esc(b.title)}" src="${esc(b.src ?? `/api/campus/lti/embed/${b.toolId}`)}" loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>`;
       }
     })
@@ -438,7 +440,7 @@ export function markDone(store: TenantStore, a: Actor, itemId: string, done = tr
 /** Progress for all students (teacher view). */
 export function progressReport(store: TenantStore, a: Actor, courseId: string) {
   requireCourse(store, a, courseId, ["admin", "instructor", "ta", "designer"], "modules.progress");
-  return store.list("enrollments", (e) => e.courseId === courseId && e.role === "student" && e.state === "active").map((e) => {
+  return store.list("enrollments", (e) => e.courseId === courseId && e.role === "student" && e.state === "active" && e.source !== "student_view").map((e) => {
     const states = moduleStates(store, a, courseId, e.userId as string);
     return { userId: e.userId, name: store.get("users", e.userId as string)?.name, modules: states.map((m) => ({ id: m.module.id, title: m.module.title, complete: m.complete, locked: m.locked, done: m.items.filter((i) => i.done).length, total: m.items.filter((i) => i.requirement !== "none").length })) };
   });
@@ -734,4 +736,68 @@ export function studentView(store: TenantStore, a: Actor, courseId: string, rese
     audit(store, a, reset ? "courses.student_view_reset" : "courses.student_view", `courses/${courseId}`);
     return u;
   });
+}
+
+/* ---------------- Page editing roles & live links (parity §3.10) ---------------- */
+
+/**
+ * Save a page from the text editor. Staff go through the normal entity update; students (and
+ * others) may edit only when the page's "Who can edit" allows it, the page is published and
+ * they can open it. Students can change the body, never the title or settings. Every save
+ * keeps a revision.
+ */
+export function savePageText(store: TenantStore, a: Actor, pageId: string, text: string, title?: string, ifVersion?: number) {
+  const page = store.get("pages", pageId);
+  if (!page) throw new CampusError("not_found", "Page not found", 404);
+  const courseId = String(page.courseId);
+  if (isStaff(a, courseId)) return null; // caller uses entity.update for staff
+  if (!canEditPage(a, page) || !(a.courseRoles[courseId] ?? []).length) throw new CampusError("forbidden", "Only teachers can edit this page.", 403);
+  if (page.state !== "published" || !itemAccessible(store, a, "page", page.id).ok) throw new CampusError("forbidden", "This page isn't open for editing yet.", 403);
+  if (title !== undefined && title !== page.title) throw new CampusError("forbidden", "Only teachers can rename pages.", 403);
+  const blocks = validateBlocks(markupToBlocks(text));
+  return store.tx(() => {
+    const n = store.list("page_revisions", (r) => r.pageId === page.id).length + 1;
+    store.insert("page_revisions", { pageId: page.id, courseId, title: page.title, blocks: page.blocks, authorId: a.id, revision: n }, "pr");
+    const row = store.update("pages", page.id, { blocks, html: renderBlocks(store, blocks, courseId), lastEditedBy: a.id }, ifVersion);
+    audit(store, a, "pages.student_edit", `pages/${page.id}`, `revision ${n}`);
+    return row;
+  });
+}
+
+/** Re-render every page that links to this item so link text and deleted-content markers stay current. */
+export function refreshLinkingPages(store: TenantStore, table: string, id: string) {
+  const needle = `"id":"${id}"`;
+  let n = 0;
+  for (const p of store.list("pages", (x) => JSON.stringify(x.blocks ?? []).includes(needle))) {
+    const blocks = (p.blocks as Block[]) ?? [];
+    if (!blocks.some((b) => b.type === "link" && b.ref?.table === table && b.ref?.id === id)) continue;
+    const html = renderBlocks(store, blocks, p.courseId as string);
+    if (html !== p.html) {
+      store.update("pages", p.id, { html });
+      n++;
+    }
+  }
+  return n;
+}
+
+for (const t of ["pages", "assignments", "quizzes", "discussion_topics", "files", "modules"]) {
+  addAfterWrite(t, (store, _a, row, op) => {
+    if (op === "update" || op === "archive") refreshLinkingPages(store, t, row.id);
+  });
+}
+
+/** Course home "recent activity": announcements, discussions, assignments, quizzes and pages, newest first, as this viewer may see them. */
+export function courseActivity(store: TenantStore, a: Actor, courseId: string, limit = 30) {
+  const staff = isStaff(a, courseId);
+  if (!staff && !(a.courseRoles[courseId] ?? []).length && !hasAny(a, ["admin"])) throw new CampusError("forbidden", "Not in this course.", 403);
+  const out: { kind: string; id: string; title: string; at: string; path: string }[] = [];
+  const now = nowIso();
+  for (const x of store.list("announcements", (r) => r.courseId === courseId && (staff || ((r.state ?? "published") === "published" && (!r.publishAt || String(r.publishAt) <= now)))))
+    out.push({ kind: "announcement", id: x.id, title: String(x.title), at: String(x.publishAt ?? x.createdAt), path: "announcements" });
+  const visible = (kind: string, r: Row) => staff || (r.state === "published" && itemAccessible(store, a, kind, r.id).ok);
+  for (const x of store.list("discussion_topics", (r) => r.courseId === courseId && visible("discussion", r))) out.push({ kind: "discussion", id: x.id, title: String(x.title), at: String(x.updatedAt ?? x.createdAt), path: `discussions/${x.id}` });
+  for (const x of store.list("assignments", (r) => r.courseId === courseId && visible("assignment", r))) out.push({ kind: "assignment", id: x.id, title: String(x.title), at: String(x.updatedAt ?? x.createdAt), path: `assignments/${x.id}` });
+  for (const x of store.list("quizzes", (r) => r.courseId === courseId && visible("quiz", r))) out.push({ kind: "quiz", id: x.id, title: String(x.title), at: String(x.updatedAt ?? x.createdAt), path: `quizzes/${x.id}` });
+  for (const x of store.list("pages", (r) => r.courseId === courseId && visible("page", r))) out.push({ kind: "page", id: x.id, title: String(x.title), at: String(x.updatedAt ?? x.createdAt), path: `pages/${x.id}` });
+  return out.sort((p, q) => q.at.localeCompare(p.at)).slice(0, limit);
 }

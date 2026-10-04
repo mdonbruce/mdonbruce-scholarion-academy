@@ -250,7 +250,7 @@ export function redeemPairing(store: TenantStore, a: Actor, code: string) {
   return store.tx(() => {
     store.update("pairing_codes", p.id, { usedAt: nowIso() });
     const link = store.list("observer_links", (l) => l.observerId === a.id && l.studentId === p.studentId)[0] ?? store.insert("observer_links", { observerId: a.id, studentId: p.studentId, alertGradeBelow: null, alertMissing: true, alertAnnouncements: false }, "obl");
-    for (const e of store.list("enrollments", (x) => x.userId === p.studentId && x.role === "student" && x.state === "active")) {
+    for (const e of store.list("enrollments", (x) => x.userId === p.studentId && x.role === "student" && x.state === "active" && x.source !== "student_view")) {
       if (!store.list("enrollments", (x) => x.userId === a.id && x.courseId === e.courseId && x.role === "observer" && x.observingId === p.studentId).length) store.insert("enrollments", { userId: a.id, courseId: e.courseId, sectionId: e.sectionId ?? null, role: "observer", state: "active", source: "pairing", observingId: p.studentId }, "enr");
     }
     audit(store, a, "observers.paired", `users/${p.studentId}`);

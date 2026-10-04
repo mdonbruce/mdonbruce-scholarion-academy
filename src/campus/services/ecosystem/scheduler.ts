@@ -2,6 +2,8 @@ import { broker } from "../../core";
 import { tickPlans } from "../plans";
 import { tickSessions } from "../comms";
 import { ecoTick } from "./discovery";
+import { runQueuedJobs } from "../accountcfg";
+import { recordingRetentionJob } from "../calendar";
 
 /**
  * In-process scheduler: every minute, plan and work due discovery jobs for each active tenant.
@@ -22,6 +24,8 @@ export function startEcoScheduler(intervalMs = 60_000) {
         try {
           tickPlans(store); // subscription reminders, renewals and period ends (sandbox)
           tickSessions(store); // live-session reminders, 33-minute warnings, next links, recap drafts
+          runQueuedJobs(store); // queued reports and SIS imports
+          recordingRetentionJob(store); // purge recordings past retention
         } catch (e) {
           console.error(`[plans] ${t.slug}:`, (e as Error).message);
         }

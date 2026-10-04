@@ -224,6 +224,16 @@ export function startMasquerade(store: TenantStore, a: Actor, sessionSecret: str
   if (a.masqueradedBy) throw new CampusError("conflict", "Stop acting as the current user first.", 409);
   const s = sessionRow(store, sessionSecret);
   if (!s) throw new CampusError("unauthenticated", "Please sign in.", 401);
+  // Student View: course staff may act as their course's test student (no other user), no MFA needed.
+  const tsu = store.get("users", targetUserId);
+  if (tsu?.testStudentOf && hasAny(a, ["admin", "instructor", "designer", "ta"], String(tsu.testStudentOf))) {
+    return store.tx(() => {
+      const m = store.insert("masquerades", { adminId: a.id, targetUserId, reason: "Student View", studentView: true, expiresAt: new Date(nowMs() + 60 * 60_000).toISOString(), endedAt: null }, "mq");
+      store.update("sessions", s.id, { masqueradeId: m.id });
+      audit(store, a, "masquerade.student_view", `users/${targetUserId}`, `course ${String(tsu.testStudentOf)}`);
+      return { masqueradeId: m.id, actingAs: String(tsu.name), expiresAt: m.expiresAt };
+    });
+  }
   const perm = hasAny(a, ["admin"]);
   if (!perm || !a.mfa) {
     store.audit({ actorId: a.id, actorRoles: a.roles, action: "masquerade.start", resource: `users/${targetUserId}`, outcome: "denied", reason: perm ? "mfa" : "role" });
@@ -250,7 +260,7 @@ export function stopMasquerade(store: TenantStore, sessionSecret: string) {
   return store.tx(() => {
     const m = store.update("masquerades", s.masqueradeId as string, { endedAt: nowIso() });
     store.update("sessions", s.id, { masqueradeId: null });
-    store.audit({ actorId: s.userId as string, actorRoles: ["admin"], action: "masquerade.stop", resource: `users/${m.targetUserId}`, outcome: "allowed" });
+    store.audit({ actorId: s.userId as string, actorRoles: m.studentView ? [] : ["admin"], action: "masquerade.stop", resource: `users/${m.targetUserId}`, outcome: "allowed" });
     return { stopped: true };
   });
 }
