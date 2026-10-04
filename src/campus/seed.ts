@@ -168,8 +168,10 @@ function seedTenant(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
     quiz: store.insert("assignment_groups", { courseId: cid, name: "Quizzes", weight: 30, dropLowest: 1 }, "ag").id,
     lab: store.insert("assignment_groups", { courseId: cid, name: "Labs", weight: 30 }, "ag").id,
   };
-  const outcome = store.insert("outcomes", { code: "CS.1", title: "Write and test small programs", description: "Writes correct, readable programs with tests.", masteryThreshold: 3, framework: "Program outcomes", calculationMethod: "decaying_average" }, "out");
-  store.insert("outcomes", { code: "CS.2", title: "Explain program behavior", masteryThreshold: 3, framework: "Program outcomes", calculationMethod: "highest" }, "out");
+  // Four-level scale: mastery at 3 of 4 points (75%).
+  const scale4 = store.insert("mastery_scales", { title: "Four-level scale", ratings: [{ label: "Exceeds", points: 4 }, { label: "Mastery", points: 3 }, { label: "Near mastery", points: 2 }, { label: "Below", points: 1 }], masteryPoints: 3, courseId: null }, "msc");
+  const outcome = store.insert("outcomes", { code: "CS.1", title: "Write and test small programs", description: "Writes correct, readable programs with tests.", masteryThreshold: 75, scaleId: scale4.id, framework: "Program outcomes", calculationMethod: "decaying_average" }, "out");
+  store.insert("outcomes", { code: "CS.2", title: "Explain program behavior", masteryThreshold: 75, scaleId: scale4.id, framework: "Program outcomes", calculationMethod: "highest" }, "out");
   const rubric = store.insert("rubrics", { title: "Programming assignment rubric", courseId: cid, style: "analytic", state: "published", version: 1, useForGrading: true, criteria: [
     { id: "correct", name: "Correctness", outcomeId: outcome.id, bands: [{ label: "Exemplary", points: 6 }, { label: "Proficient", points: 4 }, { label: "Developing", points: 2 }, { label: "Missing", points: 0 }] },
     { id: "style", name: "Readability", bands: [{ label: "Clear", points: 4 }, { label: "Mostly clear", points: 2 }, { label: "Unclear", points: 0 }] },
