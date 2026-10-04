@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a multi-agent service desk. Classify five fields into context, knowledge or aggregate audit data.
+
+Core concept
+Temporary context, approved knowledge and audit records have different access and retention needs. Storing everything increases exposure and retains stale conclusions. Define correction and deletion paths.
+
+Practice contract
+Keep rows with a numeric confidence between zero and one. Missing rows must not enter the accepted set.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+An outcome count without message text

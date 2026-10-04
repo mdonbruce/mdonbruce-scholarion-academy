@@ -1,0 +1,7 @@
+P15-S10 — Design a least-privilege tool server
+Faculty-review draft.
+Outcome: Separate protocol transport from tool authorization.
+Lab: Specify a catalog lookup tool, resource identifiers, input constraints and permission scopes.
+Assessment: Demonstrate denied access and schema validation with a protocol-independent test harness.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

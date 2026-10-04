@@ -1,0 +1,29 @@
+{
+  "standard": {
+    "weeks": 10,
+    "counts": {
+      "assignment": 5,
+      "lab": 3,
+      "project": 2,
+      "quiz": 8,
+      "midterm_exam": 1,
+      "final_exam": 1
+    },
+    "major": [
+      "assignment",
+      "lab",
+      "assignment",
+      "lab",
+      "project",
+      "assignment",
+      "lab",
+      "assignment",
+      "assignment",
+      "project"
+    ],
+    "examWeeks": [
+      5,
+      10
+    ]
+  }
+}

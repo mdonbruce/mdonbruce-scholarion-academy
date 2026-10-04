@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a predictive service queue. Reproduce one success and one failure; defend the boundary.
+
+Core concept
+Connect claims to reproducible evidence and explain failures. Present baseline, design, controls and rollback. A polished success-only demonstration is not enough.
+
+Practice contract
+Calculate reviewed count, total and review rate for each fictional queue; missing confidence requires review.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+Reproducible tests and candid failure analysis

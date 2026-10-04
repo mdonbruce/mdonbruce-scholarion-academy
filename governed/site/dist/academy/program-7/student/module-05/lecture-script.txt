@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a personal task workspace. Remove unnecessary fields and describe remaining linkage risks.
+
+Core concept
+Collect only fields needed for the stated task. Separate identifiers and define retention. Removing names does not guarantee anonymity because other fields may be linked.
+
+Practice contract
+Keep rows with a numeric confidence between zero and one. Missing rows must not enter the accepted set.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+No; combinations of fields may identify people

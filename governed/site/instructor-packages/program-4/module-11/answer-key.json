@@ -1,0 +1,47 @@
+[
+  {
+    "id": "P4M11Q1",
+    "prompt": "What makes rollback meaningful?",
+    "choices": [
+      "A tested restoration procedure and known prior version",
+      "A promise to fix problems later",
+      "Skip review and trust the output."
+    ],
+    "correct": 0,
+    "explanation": "Identify the configuration, evidence, owner and rollback trigger. Restoration needs a known previous state. A deployment announcement is not proof of successful operation.",
+    "outcomes": [
+      "O1",
+      "O4"
+    ]
+  },
+  {
+    "id": "P4M11Q2",
+    "prompt": "Your team supporting a software delivery team cannot reproduce a result. What next?",
+    "choices": [
+      "Publish because the report looks complete.",
+      "Reproduce the inputs, versions and checks before accepting the claim.",
+      "Remove failing examples."
+    ],
+    "correct": 1,
+    "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+    "outcomes": [
+      "O3",
+      "O5"
+    ]
+  },
+  {
+    "id": "P4M11Q3",
+    "prompt": "Which artifact best demonstrates release with rollback?",
+    "choices": [
+      "Write a release checklist with a failed-evaluation rollback trigger. Include results and limitations.",
+      "A screenshot with no inputs or explanation.",
+      "An assertion of perfect accuracy."
+    ],
+    "correct": 0,
+    "explanation": "A concrete artifact and observed evidence support review.",
+    "outcomes": [
+      "O2",
+      "O5"
+    ]
+  }
+]

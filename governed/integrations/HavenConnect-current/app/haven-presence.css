@@ -1,0 +1,3 @@
+.haven-presence{display:flex;gap:8px;overflow:auto;margin:0 0 14px;padding:10px 12px;border:1px solid #d7e1d4;border-radius:13px;background:#eaf1e8}
+.haven-presence span{white-space:nowrap;padding:6px 10px;border-radius:999px;background:#fff;color:#204d32;font-size:12px;font-weight:800;border:1px solid #dbe5d8}
+@media(max-width:580px){.haven-presence{margin-bottom:10px}}

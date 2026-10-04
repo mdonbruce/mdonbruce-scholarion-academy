@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a software delivery team. Write a release checklist with a failed-evaluation rollback trigger.
+
+Core concept
+Identify the configuration, evidence, owner and rollback trigger. Restoration needs a known previous state. A deployment announcement is not proof of successful operation.
+
+Practice contract
+Map missing confidence to needs_data, below 0.8 to human_review, otherwise awaiting_approval. Never mark an action executed.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+A tested restoration procedure and known prior version

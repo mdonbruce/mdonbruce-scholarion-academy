@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a departmental request desk. Write an instruction card with sources, schema, boundaries and two examples.
+
+Core concept
+Specify the task, allowed evidence, output fields and escalation condition. Examples demonstrate format; they do not grant new permissions. Missing support should lead to an unresolved result.
+
+Practice contract
+Rank three supplied snippets against 'approval required' by token overlap, then by ID for ties.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+An explicit missing-evidence rule

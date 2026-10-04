@@ -1,0 +1,1074 @@
+{
+  "id": 15,
+  "version": "0.1.0",
+  "brand": "Scholarion Academy",
+  "title": "Advanced Certificate in Agentic AI Engineering \u2014 Weekend Intensive",
+  "state": "faculty_review_required",
+  "productOwnerDecision": "Retain all programs; build #15 first. Approved by user in this conversation on 2026-10-02.",
+  "leadFaculty": "Dr. Martins Donbruce Idahosa",
+  "competencies": [
+    {
+      "id": "C1",
+      "text": "Build typed, reproducible AI application boundaries."
+    },
+    {
+      "id": "C2",
+      "text": "Evaluate retrieval and answer provenance."
+    },
+    {
+      "id": "C3",
+      "text": "Orchestrate bounded agents and authorized tools."
+    },
+    {
+      "id": "C4",
+      "text": "Test, observe and deliver recoverable systems."
+    },
+    {
+      "id": "C5",
+      "text": "Defend responsible system design with evidence."
+    }
+  ],
+  "sessions": [
+    {
+      "id": "P15-S01",
+      "weekend": 1,
+      "day": "Saturday",
+      "title": "Build a repeatable agent workspace",
+      "competency": "C1",
+      "commons": {
+        "id": "commons-01",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Separate configuration, secrets and request execution.",
+      "lab": "Build a synthetic request client with timeout, bounded concurrency and environment-based configuration.",
+      "checkpoint": "Show that missing secrets fail safely and cancelled requests terminate.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S02",
+      "weekend": 1,
+      "day": "Sunday",
+      "title": "Deliver a typed service boundary",
+      "competency": "C1",
+      "commons": {
+        "id": "commons-07",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Validate requests and isolate presentation from domain actions.",
+      "lab": "Expose a synthetic triage function through a typed interface; add streaming event records.",
+      "checkpoint": "Reject malformed input and prove an interrupted stream cannot duplicate an action.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S03",
+      "weekend": 2,
+      "day": "Saturday",
+      "title": "Control context and structured responses",
+      "competency": "C1",
+      "commons": {
+        "id": "commons-06",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Compare prompt variants using a fixed test set and token budget.",
+      "lab": "Design a response schema for fictional policy questions and evaluate two instruction variants.",
+      "checkpoint": "Report schema failures and abstentions without claiming a model run that did not occur.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S04",
+      "weekend": 2,
+      "day": "Sunday",
+      "title": "Measure retrieval before generation",
+      "competency": "C2",
+      "commons": {
+        "id": "commons-08",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Evaluate lexical and semantic retrieval independently of answer style.",
+      "lab": "Chunk a synthetic catalog, define relevance labels and compare retrieval candidates.",
+      "checkpoint": "Calculate recall at k from the labeled set and explain a missed relevant record.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S05",
+      "weekend": 3,
+      "day": "Saturday",
+      "title": "Build an evidence-first answer chain",
+      "competency": "C2",
+      "commons": {
+        "id": "commons-09",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Preserve provenance through loading, retrieval and answer assembly.",
+      "lab": "Implement a handbook pipeline that returns source identifiers and refuses unsupported answers.",
+      "checkpoint": "Trace each factual statement to a source and test an empty retrieval result.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S06",
+      "weekend": 3,
+      "day": "Sunday",
+      "title": "Constrain the tool-using loop",
+      "competency": "C3",
+      "commons": {
+        "id": "commons-10",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Bound tool permissions, retries and execution steps.",
+      "lab": "Create a read-only synthetic inventory agent with typed tool inputs and an action budget.",
+      "checkpoint": "Reject an unauthorized write and stop a repeated tool failure within the budget.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S07",
+      "weekend": 4,
+      "day": "Saturday",
+      "title": "Represent decisions as explicit state",
+      "competency": "C3",
+      "commons": {
+        "id": "commons-11",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Define graph transitions and terminal conditions before execution.",
+      "lab": "Build a branching research workflow with deterministic node tests.",
+      "checkpoint": "Prove every branch terminates or reaches a bounded review state.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S08",
+      "weekend": 4,
+      "day": "Sunday",
+      "title": "Resume safely after interruption",
+      "competency": "C3",
+      "commons": {
+        "id": "commons-11",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Persist checkpoints without bypassing human approval.",
+      "lab": "Add approval interrupts, restart recovery and idempotent side-effect simulation.",
+      "checkpoint": "Restart between approval and completion; demonstrate exactly one committed action.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S09",
+      "weekend": 5,
+      "day": "Saturday",
+      "title": "Make evaluation reproducible",
+      "competency": "C4",
+      "commons": {
+        "id": "commons-15",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Distinguish deterministic tests, human labels and model judgments.",
+      "lab": "Create held-out cases, trace identifiers and regression thresholds for the handbook assistant.",
+      "checkpoint": "Show a deliberately degraded candidate fails the release threshold.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S10",
+      "weekend": 5,
+      "day": "Sunday",
+      "title": "Design a least-privilege tool server",
+      "competency": "C3",
+      "commons": {
+        "id": "commons-12",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Separate protocol transport from tool authorization.",
+      "lab": "Specify a catalog lookup tool, resource identifiers, input constraints and permission scopes.",
+      "checkpoint": "Demonstrate denied access and schema validation with a protocol-independent test harness.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S11",
+      "weekend": 6,
+      "day": "Saturday",
+      "title": "Compose tools without expanding access",
+      "competency": "C3",
+      "commons": {
+        "id": "commons-12",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Propagate only the minimum permitted context between tools.",
+      "lab": "Connect two synthetic tool adapters through a bounded workflow; document trust boundaries.",
+      "checkpoint": "An upstream request must not grant downstream privileges.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S12",
+      "weekend": 6,
+      "day": "Sunday",
+      "title": "Use memory with evidence and expiry",
+      "competency": "C3",
+      "commons": {
+        "id": "commons-11",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Separate durable facts from uncertain working notes.",
+      "lab": "Implement a research notebook with source references, confidence and expiry fields.",
+      "checkpoint": "Expired or unsupported memories cannot become verified claims.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S13",
+      "weekend": 7,
+      "day": "Saturday",
+      "title": "Coordinate specialists with bounded delegation",
+      "competency": "C3",
+      "commons": {
+        "id": "commons-13",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Assign responsibilities and prevent circular delegation.",
+      "lab": "Build a fictional conference planner with explicit roles and a maximum delegation depth.",
+      "checkpoint": "Inject a circular request and verify termination with a review record.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S14",
+      "weekend": 7,
+      "day": "Sunday",
+      "title": "Evaluate multi-hop retrieval",
+      "competency": "C2",
+      "commons": {
+        "id": "commons-14",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Compare baseline retrieval with graph-assisted evidence traversal.",
+      "lab": "Create a small synthetic relationship graph and labeled multi-hop questions.",
+      "checkpoint": "Report evidence coverage and a case where added graph complexity does not help.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S15",
+      "weekend": 8,
+      "day": "Saturday",
+      "title": "Package a recoverable release",
+      "competency": "C4",
+      "commons": {
+        "id": "commons-18",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Separate build artifacts, configuration and runtime health.",
+      "lab": "Write container and deployment designs for the synthetic support platform, with rollback steps.",
+      "checkpoint": "Demonstrate local startup/shutdown and specify which cloud checks remain unrun.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S16",
+      "weekend": 8,
+      "day": "Sunday",
+      "title": "Connect operational signals to decisions",
+      "competency": "C4",
+      "commons": {
+        "id": "commons-16",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Measure latency, errors and cost with explicit denominators.",
+      "lab": "Instrument a test workload and propose an adaptation experiment using held-out evidence.",
+      "checkpoint": "Explain why tuning should or should not proceed; simulated measurements are labeled.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S17",
+      "weekend": 9,
+      "day": "Saturday",
+      "title": "Test the trust boundary",
+      "competency": "C5",
+      "commons": {
+        "id": "commons-17",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Treat retrieved instructions as untrusted content.",
+      "lab": "Create injection, disclosure and malformed-tool-input cases for the support platform.",
+      "checkpoint": "Show denied actions, safe responses and redacted trace metadata.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S18",
+      "weekend": 9,
+      "day": "Sunday",
+      "title": "Make automation retry-safe",
+      "competency": "C4",
+      "commons": {
+        "id": "commons-19",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Distinguish delivery retries from business action retries.",
+      "lab": "Build a synthetic webhook workflow with deduplication, failure routing and replay rules.",
+      "checkpoint": "Replay the same event twice and prove only one business action is recorded.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S19",
+      "weekend": 10,
+      "day": "Saturday",
+      "title": "Defend the capstone architecture",
+      "competency": "C5",
+      "commons": {
+        "id": "commons-20",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Explain scope, risks and evaluation before final implementation.",
+      "lab": "Submit a support-platform proposal, architecture, dataset card, test plan and peer review.",
+      "checkpoint": "Resolve critical review findings or explicitly record a blocked release.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    },
+    {
+      "id": "P15-S20",
+      "weekend": 10,
+      "day": "Sunday",
+      "title": "Demonstrate readiness and limitations",
+      "competency": "C5",
+      "commons": {
+        "id": "commons-15",
+        "version": "0.1.0-draft"
+      },
+      "liveMinutes": 180,
+      "outcome": "Support a final recommendation with reproducible evidence.",
+      "lab": "Present the capstone, run failure demonstrations, supply runbook and retrospective.",
+      "checkpoint": "Mentor scores the rubric and records the live defense outcome.",
+      "agenda": [
+        {
+          "minutes": 20,
+          "activity": "Concept and worked demonstration"
+        },
+        {
+          "minutes": 70,
+          "activity": "Guided build"
+        },
+        {
+          "minutes": 10,
+          "activity": "Break"
+        },
+        {
+          "minutes": 56,
+          "activity": "Independent failure testing and peer review"
+        },
+        {
+          "minutes": 24,
+          "activity": "Checkpoint and reflection"
+        }
+      ],
+      "submission": [
+        "Implementation or design artifact",
+        "Test evidence with environment details",
+        "Limitations and remediation notes"
+      ],
+      "makeup": "Review the approved recording and submit the session lab. Faculty validates equivalent participation.",
+      "passRule": "Faculty records passed only when the session-specific checkpoint is demonstrated; no automatic grade."
+    }
+  ],
+  "projects": [
+    {
+      "id": "P1",
+      "title": "Request routing with a review boundary",
+      "sessions": [
+        1,
+        2,
+        3
+      ],
+      "data": "Fictional synthetic records only; no external organization data."
+    },
+    {
+      "id": "P2",
+      "title": "Fictional policy decision comparison",
+      "sessions": [
+        3
+      ],
+      "data": "Fictional synthetic records only; no external organization data."
+    },
+    {
+      "id": "P3",
+      "title": "Catalog evidence finder",
+      "sessions": [
+        4
+      ],
+      "data": "Fictional synthetic records only; no external organization data."
+    },
+    {
+      "id": "P4",
+      "title": "Source-linked handbook assistant",
+      "sessions": [
+        5
+      ],
+      "data": "Fictional synthetic records only; no external organization data."
+    },
+    {
+      "id": "P5",
+      "title": "Recoverable research workflow",
+      "sessions": [
+        7,
+        8
+      ],
+      "data": "Fictional synthetic records only; no external organization data."
+    },
+    {
+      "id": "P6",
+      "title": "Bounded conference coordination",
+      "sessions": [
+        12,
+        13
+      ],
+      "data": "Fictional synthetic records only; no external organization data."
+    },
+    {
+      "id": "P7",
+      "title": "Reviewed content production",
+      "sessions": [
+        13
+      ],
+      "data": "Fictional synthetic records only; no external organization data."
+    },
+    {
+      "id": "P8",
+      "title": "Research memory with uncertainty",
+      "sessions": [
+        12,
+        14
+      ],
+      "data": "Fictional synthetic records only; no external organization data."
+    },
+    {
+      "id": "P9",
+      "title": "Replay-safe order workflow",
+      "sessions": [
+        18
+      ],
+      "data": "Fictional synthetic records only; no external organization data."
+    },
+    {
+      "id": "P10",
+      "title": "Support operations capstone",
+      "sessions": [
+        19,
+        20
+      ],
+      "data": "Fictional synthetic records only; no external organization data."
+    }
+  ],
+  "capstoneRubric": [
+    {
+      "criterion": "Scope and architecture",
+      "points": 15
+    },
+    {
+      "criterion": "Retrieval and source quality",
+      "points": 15
+    },
+    {
+      "criterion": "Authorized tools and orchestration",
+      "points": 20
+    },
+    {
+      "criterion": "Evaluation and failure recovery",
+      "points": 20
+    },
+    {
+      "criterion": "Security and governance",
+      "points": 15
+    },
+    {
+      "criterion": "Delivery, documentation and defense",
+      "points": 15
+    }
+  ],
+  "rubricLevels": [
+    {
+      "level": "Not demonstrated",
+      "fraction": 0
+    },
+    {
+      "level": "Partial evidence",
+      "fraction": 0.5
+    },
+    {
+      "level": "Meets criterion with reproducible evidence",
+      "fraction": 0.8
+    },
+    {
+      "level": "Complete evidence including adversarial/failure cases",
+      "fraction": 1
+    }
+  ],
+  "completion": {
+    "sessionsRequired": 20,
+    "participation": "Attendance OR reviewed recording plus submitted lab, validated by faculty",
+    "allModuleAssessmentsPassed": true,
+    "capstoneMinimum": 70,
+    "liveDefenseRequired": true,
+    "finalKnowledgeCheckRequired": true,
+    "finalAttempts": 2,
+    "remediation": "Free targeted remediation before attempt 2; third attempt requires staff review."
+  },
+  "electives": [
+    "Reviewed AI-assisted coding",
+    "Hybrid visual and Python automation",
+    "Evaluated programmatic prompting",
+    "Agent interoperability research",
+    "Generative AI security"
+  ],
+  "certificateValidity": "This certificate does not expire. The skills it covers evolve, so Scholarion offers refresher modules.",
+  "publicationBlockers": [
+    "Faculty content and assessment approval",
+    "Originality/accessibility review",
+    "Verified tool versions and educational licensing",
+    "Full notebooks, datasets, data cards and instructor editions",
+    "Final knowledge-check bank and remediation materials",
+    "Configured cohorts and policy Part E",
+    "Canvas/Cloud Lab/Zoom integration",
+    "Credential service and approved eligibility records"
+  ],
+  "toolsDisclaimer": "Tool names describe intended teaching technologies; no affiliation is implied. No tool versions or licenses are verified by this package."
+}

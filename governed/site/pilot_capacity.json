@@ -1,0 +1,16 @@
+{
+  "expectedLearners": {"min": 4, "max": 15},
+  "baselineConcurrentLearners": 15,
+  "stressConcurrentLearners": 45,
+  "readP95Milliseconds": 1000,
+  "writeP95Milliseconds": 2000,
+  "maxUnexpectedErrorRate": 0.01,
+  "hostedPlanning": {
+    "maxConcurrentCallsPerProcess": 2,
+    "dailyRunsPerInstructor": 20,
+    "maxDecisionsPerRun": 3,
+    "maxOutputTokensPerDecision": 300,
+    "monetaryBudget": null,
+    "note": "Instructor-only pilot. Provider latency, account quota and monetary budget remain unverified. No load test calls the provider."
+  }
+}

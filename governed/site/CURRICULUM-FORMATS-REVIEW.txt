@@ -1,0 +1,17 @@
+CURRENT POLICY � User instruction 2026-10-02: ALL COURSES ARE 10 WEEKS.
+Only standard is accepted. Five-week short format removed. This supersedes the two-format discussion below. Multi-course program duration is distinct from individual course length; historical catalog descriptions still require reconciliation.
+Verification: 7 format tests plus 6 curriculum tests passed after this change.
+
+HISTORICAL REVIEW
+CURRICULUM FORMAT REVIEW — 2026-10-02
+Source: attachment 788f18cb-32ae-4e29-9516-34b71e81fef4/Pasted text.txt.
+Stage 1 remains partial; no later-stage approval requested or implied.
+Added shared course_formats.json with Standard 10-week and Short 5-week profiles. Validator selects exact topic/module/outcome and assessment counts from the profile. Short default major-deliverable sequence: assignment, lab, assignment, assignment, project (implementation choice; faculty review pending). Workload checked against course weeklyHours.min/max instead of the previous fixed 6–12 hours. Announcement counts follow the selected format. Curriculum endpoint rejects non-Scholarion tenants. Review UI includes format and workload fields. Publishing remains unconditionally disabled.
+
+Verification: six new format tests and six existing curriculum tests passed; frontend syntax check passed. Positive fixtures are deliberately minimal structural test data, not sample courses or valid academic content. No Pydantic/JSON Schema, full semantic alignment, accessibility, originality, technical accuracy, dataset or licensing verification is claimed.
+
+Critical remaining validation gaps: nested schema/type constraints; exact exam week mapping; topic/module bijection; quiz IDs and outcome/competency consistency; rubric descriptors and point ranges; complete alignment matrices; default category weights and policy verification; dataset cards; pinned tool licenses; claims review and pre-launch labels across legacy pages. Existing payload limit may prevent full question-bank submissions and needs an authenticated bounded package-upload design.
+
+Specification conflicts: program 15's 20 live sessions must be grouped into 10 weekend modules rather than treated as 20 standard modules. Programs 18 and 21 currently say 8 weeks, 20 says 6, 22 says 12; these require product-owner resolution before publication. No durations were silently changed. Multi-course bundle lengths not recomputed yet. Source paths and production stack described in the attachment do not exist in the current Python/SQLite pilot. Canvas, PostgreSQL, gRPC, AWS, avatar exports and production identity remain disconnected.
+
+Next Stage 1 work: strict schema models and negative tests for every rule, semantic consistency, evidence-gated quality reviews. Stage 2 sample courses and publication workflows must not be represented as complete until those checks pass. Existing retention/program-15-first approval remains valid; it does not approve unresolved length changes or faculty publication.

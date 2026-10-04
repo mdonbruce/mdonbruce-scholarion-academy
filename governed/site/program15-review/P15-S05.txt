@@ -1,0 +1,7 @@
+P15-S05 — Build an evidence-first answer chain
+Faculty-review draft.
+Outcome: Preserve provenance through loading, retrieval and answer assembly.
+Lab: Implement a handbook pipeline that returns source identifiers and refuses unsupported answers.
+Assessment: Trace each factual statement to a source and test an empty retrieval result.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

@@ -1,0 +1,7 @@
+P15-S19 — Defend the capstone architecture
+Faculty-review draft.
+Outcome: Explain scope, risks and evaluation before final implementation.
+Lab: Submit a support-platform proposal, architecture, dataset card, test plan and peer review.
+Assessment: Resolve critical review findings or explicitly record a blocked release.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

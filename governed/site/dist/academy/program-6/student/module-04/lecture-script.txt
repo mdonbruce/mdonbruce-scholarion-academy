@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a departmental request desk. Compare whole-document and sentence-level retrieval on a policy exception.
+
+Core concept
+Chunking trades context against noise. Splitting conditions from exceptions can change meaning. Overlap preserves continuity but duplicates evidence and increases retrieval volume.
+
+Practice contract
+Rank three supplied snippets against 'approval required' by token overlap, then by ID for ties.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+Separating an exception from its condition

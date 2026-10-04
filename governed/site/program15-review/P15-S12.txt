@@ -1,0 +1,7 @@
+P15-S12 — Use memory with evidence and expiry
+Faculty-review draft.
+Outcome: Separate durable facts from uncertain working notes.
+Lab: Implement a research notebook with source references, confidence and expiry fields.
+Assessment: Expired or unsupported memories cannot become verified claims.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

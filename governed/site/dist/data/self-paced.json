@@ -1,0 +1,3963 @@
+{
+  "offerings": [
+    {
+      "id": 28,
+      "title": "RAG & Agentic AI Engineer",
+      "type": "Professional Certificate",
+      "level": "Advanced",
+      "summary": "Build retrieval-grounded applications and agents through an eight-course professional pathway.",
+      "skills": [
+        "RAG",
+        "agents",
+        "evaluation",
+        "MCP"
+      ],
+      "coding": true,
+      "format": "Self-paced",
+      "courses": [
+        {
+          "id": "SP28-C1",
+          "title": "Reliable language-model interfaces",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP28-C1-M1",
+              "title": "Reliable language-model interfaces: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate reliable language-model interfaces: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C1-M2",
+              "title": "Reliable language-model interfaces: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate reliable language-model interfaces: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C1-M3",
+              "title": "Reliable language-model interfaces: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate reliable language-model interfaces: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C1-M4",
+              "title": "Reliable language-model interfaces: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate reliable language-model interfaces: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C1-M5",
+              "title": "Reliable language-model interfaces: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate reliable language-model interfaces: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP28-C2",
+          "title": "Orchestrating a grounded assistant",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP28-C2-M1",
+              "title": "Orchestrating a grounded assistant: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate orchestrating a grounded assistant: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C2-M2",
+              "title": "Orchestrating a grounded assistant: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate orchestrating a grounded assistant: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C2-M3",
+              "title": "Orchestrating a grounded assistant: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate orchestrating a grounded assistant: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C2-M4",
+              "title": "Orchestrating a grounded assistant: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate orchestrating a grounded assistant: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C2-M5",
+              "title": "Orchestrating a grounded assistant: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate orchestrating a grounded assistant: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP28-C3",
+          "title": "Semantic indexing and retrieval stores",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP28-C3-M1",
+              "title": "Semantic indexing and retrieval stores: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate semantic indexing and retrieval stores: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C3-M2",
+              "title": "Semantic indexing and retrieval stores: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate semantic indexing and retrieval stores: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C3-M3",
+              "title": "Semantic indexing and retrieval stores: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate semantic indexing and retrieval stores: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C3-M4",
+              "title": "Semantic indexing and retrieval stores: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate semantic indexing and retrieval stores: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C3-M5",
+              "title": "Semantic indexing and retrieval stores: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate semantic indexing and retrieval stores: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP28-C4",
+          "title": "Retrieval evidence pipelines",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP28-C4-M1",
+              "title": "Retrieval evidence pipelines: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate retrieval evidence pipelines: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C4-M2",
+              "title": "Retrieval evidence pipelines: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate retrieval evidence pipelines: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C4-M3",
+              "title": "Retrieval evidence pipelines: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate retrieval evidence pipelines: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C4-M4",
+              "title": "Retrieval evidence pipelines: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate retrieval evidence pipelines: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C4-M5",
+              "title": "Retrieval evidence pipelines: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate retrieval evidence pipelines: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP28-C5",
+          "title": "Adaptive retrieval and graph evidence",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP28-C5-M1",
+              "title": "Adaptive retrieval and graph evidence: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate adaptive retrieval and graph evidence: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C5-M2",
+              "title": "Adaptive retrieval and graph evidence: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate adaptive retrieval and graph evidence: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C5-M3",
+              "title": "Adaptive retrieval and graph evidence: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate adaptive retrieval and graph evidence: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C5-M4",
+              "title": "Adaptive retrieval and graph evidence: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate adaptive retrieval and graph evidence: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C5-M5",
+              "title": "Adaptive retrieval and graph evidence: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate adaptive retrieval and graph evidence: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP28-C6",
+          "title": "Typed tools and bounded agents",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP28-C6-M1",
+              "title": "Typed tools and bounded agents: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate typed tools and bounded agents: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C6-M2",
+              "title": "Typed tools and bounded agents: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate typed tools and bounded agents: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C6-M3",
+              "title": "Typed tools and bounded agents: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate typed tools and bounded agents: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C6-M4",
+              "title": "Typed tools and bounded agents: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate typed tools and bounded agents: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C6-M5",
+              "title": "Typed tools and bounded agents: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate typed tools and bounded agents: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP28-C7",
+          "title": "Coordinating agents through secure tool protocols",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP28-C7-M1",
+              "title": "Coordinating agents through secure tool protocols: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate coordinating agents through secure tool protocols: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C7-M2",
+              "title": "Coordinating agents through secure tool protocols: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate coordinating agents through secure tool protocols: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C7-M3",
+              "title": "Coordinating agents through secure tool protocols: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate coordinating agents through secure tool protocols: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C7-M4",
+              "title": "Coordinating agents through secure tool protocols: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate coordinating agents through secure tool protocols: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C7-M5",
+              "title": "Coordinating agents through secure tool protocols: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate coordinating agents through secure tool protocols: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP28-C8",
+          "title": "Retrieval-agent portfolio studio",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP28-C8-M1",
+              "title": "Retrieval-agent portfolio studio: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate retrieval-agent portfolio studio: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C8-M2",
+              "title": "Retrieval-agent portfolio studio: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate retrieval-agent portfolio studio: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C8-M3",
+              "title": "Retrieval-agent portfolio studio: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate retrieval-agent portfolio studio: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C8-M4",
+              "title": "Retrieval-agent portfolio studio: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate retrieval-agent portfolio studio: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP28-C8-M5",
+              "title": "Retrieval-agent portfolio studio: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate retrieval-agent portfolio studio: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        }
+      ],
+      "courseCount": 8,
+      "hours": 120,
+      "weeksPerCourse": 10,
+      "sequentialWeeks": 80,
+      "paceNote": "Every course uses a ten-week suggested schedule. Guided project build effort is estimated at two hours within that window. Bundle duration depends on course sequencing.",
+      "access": "Paid per course or credential · sandbox only",
+      "price": null,
+      "checkoutEnabled": false,
+      "faculty": "Dr. Martins Donbruce Idahosa",
+      "credential": "Professional Certificate plus badge",
+      "credentialIssued": false,
+      "status": "Drafted · needs SME review",
+      "prerequisite": "Check Python functions, data structures and relevant prior concepts before starting.",
+      "capstone": {
+        "brief": "Build an evidence portfolio for the course topics, including a baseline, failure analysis, limitations and a reproducible handover.",
+        "review": "Minimum three rubric-based peer reviews or a verified autograder; neither is connected yet.",
+        "rubric": [
+          {
+            "criterion": "Problem and assumptions",
+            "points": 15
+          },
+          {
+            "criterion": "Implementation evidence",
+            "points": 30
+          },
+          {
+            "criterion": "Evaluation and failure analysis",
+            "points": 30
+          },
+          {
+            "criterion": "Privacy and human control",
+            "points": 15
+          },
+          {
+            "criterion": "Communication",
+            "points": 10
+          }
+        ]
+      },
+      "transfer": [
+        {
+          "to": 2,
+          "status": "proposed — no automatic waiver",
+          "kind": "candidate mapping",
+          "approval": false
+        }
+      ],
+      "gates": {
+        "outline": "drafted",
+        "videos": "blocked: media not produced",
+        "notebooks": "blocked: course-specific executed notebooks pending",
+        "quizzes": "blocked: banks and cooldown policy pending",
+        "Cloud Lab": "blocked: LTI and sandbox infrastructure missing",
+        "tools": "blocked: version and license verification pending",
+        "payments": "blocked: price, provider and policy not configured",
+        "issuance": "blocked: approved rules and signing service missing",
+        "claims": "no partner, accreditation, salary or popularity claims"
+      }
+    },
+    {
+      "id": 29,
+      "title": "AI Agent Developer: Foundations to Applications",
+      "type": "Professional Certificate",
+      "level": "Intermediate",
+      "summary": "Develop agents from core design concepts through provider-neutral applications.",
+      "skills": [
+        "agents",
+        "governance",
+        "multi-agent"
+      ],
+      "coding": true,
+      "format": "Self-paced",
+      "courses": [
+        {
+          "id": "SP29-C1",
+          "title": "Designing bounded autonomy",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP29-C1-M1",
+              "title": "Designing bounded autonomy: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate designing bounded autonomy: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP29-C1-M2",
+              "title": "Designing bounded autonomy: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate designing bounded autonomy: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP29-C1-M3",
+              "title": "Designing bounded autonomy: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate designing bounded autonomy: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP29-C1-M4",
+              "title": "Designing bounded autonomy: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate designing bounded autonomy: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP29-C1-M5",
+              "title": "Designing bounded autonomy: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate designing bounded autonomy: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP29-C2",
+          "title": "Portable agent adapters",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP29-C2-M1",
+              "title": "Portable agent adapters: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate portable agent adapters: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP29-C2-M2",
+              "title": "Portable agent adapters: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate portable agent adapters: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP29-C2-M3",
+              "title": "Portable agent adapters: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate portable agent adapters: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP29-C2-M4",
+              "title": "Portable agent adapters: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate portable agent adapters: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP29-C2-M5",
+              "title": "Portable agent adapters: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate portable agent adapters: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP29-C3",
+          "title": "Permission-aware agent integrations",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP29-C3-M1",
+              "title": "Permission-aware agent integrations: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate permission-aware agent integrations: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP29-C3-M2",
+              "title": "Permission-aware agent integrations: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate permission-aware agent integrations: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP29-C3-M3",
+              "title": "Permission-aware agent integrations: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate permission-aware agent integrations: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP29-C3-M4",
+              "title": "Permission-aware agent integrations: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate permission-aware agent integrations: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP29-C3-M5",
+              "title": "Permission-aware agent integrations: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate permission-aware agent integrations: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP29-C4",
+          "title": "Operating an accountable agent service",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP29-C4-M1",
+              "title": "Operating an accountable agent service: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate operating an accountable agent service: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP29-C4-M2",
+              "title": "Operating an accountable agent service: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate operating an accountable agent service: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP29-C4-M3",
+              "title": "Operating an accountable agent service: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate operating an accountable agent service: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP29-C4-M4",
+              "title": "Operating an accountable agent service: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate operating an accountable agent service: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP29-C4-M5",
+              "title": "Operating an accountable agent service: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate operating an accountable agent service: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        }
+      ],
+      "courseCount": 4,
+      "hours": 60,
+      "weeksPerCourse": 10,
+      "sequentialWeeks": 40,
+      "paceNote": "Every course uses a ten-week suggested schedule. Guided project build effort is estimated at two hours within that window. Bundle duration depends on course sequencing.",
+      "access": "Paid per course or credential · sandbox only",
+      "price": null,
+      "checkoutEnabled": false,
+      "faculty": "Dr. Martins Donbruce Idahosa",
+      "credential": "Professional Certificate plus badge",
+      "credentialIssued": false,
+      "status": "Drafted · needs SME review",
+      "prerequisite": "Check Python functions, data structures and relevant prior concepts before starting.",
+      "capstone": {
+        "brief": "Build an evidence portfolio for the course topics, including a baseline, failure analysis, limitations and a reproducible handover.",
+        "review": "Minimum three rubric-based peer reviews or a verified autograder; neither is connected yet.",
+        "rubric": [
+          {
+            "criterion": "Problem and assumptions",
+            "points": 15
+          },
+          {
+            "criterion": "Implementation evidence",
+            "points": 30
+          },
+          {
+            "criterion": "Evaluation and failure analysis",
+            "points": 30
+          },
+          {
+            "criterion": "Privacy and human control",
+            "points": 15
+          },
+          {
+            "criterion": "Communication",
+            "points": 10
+          }
+        ]
+      },
+      "transfer": [],
+      "gates": {
+        "outline": "drafted",
+        "videos": "blocked: media not produced",
+        "notebooks": "blocked: course-specific executed notebooks pending",
+        "quizzes": "blocked: banks and cooldown policy pending",
+        "Cloud Lab": "blocked: LTI and sandbox infrastructure missing",
+        "tools": "blocked: version and license verification pending",
+        "payments": "blocked: price, provider and policy not configured",
+        "issuance": "blocked: approved rules and signing service missing",
+        "claims": "no partner, accreditation, salary or popularity claims"
+      }
+    },
+    {
+      "id": 30,
+      "title": "AI Agents & Agentic Systems in Python",
+      "type": "Specialization",
+      "level": "Intermediate",
+      "summary": "Build Python agents from first principles, then extend them with tools and reusable patterns.",
+      "skills": [
+        "Python",
+        "agents",
+        "evaluation"
+      ],
+      "coding": true,
+      "format": "Self-paced",
+      "courses": [
+        {
+          "id": "SP30-C1",
+          "title": "A Python agent loop from scratch",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP30-C1-M1",
+              "title": "A Python agent loop from scratch: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate a python agent loop from scratch: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C1-M2",
+              "title": "A Python agent loop from scratch: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate a python agent loop from scratch: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C1-M3",
+              "title": "A Python agent loop from scratch: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate a python agent loop from scratch: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C1-M4",
+              "title": "A Python agent loop from scratch: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate a python agent loop from scratch: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C1-M5",
+              "title": "A Python agent loop from scratch: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate a python agent loop from scratch: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP30-C2",
+          "title": "Choosing and testing agent architectures",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP30-C2-M1",
+              "title": "Choosing and testing agent architectures: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate choosing and testing agent architectures: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C2-M2",
+              "title": "Choosing and testing agent architectures: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate choosing and testing agent architectures: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C2-M3",
+              "title": "Choosing and testing agent architectures: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate choosing and testing agent architectures: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C2-M4",
+              "title": "Choosing and testing agent architectures: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate choosing and testing agent architectures: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C2-M5",
+              "title": "Choosing and testing agent architectures: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate choosing and testing agent architectures: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP30-C3",
+          "title": "A multi-step Python work assistant",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP30-C3-M1",
+              "title": "A multi-step Python work assistant: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate a multi-step python work assistant: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C3-M2",
+              "title": "A multi-step Python work assistant: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate a multi-step python work assistant: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C3-M3",
+              "title": "A multi-step Python work assistant: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate a multi-step python work assistant: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C3-M4",
+              "title": "A multi-step Python work assistant: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate a multi-step python work assistant: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C3-M5",
+              "title": "A multi-step Python work assistant: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate a multi-step python work assistant: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        }
+      ],
+      "courseCount": 3,
+      "hours": 45,
+      "weeksPerCourse": 10,
+      "sequentialWeeks": 30,
+      "paceNote": "Every course uses a ten-week suggested schedule. Guided project build effort is estimated at two hours within that window. Bundle duration depends on course sequencing.",
+      "access": "Paid per course or credential · sandbox only",
+      "price": null,
+      "checkoutEnabled": false,
+      "faculty": "Dr. Martins Donbruce Idahosa",
+      "credential": "Specialization plus badge",
+      "credentialIssued": false,
+      "status": "Drafted · needs SME review",
+      "prerequisite": "Check Python functions, data structures and relevant prior concepts before starting.",
+      "capstone": {
+        "brief": "Build an evidence portfolio for the course topics, including a baseline, failure analysis, limitations and a reproducible handover.",
+        "review": "Minimum three rubric-based peer reviews or a verified autograder; neither is connected yet.",
+        "rubric": [
+          {
+            "criterion": "Problem and assumptions",
+            "points": 15
+          },
+          {
+            "criterion": "Implementation evidence",
+            "points": 30
+          },
+          {
+            "criterion": "Evaluation and failure analysis",
+            "points": 30
+          },
+          {
+            "criterion": "Privacy and human control",
+            "points": 15
+          },
+          {
+            "criterion": "Communication",
+            "points": 10
+          }
+        ]
+      },
+      "transfer": [
+        {
+          "to": 31,
+          "status": "proposed — no automatic waiver",
+          "kind": "shared courses",
+          "approval": false
+        }
+      ],
+      "gates": {
+        "outline": "drafted",
+        "videos": "blocked: media not produced",
+        "notebooks": "blocked: course-specific executed notebooks pending",
+        "quizzes": "blocked: banks and cooldown policy pending",
+        "Cloud Lab": "blocked: LTI and sandbox infrastructure missing",
+        "tools": "blocked: version and license verification pending",
+        "payments": "blocked: price, provider and policy not configured",
+        "issuance": "blocked: approved rules and signing service missing",
+        "claims": "no partner, accreditation, salary or popularity claims"
+      }
+    },
+    {
+      "id": 31,
+      "title": "AI Agent Developer — Extended",
+      "type": "Specialization",
+      "level": "Advanced",
+      "summary": "Extend the three-course Python agent core with advanced applications and delivery practices.",
+      "skills": [
+        "Python",
+        "agents",
+        "governance"
+      ],
+      "coding": true,
+      "format": "Self-paced",
+      "courses": [
+        {
+          "id": "SP30-C1",
+          "title": "A Python agent loop from scratch",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP30-C1-M1",
+              "title": "A Python agent loop from scratch: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate a python agent loop from scratch: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C1-M2",
+              "title": "A Python agent loop from scratch: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate a python agent loop from scratch: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C1-M3",
+              "title": "A Python agent loop from scratch: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate a python agent loop from scratch: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C1-M4",
+              "title": "A Python agent loop from scratch: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate a python agent loop from scratch: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C1-M5",
+              "title": "A Python agent loop from scratch: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate a python agent loop from scratch: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP30-C2",
+          "title": "Choosing and testing agent architectures",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP30-C2-M1",
+              "title": "Choosing and testing agent architectures: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate choosing and testing agent architectures: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C2-M2",
+              "title": "Choosing and testing agent architectures: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate choosing and testing agent architectures: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C2-M3",
+              "title": "Choosing and testing agent architectures: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate choosing and testing agent architectures: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C2-M4",
+              "title": "Choosing and testing agent architectures: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate choosing and testing agent architectures: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C2-M5",
+              "title": "Choosing and testing agent architectures: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate choosing and testing agent architectures: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP30-C3",
+          "title": "A multi-step Python work assistant",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP30-C3-M1",
+              "title": "A multi-step Python work assistant: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate a multi-step python work assistant: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C3-M2",
+              "title": "A multi-step Python work assistant: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate a multi-step python work assistant: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C3-M3",
+              "title": "A multi-step Python work assistant: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate a multi-step python work assistant: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C3-M4",
+              "title": "A multi-step Python work assistant: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate a multi-step python work assistant: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP30-C3-M5",
+              "title": "A multi-step Python work assistant: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate a multi-step python work assistant: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP31-C4",
+          "title": "Agent prompting and instruction contracts",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP31-C4-M1",
+              "title": "Agent prompting and instruction contracts: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate agent prompting and instruction contracts: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP31-C4-M2",
+              "title": "Agent prompting and instruction contracts: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate agent prompting and instruction contracts: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP31-C4-M3",
+              "title": "Agent prompting and instruction contracts: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate agent prompting and instruction contracts: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP31-C4-M4",
+              "title": "Agent prompting and instruction contracts: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate agent prompting and instruction contracts: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP31-C4-M5",
+              "title": "Agent prompting and instruction contracts: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate agent prompting and instruction contracts: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP31-C5",
+          "title": "Validated computational analysis",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP31-C5-M1",
+              "title": "Validated computational analysis: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate validated computational analysis: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP31-C5-M2",
+              "title": "Validated computational analysis: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate validated computational analysis: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP31-C5-M3",
+              "title": "Validated computational analysis: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate validated computational analysis: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP31-C5-M4",
+              "title": "Validated computational analysis: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate validated computational analysis: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP31-C5-M5",
+              "title": "Validated computational analysis: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate validated computational analysis: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP31-C6",
+          "title": "Reliability, fairness and disclosure",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP31-C6-M1",
+              "title": "Reliability, fairness and disclosure: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate reliability, fairness and disclosure: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP31-C6-M2",
+              "title": "Reliability, fairness and disclosure: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate reliability, fairness and disclosure: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP31-C6-M3",
+              "title": "Reliability, fairness and disclosure: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate reliability, fairness and disclosure: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP31-C6-M4",
+              "title": "Reliability, fairness and disclosure: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate reliability, fairness and disclosure: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP31-C6-M5",
+              "title": "Reliability, fairness and disclosure: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate reliability, fairness and disclosure: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        }
+      ],
+      "courseCount": 6,
+      "hours": 90,
+      "weeksPerCourse": 10,
+      "sequentialWeeks": 60,
+      "paceNote": "Every course uses a ten-week suggested schedule. Guided project build effort is estimated at two hours within that window. Bundle duration depends on course sequencing.",
+      "access": "Paid per course or credential · sandbox only",
+      "price": null,
+      "checkoutEnabled": false,
+      "faculty": "Dr. Martins Donbruce Idahosa",
+      "credential": "Specialization plus badge",
+      "credentialIssued": false,
+      "status": "Drafted · needs SME review",
+      "prerequisite": "Check Python functions, data structures and relevant prior concepts before starting.",
+      "capstone": {
+        "brief": "a trustworthy agent with an evaluation report",
+        "review": "Minimum three rubric-based peer reviews or a verified autograder; neither is connected yet.",
+        "rubric": [
+          {
+            "criterion": "Problem and assumptions",
+            "points": 15
+          },
+          {
+            "criterion": "Implementation evidence",
+            "points": 30
+          },
+          {
+            "criterion": "Evaluation and failure analysis",
+            "points": 30
+          },
+          {
+            "criterion": "Privacy and human control",
+            "points": 15
+          },
+          {
+            "criterion": "Communication",
+            "points": 10
+          }
+        ]
+      },
+      "transfer": [],
+      "gates": {
+        "outline": "drafted",
+        "videos": "blocked: media not produced",
+        "notebooks": "blocked: course-specific executed notebooks pending",
+        "quizzes": "blocked: banks and cooldown policy pending",
+        "Cloud Lab": "blocked: LTI and sandbox infrastructure missing",
+        "tools": "blocked: version and license verification pending",
+        "payments": "blocked: price, provider and policy not configured",
+        "issuance": "blocked: approved rules and signing service missing",
+        "claims": "no partner, accreditation, salary or popularity claims"
+      }
+    },
+    {
+      "id": 32,
+      "title": "Agentic Design Patterns",
+      "type": "Short Course",
+      "level": "Foundational",
+      "summary": "Explore agent autonomy, tool use, planning, and core design patterns.",
+      "skills": [
+        "agents",
+        "evaluation"
+      ],
+      "coding": true,
+      "format": "Self-paced",
+      "courses": [
+        {
+          "id": "SP32-C1",
+          "title": "Agent decisions: patterns and evidence",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP32-C1-M1",
+              "title": "Autonomy and decision boundaries",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate autonomy and decision boundaries with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP32-C1-M2",
+              "title": "Reflection and evidence checks",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate reflection and evidence checks with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP32-C1-M3",
+              "title": "Typed tools and safe invocation",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate typed tools and safe invocation with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP32-C1-M4",
+              "title": "Plans, dependencies and recovery",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate plans, dependencies and recovery with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP32-C1-M5",
+              "title": "Collaboration and error analysis",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate collaboration and error analysis with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        }
+      ],
+      "courseCount": 1,
+      "hours": 15,
+      "weeksPerCourse": 10,
+      "sequentialWeeks": 10,
+      "paceNote": "Every course uses a ten-week suggested schedule. Guided project build effort is estimated at two hours within that window. Bundle duration depends on course sequencing.",
+      "access": "Paid per course or credential · sandbox only",
+      "price": null,
+      "checkoutEnabled": false,
+      "faculty": "Dr. Martins Donbruce Idahosa",
+      "credential": "Course Certificate",
+      "credentialIssued": false,
+      "status": "Drafted · needs SME review",
+      "prerequisite": "No formal prerequisite; Python support will be needed for labs.",
+      "capstone": {
+        "brief": "Build an evidence portfolio for the course topics, including a baseline, failure analysis, limitations and a reproducible handover.",
+        "review": "Minimum three rubric-based peer reviews or a verified autograder; neither is connected yet.",
+        "rubric": [
+          {
+            "criterion": "Problem and assumptions",
+            "points": 15
+          },
+          {
+            "criterion": "Implementation evidence",
+            "points": 30
+          },
+          {
+            "criterion": "Evaluation and failure analysis",
+            "points": 30
+          },
+          {
+            "criterion": "Privacy and human control",
+            "points": 15
+          },
+          {
+            "criterion": "Communication",
+            "points": 10
+          }
+        ]
+      },
+      "transfer": [],
+      "gates": {
+        "outline": "drafted",
+        "videos": "blocked: media not produced",
+        "notebooks": "partial: deterministic practice starter/solutions executed locally; full Cloud Lab labs pending",
+        "quizzes": "blocked: banks and cooldown policy pending",
+        "Cloud Lab": "blocked: LTI and sandbox infrastructure missing",
+        "tools": "blocked: version and license verification pending",
+        "payments": "blocked: price, provider and policy not configured",
+        "issuance": "blocked: approved rules and signing service missing",
+        "claims": "no partner, accreditation, salary or popularity claims"
+      }
+    },
+    {
+      "id": 33,
+      "title": "Agentic AI Engineering with Graph Orchestration & MCP",
+      "type": "Specialization",
+      "level": "Advanced",
+      "summary": "Build agentic pipelines, stateful graph workflows, and tool integrations.",
+      "skills": [
+        "MCP",
+        "agents",
+        "multi-agent"
+      ],
+      "coding": true,
+      "format": "Self-paced",
+      "courses": [
+        {
+          "id": "SP33-C1",
+          "title": "Validated agent pipelines",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP33-C1-M1",
+              "title": "Validated agent pipelines: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate validated agent pipelines: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP33-C1-M2",
+              "title": "Validated agent pipelines: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate validated agent pipelines: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP33-C1-M3",
+              "title": "Validated agent pipelines: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate validated agent pipelines: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP33-C1-M4",
+              "title": "Validated agent pipelines: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate validated agent pipelines: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP33-C1-M5",
+              "title": "Validated agent pipelines: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate validated agent pipelines: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP33-C2",
+          "title": "Recoverable graph execution",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP33-C2-M1",
+              "title": "Recoverable graph execution: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate recoverable graph execution: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP33-C2-M2",
+              "title": "Recoverable graph execution: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate recoverable graph execution: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP33-C2-M3",
+              "title": "Recoverable graph execution: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate recoverable graph execution: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP33-C2-M4",
+              "title": "Recoverable graph execution: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate recoverable graph execution: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP33-C2-M5",
+              "title": "Recoverable graph execution: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate recoverable graph execution: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP33-C3",
+          "title": "Secure interoperable tool services",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP33-C3-M1",
+              "title": "Secure interoperable tool services: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate secure interoperable tool services: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP33-C3-M2",
+              "title": "Secure interoperable tool services: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate secure interoperable tool services: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP33-C3-M3",
+              "title": "Secure interoperable tool services: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate secure interoperable tool services: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP33-C3-M4",
+              "title": "Secure interoperable tool services: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate secure interoperable tool services: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP33-C3-M5",
+              "title": "Secure interoperable tool services: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate secure interoperable tool services: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        }
+      ],
+      "courseCount": 3,
+      "hours": 45,
+      "weeksPerCourse": 10,
+      "sequentialWeeks": 30,
+      "paceNote": "Every course uses a ten-week suggested schedule. Guided project build effort is estimated at two hours within that window. Bundle duration depends on course sequencing.",
+      "access": "Paid per course or credential · sandbox only",
+      "price": null,
+      "checkoutEnabled": false,
+      "faculty": "Dr. Martins Donbruce Idahosa",
+      "credential": "Specialization plus badge",
+      "credentialIssued": false,
+      "status": "Drafted · needs SME review",
+      "prerequisite": "Check Python functions, data structures and relevant prior concepts before starting.",
+      "capstone": {
+        "brief": "a graph agent consuming two custom MCP servers",
+        "review": "Minimum three rubric-based peer reviews or a verified autograder; neither is connected yet.",
+        "rubric": [
+          {
+            "criterion": "Problem and assumptions",
+            "points": 15
+          },
+          {
+            "criterion": "Implementation evidence",
+            "points": 30
+          },
+          {
+            "criterion": "Evaluation and failure analysis",
+            "points": 30
+          },
+          {
+            "criterion": "Privacy and human control",
+            "points": 15
+          },
+          {
+            "criterion": "Communication",
+            "points": 10
+          }
+        ]
+      },
+      "transfer": [
+        {
+          "to": 15,
+          "status": "proposed — no automatic waiver",
+          "kind": "candidate mapping",
+          "approval": false
+        }
+      ],
+      "gates": {
+        "outline": "drafted",
+        "videos": "blocked: media not produced",
+        "notebooks": "blocked: course-specific executed notebooks pending",
+        "quizzes": "blocked: banks and cooldown policy pending",
+        "Cloud Lab": "blocked: LTI and sandbox infrastructure missing",
+        "tools": "blocked: version and license verification pending",
+        "payments": "blocked: price, provider and policy not configured",
+        "issuance": "blocked: approved rules and signing service missing",
+        "claims": "no partner, accreditation, salary or popularity claims"
+      }
+    },
+    {
+      "id": 34,
+      "title": "Agentic AI for Leaders: A Strategic Primer",
+      "type": "Short Course",
+      "level": "Foundational",
+      "summary": "Understand agent capabilities, organizational use cases, risk, and responsible adoption.",
+      "skills": [
+        "governance"
+      ],
+      "coding": false,
+      "format": "Self-paced",
+      "courses": [
+        {
+          "id": "SP34-C1",
+          "title": "Leading an accountable agent initiative",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP34-C1-M1",
+              "title": "Capabilities and limits",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate capabilities and limits with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP34-C1-M2",
+              "title": "Use-case and process redesign",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate use-case and process redesign with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP34-C1-M3",
+              "title": "Risk and human oversight",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate risk and human oversight with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP34-C1-M4",
+              "title": "Build or buy and cost assumptions",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate build or buy and cost assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP34-C1-M5",
+              "title": "Adoption and measurable outcomes",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate adoption and measurable outcomes with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        }
+      ],
+      "courseCount": 1,
+      "hours": 15,
+      "weeksPerCourse": 10,
+      "sequentialWeeks": 10,
+      "paceNote": "Every course uses a ten-week suggested schedule. Guided project build effort is estimated at two hours within that window. Bundle duration depends on course sequencing.",
+      "access": "Paid per course or credential · sandbox only",
+      "price": null,
+      "checkoutEnabled": false,
+      "faculty": "Dr. Martins Donbruce Idahosa",
+      "credential": "Course Certificate",
+      "credentialIssued": false,
+      "status": "Drafted · needs SME review",
+      "prerequisite": "No coding required.",
+      "capstone": {
+        "brief": "Build an evidence portfolio for the course topics, including a baseline, failure analysis, limitations and a reproducible handover.",
+        "review": "Minimum three rubric-based peer reviews or a verified autograder; neither is connected yet.",
+        "rubric": [
+          {
+            "criterion": "Problem and assumptions",
+            "points": 15
+          },
+          {
+            "criterion": "Implementation evidence",
+            "points": 30
+          },
+          {
+            "criterion": "Evaluation and failure analysis",
+            "points": 30
+          },
+          {
+            "criterion": "Privacy and human control",
+            "points": 15
+          },
+          {
+            "criterion": "Communication",
+            "points": 10
+          }
+        ]
+      },
+      "transfer": [
+        {
+          "to": 9,
+          "status": "proposed — no automatic waiver",
+          "kind": "candidate mapping",
+          "approval": false
+        },
+        {
+          "to": 13,
+          "status": "proposed — no automatic waiver",
+          "kind": "candidate mapping",
+          "approval": false
+        },
+        {
+          "to": 20,
+          "status": "proposed — no automatic waiver",
+          "kind": "candidate mapping",
+          "approval": false
+        }
+      ],
+      "gates": {
+        "outline": "drafted",
+        "videos": "blocked: media not produced",
+        "notebooks": "blocked: course-specific executed notebooks pending",
+        "quizzes": "blocked: banks and cooldown policy pending",
+        "Cloud Lab": "blocked: LTI and sandbox infrastructure missing",
+        "tools": "blocked: version and license verification pending",
+        "payments": "blocked: price, provider and policy not configured",
+        "issuance": "blocked: approved rules and signing service missing",
+        "claims": "no partner, accreditation, salary or popularity claims"
+      }
+    },
+    {
+      "id": 35,
+      "title": "Building Stateful Agents with Graph Workflows",
+      "type": "Guided Project",
+      "level": "Intermediate",
+      "summary": "Build a routing graph with tool nodes, a checkpoint and a human approval step.",
+      "skills": [
+        "agents"
+      ],
+      "coding": true,
+      "format": "Self-paced",
+      "courses": [
+        {
+          "id": "SP35-C1",
+          "title": "An approval-gated routing graph",
+          "weeks": 10,
+          "hours": 2,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP35-C1-M1",
+              "title": "An approval-gated routing graph: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate an approval-gated routing graph: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP35-C1-M2",
+              "title": "An approval-gated routing graph: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate an approval-gated routing graph: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP35-C1-M3",
+              "title": "An approval-gated routing graph: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate an approval-gated routing graph: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP35-C1-M4",
+              "title": "An approval-gated routing graph: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate an approval-gated routing graph: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP35-C1-M5",
+              "title": "An approval-gated routing graph: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate an approval-gated routing graph: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        }
+      ],
+      "courseCount": 1,
+      "hours": 2,
+      "weeksPerCourse": 10,
+      "sequentialWeeks": 10,
+      "paceNote": "Every course uses a ten-week suggested schedule. Guided project build effort is estimated at two hours within that window. Bundle duration depends on course sequencing.",
+      "access": "Paid per course or credential · sandbox only",
+      "price": null,
+      "checkoutEnabled": false,
+      "faculty": "Dr. Martins Donbruce Idahosa",
+      "credential": "Completion badge",
+      "credentialIssued": false,
+      "status": "Drafted · needs SME review",
+      "prerequisite": "Check Python functions, data structures and relevant prior concepts before starting.",
+      "capstone": {
+        "brief": "Build an evidence portfolio for the course topics, including a baseline, failure analysis, limitations and a reproducible handover.",
+        "review": "Minimum three rubric-based peer reviews or a verified autograder; neither is connected yet.",
+        "rubric": [
+          {
+            "criterion": "Problem and assumptions",
+            "points": 15
+          },
+          {
+            "criterion": "Implementation evidence",
+            "points": 30
+          },
+          {
+            "criterion": "Evaluation and failure analysis",
+            "points": 30
+          },
+          {
+            "criterion": "Privacy and human control",
+            "points": 15
+          },
+          {
+            "criterion": "Communication",
+            "points": 10
+          }
+        ]
+      },
+      "transfer": [
+        {
+          "to": 1,
+          "status": "proposed — no automatic waiver",
+          "kind": "candidate mapping",
+          "approval": false
+        },
+        {
+          "to": 15,
+          "status": "proposed — no automatic waiver",
+          "kind": "candidate mapping",
+          "approval": false
+        }
+      ],
+      "gates": {
+        "outline": "drafted",
+        "videos": "blocked: media not produced",
+        "notebooks": "partial: deterministic practice starter/solutions executed locally; full Cloud Lab labs pending",
+        "quizzes": "blocked: banks and cooldown policy pending",
+        "Cloud Lab": "blocked: LTI and sandbox infrastructure missing",
+        "tools": "blocked: version and license verification pending",
+        "payments": "blocked: price, provider and policy not configured",
+        "issuance": "blocked: approved rules and signing service missing",
+        "claims": "no partner, accreditation, salary or popularity claims"
+      }
+    },
+    {
+      "id": 36,
+      "title": "Multi-Agent Teams with Role-Based Crews",
+      "type": "Guided Project",
+      "level": "Intermediate",
+      "summary": "Build a 3-agent researcher/analyst/writer crew in sequential and hierarchical modes, and compare the outputs with a rubric.",
+      "skills": [
+        "multi-agent",
+        "evaluation"
+      ],
+      "coding": true,
+      "format": "Self-paced",
+      "courses": [
+        {
+          "id": "SP36-C1",
+          "title": "Comparing specialist agent teams",
+          "weeks": 10,
+          "hours": 2,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP36-C1-M1",
+              "title": "Comparing specialist agent teams: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate comparing specialist agent teams: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP36-C1-M2",
+              "title": "Comparing specialist agent teams: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate comparing specialist agent teams: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP36-C1-M3",
+              "title": "Comparing specialist agent teams: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate comparing specialist agent teams: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP36-C1-M4",
+              "title": "Comparing specialist agent teams: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate comparing specialist agent teams: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP36-C1-M5",
+              "title": "Comparing specialist agent teams: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate comparing specialist agent teams: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        }
+      ],
+      "courseCount": 1,
+      "hours": 2,
+      "weeksPerCourse": 10,
+      "sequentialWeeks": 10,
+      "paceNote": "Every course uses a ten-week suggested schedule. Guided project build effort is estimated at two hours within that window. Bundle duration depends on course sequencing.",
+      "access": "Paid per course or credential · sandbox only",
+      "price": null,
+      "checkoutEnabled": false,
+      "faculty": "Dr. Martins Donbruce Idahosa",
+      "credential": "Completion badge",
+      "credentialIssued": false,
+      "status": "Drafted · needs SME review",
+      "prerequisite": "Check Python functions, data structures and relevant prior concepts before starting.",
+      "capstone": {
+        "brief": "Build an evidence portfolio for the course topics, including a baseline, failure analysis, limitations and a reproducible handover.",
+        "review": "Minimum three rubric-based peer reviews or a verified autograder; neither is connected yet.",
+        "rubric": [
+          {
+            "criterion": "Problem and assumptions",
+            "points": 15
+          },
+          {
+            "criterion": "Implementation evidence",
+            "points": 30
+          },
+          {
+            "criterion": "Evaluation and failure analysis",
+            "points": 30
+          },
+          {
+            "criterion": "Privacy and human control",
+            "points": 15
+          },
+          {
+            "criterion": "Communication",
+            "points": 10
+          }
+        ]
+      },
+      "transfer": [
+        {
+          "to": 1,
+          "status": "proposed — no automatic waiver",
+          "kind": "candidate mapping",
+          "approval": false
+        },
+        {
+          "to": 14,
+          "status": "proposed — no automatic waiver",
+          "kind": "candidate mapping",
+          "approval": false
+        },
+        {
+          "to": 15,
+          "status": "proposed — no automatic waiver",
+          "kind": "candidate mapping",
+          "approval": false
+        }
+      ],
+      "gates": {
+        "outline": "drafted",
+        "videos": "blocked: media not produced",
+        "notebooks": "partial: deterministic practice starter/solutions executed locally; full Cloud Lab labs pending",
+        "quizzes": "blocked: banks and cooldown policy pending",
+        "Cloud Lab": "blocked: LTI and sandbox infrastructure missing",
+        "tools": "blocked: version and license verification pending",
+        "payments": "blocked: price, provider and policy not configured",
+        "issuance": "blocked: approved rules and signing service missing",
+        "claims": "no partner, accreditation, salary or popularity claims"
+      }
+    },
+    {
+      "id": 37,
+      "title": "AI & Machine Learning Foundations with TensorFlow and PyTorch",
+      "type": "Specialization",
+      "level": "Foundational",
+      "summary": "Develop Python, data, machine-learning, and evaluation foundations.",
+      "skills": [
+        "ML",
+        "Python",
+        "TensorFlow",
+        "PyTorch",
+        "evaluation"
+      ],
+      "coding": true,
+      "format": "Self-paced",
+      "courses": [
+        {
+          "id": "SP37-C1",
+          "title": "Python data preparation for learning systems",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP37-C1-M1",
+              "title": "Python data preparation for learning systems: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate python data preparation for learning systems: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP37-C1-M2",
+              "title": "Python data preparation for learning systems: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate python data preparation for learning systems: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP37-C1-M3",
+              "title": "Python data preparation for learning systems: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate python data preparation for learning systems: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP37-C1-M4",
+              "title": "Python data preparation for learning systems: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate python data preparation for learning systems: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP37-C1-M5",
+              "title": "Python data preparation for learning systems: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate python data preparation for learning systems: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP37-C2",
+          "title": "Training and validating predictive models",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP37-C2-M1",
+              "title": "Training and validating predictive models: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate training and validating predictive models: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP37-C2-M2",
+              "title": "Training and validating predictive models: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate training and validating predictive models: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP37-C2-M3",
+              "title": "Training and validating predictive models: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate training and validating predictive models: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP37-C2-M4",
+              "title": "Training and validating predictive models: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate training and validating predictive models: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP37-C2-M5",
+              "title": "Training and validating predictive models: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate training and validating predictive models: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP37-C3",
+          "title": "Evaluating model decisions",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP37-C3-M1",
+              "title": "Evaluating model decisions: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate evaluating model decisions: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP37-C3-M2",
+              "title": "Evaluating model decisions: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate evaluating model decisions: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP37-C3-M3",
+              "title": "Evaluating model decisions: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate evaluating model decisions: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP37-C3-M4",
+              "title": "Evaluating model decisions: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate evaluating model decisions: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP37-C3-M5",
+              "title": "Evaluating model decisions: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate evaluating model decisions: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP37-C4",
+          "title": "Neural models across two frameworks",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP37-C4-M1",
+              "title": "Neural models across two frameworks: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate neural models across two frameworks: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP37-C4-M2",
+              "title": "Neural models across two frameworks: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate neural models across two frameworks: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP37-C4-M3",
+              "title": "Neural models across two frameworks: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate neural models across two frameworks: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP37-C4-M4",
+              "title": "Neural models across two frameworks: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate neural models across two frameworks: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP37-C4-M5",
+              "title": "Neural models across two frameworks: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate neural models across two frameworks: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        }
+      ],
+      "courseCount": 4,
+      "hours": 60,
+      "weeksPerCourse": 10,
+      "sequentialWeeks": 40,
+      "paceNote": "Every course uses a ten-week suggested schedule. Guided project build effort is estimated at two hours within that window. Bundle duration depends on course sequencing.",
+      "access": "Paid per course or credential · sandbox only",
+      "price": null,
+      "checkoutEnabled": false,
+      "faculty": "Dr. Martins Donbruce Idahosa",
+      "credential": "Specialization plus badge",
+      "credentialIssued": false,
+      "status": "Drafted · needs SME review",
+      "prerequisite": "Check Python functions, data structures and relevant prior concepts before starting.",
+      "capstone": {
+        "brief": "end-to-end model with an evaluation report and model card",
+        "review": "Minimum three rubric-based peer reviews or a verified autograder; neither is connected yet.",
+        "rubric": [
+          {
+            "criterion": "Problem and assumptions",
+            "points": 15
+          },
+          {
+            "criterion": "Implementation evidence",
+            "points": 30
+          },
+          {
+            "criterion": "Evaluation and failure analysis",
+            "points": 30
+          },
+          {
+            "criterion": "Privacy and human control",
+            "points": 15
+          },
+          {
+            "criterion": "Communication",
+            "points": 10
+          }
+        ]
+      },
+      "transfer": [
+        {
+          "to": 18,
+          "status": "proposed — no automatic waiver",
+          "kind": "candidate mapping",
+          "approval": false
+        }
+      ],
+      "gates": {
+        "outline": "drafted",
+        "videos": "blocked: media not produced",
+        "notebooks": "blocked: course-specific executed notebooks pending",
+        "quizzes": "blocked: banks and cooldown policy pending",
+        "Cloud Lab": "blocked: LTI and sandbox infrastructure missing",
+        "tools": "blocked: version and license verification pending",
+        "payments": "blocked: price, provider and policy not configured",
+        "issuance": "blocked: approved rules and signing service missing",
+        "claims": "no partner, accreditation, salary or popularity claims"
+      }
+    },
+    {
+      "id": 38,
+      "title": "Neural Networks, Deep Learning & NLP for Agent Builders",
+      "type": "Specialization",
+      "level": "Advanced",
+      "summary": "Study neural networks, deep learning, and language processing for agent applications.",
+      "skills": [
+        "deep learning",
+        "NLP",
+        "TensorFlow",
+        "PyTorch",
+        "RAG"
+      ],
+      "coding": true,
+      "format": "Self-paced",
+      "courses": [
+        {
+          "id": "SP38-C1",
+          "title": "Training stable neural systems",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP38-C1-M1",
+              "title": "Training stable neural systems: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate training stable neural systems: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP38-C1-M2",
+              "title": "Training stable neural systems: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate training stable neural systems: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP38-C1-M3",
+              "title": "Training stable neural systems: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate training stable neural systems: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP38-C1-M4",
+              "title": "Training stable neural systems: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate training stable neural systems: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP38-C1-M5",
+              "title": "Training stable neural systems: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate training stable neural systems: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP38-C2",
+          "title": "Adapting visual representations",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP38-C2-M1",
+              "title": "Adapting visual representations: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate adapting visual representations: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP38-C2-M2",
+              "title": "Adapting visual representations: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate adapting visual representations: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP38-C2-M3",
+              "title": "Adapting visual representations: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate adapting visual representations: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP38-C2-M4",
+              "title": "Adapting visual representations: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate adapting visual representations: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP38-C2-M5",
+              "title": "Adapting visual representations: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate adapting visual representations: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP38-C3",
+          "title": "Representing language and attention",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP38-C3-M1",
+              "title": "Representing language and attention: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate representing language and attention: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP38-C3-M2",
+              "title": "Representing language and attention: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate representing language and attention: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP38-C3-M3",
+              "title": "Representing language and attention: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate representing language and attention: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP38-C3-M4",
+              "title": "Representing language and attention: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate representing language and attention: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP38-C3-M5",
+              "title": "Representing language and attention: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate representing language and attention: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SP38-C4",
+          "title": "Connecting language models to retrieval tools",
+          "weeks": 10,
+          "hours": 15,
+          "status": "draft outline",
+          "modules": [
+            {
+              "id": "SP38-C4-M1",
+              "title": "Connecting language models to retrieval tools: scope and assumptions",
+              "weeks": [
+                1,
+                2
+              ],
+              "outcome": "Demonstrate connecting language models to retrieval tools: scope and assumptions with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP38-C4-M2",
+              "title": "Connecting language models to retrieval tools: build the baseline",
+              "weeks": [
+                3,
+                4
+              ],
+              "outcome": "Demonstrate connecting language models to retrieval tools: build the baseline with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP38-C4-M3",
+              "title": "Connecting language models to retrieval tools: compare alternatives",
+              "weeks": [
+                5,
+                6
+              ],
+              "outcome": "Demonstrate connecting language models to retrieval tools: compare alternatives with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP38-C4-M4",
+              "title": "Connecting language models to retrieval tools: test failures",
+              "weeks": [
+                7,
+                8
+              ],
+              "outcome": "Demonstrate connecting language models to retrieval tools: test failures with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            },
+            {
+              "id": "SP38-C4-M5",
+              "title": "Connecting language models to retrieval tools: evaluate and communicate",
+              "weeks": [
+                9,
+                10
+              ],
+              "outcome": "Demonstrate connecting language models to retrieval tools: evaluate and communicate with reproducible evidence and stated limitations.",
+              "deliverables": [
+                "Original lesson notes and captioned media pending",
+                "Starter and executed lab pending",
+                "Quiz bank and rubric-based assignment pending",
+                "Student and instructor activity editions pending"
+              ]
+            }
+          ]
+        }
+      ],
+      "courseCount": 4,
+      "hours": 60,
+      "weeksPerCourse": 10,
+      "sequentialWeeks": 40,
+      "paceNote": "Every course uses a ten-week suggested schedule. Guided project build effort is estimated at two hours within that window. Bundle duration depends on course sequencing.",
+      "access": "Paid per course or credential · sandbox only",
+      "price": null,
+      "checkoutEnabled": false,
+      "faculty": "Dr. Martins Donbruce Idahosa",
+      "credential": "Specialization plus badge",
+      "credentialIssued": false,
+      "status": "Drafted · needs SME review",
+      "prerequisite": "Check Python functions, data structures and relevant prior concepts before starting.",
+      "capstone": {
+        "brief": "fine-tuned NLP model plugged into a retrieval agent as a tool",
+        "review": "Minimum three rubric-based peer reviews or a verified autograder; neither is connected yet.",
+        "rubric": [
+          {
+            "criterion": "Problem and assumptions",
+            "points": 15
+          },
+          {
+            "criterion": "Implementation evidence",
+            "points": 30
+          },
+          {
+            "criterion": "Evaluation and failure analysis",
+            "points": 30
+          },
+          {
+            "criterion": "Privacy and human control",
+            "points": 15
+          },
+          {
+            "criterion": "Communication",
+            "points": 10
+          }
+        ]
+      },
+      "transfer": [
+        {
+          "to": 18,
+          "status": "proposed — no automatic waiver",
+          "kind": "candidate mapping",
+          "approval": false
+        }
+      ],
+      "gates": {
+        "outline": "drafted",
+        "videos": "blocked: media not produced",
+        "notebooks": "blocked: course-specific executed notebooks pending",
+        "quizzes": "blocked: banks and cooldown policy pending",
+        "Cloud Lab": "blocked: LTI and sandbox infrastructure missing",
+        "tools": "blocked: version and license verification pending",
+        "payments": "blocked: price, provider and policy not configured",
+        "issuance": "blocked: approved rules and signing service missing",
+        "claims": "no partner, accreditation, salary or popularity claims"
+      }
+    }
+  ],
+  "consolidation": {
+    "basis": "Exact shared course IDs in draft outlines only; not assessed outcome equivalence or credit",
+    "automaticCredit": false,
+    "pairs": [
+      {
+        "from": 30,
+        "to": 31,
+        "sharedCourses": 3,
+        "coverageOfTarget": 50.0
+      },
+      {
+        "from": 31,
+        "to": 30,
+        "sharedCourses": 3,
+        "coverageOfTarget": 100.0
+      }
+    ],
+    "rules": [
+      {
+        "from": 28,
+        "to": 2,
+        "status": "proposed — no automatic waiver",
+        "kind": "candidate mapping",
+        "approval": false
+      },
+      {
+        "from": 30,
+        "to": 31,
+        "status": "proposed — no automatic waiver",
+        "kind": "shared courses",
+        "approval": false
+      },
+      {
+        "from": 33,
+        "to": 15,
+        "status": "proposed — no automatic waiver",
+        "kind": "candidate mapping",
+        "approval": false
+      },
+      {
+        "from": 34,
+        "to": 9,
+        "status": "proposed — no automatic waiver",
+        "kind": "candidate mapping",
+        "approval": false
+      },
+      {
+        "from": 34,
+        "to": 13,
+        "status": "proposed — no automatic waiver",
+        "kind": "candidate mapping",
+        "approval": false
+      },
+      {
+        "from": 34,
+        "to": 20,
+        "status": "proposed — no automatic waiver",
+        "kind": "candidate mapping",
+        "approval": false
+      },
+      {
+        "from": 35,
+        "to": 1,
+        "status": "proposed — no automatic waiver",
+        "kind": "candidate mapping",
+        "approval": false
+      },
+      {
+        "from": 35,
+        "to": 15,
+        "status": "proposed — no automatic waiver",
+        "kind": "candidate mapping",
+        "approval": false
+      },
+      {
+        "from": 36,
+        "to": 1,
+        "status": "proposed — no automatic waiver",
+        "kind": "candidate mapping",
+        "approval": false
+      },
+      {
+        "from": 36,
+        "to": 14,
+        "status": "proposed — no automatic waiver",
+        "kind": "candidate mapping",
+        "approval": false
+      },
+      {
+        "from": 36,
+        "to": 15,
+        "status": "proposed — no automatic waiver",
+        "kind": "candidate mapping",
+        "approval": false
+      },
+      {
+        "from": 37,
+        "to": 18,
+        "status": "proposed — no automatic waiver",
+        "kind": "candidate mapping",
+        "approval": false
+      },
+      {
+        "from": 38,
+        "to": 18,
+        "status": "proposed — no automatic waiver",
+        "kind": "candidate mapping",
+        "approval": false
+      }
+    ],
+    "legacyOverlap": "Unmeasured: approved module-level mappings for programs #1–#27 missing",
+    "mergeRetire": "None; retain offerings pending academic review"
+  }
+}

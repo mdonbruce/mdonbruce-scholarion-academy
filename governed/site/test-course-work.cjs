@@ -1,0 +1,16 @@
+const assert=require('node:assert/strict'),w=require('./dist/course-work-core.js');
+assert.equal(w.dueDate('2026-10-02',1),'2026-10-08');
+assert.equal(w.dueDate('2026-12-28',2),'2027-01-10');
+assert.throws(()=>w.dueDate('2026-02-31',1));
+assert.throws(()=>w.submit([],'   ','now'));
+const first=w.submit([],'Original work','2026-10-02T12:00:00Z'),second=w.submit(first,'Revised work','2026-10-03T12:00:00Z');
+assert.equal(first.length,1);assert.equal(second.length,2);assert.equal(second[0].text,'Original work');
+assert.notEqual(second[0].id,second[1].id);
+let review=w.grade(null,first[0],80,'Explain baseline','now');assert.equal(w.visibleGrade(review,first[0]),null);
+review.posted=true;assert.equal(w.visibleGrade(review,first[0]).score,80);
+assert.equal(w.visibleGrade(review,second[1]),null);
+const revised=w.grade(review,second[1],90,'Improved evidence','later');assert.equal(revised.posted,false);assert.equal(revised.history.length,2);
+assert.throws(()=>w.grade(null,first[0],101,'bad','now'));
+assert.throws(()=>w.grade(null,null,80,'bad','now'));
+assert.equal(w.average([0,100]),50);assert.equal(w.average([]),null);
+console.log('Course work: pacing, immutable attempt copies, validation, posting, resubmission isolation and averages passed.');

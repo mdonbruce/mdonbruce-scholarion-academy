@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a multi-agent service desk. Rank source snippets by token overlap and identify an unsupported query.
+
+Core concept
+Retrieval narrows available evidence. Lexical matching is a transparent baseline but misses paraphrases. Similarity does not establish support; inspect source identifiers and unanswered cases.
+
+Practice contract
+Rank three supplied snippets against 'approval required' by token overlap, then by ID for ties.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+When sources do not support the claim

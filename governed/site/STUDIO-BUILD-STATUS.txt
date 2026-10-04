@@ -1,0 +1,45 @@
+Scholarion Academy Studio — 2026-10-02
+
+Implemented and connected at #studio-sources:
+- Source-revision snapshots, persisted build progress and failure records.
+- Dedicated hosted curriculum adapter (separate from action planning).
+- Source-ID validation, instructor edit preservation and explicit separate editions.
+- Escaped HTML previews, Markdown files, SVG topic/outcome map and ZIP downloads.
+- Native PNG covers, DOCX notes/study guides and PPTX slides from structured
+  drafts, with CSV flashcards and edition-separated JSON quizzes. These native
+  conversions use the bundled Python runtime (Pillow/python-docx/python-pptx).
+- Optional Python lab execution in a preinstalled digest-pinned Docker image;
+  no host execution fallback, no network, no host mounts, bounded resources.
+- Executed notebooks included only in instructor packages when execution returns.
+- Immutable review records and completed build content, two distinct assigned
+  reviewers, author self-approval denied, changes require a fresh build/review.
+- Drafts remain private and publication is disabled until full quality gates exist.
+
+Verified environment blockers:
+- SCHOLARION_ANTHROPIC_API_KEY and SCHOLARION_ANTHROPIC_MODEL are not configured.
+  Set them securely in the server environment, never in browser JavaScript.
+- Docker Desktop Linux engine is not running. Start it and provision an approved
+  Python image, then set SCHOLARION_LAB_IMAGE to its repository@sha256:digest.
+- FFmpeg is not installed. No speech/video provider is configured or approved.
+- Real reviewer identities/assignments are not provisioned. Assign the existing
+  authenticated instructor identities studioReviewRoles containing
+  subject-matter-expert or instructional-designer in the private identity store;
+  each reviewer also needs active instructor membership of the course. Restart
+  the service after operator-managed identity changes. Never share sign-in tokens.
+
+Remaining software scope (not represented as completed):
+- Full quantity/quality checks for every requested artifact and outcome coverage.
+- Narrated MP3/VTT/MP4 production and independently verified readings.
+- Complete interactive mini-lab renderers and seven assessment-format generation.
+- Automatic source-triggered job scheduling, durable worker recovery and partial
+  retry/diff workflows (current builds are explicitly started by instructors).
+- Release/publish gate combining executed tests, artifact checks and human reviews.
+
+Tests use mocked hosted responses to verify orchestration, not model quality.
+No live inference, actual sandbox execution, narrated media or human review was
+claimed. This is a substantial workflow implementation, not the complete spec.
+
+User policy update: instructor review is OPTIONAL. No review decision is required
+for build release eligibility or downloads. Labels now say AI-assisted content.
+Current complete builds are release-eligible; source-only/incomplete/stale builds
+remain accurately identified. A learner publication integration is still absent.

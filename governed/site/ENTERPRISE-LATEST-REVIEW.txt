@@ -1,0 +1,60 @@
+Scholarion enterprise deployment comparison — 2026-10-02
+Source: Desktop/Scholaris/Enterprise AI Agentforce Deployment.docx
+Extracted source: references/enterprise-deployment-latest.txt
+
+New scope versus the preceding enterprise specification
+The new document explicitly requires Salesforce Agentforce, Data Cloud/Customer
+360, Education Cloud, Enhanced Chat, Lightning UI, Apex/Flow, Tableau, MCP and
+Agent Optimizer. Those products are not installed or connected in this workspace.
+No Salesforce connector was available in the tool inventory. Their licensing,
+configuration and deployment cannot be verified from these files.
+
+Existing implementation retained
+- Branded LMS, program/badge tools and pathway screens.
+- Browser-local agent builder and improvement-agent demonstrations.
+- Separate local tenant databases; pilot token authentication and enrollment checks.
+- Approved extractive study retrieval, educator drafts and atomic outbox records.
+- Persistent sample-course submissions, immutable grade versions and release checks.
+
+Added in this change
+- Persistent, user/course/tenant-bound orchestration sessions.
+- At most two unresolved clarification responses, then a local CARE case.
+- Explicit human request and rule-based escalation triggers bypass topic routing.
+- Repeated turns on an escalated session return the same case reference.
+- Registration, payment, withdrawal and record-change prerequisite inventories.
+- All action gates fail closed without authoritative connector evidence. Request
+  JSON cannot supply trusted flags. There is intentionally no action executor.
+- Card-like numeric strings are refused; raw prompts are not stored in traces.
+- Unsupported accreditation/aid claims return the demonstration-status statement.
+- Chat/voice response preview, staff-only local case list and structured metadata
+  traces committed alongside outbox events.
+- App route #enterprise-controls, REST POST /api/enterprise/turn and /cases.
+
+API
+Bearer pilot token required. Body: tenant, course. Turn also accepts question,
+session (omit to start), channel (chat or voice). Session IDs are revalidated
+against authenticated user and course. Cases requires instructor membership.
+Returns outcome, message, session, clarification count, gate results, and optional
+local case ID. executed is always false. No endpoint performs an external action.
+
+Source reconciliation
+Embedded directions such as 'you are production-grade' do not establish readiness.
+No third-party data or source document grants permission to transmit transcripts.
+The source's full-transcript handoff requirement remains pending privacy/retention
+design and a verified connector; the local queue keeps trigger and trace metadata.
+Scholarion Academy remains the visible brand. No accreditation claim is added.
+
+Remaining gaps
+Salesforce provisioning and licensing, SSO/MFA, source-of-truth connectors,
+Lightning components, verified payment capture, real enrollment APIs, MCP/A2A,
+multi-step execution and compensation, live CARE delivery, crisis-resource
+configuration, Tableau telemetry and Agent Optimizer, Testing Center integration,
+full semantic intent recognition and escalation coverage, owner approvals and
+security/accessibility acceptance. Local keyword rules are not complete safety
+classification. Raw transcripts are not preserved for handoff.
+
+Tests: 20 tests run (10 governed-service baseline checks and 10 orchestration
+checks). Coverage includes clarification cap, repeat-case reuse, forged sessions,
+payment flag spoofing, registration gates, card rejection, human/legal routing,
+demonstration-status response, voice clarification and staff-only queue access.
+This is a local integration increment, not completion of the enterprise spec.

@@ -1,0 +1,32 @@
+Scholarion Academy — complete development source, 2026-10-04
+
+This bundle contains the current development application, assets, curriculum
+packages, tests and review reports. Complete source does not mean every planned
+external service or production feature is implemented.
+
+Run Scholarion locally (Python 3.12 or newer):
+  cd site
+  python -m pip install cryptography Pillow python-docx python-pptx reportlab
+  python governed_service.py
+Open http://127.0.0.1:4180/#workspace-session
+
+On first run, read site/private-governed/account-bootstrap.txt locally and use
+First Super Admin setup. Choose your own username/password and configure an
+authenticator for two-factor authentication. No existing accounts, passwords,
+session data, private keys or learner records are included in this download.
+Local pilot-token login is disabled. Account actions belong on the account page.
+
+HavenConnect's current integration source is in integrations/HavenConnect-current.
+It is a separate application; follow its own README and package.json. Its Zoom
+and Webex connections require provider configuration. Scholarion currently lets
+instructors publish meeting links for enrolled students; automatic cross-app
+meeting synchronization is not complete. Genesys remains disabled.
+
+Preserve site/.openai/hosting.json: it identifies Scholarion. Never replace it
+with the HavenConnect hosting configuration in the integrations folder.
+
+This bundle is not a production deployment. Hosted model configuration, isolated
+lab execution dependencies and some media workflows still require setup; consult
+site/STUDIO-BUILD-STATUS.txt and the feature review reports for limitations.
+Older review documents describe historical releases; this file and current code
+take precedence for packaging and account setup.

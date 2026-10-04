@@ -30,6 +30,14 @@ jobs:
         run: |
           set -o pipefail
           npm test 2>&1 | tee test.log
+      - name: Python governed service (governed/site)
+        working-directory: governed/site
+        run: |
+          set -o pipefail
+          (python -m pip install --quiet cryptography Pillow python-docx python-pptx reportlab \
+            && python -m unittest discover -p 'test_*.py' \
+            && python validate.py \
+            && for f in test-*.cjs; do node "$f"; done) 2>&1 | tee ../../python.log
       - name: Campus screens + accessibility (axe)
         env:
           CLOUDLAB_LOCAL_RUNNER: "1"
@@ -59,7 +67,7 @@ jobs:
       - name: Report failure output
         if: failure()
         run: |
-          for f in install test a11y build smoke; do
+          for f in install test python a11y build smoke; do
             [ -f "$f.log" ] || continue
             tail -n 80 "$f.log" | sed 's/\x1b\[[0-9;]*m//g' > tail.txt
             msg=$(python3 -c "import sys;print(open('tail.txt').read().replace('%','%25').replace('\r','').replace('\n','%0A'))")

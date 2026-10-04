@@ -1,0 +1,1711 @@
+Apply , Build, Create, implement and integrate all tabs and force operational module rather than the static panels and tabs that is there. Rebuild any remaining static surfaces as operational modules, and publish the resulting version
+
+
+# MASTER ARCHITECTURAL IMPLEMENTATION: SCHOLARION ACADEMY GLOBAL LEARNING PLATFORM
+## STAGE 1 & STAGE 2 DEPLOYMENT BLUEPRINT: UNIFIED HUB, DATA MODEL & QUAD-LMS INTEROPERABILITY
+
+---
++---------------------------------------------------------------------------------------------------+ | SCHOLARION ACADEMY CORE IDENTITY & HUB | | (FastAPI / PostgreSQL Aurora / Redis Cache) | +---------------------------------------------------------------------------------------------------+ | +---------------------------------------+---------------------------------------+ | | | v v v +-------------------+ +-------------------+ +-------------------+ | Cloud SaaS LMS | | On-Premise LMS | | Open-Source LMS | | (TalentLMS Adapter| | (Docker / K8s) | | (Moodle/OpenCanvas| +-------------------+ +-------------------+ +-------------------+ | | | +---------------------------------------+---------------------------------------+ | v +---------------------------+ | Custom-Built Canvas LMS | | (LTI 1.3 / SpeedGrader / | | DesignPLUS Cidi Tools) | +---------------------------+
+
+## 1. INFRASTRUCTURE-AS-CODE (IaC): AWS TERRAFORM DEPLOYMENT
+
+```hcl
+# Serverless Core Infrastructure: API Gateway, Aurora PostgreSQL, and Storage
+
+provider "aws" {
+  region = "us-east-1"
+}
+
+# --- S3 ARTIFACT & CONTENT STORAGE ---
+resource "aws_s3_bucket" "Scholarion Academy_storage" {
+  bucket        = "Scholarion Academy-global-learning-storage"
+  force_destroy = true
+}
+
+resource "aws_s3_bucket_public_access_block" "Scholarion Academy_storage_privacy" {
+  bucket                  = aws_s3_bucket.Scholarion Academy_storage.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# --- AURORA POSTGRESQL MULTI-TENANT CLUSTER ---
+resource "aws_rds_cluster" "Scholarion Academy_db_cluster" {
+  cluster_identifier      = "Scholarion Academy-aurora-cluster"
+  engine                  = "aurora-postgresql"
+  engine_mode             = "provisioned"
+  engine_version          = "15.3"
+  database_name           = "Scholarion Academy_core"
+  master_username         = "Scholarion Academy_admin"
+  master_password         = "SecureScholarion AcademyPass2026!"
+  skip_final_snapshot     = true
+
+  serverlessv2_scaling_configuration {
+    max_capacity = 16.0
+    min_capacity = 0.5
+  }
+}
+
+resource "aws_rds_cluster_instance" "Scholarion Academy_db_instance" {
+  cluster_identifier = aws_rds_cluster.Scholarion Academy_db_cluster.id
+  instance_class     = "db.serverless"
+  engine             = aws_rds_cluster.Scholarion Academy_db_cluster.engine
+  engine_version     = aws_rds_cluster.Scholarion Academy_db_cluster.engine_version
+}
+
+# --- HTTP API GATEWAY FOR DISTRIBUTED ORCHESTRATION ---
+resource "aws_apigatewayv2_api" "Scholarion Academy_api" {
+  name          = "Scholarion Academy-global-gateway"
+  protocol_type = "HTTP"
+  cors_configuration {
+    allow_origins = ["*"]
+    allow_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allow_headers = ["Authorization", "Content-Type", "X-Tenant-ID"]
+  }
+}
+
+output "api_gateway_endpoint" {
+  value = aws_apigatewayv2_api.Scholarion Academy_api.api_endpoint
+}
+output "s3_bucket_name" {
+  value = aws_s3_bucket.Scholarion Academy_storage.id
+}
+2. STAGE 1: UNIFIED RELATIONAL DATA MODEL (POSTGRESQL SCHEMA)
+SQL
+-- SCHOLARION ACADEMY CORE DATA MODEL: UNIFIED SINGLE SOURCE OF TRUTH (SIS + SMS + LMS)
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Tenant Isolation
+CREATE TABLE institutions (
+    institution_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    domain VARCHAR(128) UNIQUE NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Universal Identity & Access Management (RBAC)
+CREATE TABLE users (
+    user_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    institution_id UUID REFERENCES institutions(institution_id) ON DELETE CASCADE,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    role VARCHAR(32) CHECK (role IN ('student', 'faculty', 'administrator', 'parent', 'staff')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Student Information System (SIS) Records
+CREATE TABLE student_profiles (
+    student_id UUID PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+    enrollment_number VARCHAR(64) UNIQUE NOT NULL,
+    date_of_birth DATE NOT NULL,
+    academic_status VARCHAR(32) DEFAULT 'active',
+    admission_date DATE NOT NULL,
+    expected_graduation_date DATE
+);
+
+-- School Management System (SMS) Financials & Billing Ledger
+CREATE TABLE billing_accounts (
+    account_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    student_id UUID REFERENCES student_profiles(student_id) ON DELETE CASCADE,
+    total_balance NUMERIC(12, 2) DEFAULT 0.00,
+    payment_status VARCHAR(32) DEFAULT 'current',
+    last_billing_date TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Academic Curriculum & Course Scheduling
+CREATE TABLE courses (
+    course_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    institution_id UUID REFERENCES institutions(institution_id) ON DELETE CASCADE,
+    code VARCHAR(32) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    credits INT NOT NULL
+);
+
+CREATE TABLE course_sections (
+    section_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    course_id UUID REFERENCES courses(course_id) ON DELETE CASCADE,
+    term VARCHAR(32) NOT NULL,
+    instructor_id UUID REFERENCES users(user_id),
+    schedule_json JSONB NOT NULL -- Timetabling, room numbers, and days
+);
+
+-- Enrollments & Universal Grade Sync Join Table
+CREATE TABLE enrollments (
+    enrollment_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    student_id UUID REFERENCES student_profiles(student_id) ON DELETE CASCADE,
+    section_id UUID REFERENCES course_sections(section_id) ON DELETE CASCADE,
+    enrollment_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    final_grade VARCHAR(8),
+    UNIQUE(student_id, section_id)
+);
+
+CREATE INDEX idx_user_tenant ON users(institution_id);
+CREATE INDEX idx_enrollment_lookup ON enrollments(student_id, section_id);
+3. STAGE 2: QUAD-LMS ENGINE ABSTRACTION & CANVAS LTI 1.3 ADAPTER
+Python
+# QUAD-LMS ENGINE INTEROPERABILITY LAYER & CANVAS ADAPTER
+import os
+import jwt
+import requests
+from abc import ABC, abstractmethod
+from typing import Dict, Any, List
+from fastapi import FastAPI, HTTPException, Security, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+app = FastAPI(title="Scholarion Academy Quad-LMS Engine Core API")
+security = HTTPBearer()
+
+# --- ABSTRACT LMS ADAPTER INTERFACE ---
+class BaseLMSAdapter(ABC):
+    @abstractmethod
+    def sync_user(self, user_data: Dict[str, Any]) -> bool:
+        pass
+
+    @abstractmethod
+    def sync_course_grade(self, student_id: str, section_id: str, grade: str) -> bool:
+        pass
+
+# --- CUSTOM CANVAS LMS IMPLEMENTATION (REST + LTI 1.3) ---
+class CanvasLMSAdapter(BaseLMSAdapter):
+    def __init__(self, base_url: str, api_token: str):
+        self.base_url = base_url.rstrip('/')
+        self.headers = {
+            "Authorization": f"Bearer {api_token}",
+            "Content-Type": "application/json"
+        }
+
+    def sync_user(self, user_data: Dict[str, Any]) -> bool:
+        """Provision user into Canvas LMS via REST API."""
+        endpoint = f"{self.base_url}/api/v1/accounts/self/users"
+        payload = {
+            "user": {
+                "name": f"{user_data['first_name']} {user_data['last_name']}",
+                "short_name": user_data['first_name'],
+                "sortable_name": f"{user_data['last_name']}, {user_data['first_name']}",
+                "terms_of_use": True
+            },
+            "pseudonym": {
+                "unique_id": user_data['email'],
+                "send_confirmation": False
+            }
+        }
+        res = requests.post(endpoint, json=payload, headers=self.headers)
+        return res.status_code in (200, 201)
+
+    def sync_course_grade(self, student_id: str, section_id: str, grade: str) -> bool:
+        """Submit grade back to Canvas SpeedGrader via LTI 1.3 / REST API."""
+        endpoint = f"{self.base_url}/api/v1/courses/{section_id}/assignments/grade"
+        payload = {
+            "grade_data": {
+                student_id: {
+                    "posted_grade": grade
+                }
+            }
+        }
+        res = requests.post(endpoint, json=payload, headers=self.headers)
+        return res.status_code == 200
+
+# --- QUAD-LMS FACTORY ---
+class QuadLMSService:
+    def __init__(self):
+        self.adapters: Dict[str, BaseLMSAdapter] = {
+            "canvas": CanvasLMSAdapter(
+                base_url=os.getenv("CANVAS_BASE_URL", "[https://canvas.Scholarion Academy.edu](https://canvas.Scholarion Academy.edu)"),
+                api_token=os.getenv("CANVAS_API_TOKEN", "mock_token")
+            )
+            # Adapters for Cloud-SaaS, On-Premise, and Open-Source instances mount here
+        }
+
+    def get_adapter(self, lms_type: str) -> BaseLMSAdapter:
+        adapter = self.adapters.get(lms_type.lower())
+        if not adapter:
+            raise HTTPException(status_code=400, detail=f"Unsupported LMS type: {lms_type}")
+        return adapter
+
+lms_service = QuadLMSService()
+
+# --- API ENDPOINTS FOR SINGLE POINT OF TRUTH SYNC ---
+@app.post("/api/v1/sync/grade")
+def sync_grade_to_lms(
+    lms_type: str,
+    student_id: str,
+    section_id: str,
+    grade: str
+):
+    adapter = lms_service.get_adapter(lms_type)
+    success = adapter.sync_course_grade(student_id, section_id, grade)
+    if not success:
+        raise HTTPException(status_code=500, detail="Grade synchronization failed.")
+    return {"status": "SUCCESS", "student_id": student_id, "synced_grade": grade}
+4. VERIFICATION & UNIT TESTING SUITE
+Python
+# UNIT TESTING SUITE FOR SCHOLARION ACADEMY CORE API & ADAPTERS
+import pytest
+from unittest.mock import MagicMock, patch
+from main import CanvasLMSAdapter
+
+@pytest.fixture
+def canvas_adapter():
+    return CanvasLMSAdapter(base_url="[https://mock.canvas.edu](https://mock.canvas.edu)", api_token="test_token")
+
+def test_canvas_user_sync_success(canvas_adapter):
+    user_payload = {
+        "first_name": "Jane",
+        "last_name": "Doe",
+        "email": "jdoe@Scholarion Academy.edu"
+    }
+    
+    with patch("requests.post") as mock_post:
+        mock_post.return_value.status_code = 201
+        result = canvas_adapter.sync_user(user_payload)
+        
+        assert result is True
+        mock_post.assert_called_once()
+
+def test_canvas_grade_sync_failure(canvas_adapter):
+    with patch("requests.post") as mock_post:
+        mock_post.return_value.status_code = 500
+        result = canvas_adapter.sync_course_grade("student_123", "sec_456", "A")
+        
+        assert result is False
+5. SYSTEM INITIALIZATION BLUEPRINT
+Operational Execution Sequence
+Infrastructure Provisioning: Execute terraform apply using the provided IaC template to spin up the Aurora PostgreSQL database, S3 buckets, and API Gateway.
+Schema Migration: Apply the Stage 1 SQL DDL commands to establish multi-tenancy rules, user accounts, SIS records, SMS billing ledgers, and course tables.
+Identity & Adapter Configuration: Load the FastAPI service onto serverless runtimes (AWS Lambda or ECS Fargate). Define environment credentials (CANVAS_BASE_URL, CANVAS_API_TOKEN).
+Integration Verification: Execute pytest to confirm that LTI 1.3 endpoints, user provisioning, and SpeedGrader grade passbacks execute correctly across connected LMS endpoints.
+
+
+
+### SYSTEM ARCHITECTURE & TOPOLOGY
+The Scholarion Academy Global Learning platform is constructed as a multi-tenant, serverless hub-and-spoke distributed system. The central control plane serves as the single point of truth across administrative, financial, and educational domains, bridging four distinct LMS deployment topologies via a unified abstraction adapter layer.
+
+
+
+
+
+
+# MASTER ARCHITECTURAL PROMPT: SCHOLARION ACADEMY GLOBAL LEARNING INTEGRATED PLATFORM
+
+## System Overview & Primary Intent
+Act as a Principal Enterprise Architect, EdTech Specialist, and AI Systems Designer. Your task is to process all attached documents, architectural diagrams, screenshots, and visual reference frames to design and build **Scholarion Academy Global Learning**—a hybrid, multi-tenant, cloud-native distributed platform that serves as a single source of truth for higher education institutions.
+
+Scholarion Academy unifies four core deployment architectures (Cloud-Based SaaS, On-Premise, Open-Source, and Custom-Built Canvas LMS) into a single, cohesive **School Management System (SMS)**, **Student Information System (SIS)**, and **Learning Management System (LMS)** ecosystem.
+
+---
+
+## SECTION 1: VISUAL & SOURCE DATA EXTRACTION REQUIREMENTS
+Synthesize and integrate the following structural assets from the attached visual references:
+
+1. **Integration Protocols (`image.png`):** Enforce the 4 core integration pillars: Single Sign-On (SSO), Real-time Data Synchronization, Course Management Integration, and Universal Calendar Integration.
+2. **Topological Mapping (`Picture2.png`):** Transition from disparate, fragmented software bubbles to a centralized "One Point of Truth" hub-and-spoke architecture linking Student Administration, Academic Reporting, Extracurriculars, Payroll/HR, Accounting, Portals, Timetabling, and Authentication.
+3. **Serverless Infrastructure Topology (`Picture1.png`):** Implement the core serverless loop: Client Request → API Gateway → Serverless FaaS (AWS Lambda / Cloud Functions) ↔ Database (PostgreSQL/Aurora) & Object Storage (S3/GCS).
+4. **AI-Driven Accessibility & Content Engines (`Picture3.png`, `Picture6.png`):** Incorporate real-time accessibility auditing (Alt-text generation, contrast checks, UDL templates) and prompt-driven course generation engines.
+5. **Ecosystem & Connector Grid (`Picture4.png`):** Support turn-key bidirectional connectors for HCM/HRIS (ADP, Workday, BambooHR, UKG Pro), CRM (Salesforce, HubSpot, Zendesk), Content Libraries (Go1, SkillSoft, Traliant), and Productivity/Communication tools (Zoom, WebEx, Credly, ServiceNow, Google Workspace).
+6. **User & Identity Lifecycle Management (`Picture5.png`, `Picture7.png`):** Support role-based access control (RBAC), multi-tenant onboarding, and seamless SAML 2.0 / OAuth2 / LDAPS SSO provisioning.
+
+---
+
+## SECTION 2: INCREMENTAL DEVELOPMENT STAGE BLUEPRINT
+
+Execute the architectural design across 5 progressive, phased stages:
+[Stage 1: Core Hub & Data Model] ➔ [Stage 2: Engine Integration] ➔ [Stage 3: AI & Automation] ➔ [Stage 4: Central Distribution & Auto-Update] ➔ [Stage 5: Enterprise Scaling]
+
+### STAGE 1: CORE HUB & SINGLE SOURCE OF TRUTH (FOUNDATION)
+- **Database Schema & Data Layer:** Design a unified PostgreSQL schema handling Student Records, Family/Billing Data, Timetabling, Attendance, Markbooks, Financials/Payroll, and Compliance (NCCD/Government Reporting).
+- **Core SIS & SMS Modules:** Build the administrative backend for admissions workflows, enrollment pipelines, course registration, and automated fee billing.
+- **Single Sign-On (SSO) & RBAC:** Deploy SAML 2.0, OAuth2, and OpenID Connect protocols to unify authentication across web, mobile, and server interfaces.
+
+### STAGE 2: QUAD-LMS ENGINE INTEGRATION & CANVAS EXTENSION
+- **Multi-Deployment Interoperability:** Architect abstraction adapters connecting Cloud-SaaS (TalentLMS style), On-Premise instances, Open-Source nodes, and Custom-Built Canvas LMS environments.
+- **Canvas API & LTI 1.3 Integration:** Embed Canvas REST APIs and LTI tools to synchronize SpeedGrader, Rubrics, Modules, Pages, and Quizzes into the main Scholarion Academy interface.
+- **Course Design Toolsets:** Integrate DesignPLUS/Cidi Labs functionality—including Multi-Tool course builders, QuickStart Wizards, and automated Link Validators.
+
+### STAGE 3: AI-POWERED LEARNING & WORKFLOW AUTOMATION
+- **Generative Course & Curriculum Creation:** Build AI prompt engines that convert market trends, job growth data, and raw documentation into SCORM/xAPI-compliant courses, quizzes, and micro-learning modules in minutes.
+- **Aura Rehearse (AI Roleplay Engine):** Deploy interactive conversational agents for soft-skills practice, price pushback scenarios, and compliance roleplaying with real-time feedback loops.
+- **Self-Healing Accessibility & Analytics:** Implement automated background agents (`Ninjarn AI`) that detect accessibility issues, fix color contrast/Alt-text, track progress analytics, and predict student retention risks.
+
+### STAGE 4: CENTRALIZED DISTRIBUTION, AUTO-UPDATES & CANARY PIPELINES
+- **Hub-and-Spoke Distribution:** Deploy Amazon S3 / CloudFront / ECR pipelines for cross-platform deployments (Desktop Squirrel/Electron, Mobile CodePush OTA, Server Watchtower Docker containers).
+- **AI Anomaly Detection & Auto-Kill Switch:** Integrate real-time streaming telemetry (Kinesis/CloudWatch) with an AI anomaly monitor that calculates risk scores (`ai_anomaly_score`) and trips an automated rollout kill-switch (`is_halted`) upon detecting crash spikes.
+- **Automated CI/CD & Localized Release Notes:** Build GitHub Actions workflows utilizing GPT-4o to digest raw git commit logs and automatically publish multi-lingual, user-friendly release notes.
+
+### STAGE 5: ENTERPRISE ECOSYSTEM CONNECTOR GRID & HEADLESS LMS
+- **Turnkey Connector Mesh:** Deploy RESTful APIs and Webhooks connecting Scholarion Academy to Workday, ADP, Salesforce, HubSpot, Zoom, NetSuite, and ServiceNow.
+- **Headless LMS ("Scholarion Academy Infuse"):** Enable headless embedding, allowing enterprise teams to consume training content natively inside their everyday work tools without switching applications.
+
+---
+
+## SECTION 3: TECHNICAL DELIVERABLES REQUIRED
+For each stage, provide:
+1. **System Architecture Diagrams:** Clear ASCII/Mermaid structural flows mapping components, data paths, and APIs.
+2. **Infrastructure-as-Code (IaC):** Production-ready Terraform snippets defining CloudFront OAC, S3 artifact buckets, API Gateways, and Aurora PostgreSQL instances.
+3. **Core Application Code:** Clean Python/Node.js/SQL implementations for orchestrators, manifest generators, AI summarizers, and client update daemons.
+4. **Verification & Testing Strategy:** Unit testing suites (e.g., PyTest for binary delta patching) and operational security audit checks (Trivy container scanning).
+
+# SYSTEM PROMPT: SCHOLARION ACADEMY GLOBAL LEARNING ARCHITECTURE & STAGE 1 DEPLOYMENT
+
+## 1. SYSTEM IDENTITY & CORE MISSION
+You are the Lead Systems Architect and Principal Engineer for **Scholarion Academy Global Learning**, an all-in-one School Management System (SMS), Student Information System (SIS), and Learning Management System (LMS) platform. 
+
+Scholarion Academy acts as the single source of truth across higher education operations, consolidating disparate workflows (admissions, course delivery, financial billing, attendance, and graduation tracking) into a unified, multi-tenant enterprise system.
+
+---
+
+## 2. STAGE 1 IMPLEMENTATION: CORE HUB DATA SCHEMAS & UNIFIED SIS/SMS ARCHITECTURE
+
+### A. Unified Relational Data Model (PostgreSQL)
+
+```sql
+-- Core Institutions / Multi-Tenancy Engine
+CREATE TABLE institutions (
+    institution_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    domain VARCHAR(128) UNIQUE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Users & Identity Management
+CREATE TABLE users (
+    user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    institution_id UUID REFERENCES institutions(institution_id) ON DELETE CASCADE,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255),
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    role VARCHAR(32) CHECK (role IN ('student', 'faculty', 'administrator', 'parent')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Student Profiles & Administrative Records (SIS)
+CREATE TABLE student_profiles (
+    student_id UUID PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+    enrollment_number VARCHAR(64) UNIQUE NOT NULL,
+    date_of_birth DATE NOT NULL,
+    academic_status VARCHAR(32) DEFAULT 'active',
+    admission_date DATE NOT NULL,
+    expected_graduation_date DATE
+);
+
+-- Family & Billing Accounts (SMS)
+CREATE TABLE billing_accounts (
+    account_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    student_id UUID REFERENCES student_profiles(student_id) ON DELETE CASCADE,
+    total_balance NUMERIC(10, 2) DEFAULT 0.00,
+    payment_status VARCHAR(32) DEFAULT 'current',
+    last_billing_date TIMESTAMP WITH TIME ZONE
+);
+
+-- Courses & Section Scheduling
+CREATE TABLE courses (
+    course_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    institution_id UUID REFERENCES institutions(institution_id) ON DELETE CASCADE,
+    code VARCHAR(32) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    credits INT NOT NULL
+);
+
+CREATE TABLE course_sections (
+    section_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    course_id UUID REFERENCES courses(course_id) ON DELETE CASCADE,
+    term VARCHAR(32) NOT NULL,
+    instructor_id UUID REFERENCES users(user_id),
+    schedule_json JSONB NOT NULL -- Timetabling details (days, times, room numbers)
+);
+
+-- Enrollments & Gradebook (SIS + LMS Integration Point)
+CREATE TABLE enrollments (
+    enrollment_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    student_id UUID REFERENCES student_profiles(student_id) ON DELETE CASCADE,
+    section_id UUID REFERENCES course_sections(section_id) ON DELETE CASCADE,
+    enrollment_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    final_grade VARCHAR(8),
+    UNIQUE(student_id, section_id)
+);
+B. Single Sign-On (SSO) & Authentication Layer (Python / FastAPI)
+
+import jwt
+import os
+from datetime import datetime, timedelta
+from fastapi import FastAPI, HTTPException, Depends, Security
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+app = FastAPI(title="Scholarion Academy Core Identity Provider API")
+security = HTTPBearer()
+
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", "Scholarion Academy_super_secret_key_2026")
+ALGORITHM = "HS256"
+
+def create_access_token(user_id: str, role: str, institution_id: str) -> str:
+    """Generates a multi-tenant JWT claims payload for unified SSO."""
+    payload = {
+        "sub": user_id,
+        "role": role,
+        "institution_id": institution_id,
+        "exp": datetime.utcnow() + timedelta(hours=12),
+        "iss": "Scholarion Academy-identity-engine"
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Security(security)):
+    """Verifies incoming authentication tokens across all connected Scholarion Academy services."""
+    token = credentials.credentials
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="SSO Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid SSO token credentials")
+
+@app.get("/api/v1/auth/me")
+def get_current_user_profile(user_claims: dict = Depends(verify_token)):
+    return {
+        "status": "authenticated",
+        "user_id": user_claims["sub"],
+        "role": user_claims["role"],
+        "institution_id": user_claims["institution_id"]
+    }
+
+MASTER EXTRACTION, ARCHITECTURE, AND INCREMENTAL BUILD PROMPT
+Scholarion Academy Global Learning — Distributed All-in-One Education Platform
+1. Your Role
+Act as a multidisciplinary team consisting of:
+Enterprise solution architect
+Distributed-systems architect
+Learning-management-system architect
+Student-information-system specialist
+Canvas LMS integration specialist
+Cloud and on-premise infrastructure engineer
+Data architect
+API and interoperability engineer
+DevSecOps engineer
+Artificial-intelligence engineer
+UX/UI designer
+Accessibility specialist
+Quality-assurance engineer
+Education compliance analyst
+Technical writer
+Your assignment is to extract, classify, validate, and synthesize information from all supplied websites, screenshots, images, diagrams, documents, and links, and then use the verified requirements to create, design, and incrementally build:
+Scholarion Academy Global Learning
+Scholarion Academy Global Learning will be a distributed, multi-tenant, AI-enabled education ecosystem combining:
+Student Information System
+School Management System
+Learning Management System
+Academic administration
+Admissions and enrollment
+Student services
+Financial and ERP capabilities
+Graduation and credential tracking
+Analytics and institutional reporting
+Cross-platform application distribution
+Cloud, on-premise, open-source, and customized Canvas-based deployments
+The system must support higher education, professional education, workforce development, corporate learning, continuing education, and future K–12 configurations without mixing the regulatory or data requirements of those sectors.
+
+2. Critical Instruction: Extract Before Designing
+Do not begin implementation immediately.
+First, examine every supplied source and build a structured evidence register. Sources may include:
+Website links
+Product pages
+Help documentation
+Screenshots
+Architecture diagrams
+Interface images
+Videos or transcripts
+Uploaded documents
+Tables
+Mobile interface images
+Desktop interface images
+Server architecture references
+LMS and SIS feature descriptions
+Canvas documentation
+API documentation
+Integration specifications
+Application-distribution references
+For each source, extract:
+Field
+Required Information
+Source ID
+Unique identifier
+Source type
+Website, screenshot, document, diagram, video, or API reference
+Source title
+Title or short description
+Source location
+URL or attachment name
+Date accessed
+Retrieval date
+Visible text
+Text extracted through direct reading or OCR
+Main subject
+LMS, SIS, ERP, deployment, AI, analytics, or another category
+Functional features
+Capabilities shown or described
+User roles
+Students, instructors, administrators, staff, or others
+Workflows
+Processes visible in the source
+Data entities
+Users, courses, grades, payments, applications, or other records
+Integration points
+APIs, SSO, LTI, webhooks, file exchange, or other methods
+UI patterns
+Navigation, dashboards, forms, tables, cards, and interactions
+Security implications
+Authentication, authorization, privacy, or compliance needs
+Deployment implications
+Cloud, on-premise, mobile, desktop, or server requirements
+Evidence status
+Verified, inferred, ambiguous, outdated, or unavailable
+Confidence
+High, medium, or low
+Recommended use
+Adopt, adapt, investigate, or exclude
+Copyright/trademark note
+Restrictions on copying or branding
+Do not treat search-result summaries, marketing statements, or AI-generated text as verified technical facts.
+Where sources conflict:
+Prefer official technical documentation.
+Record the conflict.
+Identify the more reliable source.
+Explain the design decision.
+Preserve unresolved questions in an ambiguity register.
+Do not invent features that are presented as extracted facts. Separate all findings into:
+Directly observed
+Source-verified
+Reasonably inferred
+Recommended
+Pending confirmation
+
+3. Image and Screenshot Extraction Protocol
+For every attached image or screenshot:
+Perform OCR on all visible text.
+Identify the page type and likely user role.
+Document navigation elements.
+Identify visible buttons, fields, tabs, filters, cards, tables, charts, alerts, and menus.
+Reconstruct the apparent workflow.
+Identify possible data entities.
+Record error messages and system-status indicators.
+Identify accessibility concerns.
+Record responsive-design implications.
+Identify features that require APIs or backend services.
+Distinguish real data from sample or demonstration data.
+Mark any unclear or cropped areas as unknown.
+Do not infer functionality solely because a button is visible.
+Do not duplicate proprietary visual designs exactly.
+For each image, produce:
+Screenshot inventory
+Extracted text
+UI component list
+Workflow interpretation
+Accessibility observations
+Technical implications
+Questions requiring clarification
+
+4. Link and Website Analysis Protocol
+For every supplied link:
+Open the exact page.
+Record its title, publisher, and access date.
+Extract only information relevant to Scholarion Academy.
+Follow relevant first-party documentation links when necessary.
+Do not crawl unrelated areas of the website.
+Do not bypass authentication or access restrictions.
+Do not collect personal information.
+Respect copyright, licensing, robots directives, and terms of use.
+Summarize features in original language.
+Do not copy proprietary source code, protected course content, or brand assets.
+Record whether the source is official, third-party, promotional, or community-created.
+Identify information that may be outdated.
+Verify security-sensitive and deployment-sensitive recommendations against primary documentation.
+Create a source-to-requirement traceability matrix linking every adopted requirement to its evidence source.
+
+5. Platform Vision
+Scholarion Academy Global Learning must provide one unified digital-education experience while supporting four primary LMS deployment models.
+Model 1: Scholarion Academy Cloud LMS
+A centrally hosted, multi-tenant software-as-a-service platform managed by Scholarion Academy.
+Required characteristics:
+Multi-tenant architecture
+Configurable institutional branding
+Tenant-level data separation
+Elastic scaling
+Automated upgrades
+Global content delivery
+Regional deployment options
+Central monitoring
+Subscription and licensing controls
+Configurable data residency
+Tenant-specific integrations
+Sandbox and production environments
+High availability
+Automated backups and disaster recovery
+Model 2: Scholarion Academy On-Premise LMS
+An institution-hosted deployment for organizations that require local infrastructure, private networking, or direct operational control.
+Required characteristics:
+Docker- or Kubernetes-based deployment
+Air-gapped or limited-connectivity option
+Local database and object storage
+Local identity-provider integration
+Institution-controlled encryption keys
+Offline installation packages
+Signed upgrade bundles
+Controlled synchronization with the Scholarion Academy hub
+Local audit logs
+Backup and restoration tools
+Administrative health dashboard
+Version-compatibility matrix
+Manual and controlled automatic-update modes
+Model 3: Scholarion Academy Open-Source LMS Distribution
+A documented and extensible distribution that permits approved community or institutional customization under clearly defined licenses.
+Required characteristics:
+Publicly documented architecture
+Plugin and extension framework
+API documentation
+Community contribution workflow
+Security disclosure process
+Versioned releases
+Software bill of materials
+License-compliance reports
+Digital package signatures
+Extension compatibility testing
+Community and enterprise editions
+Upgrade and migration guidance
+Separation of open-source and proprietary modules
+Model 4: Scholarion Academy Canvas-Based LMS
+A Scholarion Academy-branded, properly licensed, customized deployment based on or integrated with the open-source Canvas LMS ecosystem.
+Required characteristics:
+Canvas-compatible course experience
+Canvas API adapters
+Learning Tools Interoperability integration
+Single sign-on
+Automated user provisioning
+Course and section synchronization
+Enrollment synchronization
+Assignment and grade exchange
+Calendar synchronization
+Discussion and announcement support
+Canvas mobile compatibility where permitted
+Theme and branding configuration
+Plugin and external-tool governance
+Upgrade-safe customizations
+Separation of Scholarion Academy-owned code from upstream Canvas code
+Clear trademark and licensing disclosures
+Do not imply that Scholarion Academy owns Canvas. Do not use Canvas branding in ways that suggest endorsement, partnership, or ownership unless written authorization exists.
+
+6. Unified Scholarion Academy Experience
+Although four deployment models are supported, users must experience Scholarion Academy as one coordinated platform.
+Create a central Scholarion Academy Education Hub responsible for:
+Tenant registration
+Institution configuration
+Identity federation
+License and entitlement management
+Application registry
+LMS instance registry
+SIS and ERP connections
+Integration catalog
+Release management
+Cross-instance analytics
+AI services
+Notification services
+Audit services
+Support and incident management
+Package and update distribution
+Policy management
+Each LMS deployment must connect to the hub through secured, versioned adapters without requiring all institutional data to be copied into the central cloud.
+
+7. Core Product Domains
+7.1 Student Information System
+Build an authoritative SIS supporting:
+Prospect management
+Applicant records
+Online applications
+Admissions review
+Application decisions
+Document collection
+Identity verification
+Student onboarding
+Program admission
+Academic programs
+Terms and sessions
+Course catalog
+Sections and class schedules
+Registration
+Add/drop and withdrawal
+Waitlists
+Attendance
+Academic history
+Grades
+Grade changes
+Academic standing
+Degree audits
+Transfer-credit evaluations
+Prior-learning assessments
+Graduation applications
+Graduation clearance
+Transcript generation
+Credential records
+Alumni transition
+Student holds
+Student conduct records
+Advising notes
+Institutional reporting
+The SIS must remain the system of record for official student, enrollment, program, and academic-history data unless a tenant explicitly configures another authoritative source.
+7.2 Learning Management System
+Build or integrate LMS functionality for:
+Course creation
+Templates and course copying
+Modules
+Pages
+Files
+Syllabi
+Announcements
+Discussions
+Assignments
+Quizzes and examinations
+Question banks
+Rubrics
+Outcomes
+Competencies
+Gradebook
+Instructor feedback
+Peer review
+Groups
+Collaborations
+Virtual classroom integration
+Multimedia
+SCORM packages
+xAPI statements
+LTI tools
+Accessibility checking
+Learning analytics
+Mobile learning
+Offline content access
+Notifications
+Calendar and deadlines
+Academic-integrity tools
+Course evaluations
+Faculty course analytics
+7.3 School Management and Administrative System
+Support:
+Institutional organization
+Schools and departments
+Campuses and virtual locations
+Academic calendars
+Rooms and facilities
+Faculty assignments
+Workload management
+Class scheduling
+Attendance administration
+Advising
+Case management
+Student support
+Communications
+Policy administration
+Document management
+Workflow approvals
+Compliance reporting
+Institutional effectiveness
+Accreditation evidence management
+Retention and intervention workflows
+7.4 ERP and Business Operations
+Create optional ERP modules for:
+Tuition and fees
+Student accounts
+Invoicing
+Payment plans
+Refund processing
+Scholarships
+Sponsorships
+Employer billing
+Financial-aid data exchange
+General ledger integration
+Procurement
+Contracts
+Asset management
+Faculty and staff records
+Payroll integration
+Human resources
+Time and attendance
+Budgeting
+Financial reporting
+Financial modules must be configurable because requirements differ by country, institution, and education sector.
+7.5 Graduation and Credentials
+Support:
+Degree-progress tracking
+Degree audits
+Program requirement evaluation
+Exceptions and substitutions
+Graduation applications
+Advisor review
+Registrar approval
+Financial clearance
+Conduct clearance
+Credential conferral
+Diplomas
+Certificates
+Microcredentials
+Digital badges
+Secure credential verification
+Transcript updates
+Alumni records
+
+8. Integration and Interoperability
+Use an API-first, event-driven integration architecture.
+Support applicable standards such as:
+REST
+GraphQL where appropriate
+Webhooks
+OAuth 2.0
+OpenID Connect
+SAML 2.0
+SCIM
+OneRoster
+LTI 1.3 and LTI Advantage
+Common Cartridge
+QTI
+SCORM
+xAPI
+Caliper Analytics
+Ed-Fi where relevant
+Secure file transfer
+CSV import and export
+Event streaming
+Create a canonical education data model so each external LMS, SIS, ERP, or identity provider does not require point-to-point customization.
+Required synchronization workflows include:
+User provisioning
+Role assignment
+Program synchronization
+Course creation
+Section creation
+Enrollment synchronization
+Add/drop synchronization
+Faculty assignment
+Calendar synchronization
+Assignment metadata exchange
+Grade-passback
+Final-grade posting
+Completion status
+Attendance
+Holds
+Graduation progress
+Credential issuance
+Every integration must define:
+Source system
+Destination system
+Authoritative record
+Sync direction
+Sync frequency
+Conflict-resolution rule
+Retry policy
+Dead-letter handling
+Idempotency requirement
+Data-retention rule
+Audit requirement
+Error owner
+Recovery process
+
+9. Distributed-System Architecture
+Use a modular, distributed architecture that can scale from a small institution to a global multi-institution network.
+9.1 Recommended Logical Services
+Design bounded services for:
+Identity and access
+Tenant management
+Applicant management
+Admissions
+Student records
+Academic programs
+Course catalog
+Registration
+Scheduling
+Attendance
+Degree audit
+Graduation
+Course delivery
+Assessment
+Gradebook
+Content management
+Communications
+Notifications
+Billing
+Payments
+Reporting
+Analytics
+Credentials
+Integrations
+AI orchestration
+Search
+Document management
+Audit and compliance
+Application distribution
+Release management
+Do not split the platform into unnecessary microservices during the first phase. Begin with a modular architecture and extract independently scalable services only when justified by transaction boundaries, security requirements, or workload patterns.
+9.2 Data Architecture
+Use fit-for-purpose storage:
+PostgreSQL for transactional academic and administrative records
+Object storage for files, course assets, submissions, and release packages
+Redis for caching, sessions, rate limiting, and distributed locks
+Search index for catalog, course, document, and help-center search
+Event broker for reliable asynchronous communication
+Analytics warehouse or lakehouse for reporting
+Vector database only for justified AI retrieval use cases
+Immutable audit store for security and compliance events
+Container registry for server packages
+Artifact repository for desktop and mobile release metadata
+Do not use the analytics warehouse, search index, or vector store as the authoritative student-record database.
+9.3 Event-Driven Workflows
+Publish domain events such as:
+ApplicantCreated
+ApplicationSubmitted
+ApplicantAdmitted
+StudentActivated
+CoursePublished
+SectionCreated
+StudentRegistered
+EnrollmentDropped
+AssignmentSubmitted
+GradePosted
+FinalGradeApproved
+PaymentReceived
+StudentHoldApplied
+DegreeRequirementCompleted
+GraduationApproved
+CredentialIssued
+ReleasePublished
+DeploymentUpdated
+AIRecommendationReviewed
+Use transactional outbox patterns, idempotent consumers, retry policies, dead-letter queues, event versioning, and correlation identifiers.
+
+10. Identity, Access, and Roles
+Support:
+Single sign-on
+Passwordless authentication
+Multifactor authentication
+SAML
+OpenID Connect
+Social identity providers where authorized
+Enterprise directories
+SCIM provisioning
+Tenant-specific identity policies
+Session management
+Device management
+Delegated administration
+Role-based access control
+Attribute-based access control
+Emergency-access procedures
+Core roles may include:
+Prospective student
+Applicant
+Student
+Learner
+Instructor
+Teaching assistant
+Advisor
+Program chair
+Department administrator
+Registrar
+Admissions officer
+Bursar
+Financial-aid officer
+Student-support specialist
+Instructional designer
+Institution administrator
+Tenant administrator
+System administrator
+Auditor
+Parent or guardian, when appropriate
+Employer or sponsor
+Alumni user
+Apply least privilege and maintain a complete audit trail for sensitive actions.
+
+11. Artificial-Intelligence Layer
+Integrate AI as an assistive, governed service rather than an uncontrolled decision maker.
+11.1 Student AI Assistant
+Provide:
+Course navigation
+Study planning
+Deadline reminders
+Concept explanations
+Practice questions
+Writing feedback
+Tutoring support
+Catalog search
+Degree-progress explanations
+Support-service routing
+Accessibility assistance
+11.2 Faculty AI Assistant
+Provide:
+Course-outline drafting
+Rubric drafting
+Quiz-question generation
+Discussion-prompt generation
+Content summarization
+Accessibility recommendations
+Learning-outcome alignment
+Feedback drafting
+At-risk learner signals
+Course analytics explanations
+Faculty must review AI-generated academic materials and grading recommendations before use.
+11.3 Administrative AI Assistant
+Provide:
+Application-document classification
+Workflow triage
+Policy search
+Report generation
+Scheduling support
+Enrollment forecasting
+Student-service routing
+Graduation-audit explanations
+Data-quality anomaly identification
+11.4 AI Governance
+Require:
+Human review for high-impact decisions
+Explainable recommendations
+Model and prompt versioning
+Retrieval-source citations
+Role-aware data access
+Tenant-level data isolation
+Prompt-injection defenses
+Sensitive-data redaction
+Hallucination monitoring
+Bias testing
+Accuracy evaluation
+Feedback and appeal mechanisms
+AI activity logs
+Configurable AI opt-out
+Institution-level AI policies
+AI must not autonomously:
+Admit or reject an applicant
+Award financial aid
+Issue a final disciplinary decision
+Assign a final course grade
+Change an official student record
+Approve graduation
+Confer a credential
+Make an employment decision
+Diagnose a medical or mental-health condition
+
+12. Cross-Platform Applications
+Develop Scholarion Academy for:
+Web
+Responsive student portal
+Faculty portal
+Administrator portal
+Public catalog
+Admissions portal
+Employer and partner portal
+Mobile
+iOS application
+Android application
+Offline course access
+Push notifications
+Assignment submission
+Calendar
+Messages
+Grades
+Attendance where authorized
+Mobile identity verification where appropriate
+Native application updates must follow Apple and Google distribution requirements. Over-the-air updates must be limited to changes permitted by applicable app-store policies.
+Desktop
+Windows application
+macOS application
+Optional Linux desktop application
+Secure automatic updates
+Downloaded course materials
+Local synchronization
+Classroom presentation tools
+Assessment lockdown integration where approved
+Server and Institutional Deployment
+Container images
+Kubernetes packages
+Docker Compose packages for smaller installations
+Signed installation bundles
+Infrastructure-as-code templates
+Helm charts
+Environment validation
+Configuration migration
+Backup and restore utilities
+Health checks
+Upgrade and rollback tooling
+
+13. Centralized Application Distribution
+Create a Scholarion Academy Distribution and Release Hub.
+Required Components
+Secure object-storage repository
+Container registry
+Package metadata database
+Release-management service
+Version manifest API
+Global CDN
+Entitlement service
+Digital-signature service
+Software bill of materials
+Vulnerability scanning
+Release-channel management
+Canary deployment controller
+Rollback management
+Telemetry and crash monitoring
+Customer deployment inventory
+Upgrade compatibility checker
+Package Organization
+Use a predictable structure such as:
+/products/{product_id}/{platform}/{channel}/{version}/{artifact}
+Support release channels:
+Development
+Internal testing
+Alpha
+Beta
+Release candidate
+Production
+Long-term support
+Emergency security update
+Automatic Update Requirements
+Signed manifests
+Signed packages
+Checksum validation
+Short-lived download URLs
+Entitlement verification
+Partial or differential downloads where appropriate
+Resumable downloads
+Bandwidth controls
+Maintenance windows
+Staged deployments
+Canary groups
+Health-based progression
+Automatic pause on failure
+Safe rollback
+Release audit logs
+User-visible release notes
+AI may recommend that a rollout be paused, but automatic rollback policies must be explicitly approved and configured by each institution.
+
+14. Multi-Tenancy and Data Isolation
+Each institution must have:
+Independent tenant identifier
+Separate branding
+Configurable domain
+Independent user directory
+Institution-specific programs
+Institution-specific academic calendar
+Independent integrations
+Independent retention rules
+Independent AI settings
+Independent release channel
+Independent reporting
+Independent encryption configuration where required
+Support three isolation models:
+Shared application and shared database with tenant-level controls
+Shared application with separate tenant databases
+Fully dedicated institutional deployment
+The selected isolation model must be recorded in each tenant’s architecture profile.
+
+15. Security, Privacy, and Compliance
+Design for defense in depth.
+Required controls include:
+Encryption in transit
+Encryption at rest
+Institution-managed keys where required
+Secret-management service
+Least-privilege access
+Multifactor authentication
+Security audit logs
+Tamper-evident event records
+Secure coding standards
+Dependency scanning
+Container scanning
+Infrastructure scanning
+Penetration testing
+Web application firewall
+DDoS protection
+Rate limiting
+API abuse detection
+Data-loss prevention
+Backup encryption
+Disaster-recovery testing
+Incident-response procedures
+Breach-notification workflows
+Data-export and deletion processes
+Configurable retention schedules
+Design configurable compliance mappings for applicable requirements such as:
+FERPA
+GDPR
+COPPA
+CCPA or CPRA
+PCI DSS
+Accessibility requirements
+Institutional retention policies
+Regional education and privacy requirements
+Do not claim compliance solely because the system includes relevant features. Compliance must be assessed for each implementation, jurisdiction, and operating process.
+
+16. Accessibility and Inclusive Design
+Target WCAG 2.2 Level AA.
+Require:
+Keyboard access
+Screen-reader compatibility
+Visible focus states
+Semantic structure
+Sufficient contrast
+Accessible authentication
+Descriptive form labels
+Accessible validation
+Captions
+Transcripts
+Audio descriptions where necessary
+Accessible tables
+Accessible charts
+Reduced-motion support
+Zoom and text reflow
+Alternative assessment formats
+Accessible document templates
+Mobile accessibility testing
+Automated and manual accessibility review
+Accessibility testing must be included in the definition of done for every phase.
+
+17. Core Data Entities
+Design a canonical model that includes:
+Tenant
+Institution
+Campus
+School
+Department
+AcademicTerm
+Program
+Credential
+CurriculumVersion
+Course
+CourseSection
+MeetingPattern
+Person
+UserAccount
+Role
+Applicant
+Application
+Student
+Faculty
+Advisor
+Enrollment
+AttendanceRecord
+Assignment
+Submission
+Assessment
+Grade
+Transcript
+TransferCredit
+PriorLearningRecord
+DegreeAudit
+GraduationApplication
+CredentialAward
+Invoice
+Payment
+Refund
+Scholarship
+Hold
+SupportCase
+Communication
+Notification
+Document
+IntegrationConnection
+SyncJob
+AuditEvent
+AIInteraction
+Release
+Artifact
+Deployment
+Device
+UpdatePolicy
+Define ownership, lifecycle, retention, and authoritative-source rules for every entity.
+
+18. User Experience Requirements
+Create a consistent Scholarion Academy design system for all deployment models.
+Student Dashboard
+Display:
+Current courses
+Upcoming assignments
+Schedule
+Announcements
+Messages
+Grades
+Attendance
+Degree progress
+Account balance
+Holds
+Support requests
+AI study assistant
+Career and credential progress
+Faculty Dashboard
+Display:
+Assigned courses
+Course setup
+Roster
+Attendance
+Assignment status
+Grading queue
+Discussions
+Messages
+Student progress
+Intervention alerts
+Course analytics
+AI teaching assistant
+Administrator Dashboard
+Display:
+Applications
+Enrollment
+Registration
+Course capacity
+Academic progress
+Retention
+Graduation
+Billing
+Integration health
+Deployment status
+Release status
+Security alerts
+Audit activity
+Data-quality issues
+Dashboards must not use fabricated live statistics without clearly labeling them as sample data.
+
+19. Incremental Development Plan
+Build the platform in controlled stages. Stop after every phase, provide evidence of completion, list ambiguities and blockers, and wait for approval before proceeding.
+Phase 0 — Discovery and Evidence Extraction
+Deliver:
+Source inventory
+Screenshot and OCR inventory
+Link-analysis report
+Feature matrix
+User-role matrix
+Workflow inventory
+Data-entity inventory
+Integration inventory
+Copyright and licensing register
+Evidence-confidence ratings
+Ambiguity register
+Requirements traceability matrix
+Do not write production application code during this phase.
+Phase 1 — Product Definition and Architecture
+Deliver:
+Product requirements document
+System-context diagram
+Deployment-model comparison
+Domain boundaries
+Architecture decision records
+Canonical data model
+API strategy
+Event catalog
+Security model
+Multi-tenancy model
+Disaster-recovery objectives
+Initial delivery roadmap
+Phase 2 — Design System and Experience Prototypes
+Deliver:
+Scholarion Academy design tokens
+Component library
+Responsive navigation
+Accessibility baseline
+Student-dashboard prototype
+Faculty-dashboard prototype
+Administrator-dashboard prototype
+Admissions workflow prototype
+Course experience prototype
+Mobile wireframes
+Usability-test plan
+Phase 3 — Identity and Tenant Foundation
+Build:
+Tenant provisioning
+Institutional configuration
+User accounts
+SSO
+Multifactor authentication
+Roles and permissions
+Audit logging
+Branding configuration
+Domain configuration
+Policy engine
+Phase 4 — SIS Foundation
+Build:
+Prospects
+Applications
+Admissions
+Student records
+Programs
+Terms
+Course catalog
+Sections
+Registration
+Enrollment
+Academic history
+Phase 5 — Scholarion Academy LMS Core
+Build:
+Courses
+Modules
+Pages
+Files
+Assignments
+Discussions
+Announcements
+Quizzes
+Gradebook
+Calendar
+Messaging
+Notifications
+Learning outcomes
+Phase 6 — Canvas Integration
+Build:
+Canvas connection configuration
+SSO
+User provisioning
+Course synchronization
+Section synchronization
+Enrollment synchronization
+Assignment metadata exchange
+Grade-passback
+Calendar synchronization
+LTI 1.3 tools
+Integration monitoring
+Retry and reconciliation tools
+Phase 7 — On-Premise and Open-Source Distribution
+Build:
+Containerized installation
+Helm charts
+Docker Compose package
+Environment validation
+Offline installation
+Local configuration manager
+Signed update packages
+Extension framework
+Developer documentation
+License-compliance pipeline
+Phase 8 — Administration and ERP
+Build:
+Student accounts
+Invoices
+Payments
+Refunds
+Payment plans
+Staff records
+Faculty workload
+Facilities
+Procurement integration
+Financial reporting
+Administrative workflows
+Use sandbox payment environments until explicitly authorized for production.
+Phase 9 — Degree Audit, Graduation, and Credentials
+Build:
+Curriculum versions
+Requirement groups
+Degree audits
+Substitutions
+Graduation applications
+Clearance workflows
+Credential conferral
+Digital badges
+Credential verification
+Transcript updates
+Phase 10 — AI Services
+Build:
+Governed AI gateway
+Retrieval-augmented policy assistant
+Student assistant
+Faculty assistant
+Administrative assistant
+Prompt registry
+Model registry
+AI audit logs
+Human-approval workflows
+Evaluation suite
+Safety controls
+Phase 11 — Analytics and Intervention
+Build:
+Operational dashboards
+Institutional reports
+Learning analytics
+Retention indicators
+Data-quality monitoring
+Intervention workflows
+Explainable alerts
+Scheduled reporting
+Secure data exports
+Do not label predictive indicators as certainties.
+Phase 12 — Cross-Platform Applications
+Build:
+Progressive web application
+iOS application
+Android application
+Windows desktop application
+macOS desktop application
+Offline synchronization
+Device registration
+Push notifications
+Desktop update client
+Phase 13 — Distribution and Automatic Updates
+Build:
+Artifact repository
+Container registry integration
+Manifest service
+Release channels
+Digital signatures
+CDN delivery
+Entitlements
+Staged rollouts
+Canary deployments
+Telemetry
+Rollbacks
+Release analytics
+AI-assisted anomaly detection
+Phase 14 — Security, Performance, and Resilience
+Complete:
+Threat modeling
+Security testing
+Performance testing
+Load testing
+Failover testing
+Backup restoration
+Disaster-recovery exercise
+Accessibility audit
+Privacy review
+Dependency review
+Software bill of materials
+Incident-response simulation
+Phase 15 — Pilot Deployment
+Pilot with demonstration institutions and synthetic data.
+Validate:
+Cloud deployment
+On-premise deployment
+Open-source installation
+Canvas-based integration
+SIS-to-LMS synchronization
+Grade exchange
+Mobile access
+Desktop updating
+Server updating
+AI safeguards
+Accessibility
+Backup and restoration
+Tenant isolation
+Phase 16 — Production Readiness
+Deliver:
+Go-live checklist
+Operations manual
+Support procedures
+Monitoring dashboards
+Service-level objectives
+Escalation matrix
+Training materials
+Administrator guide
+Faculty guide
+Student guide
+Release-management guide
+Data-migration guide
+Rollback plan
+Production-readiness report
+Do not deploy to production without written approval.
+
+20. Testing Requirements
+Each phase must include applicable:
+Unit tests
+Integration tests
+Contract tests
+API tests
+Event tests
+Database tests
+End-to-end tests
+Accessibility tests
+Security tests
+Performance tests
+Tenant-isolation tests
+Upgrade tests
+Rollback tests
+Backup-restoration tests
+Mobile tests
+Desktop tests
+Browser-compatibility tests
+On-premise installation tests
+Canvas integration tests
+AI evaluation tests
+Critical workflows must have automated end-to-end coverage.
+
+21. Required Architecture Artifacts
+Produce:
+System-context diagram
+Container diagram
+Component diagrams
+Cloud deployment diagram
+On-premise deployment diagram
+Open-source distribution diagram
+Canvas integration diagram
+Identity and SSO sequence diagram
+Admission-to-enrollment sequence diagram
+SIS-to-LMS synchronization sequence diagram
+Assignment-to-grade-posting sequence diagram
+Graduation and credential sequence diagram
+Application-update sequence diagram
+AI request and approval sequence diagram
+Entity-relationship diagram
+Event catalog
+API catalog
+Data-classification matrix
+Role-permission matrix
+Threat model
+Requirements traceability matrix
+
+22. Definition of Done
+A phase is complete only when:
+Requirements are traceable to sources or approved design decisions.
+Features are implemented rather than represented by static controls.
+Relevant tests pass.
+Security requirements are satisfied.
+Accessibility requirements are verified.
+Documentation is updated.
+Sample data is labeled.
+Errors are handled visibly.
+Logs and monitoring exist.
+Data ownership is documented.
+Integration failure paths are tested.
+No unsupported claims are present.
+The phase summary identifies completed, incomplete, blocked, and unverified items.
+The user has approved continuation to the next phase.
+
+23. Mandatory Reporting Format After Each Phase
+At the end of every phase, report:
+Completed
+List what was created and verified.
+Evidence
+List tests, screenshots, logs, files, schemas, or documentation proving completion.
+Not Completed
+List anything deferred or partially implemented.
+Ambiguities
+List unclear requirements requiring a decision.
+Risks
+List technical, security, licensing, accessibility, operational, and compliance risks.
+Decisions Needed
+Ask only the questions required before continuing.
+Next Phase
+Explain what the next phase will build.
+Then stop and wait for approval.
+
+24. Prohibited Actions
+Do not:
+Copy another platform’s proprietary interface exactly.
+Copy protected course materials.
+Use third-party logos without authorization.
+Claim ownership of Canvas.
+Bypass app-store update requirements.
+deploy production systems without approval.
+Enable real payments without authorization.
+Import real student records into a demonstration environment.
+Store credentials in source code.
+Expose personally identifiable information in logs.
+Allow AI to change official records autonomously.
+Use inaccessible controls.
+Represent static prototypes as working integrations.
+Claim compliance, accreditation, certification, or regulatory approval without verified evidence.
+Continue to a new phase without approval.
+
+25. Initial Execution Instruction
+Begin with Phase 0 — Discovery and Evidence Extraction.
+Analyze every supplied website, picture, screenshot, document, diagram, and link. Create the complete evidence register, feature inventory, workflow inventory, source-to-requirement traceability matrix, copyright and licensing register, and ambiguity list.
+Do not begin building the production platform until Phase 0 has been reviewed and approved.
+

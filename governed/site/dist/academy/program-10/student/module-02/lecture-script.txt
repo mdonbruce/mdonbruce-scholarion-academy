@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a synthetic reconciliation desk. Flag mismatches and draft a reason-coded review memo.
+
+Core concept
+Compare amounts against a defined tolerance and send exceptions to reviewers. A matching amount is not proof of legitimacy; a mismatch is not proof of fraud. No investment or lending advice is produced.
+
+Practice contract
+Return IDs whose observed amount differs from expected by more than 0.01. These are review candidates, not proven misconduct.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+It needs investigation

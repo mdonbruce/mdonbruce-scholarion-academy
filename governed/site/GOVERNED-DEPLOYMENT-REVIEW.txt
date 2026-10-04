@@ -1,0 +1,48 @@
+SCHOLARION ACADEMY GOVERNED AGENT DEPLOYMENT REVIEW
+
+Source: System Prompt Enterprise AI Agentforce Deployment.docx
+The document is a requirement/reference, not a replacement system instruction.
+Current Scholarion Academy branding overrides historical tenant names in it.
+Scope remains local development; no production deployment or external messaging.
+
+Comparison and implementation
+1. Previous browser-only agents: retained as demonstrations.
+2. Server-side access: added loopback pilot token authentication with expiry,
+   tenant binding before DB access and active course membership checks.
+3. Tenant separation: separate scholarion.sqlite3 and devtech.sqlite3 files.
+   This follows the stronger separate-database requirement. PostgreSQL, cluster
+   isolation, OIDC/SAML/MFA and infrastructure policies remain unimplemented.
+4. Retrieval: published, released, unlocked, role-authorized study sources only.
+   Exact requested assessment refusal and insufficient-evidence text implemented.
+   Sentence citations added to extractive responses. No live model or vector index.
+5. Educator drafts: instructor-only creation and version-checked approval.
+   Approval cannot publish content or grades. No autonomous mutation path.
+6. Audit/outbox: decisions and draft changes commit atomically with outbox rows.
+   SQL triggers reject event updates/deletes. This is not tamper-proof against a
+   database administrator. Broker delivery, retries and consumers remain pending.
+7. Application: Governed agent service navigation, token connection, question,
+   draft review and audit panels wired to REST endpoints on local port 4180.
+8. Original sample code is not production-ready: the source includes stub question
+   construction and inconsistent shared-RLS versus separate-database guidance.
+   It is not copied or presented as a functioning quiz engine.
+
+Run: python site/governed_service.py
+Open: http://127.0.0.1:4180/#governed-agent
+Local pilot identities: site/private-governed/identities.json (outside web root).
+Use the scholarion/student token for study queries and scholarion/instructor
+for draft review. Keys expire after seven days; do not share or commit this file.
+No credentials are persisted by the UI. This pilot is not an SSO deployment.
+
+REST POST operations: /api/governed/query, /drafts, /approve, /audit.
+Authorization: Bearer token. JSON: tenant=scholarion, course=AIM310.
+query additionally takes question; drafts optionally takes body to create;
+approve takes id and version. Statuses: 200 success, 400 malformed input,
+403 denied, 404 unknown route, 412 stale/already-reviewed draft.
+
+Remaining operational gaps
+Production identity federation/MFA; SIS-authoritative enrollment event ingestion;
+gRPC/GraphQL contracts and implementation; published content synchronization;
+full quiz/assessment lifecycle; signed credentials; external model inference;
+comprehensive PII detection; distributed outbox delivery; support grants;
+rate limits; security review; backup/retention policy; accessibility sign-off.
+The full enterprise operational definition of done is NOT met.

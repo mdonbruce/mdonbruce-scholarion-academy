@@ -1,0 +1,22 @@
+SOURCE STUDIO AUTO-GENERATOR RECONCILIATION — 2026-10-02
+Source: attachment 87f5c06a-a2fa-4028-8119-5a15cf70d7db/Pasted text.txt and supplied instructor-edition screenshot.
+
+Retained: Scholarion Academy branding; single Academy; ten-week courses. Screenshot is a reference, not evidence that its executed labs, approvals or rule checks exist here.
+
+Implemented
+Instructor navigation now includes Source Studio. It creates module workspaces, accepts bounded source text with rights declarations and citations, detects duplicate content by SHA-256, stores immutable revisions, and automatically derives an output manifest. Topics map explicitly to existing source IDs and learning outcomes/competencies. This is human-authored mapping, not model topic extraction.
+Manifest tracks all nineteen output categories, with per-topic entries for readings, flashcards, quizzes and mini labs. Required counts are plans, not completed artifacts.
+Instructor-authored output drafts are saved with source revision, retained when sources change, and flagged for source review. Replacement requires explicit confirmation and current revision. History and export APIs are available. Export omits source text and includes manifest, mappings and authored drafts. It is JSON, not a cartridge or finished Studio folder.
+All access requires an authenticated instructor with course membership. Unknown sources/outcomes, unsupported actions and stale writes are rejected. Source text is stored as data, never executed or fetched as a URL. Audit events record operations.
+
+Comparison with existing implementation
+Existing Assignment package studio supplies seven templates and structural validation. Curriculum Intelligence and course validators remain separate tools linked from authoring navigation. This increment adds source provenance and output planning, not a new text/media generation provider. Existing voice studio cannot render audio/video.
+
+Unimplemented requirements
+Automatic semantic topic extraction, grounded model-generated lectures/assessments, citation verification, fresh nonduplicate quiz generation, PPTX/PNG covers and decks, audio, video, interactive labs, executed notebooks, environments/CI, Word documents, bibliography generation, complete output folders, LMS/QTI export, instructor notifications and full two-person approval workflow remain unfinished. No artifact is labeled completed merely because a manifest entry exists.
+No real model generation is configured by this change. Missing course/topic inputs and source material must be supplied in the workspace. Citations remain needs verification. No logo is generated or copied. No instructor voice or likeness is cloned.
+The supplied image's instructor/student edition layout, executed notebook evidence and independent reviewer approvals are not reproduced as functioning capabilities by this update. Source Studio is a foundation for that workflow, not the complete auto-generator.
+
+Validation
+248 Python regression tests passed. New source workflow test covers duplicate detection, mappings, preservation of instructor edits, changed-source flags, stale revision conflicts, source-text exclusion on export and instructor/course authorization. JavaScript syntax check passed. Full browser E2E, accessibility audit, content correctness and media execution were not verified.
+Local service restarted with new routes; no production deployment.

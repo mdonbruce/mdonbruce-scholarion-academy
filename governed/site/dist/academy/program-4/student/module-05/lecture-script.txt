@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a software delivery team. Count invalid and missing values before selecting records for analysis.
+
+Core concept
+Missing values and duplicates change metric denominators. Separate schema checks from business rules; reject malformed records visibly rather than silently converting them to ordinary inputs.
+
+Practice contract
+Keep rows with a numeric confidence between zero and one. Missing rows must not enter the accepted set.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+Flag it and send the record for review

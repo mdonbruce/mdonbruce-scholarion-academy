@@ -1,0 +1,47 @@
+[
+  {
+    "id": "P2M15Q1",
+    "prompt": "What follows from unequal synthetic rates?",
+    "choices": [
+      "Investigate definitions and sampling first",
+      "Immediately conclude unlawful discrimination",
+      "Skip review and trust the output."
+    ],
+    "correct": 0,
+    "explanation": "Overall scores can hide different error or review rates. Use fictional queues here, not real protected traits. Small synthetic samples suggest questions, not causal conclusions.",
+    "outcomes": [
+      "O1",
+      "O4"
+    ]
+  },
+  {
+    "id": "P2M15Q2",
+    "prompt": "Your team supporting an internal knowledge desk cannot reproduce a result. What next?",
+    "choices": [
+      "Publish because the report looks complete.",
+      "Reproduce the inputs, versions and checks before accepting the claim.",
+      "Remove failing examples."
+    ],
+    "correct": 1,
+    "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+    "outcomes": [
+      "O3",
+      "O5"
+    ]
+  },
+  {
+    "id": "P2M15Q3",
+    "prompt": "Which artifact best demonstrates compare error burdens?",
+    "choices": [
+      "Calculate queue-level review rates and state sampling limitations. Include results and limitations.",
+      "A screenshot with no inputs or explanation.",
+      "An assertion of perfect accuracy."
+    ],
+    "correct": 0,
+    "explanation": "A concrete artifact and observed evidence support review.",
+    "outcomes": [
+      "O2",
+      "O5"
+    ]
+  }
+]

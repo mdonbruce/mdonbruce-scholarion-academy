@@ -1,0 +1,7 @@
+P15-S07 — Represent decisions as explicit state
+Faculty-review draft.
+Outcome: Define graph transitions and terminal conditions before execution.
+Lab: Build a branching research workflow with deterministic node tests.
+Assessment: Prove every branch terminates or reaches a bounded review state.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

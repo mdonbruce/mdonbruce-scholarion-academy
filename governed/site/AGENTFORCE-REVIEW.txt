@@ -1,0 +1,25 @@
+AGENTFORCE GAP REVIEW — 2026-10-02
+Source: attachment ee293085-13cf-42d3-ab19-a34113299f9f/Pasted text.txt.
+Attachment is truncated at section 5: 'Approved sources: published'. Grounding details and later CARE section 9 were not supplied.
+
+IMPLEMENTED LOCAL CHANGE
+Existing enterprise-controls concierge now rejects non-Scholarion tenant calls before opening a tenant database. References to OakHaven, DevTech, Haven products and Scholaris guest tenants receive a scope redirect without retrieving their records. Existing session authentication/course membership checks remain. Every concierge response carries the pre-launch/demo notice. All responses pass a closed approved-template output gate; unapproved output is replaced with a verification fallback. Policy version and block decision are recorded with existing trace/outbox metadata. No raw question text is stored by this change.
+The existing #enterprise-controls interface uses this changed API directly; no duplicate static console was created.
+
+BOUNDARIES
+This is deterministic local orchestration, not Salesforce Agentforce and not a general-purpose model safety filter. The closed vocabulary deliberately rejects all new output text until approved. It does not claim comprehensive entity recognition for every external organization. Other older agents/local browser modules have not been migrated to this policy and are not covered by these guarantees. Existing devtech fixture files are still present in the local pilot; this update blocks them on the concierge endpoint rather than deleting data or establishing separate production deployments.
+No Salesforce org, authenticated connector, license, edition, product entitlement or regional availability was verified. No Salesforce-specific feature is relied upon or deployed. No Service Cloud delivery, MuleSoft connector, MCP bridge or Data Cloud replication was configured. Existing departments, gRPC, SSO, inference and event-bus assumptions in the attachment remain unimplemented or partial as documented in prior reviews.
+
+DATA BOUNDARY / PROPOSED MAPPING
+Learner/application/enrollment: Registration/Admissions intended records of truth; Salesforce reference IDs and consented status only; no synchronization yet.
+Invoice/payment: Finance intended record of truth; reference and minimal authorized status only; no card/bank details in chat or replicas.
+Consent: consent service intended record of truth; check live on each disclosure; fail closed until connected.
+Identity: Identity intended record of truth; result/reference only, never images/numbers; no provider connected.
+Progress/grade: LMS intended record of truth; authorized summaries only; final outcomes to Registration after faculty approval; no Salesforce sync.
+Ticket: local help/CARE queue currently holds demo intake; future Salesforce case links require verified integration and explicit delivery configuration.
+Credential: identity/credential service intended record of truth; public verification reference only once genuine issuance exists.
+All sync frequency, retention, ownership and approval policies remain to be configured and approved. No data copied into Salesforce.
+
+VERIFICATION
+15 focused engagement/pilot tests: external-tenant rejection before DB access, other-organization redirect, pre-launch notice, output claim rejection and policy audit metadata. Existing enterprise regression suite also run. No production, Salesforce, accessibility or full learner journey acceptance is claimed.
+Local entry: http://127.0.0.1:4180/#enterprise-controls

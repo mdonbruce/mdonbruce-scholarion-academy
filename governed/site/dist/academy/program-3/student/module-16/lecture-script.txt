@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support an operations analysis team. Specify researcher, checker and coordinator roles.
+
+Core concept
+Multiple agents still require an accountable workflow. Define narrow input/output contracts, shared state and a stopping rule. Escalate unresolved conflicts instead of creating endless debate.
+
+Practice contract
+Map missing confidence to needs_data, below 0.8 to human_review, otherwise awaiting_approval. Never mark an action executed.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+A defined coordinator rule or human owner

@@ -1,0 +1,285 @@
+Build Prompt: Scholarion Academy Curriculum Engine
+Build, implement, and integrate an AI system that develops, publishes, and continuously updates every program, curriculum, and course on Scholarion Academy Global Learning to one fixed course standard.
+Role
+You are a principal engineer and instructional-design architect working in the Scholarion Academy repository. You will build the Scholarion Academy Curriculum Engine as a production service and integrate it with the Scholarion Academy LMS (Canvas core), the SIS, the course catalog, and the AI Virtual Instructor.
+Platform context (already decided; do not redesign)
+Scholarion Academy Global Learning is a multi-tenant SIS + LMS + ERP platform built on a Canvas LMS core, deployed on AWS.
+Database-per-tenant isolation: every tenant's data lives in its own database. The engine never reads or writes across tenants.
+Licensing: the Canvas core is AGPLv3. The engine is a separate proprietary service. It talks to the LMS only through REST/GraphQL APIs, LTI 1.3, and events. It never loads into the Canvas process, never imports Canvas code, and uses no Instructure trademarks. If a requirement cannot be met without a Canvas core change, stop, write an ADR, and implement the change as a published AGPL extension, never as proprietary code inside Canvas.
+Tenants: Scholarion Academy is a guest demonstration tenant; its content must never claim accreditation, approval, or licensure eligibility, and all lengths and prices are labeled DEMO VALUE. DevTech (TechDev University) is an internal tenant.
+Existing assets to integrate: the catalog files (content/programs/*.json, content/courses.json) and the AI Virtual Instructor service (services/avatar-api), which reads course content from data/courses/<tenant>/<course>.json and instructor profiles from data/profiles/<tenant>/<course>.profile.json.
+Stack: Python 3.12 and FastAPI for services, PostgreSQL per tenant, AWS (ECS Fargate, Step Functions or a queue-based worker for long generation jobs, Secrets Manager), Claude via Amazon Bedrock or the Anthropic API for generation.
+
+Part 1 — The course standard (every course must satisfy all of it)
+1. Syllabus
+Every course has a complete syllabus containing:
+Course title, code, credits, prerequisites, delivery format, term length (10 weeks)
+Course Description (120–200 words, plain language, written for working adults)
+5 Course Competencies (section 2)
+Learning Outcomes (section 3)
+10 Course Topics, each with a learning activity and a Students Applied Focus (section 4)
+10-Week Course Outline with assessments and deliverables (section 5)
+Grading breakdown, grading scale, and a rubric for every graded deliverable (section 6)
+Competency-to-Topic Alignment Matrix and Outcome-to-Week Alignment (section 7)
+Course policies: late work, academic integrity, accessibility and accommodations, AI use, communication and response times. Institution-level policies come from the tenant's policy library and are never invented.
+2. Five Course Competencies
+Exactly 5 per course. Each is a measurable statement of what a graduate can do on the job, starting with an observable verb (analyze, build, evaluate, design), never "understand."
+Each competency maps to one or more program outcomes.
+Every competency is taught by at least 2 topics and assessed by at least 2 major deliverables and at least 1 exam section.
+3. Learning Outcomes
+2–3 outcomes per topic (20–30 per course), each linked to exactly one primary competency.
+Pitched to the course level: lower-level courses emphasize apply and analyze; upper-level courses emphasize evaluate and create.
+4. Ten Course Topics
+For each topic, generate:
+Title and summary
+Its learning outcomes
+Learning activity: what students do to learn it (reading, video, guided practice, discussion, an AI Virtual Instructor session)
+Students Applied Focus: how the topic applies to a real job or workplace scenario
+Competency application: for each competency the topic supports, 1–2 sentences on how the competency shows up in this topic and in its applied focus
+5. Ten modules and the 10-week outline
+One module per topic, one topic per week. Each module contains an overview, learning outcomes, instructional pages, the learning activity, one major deliverable with its rubric, and a quiz in non-exam weeks.
+Week
+Module
+Major deliverable
+Quiz
+Exam
+1
+Topic 1
+Real-World Assignment 1
+Quiz 1
+
+2
+Topic 2
+Real-World Lab Simulation 1
+Quiz 2
+
+3
+Topic 3
+Real-World Assignment 2
+Quiz 3
+
+4
+Topic 4
+Real-World Lab Simulation 2
+Quiz 4
+
+5
+Topic 5
+Midterm Real-World Project
+
+Midterm Exam
+6
+Topic 6
+Real-World Assignment 3
+Quiz 5
+
+7
+Topic 7
+Real-World Lab Simulation 3
+Quiz 6
+
+8
+Topic 8
+Real-World Assignment 4
+Quiz 7
+
+9
+Topic 9
+Real-World Assignment 5
+Quiz 8
+
+10
+Topic 10
+Final Real-World Project
+
+Final Exam
+Real-world assignments (5): a realistic workplace scenario and a deliverable a professional would produce (report, memo, analysis, design, code, plan), scoped so a working adult can finish in the stated time.
+Real-world lab simulations (3): a setup, step-by-step tasks, expected outputs, and a reflection. Specify the environment (cloud workspace, simulator, spreadsheet, sandbox dataset, case simulation) and a no-install option.
+Real-world projects (2): the midterm project integrates Topics 1–5; the final project integrates all 10 topics and at least 4 of the 5 competencies. Each has milestones, deliverables, and a presentation or demo component.
+Quizzes (8): 25 delivered questions each, mixing multiple choice, multiple answer, matching, and short scenario items. Each question is tagged to one outcome and one competency and has an answer key and rationale. Build a bank of at least 50 questions per quiz so each student gets a randomized set of 25.
+Exams (2): the midterm covers Topics 1–5; the final is cumulative with emphasis on Topics 6–10. Each exam has a blueprint showing question counts per competency and outcome and at least one applied scenario section.
+6. Grading
+Default weights (configurable per tenant; must always total 100%):
+Component
+Count
+Weight each
+Total
+Real-world assignments
+5
+5%
+25%
+Lab simulations
+3
+5%
+15%
+Midterm project
+1
+10%
+10%
+Final project
+1
+15%
+15%
+Quizzes
+8
+1.25%
+10%
+Midterm exam
+1
+10%
+10%
+Final exam
+1
+15%
+15%
+Every major deliverable (and therefore every topic) has an analytic rubric with 4–5 criteria, each tied to a competency and an outcome, and 4 performance levels (Exemplary, Proficient, Developing, Beginning) with point ranges and descriptors. The grading scale (A–F bands) comes from tenant policy.
+7. Alignment artifacts
+Competency-to-Topic Alignment Matrix: 10 topic rows by 5 competency columns. Each cell shows Introduced (I), Reinforced (R), or Mastered (M) and the deliverable that assesses it.
+Outcome-to-Week Alignment: for each week, the outcomes taught, the activity that teaches them, and the quiz, deliverable, or exam section that assesses them.
+Assessment Blueprint: every graded item with the competencies and outcomes it measures and its weight.
+8. Workload
+Estimate student hours per week for every module and flag any week outside the tenant's configured range (derived from credit hours over the term). Balance heavy weeks by adjusting scope, never by dropping required components.
+9. Term length and catalog sync
+The course standard is a 10-week term. This replaces the 8-week term assumption in the existing OakHaven catalog and the AI, AI & ML, and Robotics curricula.
+Term length is stored once as a platform setting (term.weeks = 10). No component hardcodes week counts.
+When a course is generated or updated, recalculate and propose for approval: 
+Course lengthDemo in content/courses.json and each program file
+Program lengthDemo, computed from total credits, credits per course, the default course load per term (tenant setting, default 2), and terms per year (from term.weeks plus the tenant's break weeks)
+Suggested sequencing, so year-by-year plans match the term count
+Keep recalculated lengths labeled DEMO VALUE for demonstration tenants.
+List any content still assuming 8-week terms (catalog copy, program pages, sequencing guides, tuition estimator) in a Term-Length Conflict Report and block publishing of the affected pages until each item is resolved.
+
+Part 2 — Validation rules (a course cannot be published unless all pass)
+Exactly 5 competencies, 10 topics, 10 modules, 5 assignments, 3 labs, 2 projects, 8 quizzes of 25 delivered questions (banks of 50 or more), 1 midterm exam, 1 final exam.
+Every topic has a learning activity, a Students Applied Focus, and competency applications.
+Every outcome maps to one competency; every competency meets the coverage minimums.
+Every graded item has a rubric or answer key; grading weights total 100%.
+The alignment matrix, outcome-to-week map, and assessment blueprint are complete and consistent with the modules.
+Workload is within the tenant's range for every week.
+Course and program lengths match term.weeks, and the program's Term-Length Conflict Report is empty.
+Accessibility: headings, alt text, media captions, readable contrast, plain language (WCAG 2.2 AA).
+Originality: all content is newly written. External resources are cited and linked, never reproduced.
+Accuracy: technical and factual claims pass the verification agent; uncertain items are flagged for faculty review, never published.
+Tenant rules: no accreditation, approval, or licensure claims for demonstration tenants.
+
+Part 3 — Engine architecture
+Service layout
+services/curriculum-engine/
+  app/
+    schemas/        JSON Schemas + Pydantic models for the course package
+    validation/     one module per Part 2 rule, each with tests
+    agents/         planner, content_author, assessment_author, alignment_auditor,
+                    quality_reviewer, update_monitor
+    publisher/      LMS renderer, atomic publish, rollback
+    accommodations/ SIS profile sync, per-student adjustments, exemptions, overrides
+    catalog/        catalog sync + term-length recalculation + conflict report
+    integrations/   lms_client, sis_client, avatar_export, event_bus
+    lti/            LTI 1.3 tool for the Publish tab
+    api/            FastAPI routes for the Publish tab UI and admin operations
+  web/publish-tab/  Publish tab UI
+  tests/
+Agents
+Planner: reads the program and course record and produces the blueprint (competencies, topics, outcomes, week map, grading).
+Content Author: writes the syllabus, module pages, activities, and applied-focus text.
+Assessment Author: writes assignments, labs, projects, quiz banks, exams, answer keys, and rubrics.
+Alignment Auditor: builds the matrices and blueprint and enforces coverage rules.
+Quality Reviewer: checks accuracy, originality, accessibility, bias, readability, and workload.
+Publisher: renders an approved version into the LMS.
+Update Monitor: proposes revisions on a schedule and on triggers (Part 6).
+Every agent returns structured output validated against the schemas. On validation failure, retry with the error details, up to a configured limit, then route to faculty review. Log every generation with model, prompt version, inputs, and outputs for audit.
+Course package (source of truth)
+All generated content is a versioned, schema-validated JSON course package stored in the tenant's database. The LMS is a rendering target, not the source of truth. Define schemas for: Course, Competency, Outcome, Topic, Module, Deliverable, Rubric, QuizBank, Question, Exam, ExamBlueprint, AlignmentMatrix, Announcement, AccommodationRule, and CourseVersion. Migrate the existing catalog JSON into this store, keeping the catalog files as generated exports for the public site.
+
+Part 4 — LMS integration
+Use a dedicated LMS service account per tenant (scoped developer key, token in Secrets Manager). Before building each item, confirm the exact API behavior in the Scholarion Academy Canvas fork and record any gaps in an ADR.
+Course element
+LMS target
+Syllabus
+Course syllabus body
+Module pages
+Pages API
+Modules
+Modules API: position, prerequisite module IDs, sequential progress, completion requirements
+Module contents
+Module Items API: pages, assignments, quizzes, with completion requirements (must_view, must_submit, min_score)
+Assignments, labs, projects
+Assignments API, grouped into assignment groups whose weights match Part 1 section 6
+Rubrics
+Rubrics API with rubric associations to each deliverable
+Quizzes and exams
+The quiz engine in use (classic quizzes with question groups for random selection, or the newer quiz engine with item banks). Choose one per ADR
+Outcomes
+Outcomes API, one outcome per competency, aligned to rubric criteria
+Announcements
+Announcements with delayed posting
+Per-student dates and extra time
+Assignment overrides and quiz extensions
+One Publish tab per course
+Implement the Publish tab as an LTI 1.3 tool with a course-navigation placement, visible only to faculty and administrators and enabled by default on every course. This gives each course exactly one Publish tab.
+Make the Publish tab the only way to publish a course: remove the course-publishing permission from teacher roles in each tenant's account settings, so publishing goes through the engine's service account. Verify the permission name in the fork.
+The tab shows: validation status with each failure linked to its fix, a diff against the live version, approval status and approver, and a Publish button enabled only when validation passes and approval is recorded.
+Only one version of a course is live at a time. Publishing is atomic: if any LMS write fails, roll back every change from that publish and keep the previous version live.
+Module builder
+The Publisher automatically creates all 10 modules with their pages, deliverables, quizzes, rubrics, and outcomes, in week order, using the table in Part 1 section 5.
+Sequential locking with accommodations
+Default behavior: Module 1 opens when the course starts. Each later module has the previous module as a prerequisite, with these completion requirements: view required pages, submit the major deliverable, and score at least the tenant's quiz minimum (default 70%, retakes allowed). Future modules stay locked until the current module is complete. Completed modules always stay open for review.
+Locking must never be the reason a student with an approved need falls behind. Support these paths, each configured per tenant and logged:
+Approved accommodations: the SIS or disability services office sends an accommodation profile containing only accommodation types (extended time, deadline extensions, alternate formats, flexible module pacing), never diagnoses or medical details. Apply them automatically: extra time on timed items, adjusted due dates for that student, and, for flexible pacing, unlocking the next module after submission rather than after grading.
+Transfer credit and prior learning: when the registrar approves credit for specific modules or competencies, mark those modules exempt for that student and unlock the next one. Exclude exempt items from the grade, re-normalize the weights, and show the student how.
+Late enrollment: students joining after week 1 get a catch-up plan with adjusted due dates, approved by the faculty owner.
+Grading delays: unlock the next module when a deliverable is submitted on time, so grading time never blocks a student.
+Instructor overrides: faculty can unlock any module for one student, must choose a reason (accommodation, extension, technical issue, other), and can set an expiry.
+Stuck-student alerts: if a student stays locked on the same module past a tenant threshold (default 7 days after its due date), alert the faculty owner and advisor, and have the AI Virtual Instructor offer help on the blocking item.
+If the Canvas core cannot unlock a module for an individual student, do not add proprietary code to Canvas. Write an ADR comparing options (for example, per-student module assignment overrides, engine-managed completion marking, or a published AGPL core extension) and implement the approved option.
+Privacy and compliance for accommodations:
+Store accommodation types and dates only, fetched from the SIS when needed.
+Accommodations are visible only to the student, their instructors, and authorized staff, and never appear in announcements, rosters, or AI-generated content.
+Record every unlock, exemption, and override in the audit trail with approver and reason.
+Each tenant confirms its locking and accommodation settings against its own policies before locking is enabled on live courses.
+Weekly announcements
+Generate one announcement per week (10 total) from the course package and schedule each with delayed posting at the start of its week in the tenant's timezone. Each covers the week's topic and why it matters on the job, what's due and when, tips for the deliverable, and a reminder that the AI Virtual Instructor and faculty are available. The faculty owner can edit any announcement before it posts. Announcements never contain grades or individual student information.
+
+Part 5 — Other integrations
+SIS: read enrollments (for late enrollment), accommodation profiles, and approved transfer credit; write nothing to student records.
+AI Virtual Instructor: on every publish, export the course's module content as retrieval chunks and generate its instructor profile in the avatar service's formats, so the avatar teaches from exactly what is published. Stuck-student alerts can trigger an avatar help session.
+Catalog: keep program and course pages in sync with published versions and the term-length rules.
+Event bus: publish course.version.proposed, course.version.approved, course.published, course.publish.failed, student.module.stuck, and accommodation.applied events with identifiers only, never student content.
+
+Part 6 — Continuous development and updates
+The Update Monitor reviews every course each term and on triggers: program changes, faculty requests, weak assessment statistics, broken links, and retired tools. It proposes changes such as new tools and practices in the field, refreshed scenarios, revised low-performing questions, and accuracy fixes.
+Updates are proposals, never silent edits. Each creates a new course version with a change summary and rationale, and goes through validation and faculty approval.
+Never change a live course's graded components while students are enrolled. Approved updates take effect at the next term start. Only error corrections (typos, broken links, factual fixes) apply mid-term, and students are told about them.
+Keep full version history with one-click restore of any past version.
+Record outside sources used to justify an update. Never copy their text into course content.
+
+Part 7 — Human oversight
+Every course has an accountable faculty owner. Nothing is published without their approval or the tenant curriculum committee's.
+Faculty can edit any generated content, lock sections from regeneration, and request targeted regeneration of one item.
+Every generation, edit, approval, publish, and override is written to the audit trail.
+Quiz and exam banks are access-controlled so students never see them before release.
+
+Part 8 — Deliverables
+JSON schemas and Pydantic models for the course package, with tests for every Part 2 rule
+The agent pipeline with prompts, structured outputs, retries, and generation logging
+The LMS publisher: modules, prerequisites, completion requirements, pages, assignments and groups, rubrics, quizzes, outcomes, announcements, atomic publish, and rollback
+The Publish tab: LTI 1.3 tool, validation panel, version diff, approval, publish
+The accommodation and exemption engine: SIS sync, per-student adjustments, transfer-credit exemptions with grade re-normalization, catch-up plans, overrides, stuck-student alerts
+Catalog sync, the term-length recalculation job, and the Term-Length Conflict Report
+The AI Virtual Instructor export
+The Update Monitor with scheduling, triggers, and the proposal workflow
+A complete sample course (AIM310 Machine Learning I for the OakHaven demo tenant) as a JSON package plus a rendered syllabus, proving the standard is met
+An evaluation suite scoring generated courses on alignment coverage, accuracy, readability, accessibility, and workload balance, run in CI on every prompt or model change
+ADRs for the quiz engine choice, per-student unlocking, and the Publish tab permission model
+Build order
+Work in these stages. Stop after each one, summarize what was built and tested, list open questions, and wait for review.
+Schemas and validation rules, with tests
+The AIM310 sample course, hand-checked against every rule
+Agent pipeline, generating a second course end to end
+LMS publisher and module builder in a test tenant, including rollback
+Publish tab and approval workflow
+Sequential locking and the accommodation engine
+Weekly announcements
+Catalog sync and term-length recalculation
+AI Virtual Instructor export and event bus
+Update Monitor and evaluation suite
+

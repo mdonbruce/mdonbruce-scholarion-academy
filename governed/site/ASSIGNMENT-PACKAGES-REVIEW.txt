@@ -1,0 +1,32 @@
+ASSIGNMENT PACKAGE ENGINE — 2026-10-02
+Source: attachment 46bd1959-512f-44ba-a93e-eb838953ffa0/Pasted text.txt
+
+Specification interpretation
+This is a reusable context and seven assessment-format prompts. Program, topic, level, competencies, outcomes, references and tool versions are placeholders, not supplied lesson content. The implementation provides an authoring and validation workflow; it does not invent a chosen topic or claim to generate finished teaching materials.
+
+Compared with existing system
+The existing course validator checks ten-week counts and alignment. Curriculum Intelligence stores graph drafts. Neither provided the seven package templates, four-pillar review or edition exports added here.
+
+Implemented
+- Assignment package studio in instructor navigation, with authorized course selection, seven templates, JSON authoring, saved revision history, findings and student/instructor exports.
+- Formats: lab, exercises, in-class activity, scenario quiz, mini-project, scenario project and senior capstone.
+- Placement fields, exactly five written competencies, LO/competency references, Bloom fields, four pillars and ordered required headings.
+- Structural checks: all task/item/criterion/deliverable mappings; Bloom field matching; rubric totals and four bands for relevant formats; mini-project constraint count; lab duration; quiz bank 3x delivery size and 60%/75% higher-order target; separate quiz keys with explanations and distractor rationale checks; data-card provenance and tool verification metadata; AI-use policy and missing review evidence.
+- Drafts save even with findings, allowing iterative authoring. Publication remains disabled, regardless of self-entered review metadata.
+- Student projection strips structured instructor keys, solutions, explanations and distractor rationales. Free text and option text must still be reviewed for inadvertent answers. Student export is an instructor authoring action; these drafts are not published to learners.
+- Immutable versions, stale-revision protection, course access checks, audit events and bounded instructor request size. Existing program and course workflows linked from the new studio.
+
+Limitations and remaining work
+Templates contain no authored lessons or executed notebooks. They do not create datasets, slides, APA references, tool licenses or external deployments. No LLM generation is connected.
+Validation is structural, not semantic Bloom validation, answer correctness, plagiarism checking or WCAG certification. Every fine-grained requirement (exercise distribution, walkthrough completeness, exact scenario counts, hidden-test quality, script/caption quality, execution attestations and real tool currency) still needs content-specific validation and human review.
+Instructor edition fields remain incomplete until authored. JSON export is not a Word/PDF, notebook, QTI or LMS import package. Cloud Lab execution, secure autograding, media production, scheduled deadlines and publication approval are not added by this increment.
+Sunday 11:59 PM requires a configured cohort calendar/time zone; no deadlines were invented. Senior-capstone scheduling must fit the confirmed ten-week course architecture.
+All outputs remain AI DRAFT — requires SME and instructional-designer approval.
+
+API
+Authenticated instructor POST /api/assignment-packages/template, list, save, export.
+Shared inputs: tenant=scholarion and authorized course. Template: kind. Save: package plus optional id and current revision; incomplete drafts return findings and publicationAllowed=false. Export: id and edition=student|instructor.
+
+Validation
+245 regression tests passed. After adding quiz key/explanation checks, five targeted package tests passed again. Tests cover templates, mapping/Bloom failures, quiz ratio, edition filtering, revisions, role/course isolation and malformed identifiers. JavaScript syntax passed. All seven template types were verified through the running HTTP service. No full browser E2E or accessibility certification is claimed.
+Local only; not deployed to production.

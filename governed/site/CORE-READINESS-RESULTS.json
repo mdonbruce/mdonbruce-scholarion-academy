@@ -1,0 +1,632 @@
+[
+  {
+    "program": 1,
+    "courses": [
+      {
+        "course": "P01-B1",
+        "plannedAssessments": 20,
+        "unmappedOutcomes": [],
+        "gaps": [
+          "P01-B1-assignment-1: assessed content missing",
+          "P01-B1-quiz-1: assessed content missing",
+          "P01-B1-lab-1: assessed content missing",
+          "P01-B1-quiz-2: assessed content missing",
+          "P01-B1-assignment-2: assessed content missing",
+          "P01-B1-quiz-3: assessed content missing",
+          "P01-B1-lab-2: assessed content missing",
+          "P01-B1-quiz-4: assessed content missing",
+          "P01-B1-project-1: assessed content missing",
+          "P01-B1-midterm_exam-1: assessed content missing",
+          "P01-B1-assignment-3: assessed content missing",
+          "P01-B1-quiz-5: assessed content missing",
+          "P01-B1-lab-3: assessed content missing",
+          "P01-B1-quiz-6: assessed content missing",
+          "P01-B1-assignment-4: assessed content missing",
+          "P01-B1-quiz-7: assessed content missing",
+          "P01-B1-assignment-5: assessed content missing",
+          "P01-B1-quiz-8: assessed content missing",
+          "P01-B1-project-2: assessed content missing",
+          "P01-B1-final_exam-1: assessed content missing",
+          "notebooks: evidence missing",
+          "dataCards: evidence missing",
+          "walkthroughs: evidence missing",
+          "slides: evidence missing",
+          "scripts: evidence missing",
+          "instructorGuide: evidence missing"
+        ],
+        "ready": false
+      },
+      {
+        "course": "P01-B2",
+        "plannedAssessments": 20,
+        "unmappedOutcomes": [],
+        "gaps": [
+          "P01-B2-assignment-1: assessed content missing",
+          "P01-B2-quiz-1: assessed content missing",
+          "P01-B2-lab-1: assessed content missing",
+          "P01-B2-quiz-2: assessed content missing",
+          "P01-B2-assignment-2: assessed content missing",
+          "P01-B2-quiz-3: assessed content missing",
+          "P01-B2-lab-2: assessed content missing",
+          "P01-B2-quiz-4: assessed content missing",
+          "P01-B2-project-1: assessed content missing",
+          "P01-B2-midterm_exam-1: assessed content missing",
+          "P01-B2-assignment-3: assessed content missing",
+          "P01-B2-quiz-5: assessed content missing",
+          "P01-B2-lab-3: assessed content missing",
+          "P01-B2-quiz-6: assessed content missing",
+          "P01-B2-assignment-4: assessed content missing",
+          "P01-B2-quiz-7: assessed content missing",
+          "P01-B2-assignment-5: assessed content missing",
+          "P01-B2-quiz-8: assessed content missing",
+          "P01-B2-project-2: assessed content missing",
+          "P01-B2-final_exam-1: assessed content missing",
+          "notebooks: evidence missing",
+          "dataCards: evidence missing",
+          "walkthroughs: evidence missing",
+          "slides: evidence missing",
+          "scripts: evidence missing",
+          "instructorGuide: evidence missing"
+        ],
+        "ready": false
+      }
+    ],
+    "publicationAllowed": false,
+    "reviewRequired": [
+      "Originality",
+      "Tool licensing and versions",
+      "Accessibility",
+      "Responsible AI",
+      "Independent instructional designer and SME"
+    ],
+    "note": "Structural planning does not certify content quality or enable publication."
+  },
+  {
+    "program": 2,
+    "courses": [
+      {
+        "course": "P02-B1",
+        "plannedAssessments": 20,
+        "unmappedOutcomes": [],
+        "gaps": [
+          "P02-B1-assignment-1: assessed content missing",
+          "P02-B1-quiz-1: assessed content missing",
+          "P02-B1-lab-1: assessed content missing",
+          "P02-B1-quiz-2: assessed content missing",
+          "P02-B1-assignment-2: assessed content missing",
+          "P02-B1-quiz-3: assessed content missing",
+          "P02-B1-lab-2: assessed content missing",
+          "P02-B1-quiz-4: assessed content missing",
+          "P02-B1-project-1: assessed content missing",
+          "P02-B1-midterm_exam-1: assessed content missing",
+          "P02-B1-assignment-3: assessed content missing",
+          "P02-B1-quiz-5: assessed content missing",
+          "P02-B1-lab-3: assessed content missing",
+          "P02-B1-quiz-6: assessed content missing",
+          "P02-B1-assignment-4: assessed content missing",
+          "P02-B1-quiz-7: assessed content missing",
+          "P02-B1-assignment-5: assessed content missing",
+          "P02-B1-quiz-8: assessed content missing",
+          "P02-B1-project-2: assessed content missing",
+          "P02-B1-final_exam-1: assessed content missing",
+          "notebooks: evidence missing",
+          "dataCards: evidence missing",
+          "walkthroughs: evidence missing",
+          "slides: evidence missing",
+          "scripts: evidence missing",
+          "instructorGuide: evidence missing"
+        ],
+        "ready": false
+      },
+      {
+        "course": "P02-B2",
+        "plannedAssessments": 20,
+        "unmappedOutcomes": [],
+        "gaps": [
+          "P02-B2-assignment-1: assessed content missing",
+          "P02-B2-quiz-1: assessed content missing",
+          "P02-B2-lab-1: assessed content missing",
+          "P02-B2-quiz-2: assessed content missing",
+          "P02-B2-assignment-2: assessed content missing",
+          "P02-B2-quiz-3: assessed content missing",
+          "P02-B2-lab-2: assessed content missing",
+          "P02-B2-quiz-4: assessed content missing",
+          "P02-B2-project-1: assessed content missing",
+          "P02-B2-midterm_exam-1: assessed content missing",
+          "P02-B2-assignment-3: assessed content missing",
+          "P02-B2-quiz-5: assessed content missing",
+          "P02-B2-lab-3: assessed content missing",
+          "P02-B2-quiz-6: assessed content missing",
+          "P02-B2-assignment-4: assessed content missing",
+          "P02-B2-quiz-7: assessed content missing",
+          "P02-B2-assignment-5: assessed content missing",
+          "P02-B2-quiz-8: assessed content missing",
+          "P02-B2-project-2: assessed content missing",
+          "P02-B2-final_exam-1: assessed content missing",
+          "notebooks: evidence missing",
+          "dataCards: evidence missing",
+          "walkthroughs: evidence missing",
+          "slides: evidence missing",
+          "scripts: evidence missing",
+          "instructorGuide: evidence missing"
+        ],
+        "ready": false
+      }
+    ],
+    "publicationAllowed": false,
+    "reviewRequired": [
+      "Originality",
+      "Tool licensing and versions",
+      "Accessibility",
+      "Responsible AI",
+      "Independent instructional designer and SME"
+    ],
+    "note": "Structural planning does not certify content quality or enable publication."
+  },
+  {
+    "program": 3,
+    "courses": [
+      {
+        "course": "P03-B1",
+        "plannedAssessments": 20,
+        "unmappedOutcomes": [],
+        "gaps": [
+          "P03-B1-assignment-1: assessed content missing",
+          "P03-B1-quiz-1: assessed content missing",
+          "P03-B1-lab-1: assessed content missing",
+          "P03-B1-quiz-2: assessed content missing",
+          "P03-B1-assignment-2: assessed content missing",
+          "P03-B1-quiz-3: assessed content missing",
+          "P03-B1-lab-2: assessed content missing",
+          "P03-B1-quiz-4: assessed content missing",
+          "P03-B1-project-1: assessed content missing",
+          "P03-B1-midterm_exam-1: assessed content missing",
+          "P03-B1-assignment-3: assessed content missing",
+          "P03-B1-quiz-5: assessed content missing",
+          "P03-B1-lab-3: assessed content missing",
+          "P03-B1-quiz-6: assessed content missing",
+          "P03-B1-assignment-4: assessed content missing",
+          "P03-B1-quiz-7: assessed content missing",
+          "P03-B1-assignment-5: assessed content missing",
+          "P03-B1-quiz-8: assessed content missing",
+          "P03-B1-project-2: assessed content missing",
+          "P03-B1-final_exam-1: assessed content missing",
+          "notebooks: evidence missing",
+          "dataCards: evidence missing",
+          "walkthroughs: evidence missing",
+          "slides: evidence missing",
+          "scripts: evidence missing",
+          "instructorGuide: evidence missing"
+        ],
+        "ready": false
+      },
+      {
+        "course": "P03-B2",
+        "plannedAssessments": 20,
+        "unmappedOutcomes": [],
+        "gaps": [
+          "P03-B2-assignment-1: assessed content missing",
+          "P03-B2-quiz-1: assessed content missing",
+          "P03-B2-lab-1: assessed content missing",
+          "P03-B2-quiz-2: assessed content missing",
+          "P03-B2-assignment-2: assessed content missing",
+          "P03-B2-quiz-3: assessed content missing",
+          "P03-B2-lab-2: assessed content missing",
+          "P03-B2-quiz-4: assessed content missing",
+          "P03-B2-project-1: assessed content missing",
+          "P03-B2-midterm_exam-1: assessed content missing",
+          "P03-B2-assignment-3: assessed content missing",
+          "P03-B2-quiz-5: assessed content missing",
+          "P03-B2-lab-3: assessed content missing",
+          "P03-B2-quiz-6: assessed content missing",
+          "P03-B2-assignment-4: assessed content missing",
+          "P03-B2-quiz-7: assessed content missing",
+          "P03-B2-assignment-5: assessed content missing",
+          "P03-B2-quiz-8: assessed content missing",
+          "P03-B2-project-2: assessed content missing",
+          "P03-B2-final_exam-1: assessed content missing",
+          "notebooks: evidence missing",
+          "dataCards: evidence missing",
+          "walkthroughs: evidence missing",
+          "slides: evidence missing",
+          "scripts: evidence missing",
+          "instructorGuide: evidence missing"
+        ],
+        "ready": false
+      }
+    ],
+    "publicationAllowed": false,
+    "reviewRequired": [
+      "Originality",
+      "Tool licensing and versions",
+      "Accessibility",
+      "Responsible AI",
+      "Independent instructional designer and SME"
+    ],
+    "note": "Structural planning does not certify content quality or enable publication."
+  },
+  {
+    "program": 4,
+    "courses": [
+      {
+        "course": "P04-B1",
+        "plannedAssessments": 20,
+        "unmappedOutcomes": [],
+        "gaps": [
+          "P04-B1-assignment-1: assessed content missing",
+          "P04-B1-quiz-1: assessed content missing",
+          "P04-B1-lab-1: assessed content missing",
+          "P04-B1-quiz-2: assessed content missing",
+          "P04-B1-assignment-2: assessed content missing",
+          "P04-B1-quiz-3: assessed content missing",
+          "P04-B1-lab-2: assessed content missing",
+          "P04-B1-quiz-4: assessed content missing",
+          "P04-B1-project-1: assessed content missing",
+          "P04-B1-midterm_exam-1: assessed content missing",
+          "P04-B1-assignment-3: assessed content missing",
+          "P04-B1-quiz-5: assessed content missing",
+          "P04-B1-lab-3: assessed content missing",
+          "P04-B1-quiz-6: assessed content missing",
+          "P04-B1-assignment-4: assessed content missing",
+          "P04-B1-quiz-7: assessed content missing",
+          "P04-B1-assignment-5: assessed content missing",
+          "P04-B1-quiz-8: assessed content missing",
+          "P04-B1-project-2: assessed content missing",
+          "P04-B1-final_exam-1: assessed content missing",
+          "notebooks: evidence missing",
+          "dataCards: evidence missing",
+          "walkthroughs: evidence missing",
+          "slides: evidence missing",
+          "scripts: evidence missing",
+          "instructorGuide: evidence missing"
+        ],
+        "ready": false
+      }
+    ],
+    "publicationAllowed": false,
+    "reviewRequired": [
+      "Originality",
+      "Tool licensing and versions",
+      "Accessibility",
+      "Responsible AI",
+      "Independent instructional designer and SME"
+    ],
+    "note": "Structural planning does not certify content quality or enable publication."
+  },
+  {
+    "program": 5,
+    "courses": [
+      {
+        "course": "P05-B1",
+        "plannedAssessments": 20,
+        "unmappedOutcomes": [],
+        "gaps": [
+          "P05-B1-assignment-1: assessed content missing",
+          "P05-B1-quiz-1: assessed content missing",
+          "P05-B1-lab-1: assessed content missing",
+          "P05-B1-quiz-2: assessed content missing",
+          "P05-B1-assignment-2: assessed content missing",
+          "P05-B1-quiz-3: assessed content missing",
+          "P05-B1-lab-2: assessed content missing",
+          "P05-B1-quiz-4: assessed content missing",
+          "P05-B1-project-1: assessed content missing",
+          "P05-B1-midterm_exam-1: assessed content missing",
+          "P05-B1-assignment-3: assessed content missing",
+          "P05-B1-quiz-5: assessed content missing",
+          "P05-B1-lab-3: assessed content missing",
+          "P05-B1-quiz-6: assessed content missing",
+          "P05-B1-assignment-4: assessed content missing",
+          "P05-B1-quiz-7: assessed content missing",
+          "P05-B1-assignment-5: assessed content missing",
+          "P05-B1-quiz-8: assessed content missing",
+          "P05-B1-project-2: assessed content missing",
+          "P05-B1-final_exam-1: assessed content missing",
+          "notebooks: evidence missing",
+          "dataCards: evidence missing",
+          "walkthroughs: evidence missing",
+          "slides: evidence missing",
+          "scripts: evidence missing",
+          "instructorGuide: evidence missing"
+        ],
+        "ready": false
+      }
+    ],
+    "publicationAllowed": false,
+    "reviewRequired": [
+      "Originality",
+      "Tool licensing and versions",
+      "Accessibility",
+      "Responsible AI",
+      "Independent instructional designer and SME"
+    ],
+    "note": "Structural planning does not certify content quality or enable publication."
+  },
+  {
+    "program": 6,
+    "courses": [
+      {
+        "course": "P06-B1",
+        "plannedAssessments": 20,
+        "unmappedOutcomes": [],
+        "gaps": [
+          "P06-B1-assignment-1: assessed content missing",
+          "P06-B1-quiz-1: assessed content missing",
+          "P06-B1-lab-1: assessed content missing",
+          "P06-B1-quiz-2: assessed content missing",
+          "P06-B1-assignment-2: assessed content missing",
+          "P06-B1-quiz-3: assessed content missing",
+          "P06-B1-lab-2: assessed content missing",
+          "P06-B1-quiz-4: assessed content missing",
+          "P06-B1-project-1: assessed content missing",
+          "P06-B1-midterm_exam-1: assessed content missing",
+          "P06-B1-assignment-3: assessed content missing",
+          "P06-B1-quiz-5: assessed content missing",
+          "P06-B1-lab-3: assessed content missing",
+          "P06-B1-quiz-6: assessed content missing",
+          "P06-B1-assignment-4: assessed content missing",
+          "P06-B1-quiz-7: assessed content missing",
+          "P06-B1-assignment-5: assessed content missing",
+          "P06-B1-quiz-8: assessed content missing",
+          "P06-B1-project-2: assessed content missing",
+          "P06-B1-final_exam-1: assessed content missing",
+          "notebooks: evidence missing",
+          "dataCards: evidence missing",
+          "walkthroughs: evidence missing",
+          "slides: evidence missing",
+          "scripts: evidence missing",
+          "instructorGuide: evidence missing"
+        ],
+        "ready": false
+      }
+    ],
+    "publicationAllowed": false,
+    "reviewRequired": [
+      "Originality",
+      "Tool licensing and versions",
+      "Accessibility",
+      "Responsible AI",
+      "Independent instructional designer and SME"
+    ],
+    "note": "Structural planning does not certify content quality or enable publication."
+  },
+  {
+    "program": 7,
+    "courses": [
+      {
+        "course": "P07-B1",
+        "plannedAssessments": 20,
+        "unmappedOutcomes": [],
+        "gaps": [
+          "P07-B1-assignment-1: assessed content missing",
+          "P07-B1-quiz-1: assessed content missing",
+          "P07-B1-lab-1: assessed content missing",
+          "P07-B1-quiz-2: assessed content missing",
+          "P07-B1-assignment-2: assessed content missing",
+          "P07-B1-quiz-3: assessed content missing",
+          "P07-B1-lab-2: assessed content missing",
+          "P07-B1-quiz-4: assessed content missing",
+          "P07-B1-project-1: assessed content missing",
+          "P07-B1-midterm_exam-1: assessed content missing",
+          "P07-B1-assignment-3: assessed content missing",
+          "P07-B1-quiz-5: assessed content missing",
+          "P07-B1-lab-3: assessed content missing",
+          "P07-B1-quiz-6: assessed content missing",
+          "P07-B1-assignment-4: assessed content missing",
+          "P07-B1-quiz-7: assessed content missing",
+          "P07-B1-assignment-5: assessed content missing",
+          "P07-B1-quiz-8: assessed content missing",
+          "P07-B1-project-2: assessed content missing",
+          "P07-B1-final_exam-1: assessed content missing",
+          "notebooks: evidence missing",
+          "dataCards: evidence missing",
+          "walkthroughs: evidence missing",
+          "slides: evidence missing",
+          "scripts: evidence missing",
+          "instructorGuide: evidence missing"
+        ],
+        "ready": false
+      }
+    ],
+    "publicationAllowed": false,
+    "reviewRequired": [
+      "Originality",
+      "Tool licensing and versions",
+      "Accessibility",
+      "Responsible AI",
+      "Independent instructional designer and SME"
+    ],
+    "note": "Structural planning does not certify content quality or enable publication."
+  },
+  {
+    "program": 8,
+    "courses": [
+      {
+        "course": "P08-B1",
+        "plannedAssessments": 20,
+        "unmappedOutcomes": [],
+        "gaps": [
+          "P08-B1-assignment-1: assessed content missing",
+          "P08-B1-quiz-1: assessed content missing",
+          "P08-B1-lab-1: assessed content missing",
+          "P08-B1-quiz-2: assessed content missing",
+          "P08-B1-assignment-2: assessed content missing",
+          "P08-B1-quiz-3: assessed content missing",
+          "P08-B1-lab-2: assessed content missing",
+          "P08-B1-quiz-4: assessed content missing",
+          "P08-B1-project-1: assessed content missing",
+          "P08-B1-midterm_exam-1: assessed content missing",
+          "P08-B1-assignment-3: assessed content missing",
+          "P08-B1-quiz-5: assessed content missing",
+          "P08-B1-lab-3: assessed content missing",
+          "P08-B1-quiz-6: assessed content missing",
+          "P08-B1-assignment-4: assessed content missing",
+          "P08-B1-quiz-7: assessed content missing",
+          "P08-B1-assignment-5: assessed content missing",
+          "P08-B1-quiz-8: assessed content missing",
+          "P08-B1-project-2: assessed content missing",
+          "P08-B1-final_exam-1: assessed content missing",
+          "notebooks: evidence missing",
+          "dataCards: evidence missing",
+          "walkthroughs: evidence missing",
+          "slides: evidence missing",
+          "scripts: evidence missing",
+          "instructorGuide: evidence missing"
+        ],
+        "ready": false
+      }
+    ],
+    "publicationAllowed": false,
+    "reviewRequired": [
+      "Originality",
+      "Tool licensing and versions",
+      "Accessibility",
+      "Responsible AI",
+      "Independent instructional designer and SME"
+    ],
+    "note": "Structural planning does not certify content quality or enable publication."
+  },
+  {
+    "program": 9,
+    "courses": [
+      {
+        "course": "P09-B1",
+        "plannedAssessments": 20,
+        "unmappedOutcomes": [],
+        "gaps": [
+          "P09-B1-assignment-1: assessed content missing",
+          "P09-B1-quiz-1: assessed content missing",
+          "P09-B1-lab-1: assessed content missing",
+          "P09-B1-quiz-2: assessed content missing",
+          "P09-B1-assignment-2: assessed content missing",
+          "P09-B1-quiz-3: assessed content missing",
+          "P09-B1-lab-2: assessed content missing",
+          "P09-B1-quiz-4: assessed content missing",
+          "P09-B1-project-1: assessed content missing",
+          "P09-B1-midterm_exam-1: assessed content missing",
+          "P09-B1-assignment-3: assessed content missing",
+          "P09-B1-quiz-5: assessed content missing",
+          "P09-B1-lab-3: assessed content missing",
+          "P09-B1-quiz-6: assessed content missing",
+          "P09-B1-assignment-4: assessed content missing",
+          "P09-B1-quiz-7: assessed content missing",
+          "P09-B1-assignment-5: assessed content missing",
+          "P09-B1-quiz-8: assessed content missing",
+          "P09-B1-project-2: assessed content missing",
+          "P09-B1-final_exam-1: assessed content missing",
+          "notebooks: evidence missing",
+          "dataCards: evidence missing",
+          "walkthroughs: evidence missing",
+          "slides: evidence missing",
+          "scripts: evidence missing",
+          "instructorGuide: evidence missing"
+        ],
+        "ready": false
+      }
+    ],
+    "publicationAllowed": false,
+    "reviewRequired": [
+      "Originality",
+      "Tool licensing and versions",
+      "Accessibility",
+      "Responsible AI",
+      "Independent instructional designer and SME"
+    ],
+    "note": "Structural planning does not certify content quality or enable publication."
+  },
+  {
+    "program": 10,
+    "courses": [
+      {
+        "course": "P10-B1",
+        "plannedAssessments": 20,
+        "unmappedOutcomes": [],
+        "gaps": [
+          "P10-B1-assignment-1: assessed content missing",
+          "P10-B1-quiz-1: assessed content missing",
+          "P10-B1-lab-1: assessed content missing",
+          "P10-B1-quiz-2: assessed content missing",
+          "P10-B1-assignment-2: assessed content missing",
+          "P10-B1-quiz-3: assessed content missing",
+          "P10-B1-lab-2: assessed content missing",
+          "P10-B1-quiz-4: assessed content missing",
+          "P10-B1-project-1: assessed content missing",
+          "P10-B1-midterm_exam-1: assessed content missing",
+          "P10-B1-assignment-3: assessed content missing",
+          "P10-B1-quiz-5: assessed content missing",
+          "P10-B1-lab-3: assessed content missing",
+          "P10-B1-quiz-6: assessed content missing",
+          "P10-B1-assignment-4: assessed content missing",
+          "P10-B1-quiz-7: assessed content missing",
+          "P10-B1-assignment-5: assessed content missing",
+          "P10-B1-quiz-8: assessed content missing",
+          "P10-B1-project-2: assessed content missing",
+          "P10-B1-final_exam-1: assessed content missing",
+          "notebooks: evidence missing",
+          "dataCards: evidence missing",
+          "walkthroughs: evidence missing",
+          "slides: evidence missing",
+          "scripts: evidence missing",
+          "instructorGuide: evidence missing"
+        ],
+        "ready": false
+      }
+    ],
+    "publicationAllowed": false,
+    "reviewRequired": [
+      "Originality",
+      "Tool licensing and versions",
+      "Accessibility",
+      "Responsible AI",
+      "Independent instructional designer and SME"
+    ],
+    "note": "Structural planning does not certify content quality or enable publication."
+  },
+  {
+    "program": 11,
+    "courses": [
+      {
+        "course": "P11-B1",
+        "plannedAssessments": 20,
+        "unmappedOutcomes": [],
+        "gaps": [
+          "P11-B1-assignment-1: assessed content missing",
+          "P11-B1-quiz-1: assessed content missing",
+          "P11-B1-lab-1: assessed content missing",
+          "P11-B1-quiz-2: assessed content missing",
+          "P11-B1-assignment-2: assessed content missing",
+          "P11-B1-quiz-3: assessed content missing",
+          "P11-B1-lab-2: assessed content missing",
+          "P11-B1-quiz-4: assessed content missing",
+          "P11-B1-project-1: assessed content missing",
+          "P11-B1-midterm_exam-1: assessed content missing",
+          "P11-B1-assignment-3: assessed content missing",
+          "P11-B1-quiz-5: assessed content missing",
+          "P11-B1-lab-3: assessed content missing",
+          "P11-B1-quiz-6: assessed content missing",
+          "P11-B1-assignment-4: assessed content missing",
+          "P11-B1-quiz-7: assessed content missing",
+          "P11-B1-assignment-5: assessed content missing",
+          "P11-B1-quiz-8: assessed content missing",
+          "P11-B1-project-2: assessed content missing",
+          "P11-B1-final_exam-1: assessed content missing",
+          "notebooks: evidence missing",
+          "dataCards: evidence missing",
+          "walkthroughs: evidence missing",
+          "slides: evidence missing",
+          "scripts: evidence missing",
+          "instructorGuide: evidence missing"
+        ],
+        "ready": false
+      }
+    ],
+    "publicationAllowed": false,
+    "reviewRequired": [
+      "Originality",
+      "Tool licensing and versions",
+      "Accessibility",
+      "Responsible AI",
+      "Independent instructional designer and SME"
+    ],
+    "note": "Structural planning does not certify content quality or enable publication."
+  }
+]

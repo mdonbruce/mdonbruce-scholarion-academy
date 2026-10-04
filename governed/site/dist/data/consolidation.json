@@ -1,0 +1,959 @@
+{
+  "brand": "Scholarion Academy",
+  "status": "Build scope approved; academic equivalence and publication pending",
+  "published": false,
+  "automaticCredit": false,
+  "leadFaculty": "Dr. Martins Donbruce Idahosa",
+  "modules": [
+    {
+      "id": "commons-01",
+      "version": "0.1.0-draft",
+      "title": "Python development environment",
+      "programs": [
+        15,
+        16,
+        17,
+        18,
+        21,
+        22,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-02",
+      "version": "0.1.0-draft",
+      "title": "Python foundations",
+      "programs": [
+        17,
+        18,
+        21,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-03",
+      "version": "0.1.0-draft",
+      "title": "Data preparation and visualization",
+      "programs": [
+        17,
+        18,
+        21,
+        22,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-04",
+      "version": "0.1.0-draft",
+      "title": "Machine learning foundations",
+      "programs": [
+        3,
+        17,
+        18,
+        21,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-05",
+      "version": "0.1.0-draft",
+      "title": "Deep learning and language foundations",
+      "programs": [
+        3,
+        17,
+        18,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-06",
+      "version": "0.1.0-draft",
+      "title": "Language models and prompting",
+      "programs": [
+        2,
+        15,
+        16,
+        17,
+        19,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-07",
+      "version": "0.1.0-draft",
+      "title": "AI application delivery",
+      "programs": [
+        15,
+        16,
+        17,
+        22,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-08",
+      "version": "0.1.0-draft",
+      "title": "Embeddings and hybrid retrieval",
+      "programs": [
+        1,
+        2,
+        15,
+        16,
+        17,
+        22,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-09",
+      "version": "0.1.0-draft",
+      "title": "Retrieval chains and memory",
+      "programs": [
+        1,
+        2,
+        15,
+        16,
+        17,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-10",
+      "version": "0.1.0-draft",
+      "title": "Agents and typed tools",
+      "programs": [
+        1,
+        2,
+        15,
+        16,
+        17,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-11",
+      "version": "0.1.0-draft",
+      "title": "Persistent graph workflows",
+      "programs": [
+        1,
+        15,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-12",
+      "version": "0.1.0-draft",
+      "title": "MCP integrations",
+      "programs": [
+        1,
+        4,
+        14,
+        15,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-13",
+      "version": "0.1.0-draft",
+      "title": "Multi-agent orchestration",
+      "programs": [
+        1,
+        14,
+        15,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-14",
+      "version": "0.1.0-draft",
+      "title": "Agentic and graph retrieval",
+      "programs": [
+        1,
+        15,
+        22,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-15",
+      "version": "0.1.0-draft",
+      "title": "Evaluation and regression testing",
+      "programs": [
+        1,
+        14,
+        15,
+        23,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-16",
+      "version": "0.1.0-draft",
+      "title": "Monitoring and model adaptation",
+      "programs": [
+        15,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-17",
+      "version": "0.1.0-draft",
+      "title": "AI security and red teaming",
+      "programs": [
+        1,
+        15,
+        22,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-18",
+      "version": "0.1.0-draft",
+      "title": "Container delivery and CI/CD",
+      "programs": [
+        1,
+        15,
+        22,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-19",
+      "version": "0.1.0-draft",
+      "title": "Workflow automation",
+      "programs": [
+        5,
+        6,
+        7,
+        14,
+        15,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-20",
+      "version": "0.1.0-draft",
+      "title": "Responsible AI and governance",
+      "programs": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-21",
+      "version": "0.1.0-draft",
+      "title": "AI strategy and organizational change",
+      "programs": [
+        9,
+        13,
+        20,
+        23,
+        25
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    },
+    {
+      "id": "commons-22",
+      "version": "0.1.0-draft",
+      "title": "Language representations and transformer evaluation",
+      "programs": [
+        17,
+        18,
+        19,
+        24
+      ],
+      "state": "mapping_only",
+      "contentApproved": false
+    }
+  ],
+  "programs": [
+    {
+      "id": 1,
+      "title": "Professional Certificate in Agentic AI Systems",
+      "length": "18 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-08",
+        "commons-09",
+        "commons-10",
+        "commons-11",
+        "commons-12",
+        "commons-13",
+        "commons-14",
+        "commons-15",
+        "commons-17",
+        "commons-18",
+        "commons-20"
+      ],
+      "relationships": [
+        {
+          "from": 26,
+          "to": 1,
+          "type": "proposed_recognition",
+          "detail": "Candidate source Weeks 1\u20138 mapping; assessed equivalence and approval required."
+        },
+        {
+          "from": 15,
+          "to": 1,
+          "type": "mutually_exclusive_credit",
+          "detail": "Retain both formats; do not award duplicate credit."
+        }
+      ],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 19
+    },
+    {
+      "id": 2,
+      "title": "Certificate in Applied Generative & Agentic AI",
+      "length": "16 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-06",
+        "commons-08",
+        "commons-09",
+        "commons-10",
+        "commons-20"
+      ],
+      "relationships": [],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 3,
+      "title": "Professional Certificate in Applied AI: Machine Learning, Generative AI & Agents",
+      "length": "20 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-04",
+        "commons-05",
+        "commons-20"
+      ],
+      "relationships": [],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 4,
+      "title": "Certificate in AI Agents for Software Engineering",
+      "length": "14 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-12",
+        "commons-20"
+      ],
+      "relationships": [],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 5,
+      "title": "Certificate in No-Code AI, Machine Learning & Agents",
+      "length": "14 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-19",
+        "commons-20"
+      ],
+      "relationships": [],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 6,
+      "title": "Certificate in No-Code Generative AI & Agent Workflows",
+      "length": "12 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-19",
+        "commons-20"
+      ],
+      "relationships": [],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 7,
+      "title": "AI-Native Professional: Workflows & Agents for Everyday Productivity",
+      "length": "6 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-19",
+        "commons-20"
+      ],
+      "relationships": [],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 8,
+      "title": "Certificate in AI Agents for Business Operations",
+      "length": "12 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-20"
+      ],
+      "relationships": [],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 9,
+      "title": "Certificate in Generative AI & AI Agent Strategy for Leaders",
+      "length": "12 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-20",
+        "commons-21"
+      ],
+      "relationships": [],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 10,
+      "title": "Certificate in AI & Agentic AI for Finance",
+      "length": "10 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-20"
+      ],
+      "relationships": [],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 11,
+      "title": "Certificate in AI & Agentic AI for Healthcare Operations",
+      "length": "10 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-20"
+      ],
+      "relationships": [],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 12,
+      "title": "Certificate in Designing & Building AI Products and Services",
+      "length": "10 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-20"
+      ],
+      "relationships": [
+        {
+          "from": 23,
+          "to": 12,
+          "type": "no_double_credit",
+          "detail": "Shared content requires module-level equivalence; distinct product focus."
+        }
+      ],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 10
+    },
+    {
+      "id": 13,
+      "title": "Specification missing \u2014 TBC",
+      "length": "TBC",
+      "catalogPresent": false,
+      "moduleIds": [
+        "commons-20",
+        "commons-21"
+      ],
+      "relationships": [
+        {
+          "from": 20,
+          "to": 13,
+          "type": "dependency_tbc",
+          "detail": "Short-form Course 1 recognition; program 13 missing."
+        }
+      ],
+      "decision": "Recover specification before dependent build",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 14,
+      "title": "Specification missing \u2014 TBC",
+      "length": "TBC",
+      "catalogPresent": false,
+      "moduleIds": [
+        "commons-12",
+        "commons-13",
+        "commons-15",
+        "commons-19",
+        "commons-20"
+      ],
+      "relationships": [],
+      "decision": "Recover specification before dependent build",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 15,
+      "title": "Advanced Certificate in Agentic AI Engineering \u2014 Weekend Intensive",
+      "length": "10 weekends live (60 hrs) + 5 self-paced electives",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-01",
+        "commons-06",
+        "commons-07",
+        "commons-08",
+        "commons-09",
+        "commons-10",
+        "commons-11",
+        "commons-12",
+        "commons-13",
+        "commons-14",
+        "commons-15",
+        "commons-16",
+        "commons-17",
+        "commons-18",
+        "commons-19",
+        "commons-20"
+      ],
+      "relationships": [
+        {
+          "from": 26,
+          "to": 15,
+          "type": "proposed_recognition",
+          "detail": "Candidate Weekends 3\u20135 mapping; no automatic waiver."
+        },
+        {
+          "from": 16,
+          "to": 15,
+          "type": "proposed_recognition",
+          "detail": "Modules 1\u20136 / weekends 1\u20133; requires assessed equivalence."
+        },
+        {
+          "from": 15,
+          "to": 1,
+          "type": "mutually_exclusive_credit",
+          "detail": "Retain both formats; do not award duplicate credit."
+        }
+      ],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 10
+    },
+    {
+      "id": 16,
+      "title": "Certificate in Agentic AI for Developers",
+      "length": "5 weekends live (30 hrs)",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-01",
+        "commons-06",
+        "commons-07",
+        "commons-08",
+        "commons-09",
+        "commons-10",
+        "commons-20"
+      ],
+      "relationships": [
+        {
+          "from": 16,
+          "to": 15,
+          "type": "proposed_recognition",
+          "detail": "Modules 1\u20136 / weekends 1\u20133; requires assessed equivalence."
+        }
+      ],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 17,
+      "title": "Generative AI Professional Pathway",
+      "length": "~24 weeks, stacked courses",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-01",
+        "commons-02",
+        "commons-03",
+        "commons-04",
+        "commons-05",
+        "commons-06",
+        "commons-07",
+        "commons-08",
+        "commons-09",
+        "commons-10",
+        "commons-20",
+        "commons-22"
+      ],
+      "relationships": [],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 18,
+      "title": "Certificate in Artificial Intelligence with Python (TensorFlow & PyTorch)",
+      "length": "8 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-01",
+        "commons-02",
+        "commons-03",
+        "commons-04",
+        "commons-05",
+        "commons-20",
+        "commons-22"
+      ],
+      "relationships": [
+        {
+          "from": 21,
+          "to": 18,
+          "type": "prerequisite_path",
+          "detail": "Data foundations before AI with Python."
+        }
+      ],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 19,
+      "title": "Certificate in LLM Prompt Engineering & LLM Applications",
+      "length": "5 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-06",
+        "commons-20",
+        "commons-22"
+      ],
+      "relationships": [],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 20,
+      "title": "Certificate in Generative AI for Business Transformation",
+      "length": "6 weeks, no code",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-20",
+        "commons-21"
+      ],
+      "relationships": [
+        {
+          "from": 20,
+          "to": 13,
+          "type": "dependency_tbc",
+          "detail": "Short-form Course 1 recognition; program 13 missing."
+        }
+      ],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 21,
+      "title": "Certificate in Data Science with Python",
+      "length": "8 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-01",
+        "commons-02",
+        "commons-03",
+        "commons-04",
+        "commons-20"
+      ],
+      "relationships": [
+        {
+          "from": 21,
+          "to": 18,
+          "type": "prerequisite_path",
+          "detail": "Data foundations before AI with Python."
+        },
+        {
+          "from": 21,
+          "to": 22,
+          "type": "prerequisite_path",
+          "detail": "Data foundations before data engineering."
+        }
+      ],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 22,
+      "title": "Advanced Certificate in Data Engineering with Generative AI",
+      "length": "12 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-01",
+        "commons-03",
+        "commons-07",
+        "commons-08",
+        "commons-14",
+        "commons-17",
+        "commons-18",
+        "commons-20"
+      ],
+      "relationships": [
+        {
+          "from": 21,
+          "to": 22,
+          "type": "prerequisite_path",
+          "detail": "Data foundations before data engineering."
+        }
+      ],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 23,
+      "title": "Advanced Certificate in AI Product Management",
+      "length": "10 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-15",
+        "commons-20",
+        "commons-21"
+      ],
+      "relationships": [
+        {
+          "from": 23,
+          "to": 12,
+          "type": "no_double_credit",
+          "detail": "Shared content requires module-level equivalence; distinct product focus."
+        }
+      ],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 24,
+      "title": "Extended Professional Program in Generative & Agentic AI",
+      "length": "~32 weeks",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-01",
+        "commons-02",
+        "commons-03",
+        "commons-04",
+        "commons-05",
+        "commons-06",
+        "commons-07",
+        "commons-08",
+        "commons-09",
+        "commons-10",
+        "commons-11",
+        "commons-12",
+        "commons-13",
+        "commons-14",
+        "commons-15",
+        "commons-16",
+        "commons-17",
+        "commons-18",
+        "commons-19",
+        "commons-20",
+        "commons-22"
+      ],
+      "relationships": [],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 25,
+      "title": "Extended Professional Certificate in Applied AI for Business Leaders",
+      "length": "24 weeks (#13 C1 + C2 + new Leadership Practicum)",
+      "catalogPresent": true,
+      "moduleIds": [
+        "commons-20",
+        "commons-21"
+      ],
+      "relationships": [],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 0
+    },
+    {
+      "id": 26,
+      "title": "Agentic AI Systems Design \u2014 Live Intensive",
+      "length": "10 weeks",
+      "catalogPresent": true,
+      "moduleIds": [],
+      "relationships": [
+        {
+          "from": 26,
+          "to": 1,
+          "type": "proposed_recognition",
+          "detail": "Candidate source Weeks 1\u20138 mapping; assessed equivalence and approval required."
+        },
+        {
+          "from": 26,
+          "to": 15,
+          "type": "proposed_recognition",
+          "detail": "Candidate Weekends 3\u20135 mapping; no automatic waiver."
+        }
+      ],
+      "decision": "Retain for review; no merge or retirement authorized",
+      "overlap": "Not measured: approved weighted outcomes and assessments unavailable",
+      "weeksInCatalog": 10
+    },
+    {
+      "id": 27,
+      "title": "Proposed Certificate in MLOps and LLMOps",
+      "length": "Proposal only; ten-week course rule applies if approved",
+      "catalogPresent": false,
+      "moduleIds": [
+        "commons-16",
+        "commons-18"
+      ],
+      "relationships": [],
+      "decision": "Proposal only \u2014 no build or publication approval",
+      "overlap": "Unmeasured; assessed equivalence required",
+      "weeksInCatalog": 0
+    }
+  ],
+  "rules": [
+    {
+      "from": 26,
+      "to": 1,
+      "type": "proposed_recognition",
+      "detail": "Candidate source Weeks 1\u20138 mapping; assessed equivalence and approval required."
+    },
+    {
+      "from": 26,
+      "to": 15,
+      "type": "proposed_recognition",
+      "detail": "Candidate Weekends 3\u20135 mapping; no automatic waiver."
+    },
+    {
+      "from": 16,
+      "to": 15,
+      "type": "proposed_recognition",
+      "detail": "Modules 1\u20136 / weekends 1\u20133; requires assessed equivalence."
+    },
+    {
+      "from": 15,
+      "to": 1,
+      "type": "mutually_exclusive_credit",
+      "detail": "Retain both formats; do not award duplicate credit."
+    },
+    {
+      "from": 20,
+      "to": 13,
+      "type": "dependency_tbc",
+      "detail": "Short-form Course 1 recognition; program 13 missing."
+    },
+    {
+      "from": 23,
+      "to": 12,
+      "type": "no_double_credit",
+      "detail": "Shared content requires module-level equivalence; distinct product focus."
+    },
+    {
+      "from": 21,
+      "to": 18,
+      "type": "prerequisite_path",
+      "detail": "Data foundations before AI with Python."
+    },
+    {
+      "from": 21,
+      "to": 22,
+      "type": "prerequisite_path",
+      "detail": "Data foundations before data engineering."
+    }
+  ],
+  "cohortDecision": "Retain all existing offerings. Courses use ten-week blocks; bundled pathways require separate sequencing review.",
+  "blockers": [
+    "Programs 13 and 14 absent from catalog",
+    "Weighted outcome equivalence unavailable; no verified >60% overlap claim",
+    "Faculty and product-owner approval not recorded",
+    "Canvas, Cloud Lab and Zoom integrations unavailable",
+    "Policy Part E missing",
+    "Tool versions, educational licensing and textbook chapter references not verified"
+  ],
+  "versionRule": "New module versions are proposed for new cohorts only. Running-cohort pinning is not implemented.",
+  "productOwnerApproval": {
+    "date": "2026-10-02",
+    "scope": "Retain all programs; proceed with program 15 first",
+    "source": "Explicit YES in current conversation",
+    "facultyPublicationApproved": false
+  }
+}

@@ -1,0 +1,6 @@
+.haven-presence{display:flex;gap:10px;flex-wrap:wrap;padding:14px 0}
+.haven-presence button{min-height:42px;border:1px solid #d8e1d6;border-radius:999px;background:#fff;color:#173f2a;padding:8px 16px;font-size:14px;font-weight:800;cursor:pointer}
+.haven-presence button:hover{border-color:#b68b2d;background:#fff9e8}.haven-presence button.active{background:#173f2a;color:#fff;border-color:#173f2a;box-shadow:0 5px 14px rgba(23,63,42,.2)}
+.surface-console{display:grid;grid-template-columns:minmax(170px,.65fr) minmax(260px,1.7fr) auto;gap:18px;align-items:center;margin:0 0 16px;padding:16px 18px;border:1px solid #d9e2d7;border-radius:14px;background:#fff;box-shadow:0 8px 20px rgba(24,62,42,.05)}
+.surface-console>div{display:flex;flex-direction:column}.surface-console>div>span{font-size:12px;letter-spacing:.13em;color:#9a7427;font-weight:800}.surface-console strong{font:700 21px Georgia,serif;margin:3px 0}.surface-console small{font-size:13px;color:#627268}.surface-console p{margin:0;color:#4c5c52;font-size:15px;line-height:1.45}.surface-console button{min-height:42px;white-space:nowrap}
+@media(max-width:850px){.surface-console{grid-template-columns:1fr}.surface-console button{width:100%}}

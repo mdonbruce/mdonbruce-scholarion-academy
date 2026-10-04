@@ -1,0 +1,81 @@
+SCHOLARION ACADEMY — CORE PROGRAM DRAFT BUILD
+2026-10-02
+
+All entries below are draft authoring packages, not published production courses.
+
+Program 2: Certificate in Applied Generative & Agentic AI
+Built: 20 module packages; 40 draft assessment briefs; 5 outcomes; program and capstone badge artwork.
+Verified: synthetic data, deterministic solution-cell execution, file and package checks.
+Draft: lesson content, slides/scripts, activities, assessment rubrics, capstone scaffold.
+Pending: SME/originality/accessibility review, advanced live-model labs, media, final exams, hosted integrations.
+Two 10-module blocks need pacing approval within the advertised duration; no automatic workload compression is approved.
+
+Program 1: Professional Certificate in Agentic AI Systems
+Built: 20 module packages; 40 draft assessment briefs; 5 outcomes; program and capstone badge artwork.
+Verified: synthetic data, deterministic solution-cell execution, file and package checks.
+Draft: lesson content, slides/scripts, activities, assessment rubrics, capstone scaffold.
+Pending: SME/originality/accessibility review, advanced live-model labs, media, final exams, hosted integrations.
+Two 10-module blocks need pacing approval within the advertised duration; no automatic workload compression is approved.
+
+Program 7: AI-Native Professional: Workflows & Agents for Everyday Productivity
+Built: 6 module packages; 13 draft assessment briefs; 5 outcomes; program and capstone badge artwork.
+Verified: synthetic data, deterministic solution-cell execution, file and package checks.
+Draft: lesson content, slides/scripts, activities, assessment rubrics, capstone scaffold.
+Pending: SME/originality/accessibility review, advanced live-model labs, media, final exams, hosted integrations.
+Proposed sequence; dates and pacing require approval.
+
+Program 6: Certificate in No-Code Generative AI & Agent Workflows
+Built: 12 module packages; 20 draft assessment briefs; 5 outcomes; program and capstone badge artwork.
+Verified: synthetic data, deterministic solution-cell execution, file and package checks.
+Draft: lesson content, slides/scripts, activities, assessment rubrics, capstone scaffold.
+Pending: SME/originality/accessibility review, advanced live-model labs, media, final exams, hosted integrations.
+Proposed sequence; dates and pacing require approval.
+
+Program 5: Certificate in No-Code AI, Machine Learning & Agents
+Built: 14 module packages; 20 draft assessment briefs; 5 outcomes; program and capstone badge artwork.
+Verified: synthetic data, deterministic solution-cell execution, file and package checks.
+Draft: lesson content, slides/scripts, activities, assessment rubrics, capstone scaffold.
+Pending: SME/originality/accessibility review, advanced live-model labs, media, final exams, hosted integrations.
+Proposed sequence; dates and pacing require approval.
+
+Program 8: Certificate in AI Agents for Business Operations
+Built: 12 module packages; 20 draft assessment briefs; 5 outcomes; program and capstone badge artwork.
+Verified: synthetic data, deterministic solution-cell execution, file and package checks.
+Draft: lesson content, slides/scripts, activities, assessment rubrics, capstone scaffold.
+Pending: SME/originality/accessibility review, advanced live-model labs, media, final exams, hosted integrations.
+Proposed sequence; dates and pacing require approval.
+
+Program 9: Certificate in Generative AI & AI Agent Strategy for Leaders
+Built: 12 module packages; 20 draft assessment briefs; 5 outcomes; program and capstone badge artwork.
+Verified: synthetic data, deterministic solution-cell execution, file and package checks.
+Draft: lesson content, slides/scripts, activities, assessment rubrics, capstone scaffold.
+Pending: SME/originality/accessibility review, advanced live-model labs, media, final exams, hosted integrations.
+Proposed sequence; dates and pacing require approval.
+
+Program 3: Professional Certificate in Applied AI: Machine Learning, Generative AI & Agents
+Built: 20 module packages; 40 draft assessment briefs; 5 outcomes; program and capstone badge artwork.
+Verified: synthetic data, deterministic solution-cell execution, file and package checks.
+Draft: lesson content, slides/scripts, activities, assessment rubrics, capstone scaffold.
+Pending: SME/originality/accessibility review, advanced live-model labs, media, final exams, hosted integrations.
+Proposed sequence; dates and pacing require approval.
+
+Program 4: Certificate in AI Agents for Software Engineering
+Built: 14 module packages; 20 draft assessment briefs; 5 outcomes; program and capstone badge artwork.
+Verified: synthetic data, deterministic solution-cell execution, file and package checks.
+Draft: lesson content, slides/scripts, activities, assessment rubrics, capstone scaffold.
+Pending: SME/originality/accessibility review, advanced live-model labs, media, final exams, hosted integrations.
+Proposed sequence; dates and pacing require approval.
+
+Program 10: Certificate in AI & Agentic AI for Finance
+Built: 10 module packages; 20 draft assessment briefs; 5 outcomes; program and capstone badge artwork.
+Verified: synthetic data, deterministic solution-cell execution, file and package checks.
+Draft: lesson content, slides/scripts, activities, assessment rubrics, capstone scaffold.
+Pending: SME/originality/accessibility review, advanced live-model labs, media, final exams, hosted integrations.
+Proposed sequence; dates and pacing require approval.
+
+Program 11: Certificate in AI & Agentic AI for Healthcare Operations
+Built: 10 module packages; 20 draft assessment briefs; 5 outcomes; program and capstone badge artwork.
+Verified: synthetic data, deterministic solution-cell execution, file and package checks.
+Draft: lesson content, slides/scripts, activities, assessment rubrics, capstone scaffold.
+Pending: SME/originality/accessibility review, advanced live-model labs, media, final exams, hosted integrations.
+Proposed sequence; dates and pacing require approval.

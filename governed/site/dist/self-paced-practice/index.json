@@ -1,0 +1,58 @@
+[
+  {
+    "id": "32-1",
+    "title": "Bounded autonomy",
+    "starter": "self-paced-practice/32-1-starter.ipynb",
+    "executedVerified": true,
+    "runtime": "3.12.3",
+    "kind": "deterministic practice simulation"
+  },
+  {
+    "id": "32-2",
+    "title": "Evidence-driven reflection",
+    "starter": "self-paced-practice/32-2-starter.ipynb",
+    "executedVerified": true,
+    "runtime": "3.12.3",
+    "kind": "deterministic practice simulation"
+  },
+  {
+    "id": "32-3",
+    "title": "Typed tool boundaries",
+    "starter": "self-paced-practice/32-3-starter.ipynb",
+    "executedVerified": true,
+    "runtime": "3.12.3",
+    "kind": "deterministic practice simulation"
+  },
+  {
+    "id": "32-4",
+    "title": "Dependency-aware planning",
+    "starter": "self-paced-practice/32-4-starter.ipynb",
+    "executedVerified": true,
+    "runtime": "3.12.3",
+    "kind": "deterministic practice simulation"
+  },
+  {
+    "id": "32-5",
+    "title": "Collaborative error analysis",
+    "starter": "self-paced-practice/32-5-starter.ipynb",
+    "executedVerified": true,
+    "runtime": "3.12.3",
+    "kind": "deterministic practice simulation"
+  },
+  {
+    "id": "35",
+    "title": "Approval-gated graph",
+    "starter": "self-paced-practice/35-starter.ipynb",
+    "executedVerified": true,
+    "runtime": "3.12.3",
+    "kind": "deterministic practice simulation"
+  },
+  {
+    "id": "36",
+    "title": "Specialist-team handoff",
+    "starter": "self-paced-practice/36-starter.ipynb",
+    "executedVerified": true,
+    "runtime": "3.12.3",
+    "kind": "deterministic practice simulation"
+  }
+]

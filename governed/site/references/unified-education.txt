@@ -1,0 +1,945 @@
+Master Prompt: Unified AI-Powered Education Management System
+Act as a senior education-technology architect, university registrar, admissions-system specialist, financial-aid workflow specialist, LMS architect, instructional designer, full-stack engineer, AI engineer, database architect, integration engineer, cybersecurity specialist, accessibility specialist, and quality-assurance engineer.
+Create, build, design, secure, test, document, and fully integrate a modern Unified Education Management System (UEMS) for [Scholarion Academy].
+The system must combine:
+Student Information System
+Learning Management System
+Admissions and Recruitment
+Automated Registration
+Financial Aid and Student Finance
+Course and Section Management
+Online Classrooms
+Faculty Management
+Parent or Authorized Supporter Portal
+Employee Learning and Development
+AI-Powered Course Creation
+Collaborative Learning
+Skills Management
+Reporting and Analytics
+Integration Management
+Mobile Learning
+Student Support
+Identity and Access Management
+Build the platform as a reusable, tenant-isolated education SaaS system that can support universities, colleges, schools, training organizations, healthcare education, corporate learning, and future educational institutions.
+Do not copy the trademarks, logos, proprietary text, or protected layouts of Canvas, TalentLMS, 360Learning, WGU, GCU, or another organization. Use the screenshots only as functional and structural inspiration and apply the institution’s authorized branding.
+
+1. Platform Objective
+Create one end-to-end digital education platform that manages the complete learner lifecycle:
+Prospect
+Applicant
+Admission
+Financial planning
+Student registration
+Orientation
+Course enrollment
+Online learning
+Assessment
+Academic progress
+Student support
+Completion
+Graduation
+Alumni engagement
+Continuing education
+The system must eliminate unnecessary duplicate entry between admissions, registration, finance, student records, and the LMS.
+All authorized modules must use a governed common data model and securely synchronized student identity.
+
+2. Public Website and University Gateway
+Create a modern, responsive public gateway inspired by the attached split-screen portal.
+Desktop layout
+Use:
+A full-height institutional image or video on the left
+A branded color overlay
+Institution name, welcome message, and support information
+A clean white gateway panel on the right
+Large role-based access buttons
+Clear help and password-recovery options
+Mobile layout
+Stack the institutional introduction above the access controls. Preserve large touch targets and clear role separation.
+Gateway buttons
+Include:
+Apply for Admission
+Applicant Access
+Student Access
+Faculty Access
+Staff Access
+Parent or Authorized Supporter Access
+Alumni Access
+Continuing Education
+Corporate Learning
+Learn About the Institution
+Technical Support
+Password Reset
+Every button must connect to a functional page, verified authentication route, or clearly identified public-information section.
+Do not use placeholder buttons that appear functional but perform no action.
+
+3. Public Navigation and Mega-Menu
+Create an accessible multi-column mega-menu inspired by the screenshots.
+Platform Overview
+Include a concise statement describing the platform as a unified, AI-assisted education, student-information, and learning-management system.
+Capabilities
+Include:
+AI Content Builder
+Admissions
+Automated Registration
+Student Information
+Learning Academies
+Learning Management
+Learning Experience
+Skills
+Assessments
+Online Classroom
+Student Finance
+Financial Aid
+Analytics
+Certifications
+Compliance Training
+Advanced Features
+Include:
+Mobile Learning
+Coaching
+Globalization
+Live Training
+Mentoring
+Learning Champions
+Content Marketplace
+Collaborative Learning
+Training and Learning
+Onboarding
+Management and Mindset
+Continuing Education
+AI
+Include:
+AI Content Builder
+AI Translation
+AI Learning Companion
+Learning and Development Agent
+Student Success Agent
+Faculty Copilot
+Skills Intelligence
+Program Discovery Agent
+MCP Tool Gateway
+AI Governance Center
+Integrations
+Provide configurable integrations for:
+Workday
+SAP SuccessFactors
+Microsoft Teams
+Slack
+OpenSesame
+SCORM
+Google Workspace
+Microsoft 365
+Zoom
+Student-information systems
+Finance systems
+Identity providers
+Library systems
+Proctoring systems
+Payment gateways
+Approved third-party content providers
+Label every integration accurately as:
+Live and verified
+Connected
+Awaiting authorization
+Configured but disabled
+Simulated
+Planned
+Unavailable
+Use “New” and “Coming Soon” badges only when their status is true and administratively controlled.
+
+4. Automated Admissions
+Create a complete admissions system containing:
+Inquiry form
+Request-information form
+Applicant account creation
+Application form
+Program selection
+Academic history
+Previous institutions
+Transcript upload
+Identity-document upload
+Residency information
+Recommendation requests
+Personal statement
+Application fee
+Waiver requests
+Application checklist
+Application status
+Admissions review
+Interview scheduling
+Conditional admission
+Admission decision
+Acceptance
+Deposit
+Deferral
+Denial
+Appeal
+Enrollment confirmation
+Use configurable admission stages:
+Inquiry
+Prospect
+Application Started
+Application Submitted
+Documents Pending
+Under Review
+Interview Required
+Decision Pending
+Admitted
+Conditionally Admitted
+Waitlisted
+Deferred
+Denied
+Withdrawn
+Accepted
+Enrollment Confirmed
+Automated decisions must be limited to institutionally approved low-risk rules. High-impact admissions decisions must remain reviewable by authorized admissions personnel.
+
+5. Self-Service Student Registration
+Create a fully connected student-registration system supporting:
+Term selection
+Program requirements
+Course search
+Section search
+Prerequisites
+Corequisites
+Registration eligibility
+Seat availability
+Waitlists
+Schedule conflicts
+Credit limits
+Holds
+Advisor approval
+Registration
+Course addition
+Course withdrawal
+Course drop
+Section change
+Registration confirmation
+Tuition calculation
+Degree-progress updates
+When a student submits registration:
+Authenticate the student.
+Verify account and academic status.
+Check registration dates.
+Check holds.
+Validate prerequisites and corequisites.
+Check schedule conflicts.
+Confirm section capacity.
+Calculate attempted credits.
+Apply approved registration rules.
+Reserve the seat transactionally.
+Update student enrollment.
+Update section capacity.
+Update student finance.
+Create the LMS enrollment.
+Send confirmation.
+Record the audit event.
+Registration must use transactional backend logic to prevent oversubscribed sections and partially completed enrollment.
+
+6. Dynamic Course and Section Management
+Allow authorized administrators to create and manage:
+Schools
+Colleges
+Departments
+Programs
+Degrees
+Certificates
+Courses
+Course versions
+Sections
+Terms
+Academic calendars
+Class locations
+Online classrooms
+Instructors
+Teaching assistants
+Capacity
+Waitlists
+Meeting patterns
+Prerequisites
+Corequisites
+Credit hours
+Contact hours
+Delivery methods
+Support:
+Online
+In person
+Hybrid
+HyFlex
+Self-paced
+Competency-based
+Instructor-led training
+Live virtual training
+Internship
+Practicum
+Clinical
+Laboratory
+AI may recommend section sizes or schedules but must not independently assign faculty workloads or override academic policies without approval.
+
+7. Student Information System
+Create a centralized student record containing:
+Student ID
+Legal name
+Preferred name
+Contact information
+Demographics
+Emergency contacts
+Program
+Academic level
+Enrollment status
+Registration history
+Course history
+Grades
+GPA
+Credits
+Transfer credits
+Degree progress
+Academic standing
+Holds
+Advising
+Attendance
+Financial account
+Financial aid
+Documents
+Accommodation indicators
+Communication preferences
+Consent
+Graduation status
+Protect sensitive student information using least privilege, field-level security, and complete audit logging.
+
+8. Student Finance and Financial Aid
+Create modules for:
+Tuition
+Fees
+Charges
+Scholarships
+Grants
+Sponsorships
+Loans
+Payment plans
+Payments
+Refunds
+Account balances
+Statements
+Receipts
+Financial holds
+Financial-aid applications
+Document verification
+Award packaging
+Acceptance or rejection of awards
+Disbursement
+Return calculations
+Satisfactory academic progress
+Financial counseling
+Clearly distinguish:
+Estimated aid
+Pending aid
+Awarded aid
+Accepted aid
+Disbursed aid
+Returned aid
+Outstanding balance
+AI may help explain financial information but must not guarantee eligibility, funding, approval, or disbursement.
+
+9. Learning Management System
+Create a complete LMS containing:
+Course homepage
+Syllabus
+Modules
+Lessons
+Pages
+Files
+Announcements
+Calendar
+Assignments
+Discussions
+Quizzes
+Exams
+Projects
+Rubrics
+Gradebook
+Attendance
+Groups
+Peer review
+Surveys
+Polls
+Messaging
+Notifications
+Video
+Live sessions
+Office hours
+Progress tracking
+Certificates
+Learning analytics
+Allow instructors to:
+Create and import courses
+Organize modules
+Schedule content
+Create assessments
+Configure question banks
+Create rubrics
+Grade submissions
+Provide feedback
+Monitor participation
+Contact students
+Copy courses
+Export authorized content
+Archive courses
+Allow students to:
+View enrolled courses
+Access materials
+Submit assignments
+Take assessments
+Join discussions
+Attend live sessions
+Review grades and feedback
+Track progress
+Request support
+Manage notifications
+
+10. AI Content Builder
+Create an instructor-controlled AI Content Builder that can draft:
+Course outlines
+Modules
+Lessons
+Learning objectives
+Announcements
+Examples
+Activities
+Discussions
+Assignments
+Quizzes
+Rubrics
+Study guides
+Summaries
+Accessibility descriptions
+Translations
+The instructor must specify:
+Subject
+Academic level
+Audience
+Learning objectives
+Source materials
+Tone
+Length
+Assessment type
+Accessibility requirements
+Citation requirements
+Prohibited content
+AI-generated content must remain in Draft status until reviewed and approved by an authorized instructor.
+Display:
+Source material
+Model and version
+Generation date
+Author
+Reviewer
+Approval status
+Revision history
+AI must not fabricate references, grades, academic policies, or accreditation claims.
+
+11. AI Learning Companion
+Create a student-facing AI Learning Companion that:
+Explains approved course concepts
+Answers questions using authorized course materials
+Creates study plans
+Generates practice questions
+Provides formative feedback
+Recommends relevant learning resources
+Helps students navigate the platform
+Supports multilingual interaction
+Uses accessible language
+Escalates to faculty or support staff
+It must never:
+Complete graded assignments for students
+Take examinations
+Impersonate the student
+Change grades
+Bypass academic-integrity controls
+Provide unauthorized answer keys
+Guarantee academic outcomes
+Clearly label AI assistance and record appropriate interaction metadata according to institutional policy.
+
+12. Faculty Copilot
+Create an instructor-facing AI assistant for:
+Course preparation
+Content drafting
+Announcement drafting
+Rubric drafting
+Assessment analysis
+Identification of learning gaps
+Student-engagement summaries
+Feedback suggestions
+Accessibility checks
+Translation
+Administrative task support
+Faculty must retain control over final course content, grades, student interventions, and academic decisions.
+
+13. Collaborative Learning
+Include:
+Discussion boards
+Group workspaces
+Peer review
+Cohort communities
+Learning academies
+Mentoring
+Coaching
+Social learning feeds
+Collaborative documents
+Live chat
+Video meetings
+Polls
+Shared resources
+Instructor moderation
+Community reporting
+Group analytics
+Create appropriate protections against harassment, abuse, unauthorized disclosure, and academic-integrity violations.
+
+14. Skills and Competency Management
+Create:
+Skills taxonomy
+Competency frameworks
+Program outcomes
+Course outcomes
+Skill assessments
+Mastery levels
+Skills profiles
+Gap analysis
+Personalized learning paths
+Credential mapping
+Badges
+Certificates
+Continuing education units
+Compliance requirements
+AI recommendations must explain why a course or learning path was suggested.
+
+15. Program and Course Catalog
+Create a searchable catalog supporting:
+Institution
+School
+Department
+Program
+Degree level
+Certificate
+Course
+Delivery mode
+Duration
+Credits
+Tuition
+Admission requirements
+Career outcomes
+Licensure disclosure
+Availability
+Start date
+Location
+Provide filters for:
+Business
+Education
+Technology
+Health and Nursing
+Undergraduate
+Graduate
+Certificate
+Licensure
+Endorsement
+Online
+Hybrid
+In person
+
+16. WGU Public-Catalog Connector
+Create an optional public-catalog connector for:
+https://www.wgu.edu/online-degree-programs.html
+The connector may retrieve publicly available program metadata such as:
+Program title
+School or subject area
+Degree level
+Program type
+Public source URL
+Public availability
+Last-verified date
+Apply these rules:
+Treat WGU as an external catalog source.
+Do not represent WGU programs as programs offered by this institution.
+Display clear attribution and the original source link.
+Do not copy full protected program descriptions.
+Respect website terms, robots directives, copyright, rate limits, and applicable law.
+Prefer an authorized API or approved structured feed when available.
+Do not enroll students into external programs without a formal integration and authorization.
+Refresh metadata on an approved schedule.
+Mark removed or changed programs as requiring review.
+Allow administrators to disable the connector.
+Do not claim an institutional partnership without documented authorization.
+The internal catalog must remain separate from external comparison or referral listings.
+
+17. Parent and Authorized Supporter Portal
+Create an optional portal for parents, guardians, sponsors, or authorized supporters.
+Access must depend on:
+Student authorization
+Applicable privacy law
+Verified identity
+Defined relationship
+Granted permissions
+Permission expiration
+Revocation controls
+Authorized supporters may receive access only to information specifically approved by the student or permitted by law.
+Do not expose grades, attendance, finance, disciplinary records, or private communications without valid authorization.
+
+18. Employee Learning and Development
+Support organizational training through:
+Employee onboarding
+Required training
+Compliance learning
+Management development
+Leadership academies
+Skills development
+Departmental learning
+Coaching
+Certifications
+Renewal reminders
+Learning paths
+Completion reports
+Allow approved HR-system events to trigger enrollment, such as assigning onboarding courses after a verified employee record is created.
+
+19. Gamification
+Support optional:
+Points
+Badges
+Milestones
+Certificates
+Progress streaks
+Cohort achievements
+Leaderboards
+Rewards
+Provide privacy controls and allow institutions to disable public comparison.
+Gamification must not disadvantage students with disabilities, part-time schedules, approved accommodations, or different access conditions.
+
+20. Integrations and Interoperability
+Support:
+SCORM
+xAPI
+LTI
+OneRoster
+SAML
+OAuth 2.0
+OpenID Connect
+REST APIs
+Webhooks
+Event streams
+Secure file exchange
+Approved MCP tools
+Create an Integration Center that shows:
+Integration name
+Owner
+Purpose
+Authentication
+Permissions
+Data exchanged
+Synchronization schedule
+Health
+Last successful sync
+Errors
+Consent requirements
+Retention policy
+Status
+Audit history
+No integration may be represented as active until authentication, authorization, testing, and successful synchronization are verified.
+
+21. Authentication and Role-Based Access
+Create role-specific access for:
+Prospective Student
+Applicant
+Student
+Faculty
+Adjunct Faculty
+Teaching Assistant
+Advisor
+Admissions Staff
+Registrar
+Financial Aid Staff
+Finance Staff
+Department Chair
+Program Director
+LMS Administrator
+IT Support
+Human Resources
+Parent or Authorized Supporter
+Auditor
+Superadmin
+Include:
+Secure login
+Single sign-on
+MFA
+Password recovery
+Account activation
+Session management
+Device management
+Account lockout
+Identity verification
+Role-based dashboards
+Backend permission enforcement
+Audit logging
+A user with multiple roles must be able to switch authorized workspaces without receiving broader combined access than policy permits.
+
+22. Help and Password Recovery
+Create a visible “Need Help?” section containing:
+Student Login Help
+Applicant Login Help
+Faculty Login Help
+Adjunct Faculty Password Reset
+Staff Password Reset
+Parent or Supporter Login Help
+MFA Recovery
+Technical Support
+Accessibility Support
+Service Status
+Knowledge Base
+Submit a Ticket
+Password-reset workflows must use secure, expiring, single-use tokens or approved identity-provider recovery.
+Support personnel must never see or retrieve a user’s existing password.
+
+23. Dashboards and Analytics
+Student dashboard
+Include:
+Current courses
+Upcoming work
+Grades
+Progress
+Attendance
+Degree progress
+Registration
+Financial account
+Financial aid
+Messages
+Support
+Calendar
+Faculty dashboard
+Include:
+Courses
+Teaching schedule
+Ungraded submissions
+Student engagement
+Announcements
+Messages
+Office hours
+At-risk indicators
+Accessibility notices
+Course analytics
+Administration dashboard
+Include:
+Applications
+Admissions
+Enrollment
+Registration
+Section capacity
+Retention
+Completion
+Graduation
+Student finance
+Financial aid
+LMS activity
+Faculty workload
+Integration health
+Security alerts
+Compliance reports
+AI-generated risk indicators must be explainable, reviewable, and prohibited from making final high-impact decisions autonomously.
+
+24. Accessibility and Globalization
+Implement:
+WCAG 2.2 AA targets
+Keyboard navigation
+Screen-reader support
+Captions
+Transcripts
+Alternative text
+Adjustable text
+High-contrast mode
+Reduced motion
+Accessible assessments
+Extended-time accommodations
+Multiple languages
+Localized dates
+Localized time zones
+Localized currencies
+Right-to-left language support when required
+Mobile and low-bandwidth access
+Accommodation information must be restricted to personnel with a legitimate need to know.
+
+25. Security, Privacy, and Academic Integrity
+Implement:
+Encryption in transit and at rest
+Tenant isolation
+Least privilege
+MFA
+Secure sessions
+Field-level protection
+Data retention
+Consent management
+Audit trails
+Incident response
+Backup and recovery
+Input validation
+Malware scanning
+Rate limiting
+API protection
+Prompt-injection defenses
+Academic-integrity controls
+Data-loss prevention
+Configure controls for applicable requirements such as FERPA, GDPR, CCPA, COPPA, PCI DSS, and jurisdiction-specific education and privacy laws.
+Do not claim legal compliance or certification without formal assessment and supporting evidence.
+
+26. Automated Workflows
+Support configurable automation for:
+Applicant reminders
+Missing-document reminders
+Admissions routing
+Registration eligibility
+Waitlist promotion
+LMS enrollment
+Course access
+Tuition calculation
+Financial-aid notifications
+At-risk alerts
+Faculty notifications
+Assignment reminders
+Certificate generation
+Compliance renewal
+Graduation review
+Alumni transition
+High-impact decisions must include human review, appeals, and complete auditability.
+
+27. Backend Data Model
+Create connected entities for:
+Users
+Roles
+Permissions
+Prospects
+Applicants
+Applications
+Admission decisions
+Students
+Supporters
+Consent records
+Institutions
+Schools
+Departments
+Programs
+Courses
+Course versions
+Sections
+Terms
+Enrollments
+Waitlists
+Instructors
+Assignments
+Submissions
+Assessments
+Grades
+Attendance
+Skills
+Competencies
+Learning paths
+Financial accounts
+Charges
+Payments
+Refunds
+Financial-aid applications
+Awards
+Documents
+Messages
+Support cases
+Integrations
+Notifications
+Audit events
+Use foreign keys, unique constraints, transactions, indexes, record ownership, version history, soft-deletion or anonymization policies, and secure backend authorization.
+
+28. Testing
+Test:
+Applicant registration
+Application submission
+Document upload
+Admission review
+Student activation
+Registration
+Prerequisite enforcement
+Section capacity
+Waitlists
+Schedule conflicts
+Financial calculation
+LMS enrollment
+Course access
+Assignment submission
+Quiz grading
+Manual grading
+Grade publication
+Parent authorization
+Password recovery
+MFA
+Role-based access
+Cross-user access prevention
+Cross-tenant access prevention
+AI content review
+Academic-integrity restrictions
+External catalog attribution
+SCORM content
+Mobile responsiveness
+Accessibility
+Audit logging
+Backup and recovery
+
+29. Required Deliverables
+Provide:
+Public university website
+Role-based gateway portal
+Admissions system
+Applicant portal
+Student Information System
+Automated registration
+Course and section management
+Student finance
+Financial-aid workflows
+Learning Management System
+Online classroom
+Student portal
+Faculty portal
+Parent or authorized supporter portal
+Employee learning and development
+AI Content Builder
+AI Learning Companion
+Faculty Copilot
+Collaborative learning
+Skills and competency management
+Program catalog
+Optional WGU public-catalog connector
+Integration Center
+Analytics dashboards
+Role and permission matrix
+Audit and security center
+Backend database schema
+API documentation
+Automated tests
+Accessibility report
+Administrator documentation
+Private working deployment or preview
+Status report distinguishing live, connected, disabled, simulated, and planned capabilities
+
+30. Completion Requirements
+Do not declare completion until:
+Every gateway button works.
+Applicant registration reaches the backend.
+Student registration is transactional.
+Course capacity is enforced.
+Financial and LMS records synchronize correctly.
+Role-based access is enforced in the backend.
+Parent access requires valid authorization.
+AI-generated content requires faculty review.
+Students cannot use AI to bypass graded work.
+External programs are clearly attributed.
+Integrations are accurately labeled.
+Audit events are recorded.
+Desktop and mobile experiences are verified.
+Accessibility tests pass.
+Placeholder data is not represented as live.
+No external institutional partnership is implied without authorization.
+No disconnected interface is represented as operational.
+Test evidence and unresolved limitations are provided.
+The completed system must provide one secure, accessible, AI-assisted platform for admissions, registration, student records, financial support, teaching, learning, collaboration, assessment, skills development, reporting, and the entire learner lifecycle.
+

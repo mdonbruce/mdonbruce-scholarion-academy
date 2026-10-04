@@ -1,0 +1,38 @@
+CORE PROGRAMS #1–#11 — MASTER SPEC REVIEW — 2026-10-02
+Source: attachment 567ca2b1-8ee0-498d-a205-c4fef25f850a/Pasted text.txt
+
+Decisions retained
+Scholarion Academy, single Academy, every course ten weeks. No tenants or institution partnership claims added. #7 is ten weeks rather than the source six-week exception. #1, #2 and #3 use two ten-week blocks. Other core programs use one ten-week block. This is a curriculum redesign requiring SME review, not proof that all source learning volume fits the new durations.
+
+Before this update
+Core programs had catalog entries. #1 had two versioned draft blocks from the additional-program batch. #2–#11 had no saved program design shells. The existing curriculum validator checks standard counts but catalog outlines had no mapped assessment inventory.
+
+Implemented
+- Versioned drafts for #2–#11, preserving #1 and prior #12–#26 designs. Local AIM310 now has 26 program drafts.
+- Fourteen ten-week core blocks, 140 weekly design outlines, competency/outcome references and activity briefs.
+- Each block has mapped plans for five assignments, three labs, two projects, eight quizzes, midterm and final assessment. A final may be designated as capstone defense. These are planned records, not complete assessments or item banks.
+- Two mini-lab plan entries per module, predecessor-week metadata and ten draft announcements per block. No claim that these metadata fields enforce live learner behavior.
+- Public #2–#11 previews load the same core design register. Catalog dates/durations updated. Program studio displays assessment inventory and offers a server-backed readiness audit.
+- Readiness audit operates on saved course-scoped versions, detects missing counts, unmapped outcomes and absent content artifacts, and lists external reviews. It never authorizes publication.
+- Explicit design refresh creates a new immutable program revision and preserves educator notes. #1 refreshed to revision 2 to incorporate its assessment inventory.
+- Commons accepts mapped core programs; no automatic transfers.
+- Completion proposal records overall 70%, all labs, capstone pass, 80% participation or approved alternative; marked unapproved pending reconciliation with prior C-or-better course eligibility. No issuance change.
+- Finance and healthcare boundaries are explicit; no personalized investment advice, diagnosis or treatment-decision agents.
+
+Program status
+#1: existing detailed draft retained; assessment inventory added; needs SME review.
+#2–#11: draft block designs and previews integrated; needs content production and SME review.
+No program is represented as production-ready.
+
+Unclosed requirements
+- Full syllabi, complete original lessons, resources, twelve-part activity worksheets, executable notebooks, no-code screenshots/reference builds, datasets/data cards, two implemented mini labs per module, enhanced assignments, validated quiz/exam banks, exemplars, analytic rubric bands, slides/scripts and instructor answer keys.
+- Pinned and verified tools, educational licensing, clean execution evidence, captioned media and WCAG audit.
+- Live sequential locking, remediation Mastery Paths, peer review, learner pacing, announcements, competency gradebook, LTI 1.3 Cloud Lab and automatic grade passback for these course designs. Current metadata is not those workflows.
+- Actual signed program/capstone credentials, policy-approved completion, assessed evidence and prior-learning/transfer rules.
+- Career-service staffing, evaluation surveys/analytics and verified deployment capacity.
+- Common Cartridge export and provider-specific Cloud Lab configuration. JSON design exports are not Common Cartridge packages.
+- Independent instructional-designer and SME review, originality and responsible-AI release approval.
+
+Validation
+237 Python regression tests passed. New tests verify core assessment counts, outcome mapping, duration and prerequisites, missing-evidence detection, preserved notes, revision conflicts and authorization. JavaScript syntax checks passed. Live load returned 26 drafts; live audit covered 11 core programs and 14 blocks, all publication blocked. Browser verified #11 curriculum preview and non-clinical boundary. No production deployment or full accessibility certification.
+See CORE-READINESS-RESULTS.json for course-level missing-evidence results.

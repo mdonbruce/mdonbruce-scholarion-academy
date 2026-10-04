@@ -1,0 +1,35 @@
+MASTER PLATFORM SPECIFICATION — RECONCILIATION
+2026-10-02 | Scholarion Academy | Local pilot only
+Source: 0613834a-ae76-4662-8450-7823999d4417/Pasted text.txt.
+User confirmed learner brand Scholarion Academy, overriding attachment wording. All courses remain ten weeks under the user's standing instruction.
+
+IMPLEMENTED IN THIS CHANGE
+1. Active service initializes only the Academy database and identities. Non-Academy identity requests fail before database access. Previously saved non-Academy identities are excluded from the runtime identity registry. Old files are preserved, not migrated or deleted.
+2. The browser has a Platform capabilities route, server-sourced status inventory, definitions, ten acceptance scenario gaps and downloadable report. No UI control can relabel an unimplemented capability as connected.
+3. Instructor-only, course-scoped catalog copy review saves drafts and audit events. Restricted claim phrases block readiness. Publication remains disabled. Unicode normalization handles full-width restricted words. This conservative phrase check is not semantic verification and does not authorize claim exceptions.
+4. Curriculum evidence uses the same restricted-claim detector. Credential sample download filenames now use Scholarion.
+5. External-institution catalog integration planning entry removed from active integration choices; old saved planning records are filtered and cannot be updated through this API.
+
+GAPS BY SPEC SECTION
+0–1 Scope: active second data plane removed. Historical source documents, archived packages, screenshots, tests and legacy audit inventories still contain prior institution references. No zero-reference scan claim is made. No data shared with another institution. Academy brand retained by explicit user decision.
+2 Architecture: SQLite remains local storage. Dedicated PostgreSQL, database organization RLS, object/search/vector/analytics stores, gRPC/event bus, public API/SDKs and managed secrets not implemented. Existing contracts do not establish working integrations.
+3.1 Administration: pilot student/instructor roles only. Full role matrix, Academy Admin authority, organization accounts, seat billing and SSO missing. No organization onboarding enabled.
+3.2 LMS: local course submissions, versioned grades/posting, calendar, discussions, support and curriculum review operational. Full Canvas-parity spec remains incomplete: advanced mastery, annotations, quizzes/accommodations, blueprints, pacing, live cohort scheduling and mobile acceptance.
+3.3 Catalog/commerce: existing draft catalogs/pathway visuals are not authoritative catalog #1–#38. Exact missing program definitions, approved pricing and module transfer/overlap rules required. Claims review is operational but public page generation and credentials do not yet share a release gate. Checkout/subscriptions/tax/refunds/coupons disabled.
+3.4 Records: official application/decision/seat/enrollment and projection ownership not implemented. Existing pilot enrollment table is access control, not an authoritative records service.
+3.5 Credentials: artwork and browser samples are not signed credentials. Managed signing, OB3/VC/CLR interoperability, public verification, consent and lifecycle service missing.
+3.6 AI: local extractive citations and refusals operational. Hosted adapter exists but live inference acceptance, encrypted erasable conversation memory, rubric publishing governance and complete evaluation metrics remain missing. Optional avatar connectors disabled.
+3.7 Labs: no LTI 1.3 launch, Deep Linking, AGS/NRPS, isolated sandboxes, GPUs, hidden autograding or spend-limited key vault. UI labs are previews, not Cloud Lab infrastructure.
+3.8 Analytics: authorized local dashboard counts exist; full event analytics, funnel/mastery, director/organization reports and CSV/Parquet schedules missing.
+4 Security: local authorization checks and append-only events exist. Full org isolation, privacy lifecycle, vault/encryption, penetration test and PostgreSQL point-in-time restore missing. Pilot is not compliance certification.
+5 Roadmap: Phase 0 partial; phases 1–5 not accepted. Status board gives implementation scope, not release authorization.
+6 Acceptance: all ten full scenarios remain NOT VERIFIED. Local claims rejection and tutor behavior tests do not satisfy complete end-to-end scenarios.
+
+REMAINING INPUTS / INFRASTRUCTURE
+Complete #1–#38 source catalog and approved rules; finance/identity/retention policies; Academy operator and admin roles; staging provider and infrastructure; sandbox service credentials; managed key ownership; institutional support policy/configuration; independent academic, security and accessibility review. No secrets should be pasted into chat.
+
+VALIDATION
+Final full suite: 212 Python tests passed after the shared-claims and registry adjustments. Result recorded in MASTER-PLATFORM-TEST-RESULT.txt. JavaScript syntax checked. Browser signed-out route and navigation inspected; authenticated browser click-through, accessibility conformance and production acceptance are NOT claimed.
+
+DEPLOYMENT
+Local server only, production blocked. New release excludes private identity files and databases. Historic files remain recoverable. This release closes selected foundation gaps; it does not complete the master specification.

@@ -1,0 +1,213 @@
+SCHOLARION ACADEMY — DEVELOPMENT REVIEW
+Date: 2026-10-02
+
+Conclusion
+Scholarion has useful working pilot components, a recognizable visual identity,
+and meaningful safeguards. Its main limitation is fragmentation: learner-facing
+demo pages, database-backed services, and agent experiments do not yet form one
+consistent academy. Improve the complete learning journey before adding more tabs.
+This review changes no application behavior and makes no production-readiness claim.
+
+Scope and evidence
+Inspected the local frontend, service, coursework, curriculum validation, planner,
+retrieval, MCP, scenarios, runtime and operational acceptance code. Inspected the
+courses and dashboard routes in the browser. Ran the Python suite and selected JS
+suites. Reproduced defects in temporary databases without changing learner records.
+This is not an independent penetration test, accessibility certification, full
+browser regression, load test, vendor integration verification or disaster-recovery
+exercise. Earlier conversation claims about release ZIPs and tests are not evidence
+of the current checkout's production capabilities.
+
+Verified test results
+- Python: 189 test executions passed. Introspection found 89 distinct test method
+  implementations; inherited baseline tests account for much of the repetition.
+- Agents JS: 33 passed. Credentials JS: 19 passed.
+- Badges JS: 140 catalog/style checks plus 2 edge checks passed.
+- Coursework JS: pacing, immutable attempts, validation, posting, resubmission
+  isolation and averages passed.
+Passing these tests does not establish complete feature or security coverage.
+
+What is worth preserving
+- Server-side identity and course membership checks in many service operations.
+- Immutable submissions, idempotent requests and grade-version conflict checks.
+- Approval before the supported agent action executes; atomic ticket creation and
+  retry handling in that runtime.
+- Private owner/course retrieval boundaries and learner-safe scenario projections.
+- Explicit demo/unverified labels and curriculum publishing blocked until ready.
+- Reusable badge designs and the standard 10-week course format.
+
+PRIORITY 1 — CORRECTNESS AND TRUST
+
+1. Restrict audit results to authorized courses.
+Evidence: governed_service.py events() validates membership in the requested course
+but then selects the latest 50 events across the tenant. An isolated probe returned
+an event for UNASSIGNED-COURSE to a teacher authorized for AIM310. This is a
+cross-course exposure within a tenant, not evidence of cross-tenant exposure.
+Action: give events explicit tenant/course/resource scope; filter before returning
+data; reserve institution-wide audit access for an explicit authorized role.
+Acceptance: two instructors with disjoint courses cannot retrieve each other's
+events, including pagination and events without a course identifier.
+
+2. Make full curriculum packages submit successfully and validate correctly.
+Evidence: the HTTP handler rejects bodies over 16,000 bytes. A structurally accepted
+standard-course test fixture is 57,909 bytes before its request envelope. The
+validator also accepts placeholder-heavy content and can raise TypeError for a
+malformed nested outcome value.
+Action: introduce a bounded authenticated package submission mechanism, strict
+nested schemas and precise validation messages. Validate identifiers, outcome
+references, assessment alignment, scheduling and rubric criteria. Keep academic
+quality review separate from structural validation and require educator approval.
+Acceptance: a realistic full 10-week package passes through the actual HTTP route;
+invalid nested fields produce useful errors; placeholders cannot become approved
+curriculum merely by satisfying counts and word lengths.
+
+3. Unify identity and the source of learning records.
+Evidence: #courses shows fixed demonstration progress (60%, 40%, 30%) while
+#dashboard asks for a pilot token to load database-backed records. The displayed
+demo identity and browser-local banner remain on the database dashboard.
+Action: one server-authorized session and one course/enrollment/assessment record
+model. Derive every progress card, deadline and credential requirement from it.
+Separate demonstration accounts and records clearly from actual learners.
+Acceptance: submitting and receiving feedback updates the same course everywhere;
+another account cannot see it; reload and a second device preserve the result.
+
+4. Preserve published grades while a revision is in draft.
+Evidence: lms_service.py selects the latest grade version, then hides it if it is
+unposted. A new draft can therefore hide a previously posted grade from the learner.
+Action: track the current published version separately from the editable draft.
+Require a reason for changes to released grades and apply an explicit review policy.
+Acceptance: a draft revision leaves the old released result visible until the new
+version is approved/published; complete history remains available to authorized staff.
+
+PRIORITY 2 — A COHERENT, EFFECTIVE LEARNING PRODUCT
+
+5. Replace global render wrappers with one router and shared application shell.
+Evidence: index loads 32 scripts; 24 global render wrappers were counted. Navigation
+items disappeared between the inspected courses and dashboard pages, and the browser
+title remained Courses after opening the dashboard.
+Action: central route definitions, capability-based navigation, one session/client,
+shared loading/error/empty states and route-specific titles. Keep development
+consoles out of the ordinary learner navigation.
+Acceptance: direct links, refresh, Back, keyboard navigation and role changes work
+consistently; every supported destination remains discoverable to its intended role.
+
+6. Make one 10-week flagship course complete before multiplying outlines.
+Action: complete weekly explanations, accessible resources, worked examples,
+practice, meaningful labs, quizzes with rationales, assessment rubrics and capstone
+feedback. Connect prerequisites, deadlines and the next recommended activity.
+Use an educator to review accuracy, difficulty, assessment validity and accessibility.
+Acceptance: an independent learner can finish the course without developer guidance;
+an instructor can review, return feedback and resolve a support request end to end.
+
+7. Reconcile duration and pathway records.
+Evidence: catalog records still contain 5-, 6-, 8- and 12-week offerings while the
+course format only permits 10 weeks. IDs 13 and 14 are absent in the inspected catalog.
+Action: honor the user's 10-week rule at course level. Calculate multi-course program
+length from its sequence and overlap; do not make every multi-course program ten
+weeks. Version curricula and pin active cohorts. Keep unavailable dependencies and
+unconfirmed waivers explicitly TBC. Prevent double counting shared learning.
+Acceptance: catalog, enrollment, calendar, modules and completion requirements agree.
+
+8. Make staff operations ordinary workflows rather than developer forms.
+Action: course selection instead of hard-coded course IDs; guided scenario and agent
+forms instead of raw JSON; queues for ungraded work and learner issues; support
+assignment, replies, resolution states and timestamps; draft knowledge articles with
+human approval. Surface the next action and ownership on each record.
+Acceptance: instructors and support staff perform common tasks without copying IDs,
+tokens or payloads, and learners can track the outcome.
+
+PRIORITY 3 — MAKE AI CAPABILITIES REAL AND MEASURABLE
+
+9. Turn planning into a persisted, bounded workflow.
+Evidence: model_planner.plan returns on its first decision. An isolated provider
+probe with max_steps=5 made one call. The proposal is not connected to the separate
+approved action runtime. It is currently a proposal generator, not a multi-step agent.
+Action: persist a plan and step states; connect allowed tool requests to the existing
+approval/execution path; feed observations back to the planner; add explicit stop,
+resume, cancellation, idempotency and error states. Begin with read-only tools.
+Acceptance: a multi-step synthetic task can pause for approval, resume after restart,
+complete without duplicate effects and explain failure within configured limits.
+
+10. Add a controlled hosted-model operating boundary.
+Evidence: an adapter exists, but live service success was not verified in this review.
+Its synthetic flag is supplied by the client; simple email/number redaction is not
+comprehensive personal-data filtering. No complete usage/budget control was found.
+Action: private server credentials, authorized callers, input/data classification,
+per-user and institution limits, token/cost accounting, timeouts, bounded retries,
+circuit breaking and actual verified health. Keep real learner data excluded until
+the permitted data flow and provider configuration have been reviewed.
+Acceptance: exhausted limits block calls, failures do not break coursework, and
+metrics distinguish configured, connected and verified states.
+
+11. Upgrade retrieval according to measured answer quality.
+Evidence: current vectors are hashed token counts with cosine similarity, not model
+embeddings. They are scanned in Python and have no retention policy.
+Action: approved, versioned course sources; scoped retrieval; semantic and keyword
+search where evaluations justify them; source citations; abstention for weak evidence;
+retention/deletion controls and poisoning tests. Personal memory and institutional
+knowledge require different ownership and approval policies.
+Acceptance: an educator-reviewed question set measures retrieval relevance, citation
+support, refusal quality and unauthorized-content leakage before release.
+
+12. Treat MCP and avatar scenarios as limited pilots.
+Evidence: MCP currently launches one fixed local tool, course_standard. This is not
+a general remote connector service. Scenarios switch state when an answer contains
+a configured phrase; even a negated phrase can match. No automated grade is assigned,
+which is appropriate for the present mechanism.
+Action: connection inventory, tool allowlists, scoped credentials, protocol/error
+tests and approval rules for MCP. Improve scenario dialogue, rubric-based evidence
+and educator review before adding voice or animated avatars.
+Acceptance: connector failure is contained; scenario quality is judged on meaning,
+not keyword presence; claims accurately describe supported capabilities.
+
+PRIORITY 4 — OPERATIONS AND RELEASE DISCIPLINE
+
+13. Consolidate the backend before splitting it into more services.
+Recommendation: a modular monolith with clear learning, identity, credentials,
+finance and agent boundaries fits the current pilot better than additional nominal
+microservices. Introduce versioned migrations, durable jobs, structured error logs,
+health checks, backup/restore and a reproducible release manifest. SQLite is not
+itself proof of a problem; choose storage from demonstrated operational needs.
+Acceptance: restore to a clean environment, replay queued work safely and identify
+which release and schema produced a record.
+
+14. Turn acceptance records into executable release checks.
+Evidence: operational acceptance areas are listed but marked not_verified; evidence
+recording alone is not verification, and production_allowed is always false.
+Action: genuine HTTP and browser journeys, course/role isolation matrices, keyboard
+and screen-reader checks, retry/failure tests, restore exercises and representative
+load tests. Deduplicate test reporting and track risks covered, not headline counts.
+Set concurrency and inference budgets from expected enrollment and activity patterns;
+the first-term learner count remains unknown, so concrete capacity is not justified.
+
+15. Make status and documentation trustworthy.
+Evidence: README sections contradict the current database/authentication pilot and
+retain older branding. Several surfaces mix demo capabilities with operational ones.
+Action: one capability inventory: demo / implemented locally / integration verified /
+production accepted. Link each claim to its tests and deployment evidence. Use
+Scholarion Academy consistently. Do not claim real issuance, finance, identity or
+external messaging merely because a UI or local test exists.
+
+Suggested delivery sequence and exit gates
+A. Correct audit isolation, package ingestion, grade visibility and identity/data
+   consistency; pass targeted negative tests through the actual API.
+B. Ship one coherent 10-week learner journey: sign in, enroll, learn, submit,
+   receive feedback, get support, complete requirements and inspect a credential.
+   Clearly distinguish demonstration issuance from verified external issuance.
+C. Connect bounded planning, approved actions and evaluated retrieval. Add scenarios
+   and external connectors only with explicit supported behavior and evidence.
+D. Run accessibility, multi-user browser, restore, failure and load acceptance before
+   an external pilot. Expand the remaining programs using the validated course pattern.
+
+Measures of effectiveness
+Establish a baseline before setting numeric targets. Track time to first successful
+learning activity, weekly participation, on-time submissions, competency attainment,
+feedback turnaround, learner support resolution and course completion. For AI, track
+supported answers, correct abstentions, approval rates, successful tool completion,
+latency and cost per useful outcome. For operations, track errors, queue age, recovery
+time and authorization failures. Use aggregated reporting with appropriate access.
+Do not optimize for number of tabs, generated pages, badges or raw test executions.
+
+Decision
+The highest-value next release is a reliability and integration release. The desired
+outcome is one trustworthy academy experience, then a repeatable way to grow it.

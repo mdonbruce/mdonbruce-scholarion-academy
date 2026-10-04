@@ -1,0 +1,15 @@
+DEPARTMENT SPEC REVIEW — 2026-10-02
+Source: user attachment 974ae791-71bd-4f16-a9be-dbdefaf92b62/Pasted text.txt and explicit corrections.
+The supplied attachment contains Parts A–D only. Part E is absent.
+
+Added: sandbox policy rule library, authenticated department-readiness API, instructor-only non-executing hold/refund previews, department status UI and audit metadata for previews. Missing policy fails closed. No policy values are installed by default. Tests use clearly synthetic fixtures only.
+Hold rules require policy.finance.holds with advance_notice_seconds, reminder_days, levels [{name:soft|hard,after_days}]. Late processing announces before enforcement and delays effective time by the notice interval. Notices include outstanding amount and clearance instructions. A zero outstanding balance yields release intents immediately. Partial payment does not clear an outstanding balance. Intents require a future transactional worker and idempotency store; no holds are currently executed.
+Refund rules require policy.finance.refunds with auto_approve_limit_minor and ascending schedule [{through_day,refund_basis_points}]. Pay-as-you-go scope is course; full/installment scope is program. Calculations use collected amounts minus prior refunds, in integer minor units, and route out-of-schedule or over-limit results to a review decision. No refund processor or staff review queue is connected. Currency, policy anchor date, installment liabilities and fee treatment need Part E before execution.
+Identity rules require policy.identity.provider {name,mode:sandbox} and policy.identity.retries {max_attempts}. Allowlisted result metadata only; unexpected fields rejected. Failed results omit name and DOB. Verified results require verified name/date of birth, result, provider reference and timestamp. This validator has no public callback endpoint and does not prove identity. No ID upload endpoint was created. Future provider signature, session ownership, freshness and replay checks are required before accepting provider events.
+
+NOT COMPLETE
+Separate department services/databases, event bus, lifecycle state machine, admissions, registration saga, supporter consent, notifications, hosted checkout, signed webhooks, dunning worker, one-hour release SLA, refund execution, reconciliation, identity provider/MFA/SSO, six autonomous agents and full learner journey are not implemented.
+Existing pilot contains devtech test identities/databases alongside Scholarion. The new department API rejects non-Scholarion tenants. Physical deployment/identity separation remains outstanding; existing files were not deleted or silently migrated.
+
+Verification: 11 rule tests and 13 department-service tests passed (the latter includes 10 existing authorization/retrieval checks). JavaScript syntax check passed. Browser and accessibility acceptance not performed for this change.
+Open local preview at http://127.0.0.1:4180/#departments. Requires existing private pilot token. Versioned policy file will be site/private-governed/scholarion-policy.json only after Part E is supplied and validated. Do not enter real identity or payment data into previews.

@@ -1,0 +1,7 @@
+P15-S02 — Deliver a typed service boundary
+Faculty-review draft.
+Outcome: Validate requests and isolate presentation from domain actions.
+Lab: Expose a synthetic triage function through a typed interface; add streaming event records.
+Assessment: Reject malformed input and prove an interrupted stream cannot duplicate an action.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

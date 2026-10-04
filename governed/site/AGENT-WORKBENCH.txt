@@ -1,0 +1,11 @@
+AGENT WORKBENCH — 2026-10-02
+Open http://127.0.0.1:4180/#agent-workbench
+Local features: authenticated private persistent hashed-token vector memory, cosine retrieval and deletion; structured instructor-created text scenarios; learner-safe projection excludes background, traits and agreement conditions; persisted owner-scoped sessions, 20-turn cap, explicit phrase-triggered agreement. These are text simulations, not voice or 3D rendering, semantic model memory or validated grading.
+MCP: real child-process stdio client/server handshake pinned to 2025-11-25. Discovers and invokes one allowlisted read-only course-standard tool. No arbitrary executable/remote host accepted. Five-second timeout and child cleanup. This is not a generic remote MCP connector or SDK compatibility certification.
+Planning: provider-independent structured decision contract and Anthropic Messages adapter with fixed HTTPS endpoint, timeout, output bound, basic redaction and strict action allowlist. Planning returns a proposal, not executed tools. Action runner remains the separate approval flow. No autonomous multi-step live execution chain is claimed.
+Configure server environment SCHOLARION_ANTHROPIC_API_KEY and SCHOLARION_ANTHROPIC_MODEL, then restart governed_service.py. Use a model identifier available to your Anthropic account. Do not paste keys into chat or browser forms. No credentials are included in the release. No live provider call has been verified. The Connect token in the workbench is the existing local pilot identity, not an Anthropic key.
+Hosted planner is instructor-only, intended for synthetic goals. Per-account provider spending limits and production rate/budget controls still need configuration; no exam availability SLA claimed. Basic redaction is not comprehensive DLP.
+Tests: 15 workbench tests including memory persistence/privacy, hidden scenario fields, earned agreement, real MCP subprocess discovery/call and model action rejection; frontend syntax check passed. No browser/accessibility acceptance or hosted-model integration test yet.
+Source protocol: https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2025-11-25/server/tools.mdx
+Hosted API: https://platform.claude.com/docs/en/api/messages/create
+All courses remain ten weeks. Local pilot only.

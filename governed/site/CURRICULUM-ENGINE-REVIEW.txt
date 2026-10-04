@@ -1,0 +1,41 @@
+Scholarion Academy curriculum engine review — 2026-10-02
+Source: @Build Prompt Scholaris Curriculum Engine.docx
+
+The specification assumes a Canvas fork on AWS, FastAPI/PostgreSQL services,
+content/programs files and services/avatar-api. These are not present in the
+inspected workspace. Existing code is a static LMS preview plus a local Python
+HTTP/SQLite pilot. No Canvas or avatar API compatibility is claimed.
+
+Implemented increment
+Server-only instructor curriculum review endpoint; version-like proposal records
+retained in the tenant database; structural validation with JSON field paths;
+UI at #curriculum-review; review history; transactional proposal audit event.
+Checks cover counts, term weeks, description length, observable competencies,
+topic outcomes, required topic/module fields, weekly deliverable types, quiz
+bank sizes, assessment weights, references, minimum competency coverage and
+required alignment artifacts. Publishing always remains blocked.
+
+Existing packages versus this standard
+The 11 core packages are program drafts, not compliant ten-week course packages.
+They have small practice quizzes, generic rubrics and unresolved course mappings.
+They must not be relabeled as having passed this new standard. An eight-week
+program duration is not automatically an eight-week course-term conflict.
+
+Remaining gaps
+Complete formal schemas/Pydantic models and every validation rule; configurable
+tenant policy/workload storage; semantic alignment validation; exam section
+blueprints and question-type distributions; full AIM310 sample with original
+50-question banks; AI generation pipeline/retries; faculty ownership approval;
+Canvas publisher and rollback; LTI Publish tab; accommodation/exemption engine;
+announcements; catalog recalculation; avatar export; update monitor; evaluation
+and accessibility acceptance. No content was silently converted or published.
+
+API: POST /api/curriculum/validate with Bearer instructor pilot token and JSON
+{tenant,course,package}; /api/curriculum/history uses tenant and course only.
+The response distinguishes structuralChecksPassed from publishAllowed, which is
+always false in this implementation. Some malformed nested structures return
+400 rather than detailed diagnostics. This validator is intentionally not a
+complete production schema or quality certification.
+
+Validation: six targeted validator tests; JavaScript syntax check. No claim of
+full course-standard conformance or end-to-end Canvas deployment.

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "P10M5Q1",
+    "prompt": "What does an exception mean?",
+    "choices": [
+      "It needs investigation",
+      "It proves fraud",
+      "Skip review and trust the output."
+    ],
+    "correct": 0,
+    "explanation": "Compare amounts against a defined tolerance and send exceptions to reviewers. A matching amount is not proof of legitimacy; a mismatch is not proof of fraud. No investment or lending advice is produced.",
+    "outcomes": [
+      "O1",
+      "O4"
+    ]
+  },
+  {
+    "id": "P10M5Q2",
+    "prompt": "Your team supporting a synthetic reconciliation desk cannot reproduce a result. What next?",
+    "choices": [
+      "Publish because the report looks complete.",
+      "Reproduce the inputs, versions and checks before accepting the claim.",
+      "Remove failing examples."
+    ],
+    "correct": 1,
+    "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+    "outcomes": [
+      "O3",
+      "O5"
+    ]
+  },
+  {
+    "id": "P10M5Q3",
+    "prompt": "Which artifact best demonstrates reconcile synthetic records?",
+    "choices": [
+      "Flag mismatches and draft a reason-coded review memo. Include results and limitations.",
+      "A screenshot with no inputs or explanation.",
+      "An assertion of perfect accuracy."
+    ],
+    "correct": 0,
+    "explanation": "A concrete artifact and observed evidence support review.",
+    "outcomes": [
+      "O2",
+      "O5"
+    ]
+  }
+]

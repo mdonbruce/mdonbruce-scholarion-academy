@@ -1,0 +1,7 @@
+P15-S11 — Compose tools without expanding access
+Faculty-review draft.
+Outcome: Propagate only the minimum permitted context between tools.
+Lab: Connect two synthetic tool adapters through a bounded workflow; document trust boundaries.
+Assessment: An upstream request must not grant downstream privileges.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

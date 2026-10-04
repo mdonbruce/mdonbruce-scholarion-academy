@@ -1,0 +1,3371 @@
+{
+  "id": 6,
+  "title": "Certificate in No-Code Generative AI & Agent Workflows",
+  "track": "No-Code",
+  "length": "12 weeks",
+  "coding": "No coding required",
+  "summary": "Create prompting workflows, knowledge assistants, no-code RAG solutions, and automated agent workflows.",
+  "capstone": "No-code knowledge assistant and automated workflow for a department process.",
+  "status": "Draft — academic review required",
+  "format": "Online / cohort",
+  "type": "Certificate program",
+  "source": "v2 archive catalog",
+  "level": "Intermediate",
+  "issuer": "Scholarion Academy",
+  "audience": "a departmental request desk",
+  "weeklyHours": "4–6",
+  "prerequisites": "Basic digital literacy; no coding required",
+  "delivery": "Self-paced draft modules with proposed weekend workshops, peer discussion and office hours; no cohort scheduled.",
+  "outcomes": [
+    "O1: Map decision boundaries and evidence requirements for a departmental request desk.",
+    "O2: Construct and explain a bounded prototype for a departmental request desk.",
+    "O3: Evaluate ordinary, ambiguous and adversarial cases against a baseline.",
+    "O4: Demonstrate privacy minimization, human approval and recoverable failure.",
+    "O5: Defend a no-code knowledge workflows portfolio with reproducible evidence and limitations."
+  ],
+  "modules": [
+    {
+      "id": "P6-M01",
+      "number": 1,
+      "title": "Define the decision boundary",
+      "topic": "scope",
+      "family": "routing",
+      "lesson": "An assistant can suggest an action without permission to perform it. Name the decision owner, allowed inputs, prohibited outputs and measurable baseline before selecting a model.",
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "activity": {
+        "title": "Define the decision boundary — applied workshop",
+        "objective": "O1: Map decision boundaries and evidence requirements for a departmental request desk.",
+        "overview": "You support a departmental request desk. Draw an input-to-review map with two mandatory human checkpoints.",
+        "steps": [
+          {
+            "title": "Concept setup · 10 minutes",
+            "text": "An assistant can suggest an action without permission to perform it. Name the decision owner, allowed inputs, prohibited outputs and measurable baseline before selecting a model."
+          },
+          {
+            "title": "Implementation · 20 minutes",
+            "text": "Map each ID to review if confidence is missing or below 0.8, otherwise ready_for_review. Neither route executes an action. Open the starter notebook or visual workflow simulator."
+          },
+          {
+            "title": "Task · 20 minutes",
+            "text": "Draw an input-to-review map with two mandatory human checkpoints. Record a normal, missing-input and human-review case."
+          },
+          {
+            "title": "Research and discussion · 15 minutes",
+            "text": "Compare with a peer, cite your reading and identify a failure condition."
+          },
+          {
+            "title": "Wrap-up · 5 minutes",
+            "text": "Explain why a simulation is not a production-ready system; name the accountable owner."
+          }
+        ],
+        "reflection": [
+          "What evidence changes your decision?",
+          "Which error is more costly here?",
+          "What information can you avoid retaining?"
+        ],
+        "submission": "Draft cohort policy: 2–3-page APA-style paper with relevant code, output screenshots and citations. Word/PDF upload and Sunday 11:59 PM deadline need a scheduled cohort; no live deadline is set.",
+        "integrity": "AI coaching on concepts and ungraded practice is allowed with disclosure. Graded reasoning must be your own."
+      },
+      "labTask": "Map each ID to review if confidence is missing or below 0.8, otherwise ready_for_review. Neither route executes an action.",
+      "miniLabs": [
+        {
+          "title": "Missing-input stress test",
+          "task": "Replace every fourth confidence with None. Re-run and explain the changed results."
+        },
+        {
+          "title": "Scale and subgroup check",
+          "task": "Use the 60-row assignment dataset; compare queues and state a sampling limitation."
+        }
+      ],
+      "readings": [
+        {
+          "title": "Python CSV reference",
+          "url": "https://docs.python.org/3.12/library/csv.html"
+        },
+        {
+          "title": "Python test framework reference",
+          "url": "https://docs.python.org/3.12/library/unittest.html"
+        },
+        {
+          "title": "NIST AI risk framework overview",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+        }
+      ],
+      "quiz": [
+        {
+          "id": "P6M1Q1",
+          "prompt": "Which boundary is testable?",
+          "choices": [
+            "A named task with allowed actions and a human escalation owner",
+            "A promise to automate the department",
+            "Skip review and trust the output."
+          ],
+          "correct": 0,
+          "explanation": "An assistant can suggest an action without permission to perform it. Name the decision owner, allowed inputs, prohibited outputs and measurable baseline before selecting a model.",
+          "outcomes": [
+            "O1",
+            "O4"
+          ]
+        },
+        {
+          "id": "P6M1Q2",
+          "prompt": "Your team supporting a departmental request desk cannot reproduce a result. What next?",
+          "choices": [
+            "Publish because the report looks complete.",
+            "Reproduce the inputs, versions and checks before accepting the claim.",
+            "Remove failing examples."
+          ],
+          "correct": 1,
+          "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+          "outcomes": [
+            "O3",
+            "O5"
+          ]
+        },
+        {
+          "id": "P6M1Q3",
+          "prompt": "Which artifact best demonstrates define the decision boundary?",
+          "choices": [
+            "Draw an input-to-review map with two mandatory human checkpoints. Include results and limitations.",
+            "A screenshot with no inputs or explanation.",
+            "An assertion of perfect accuracy."
+          ],
+          "correct": 0,
+          "explanation": "A concrete artifact and observed evidence support review.",
+          "outcomes": [
+            "O2",
+            "O5"
+          ]
+        }
+      ],
+      "liveSession": "Compare two approaches to define the decision boundary and defend the review boundary.",
+      "announcement": "Module 1: Define the decision boundary. Review the objective, run practice cases and bring a failure to discussion. Cohort dates pending.",
+      "prerequisite": null,
+      "masteryPath": {
+        "remediation": "Re-read the concept, repeat the missing-input task and explain the mistake before retrying.",
+        "enrichment": "Change an assumption, create a counterexample and compare error rates."
+      },
+      "path": "academy/program-6/student/module-01",
+      "proposedWeek": 1
+    },
+    {
+      "id": "P6-M02",
+      "number": 2,
+      "title": "Write bounded instructions",
+      "topic": "prompt",
+      "family": "retrieval",
+      "lesson": "Specify the task, allowed evidence, output fields and escalation condition. Examples demonstrate format; they do not grant new permissions. Missing support should lead to an unresolved result.",
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "activity": {
+        "title": "Write bounded instructions — applied workshop",
+        "objective": "O2: Construct and explain a bounded prototype for a departmental request desk.",
+        "overview": "You support a departmental request desk. Write an instruction card with sources, schema, boundaries and two examples.",
+        "steps": [
+          {
+            "title": "Concept setup · 10 minutes",
+            "text": "Specify the task, allowed evidence, output fields and escalation condition. Examples demonstrate format; they do not grant new permissions. Missing support should lead to an unresolved result."
+          },
+          {
+            "title": "Implementation · 20 minutes",
+            "text": "Rank three supplied snippets against 'approval required' by token overlap, then by ID for ties. Open the starter notebook or visual workflow simulator."
+          },
+          {
+            "title": "Task · 20 minutes",
+            "text": "Write an instruction card with sources, schema, boundaries and two examples. Record a normal, missing-input and human-review case."
+          },
+          {
+            "title": "Research and discussion · 15 minutes",
+            "text": "Compare with a peer, cite your reading and identify a failure condition."
+          },
+          {
+            "title": "Wrap-up · 5 minutes",
+            "text": "Explain why a simulation is not a production-ready system; name the accountable owner."
+          }
+        ],
+        "reflection": [
+          "What evidence changes your decision?",
+          "Which error is more costly here?",
+          "What information can you avoid retaining?"
+        ],
+        "submission": "Draft cohort policy: 2–3-page APA-style paper with relevant code, output screenshots and citations. Word/PDF upload and Sunday 11:59 PM deadline need a scheduled cohort; no live deadline is set.",
+        "integrity": "AI coaching on concepts and ungraded practice is allowed with disclosure. Graded reasoning must be your own."
+      },
+      "labTask": "Rank three supplied snippets against 'approval required' by token overlap, then by ID for ties.",
+      "miniLabs": [
+        {
+          "title": "Abstention test",
+          "task": "Change the query to 'unicorn policy'. Return no ranked result when every overlap score is zero."
+        },
+        {
+          "title": "Evidence-sensitive ranking",
+          "task": "Change the query to 'sensitive update'. Explain why D3 should rank first and why its rank does not authorize an update."
+        }
+      ],
+      "readings": [
+        {
+          "title": "Python CSV reference",
+          "url": "https://docs.python.org/3.12/library/csv.html"
+        },
+        {
+          "title": "Python test framework reference",
+          "url": "https://docs.python.org/3.12/library/unittest.html"
+        },
+        {
+          "title": "NIST AI risk framework overview",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+        }
+      ],
+      "quiz": [
+        {
+          "id": "P6M2Q1",
+          "prompt": "What belongs in an instruction card?",
+          "choices": [
+            "An explicit missing-evidence rule",
+            "An instruction to always sound certain",
+            "Skip review and trust the output."
+          ],
+          "correct": 0,
+          "explanation": "Specify the task, allowed evidence, output fields and escalation condition. Examples demonstrate format; they do not grant new permissions. Missing support should lead to an unresolved result.",
+          "outcomes": [
+            "O1",
+            "O4"
+          ]
+        },
+        {
+          "id": "P6M2Q2",
+          "prompt": "Your team supporting a departmental request desk cannot reproduce a result. What next?",
+          "choices": [
+            "Publish because the report looks complete.",
+            "Reproduce the inputs, versions and checks before accepting the claim.",
+            "Remove failing examples."
+          ],
+          "correct": 1,
+          "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+          "outcomes": [
+            "O3",
+            "O5"
+          ]
+        },
+        {
+          "id": "P6M2Q3",
+          "prompt": "Which artifact best demonstrates write bounded instructions?",
+          "choices": [
+            "Write an instruction card with sources, schema, boundaries and two examples. Include results and limitations.",
+            "A screenshot with no inputs or explanation.",
+            "An assertion of perfect accuracy."
+          ],
+          "correct": 0,
+          "explanation": "A concrete artifact and observed evidence support review.",
+          "outcomes": [
+            "O2",
+            "O5"
+          ]
+        }
+      ],
+      "liveSession": "Compare two approaches to write bounded instructions and defend the review boundary.",
+      "announcement": "Module 2: Write bounded instructions. Review the objective, run practice cases and bring a failure to discussion. Cohort dates pending.",
+      "prerequisite": "P6-M01",
+      "masteryPath": {
+        "remediation": "Re-read the concept, repeat the missing-input task and explain the mistake before retrying.",
+        "enrichment": "Change an assumption, create a counterexample and compare error rates."
+      },
+      "path": "academy/program-6/student/module-02",
+      "proposedWeek": 2
+    },
+    {
+      "id": "P6-M03",
+      "number": 3,
+      "title": "Retrieve evidence before drafting",
+      "topic": "retrieval",
+      "family": "retrieval",
+      "lesson": "Retrieval narrows available evidence. Lexical matching is a transparent baseline but misses paraphrases. Similarity does not establish support; inspect source identifiers and unanswered cases.",
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "activity": {
+        "title": "Retrieve evidence before drafting — applied workshop",
+        "objective": "O3: Evaluate ordinary, ambiguous and adversarial cases against a baseline.",
+        "overview": "You support a departmental request desk. Rank source snippets by token overlap and identify an unsupported query.",
+        "steps": [
+          {
+            "title": "Concept setup · 10 minutes",
+            "text": "Retrieval narrows available evidence. Lexical matching is a transparent baseline but misses paraphrases. Similarity does not establish support; inspect source identifiers and unanswered cases."
+          },
+          {
+            "title": "Implementation · 20 minutes",
+            "text": "Rank three supplied snippets against 'approval required' by token overlap, then by ID for ties. Open the starter notebook or visual workflow simulator."
+          },
+          {
+            "title": "Task · 20 minutes",
+            "text": "Rank source snippets by token overlap and identify an unsupported query. Record a normal, missing-input and human-review case."
+          },
+          {
+            "title": "Research and discussion · 15 minutes",
+            "text": "Compare with a peer, cite your reading and identify a failure condition."
+          },
+          {
+            "title": "Wrap-up · 5 minutes",
+            "text": "Explain why a simulation is not a production-ready system; name the accountable owner."
+          }
+        ],
+        "reflection": [
+          "What evidence changes your decision?",
+          "Which error is more costly here?",
+          "What information can you avoid retaining?"
+        ],
+        "submission": "Draft cohort policy: 2–3-page APA-style paper with relevant code, output screenshots and citations. Word/PDF upload and Sunday 11:59 PM deadline need a scheduled cohort; no live deadline is set.",
+        "integrity": "AI coaching on concepts and ungraded practice is allowed with disclosure. Graded reasoning must be your own."
+      },
+      "labTask": "Rank three supplied snippets against 'approval required' by token overlap, then by ID for ties.",
+      "miniLabs": [
+        {
+          "title": "Abstention test",
+          "task": "Change the query to 'unicorn policy'. Return no ranked result when every overlap score is zero."
+        },
+        {
+          "title": "Evidence-sensitive ranking",
+          "task": "Change the query to 'sensitive update'. Explain why D3 should rank first and why its rank does not authorize an update."
+        }
+      ],
+      "readings": [
+        {
+          "title": "Python CSV reference",
+          "url": "https://docs.python.org/3.12/library/csv.html"
+        },
+        {
+          "title": "Python test framework reference",
+          "url": "https://docs.python.org/3.12/library/unittest.html"
+        },
+        {
+          "title": "NIST AI risk framework overview",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+        }
+      ],
+      "quiz": [
+        {
+          "id": "P6M3Q1",
+          "prompt": "When should a grounded answer abstain?",
+          "choices": [
+            "When sources do not support the claim",
+            "When the source title is short",
+            "Skip review and trust the output."
+          ],
+          "correct": 0,
+          "explanation": "Retrieval narrows available evidence. Lexical matching is a transparent baseline but misses paraphrases. Similarity does not establish support; inspect source identifiers and unanswered cases.",
+          "outcomes": [
+            "O1",
+            "O4"
+          ]
+        },
+        {
+          "id": "P6M3Q2",
+          "prompt": "Your team supporting a departmental request desk cannot reproduce a result. What next?",
+          "choices": [
+            "Publish because the report looks complete.",
+            "Reproduce the inputs, versions and checks before accepting the claim.",
+            "Remove failing examples."
+          ],
+          "correct": 1,
+          "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+          "outcomes": [
+            "O3",
+            "O5"
+          ]
+        },
+        {
+          "id": "P6M3Q3",
+          "prompt": "Which artifact best demonstrates retrieve evidence before drafting?",
+          "choices": [
+            "Rank source snippets by token overlap and identify an unsupported query. Include results and limitations.",
+            "A screenshot with no inputs or explanation.",
+            "An assertion of perfect accuracy."
+          ],
+          "correct": 0,
+          "explanation": "A concrete artifact and observed evidence support review.",
+          "outcomes": [
+            "O2",
+            "O5"
+          ]
+        }
+      ],
+      "liveSession": "Compare two approaches to retrieve evidence before drafting and defend the review boundary.",
+      "announcement": "Module 3: Retrieve evidence before drafting. Review the objective, run practice cases and bring a failure to discussion. Cohort dates pending.",
+      "prerequisite": "P6-M02",
+      "masteryPath": {
+        "remediation": "Re-read the concept, repeat the missing-input task and explain the mistake before retrying.",
+        "enrichment": "Change an assumption, create a counterexample and compare error rates."
+      },
+      "path": "academy/program-6/student/module-03",
+      "proposedWeek": 3
+    },
+    {
+      "id": "P6-M04",
+      "number": 4,
+      "title": "Preserve evidence boundaries",
+      "topic": "chunks",
+      "family": "retrieval",
+      "lesson": "Chunking trades context against noise. Splitting conditions from exceptions can change meaning. Overlap preserves continuity but duplicates evidence and increases retrieval volume.",
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "activity": {
+        "title": "Preserve evidence boundaries — applied workshop",
+        "objective": "O4: Demonstrate privacy minimization, human approval and recoverable failure.",
+        "overview": "You support a departmental request desk. Compare whole-document and sentence-level retrieval on a policy exception.",
+        "steps": [
+          {
+            "title": "Concept setup · 10 minutes",
+            "text": "Chunking trades context against noise. Splitting conditions from exceptions can change meaning. Overlap preserves continuity but duplicates evidence and increases retrieval volume."
+          },
+          {
+            "title": "Implementation · 20 minutes",
+            "text": "Rank three supplied snippets against 'approval required' by token overlap, then by ID for ties. Open the starter notebook or visual workflow simulator."
+          },
+          {
+            "title": "Task · 20 minutes",
+            "text": "Compare whole-document and sentence-level retrieval on a policy exception. Record a normal, missing-input and human-review case."
+          },
+          {
+            "title": "Research and discussion · 15 minutes",
+            "text": "Compare with a peer, cite your reading and identify a failure condition."
+          },
+          {
+            "title": "Wrap-up · 5 minutes",
+            "text": "Explain why a simulation is not a production-ready system; name the accountable owner."
+          }
+        ],
+        "reflection": [
+          "What evidence changes your decision?",
+          "Which error is more costly here?",
+          "What information can you avoid retaining?"
+        ],
+        "submission": "Draft cohort policy: 2–3-page APA-style paper with relevant code, output screenshots and citations. Word/PDF upload and Sunday 11:59 PM deadline need a scheduled cohort; no live deadline is set.",
+        "integrity": "AI coaching on concepts and ungraded practice is allowed with disclosure. Graded reasoning must be your own."
+      },
+      "labTask": "Rank three supplied snippets against 'approval required' by token overlap, then by ID for ties.",
+      "miniLabs": [
+        {
+          "title": "Abstention test",
+          "task": "Change the query to 'unicorn policy'. Return no ranked result when every overlap score is zero."
+        },
+        {
+          "title": "Evidence-sensitive ranking",
+          "task": "Change the query to 'sensitive update'. Explain why D3 should rank first and why its rank does not authorize an update."
+        }
+      ],
+      "readings": [
+        {
+          "title": "Python CSV reference",
+          "url": "https://docs.python.org/3.12/library/csv.html"
+        },
+        {
+          "title": "Python test framework reference",
+          "url": "https://docs.python.org/3.12/library/unittest.html"
+        },
+        {
+          "title": "NIST AI risk framework overview",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+        }
+      ],
+      "quiz": [
+        {
+          "id": "P6M4Q1",
+          "prompt": "What is a chunking risk?",
+          "choices": [
+            "Separating an exception from its condition",
+            "Making all source facts invalid",
+            "Skip review and trust the output."
+          ],
+          "correct": 0,
+          "explanation": "Chunking trades context against noise. Splitting conditions from exceptions can change meaning. Overlap preserves continuity but duplicates evidence and increases retrieval volume.",
+          "outcomes": [
+            "O1",
+            "O4"
+          ]
+        },
+        {
+          "id": "P6M4Q2",
+          "prompt": "Your team supporting a departmental request desk cannot reproduce a result. What next?",
+          "choices": [
+            "Publish because the report looks complete.",
+            "Reproduce the inputs, versions and checks before accepting the claim.",
+            "Remove failing examples."
+          ],
+          "correct": 1,
+          "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+          "outcomes": [
+            "O3",
+            "O5"
+          ]
+        },
+        {
+          "id": "P6M4Q3",
+          "prompt": "Which artifact best demonstrates preserve evidence boundaries?",
+          "choices": [
+            "Compare whole-document and sentence-level retrieval on a policy exception. Include results and limitations.",
+            "A screenshot with no inputs or explanation.",
+            "An assertion of perfect accuracy."
+          ],
+          "correct": 0,
+          "explanation": "A concrete artifact and observed evidence support review.",
+          "outcomes": [
+            "O2",
+            "O5"
+          ]
+        }
+      ],
+      "liveSession": "Compare two approaches to preserve evidence boundaries and defend the review boundary.",
+      "announcement": "Module 4: Preserve evidence boundaries. Review the objective, run practice cases and bring a failure to discussion. Cohort dates pending.",
+      "prerequisite": "P6-M03",
+      "masteryPath": {
+        "remediation": "Re-read the concept, repeat the missing-input task and explain the mistake before retrying.",
+        "enrichment": "Change an assumption, create a counterexample and compare error rates."
+      },
+      "path": "academy/program-6/student/module-04",
+      "proposedWeek": 4
+    },
+    {
+      "id": "P6-M05",
+      "number": 5,
+      "title": "Validate structured outputs",
+      "topic": "schema",
+      "family": "quality",
+      "lesson": "Parseable output is not automatically correct. Check required fields, types, ranges and allowed categories. Generated identifiers and tool arguments remain untrusted until independently validated.",
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "activity": {
+        "title": "Validate structured outputs — applied workshop",
+        "objective": "O5: Defend a no-code knowledge workflows portfolio with reproducible evidence and limitations.",
+        "overview": "You support a departmental request desk. Define three result fields and reject an out-of-range score.",
+        "steps": [
+          {
+            "title": "Concept setup · 10 minutes",
+            "text": "Parseable output is not automatically correct. Check required fields, types, ranges and allowed categories. Generated identifiers and tool arguments remain untrusted until independently validated."
+          },
+          {
+            "title": "Implementation · 20 minutes",
+            "text": "Keep rows with a numeric confidence between zero and one. Missing rows must not enter the accepted set. Open the starter notebook or visual workflow simulator."
+          },
+          {
+            "title": "Task · 20 minutes",
+            "text": "Define three result fields and reject an out-of-range score. Record a normal, missing-input and human-review case."
+          },
+          {
+            "title": "Research and discussion · 15 minutes",
+            "text": "Compare with a peer, cite your reading and identify a failure condition."
+          },
+          {
+            "title": "Wrap-up · 5 minutes",
+            "text": "Explain why a simulation is not a production-ready system; name the accountable owner."
+          }
+        ],
+        "reflection": [
+          "What evidence changes your decision?",
+          "Which error is more costly here?",
+          "What information can you avoid retaining?"
+        ],
+        "submission": "Draft cohort policy: 2–3-page APA-style paper with relevant code, output screenshots and citations. Word/PDF upload and Sunday 11:59 PM deadline need a scheduled cohort; no live deadline is set.",
+        "integrity": "AI coaching on concepts and ungraded practice is allowed with disclosure. Graded reasoning must be your own."
+      },
+      "labTask": "Keep rows with a numeric confidence between zero and one. Missing rows must not enter the accepted set.",
+      "miniLabs": [
+        {
+          "title": "Missing-input stress test",
+          "task": "Replace every fourth confidence with None. Re-run and explain the changed results."
+        },
+        {
+          "title": "Scale and subgroup check",
+          "task": "Use the 60-row assignment dataset; compare queues and state a sampling limitation."
+        }
+      ],
+      "readings": [
+        {
+          "title": "Python CSV reference",
+          "url": "https://docs.python.org/3.12/library/csv.html"
+        },
+        {
+          "title": "Python test framework reference",
+          "url": "https://docs.python.org/3.12/library/unittest.html"
+        },
+        {
+          "title": "NIST AI risk framework overview",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+        }
+      ],
+      "quiz": [
+        {
+          "id": "P6M5Q1",
+          "prompt": "What does JSON validity alone establish?",
+          "choices": [
+            "Syntactic validity only",
+            "That the content is factually correct",
+            "Skip review and trust the output."
+          ],
+          "correct": 0,
+          "explanation": "Parseable output is not automatically correct. Check required fields, types, ranges and allowed categories. Generated identifiers and tool arguments remain untrusted until independently validated.",
+          "outcomes": [
+            "O1",
+            "O4"
+          ]
+        },
+        {
+          "id": "P6M5Q2",
+          "prompt": "Your team supporting a departmental request desk cannot reproduce a result. What next?",
+          "choices": [
+            "Publish because the report looks complete.",
+            "Reproduce the inputs, versions and checks before accepting the claim.",
+            "Remove failing examples."
+          ],
+          "correct": 1,
+          "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+          "outcomes": [
+            "O3",
+            "O5"
+          ]
+        },
+        {
+          "id": "P6M5Q3",
+          "prompt": "Which artifact best demonstrates validate structured outputs?",
+          "choices": [
+            "Define three result fields and reject an out-of-range score. Include results and limitations.",
+            "A screenshot with no inputs or explanation.",
+            "An assertion of perfect accuracy."
+          ],
+          "correct": 0,
+          "explanation": "A concrete artifact and observed evidence support review.",
+          "outcomes": [
+            "O2",
+            "O5"
+          ]
+        }
+      ],
+      "liveSession": "Compare two approaches to validate structured outputs and defend the review boundary.",
+      "announcement": "Module 5: Validate structured outputs. Review the objective, run practice cases and bring a failure to discussion. Cohort dates pending.",
+      "prerequisite": "P6-M04",
+      "masteryPath": {
+        "remediation": "Re-read the concept, repeat the missing-input task and explain the mistake before retrying.",
+        "enrichment": "Change an assumption, create a counterexample and compare error rates."
+      },
+      "path": "academy/program-6/student/module-05",
+      "proposedWeek": 5
+    },
+    {
+      "id": "P6-M06",
+      "number": 6,
+      "title": "Build a visual approval flow",
+      "topic": "workflow",
+      "family": "workflow",
+      "lesson": "No-code systems still need input contracts, error paths and owners. Connect validation, branching, review and recording. Test negative paths as well as success paths.",
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "activity": {
+        "title": "Build a visual approval flow — applied workshop",
+        "objective": "O1: Map decision boundaries and evidence requirements for a departmental request desk.",
+        "overview": "You support a departmental request desk. Configure the supplied simulator and export its decision table.",
+        "steps": [
+          {
+            "title": "Concept setup · 10 minutes",
+            "text": "No-code systems still need input contracts, error paths and owners. Connect validation, branching, review and recording. Test negative paths as well as success paths."
+          },
+          {
+            "title": "Implementation · 20 minutes",
+            "text": "Map missing confidence to needs_data, below 0.8 to human_review, otherwise awaiting_approval. Never mark an action executed. Open the starter notebook or visual workflow simulator."
+          },
+          {
+            "title": "Task · 20 minutes",
+            "text": "Configure the supplied simulator and export its decision table. Record a normal, missing-input and human-review case."
+          },
+          {
+            "title": "Research and discussion · 15 minutes",
+            "text": "Compare with a peer, cite your reading and identify a failure condition."
+          },
+          {
+            "title": "Wrap-up · 5 minutes",
+            "text": "Explain why a simulation is not a production-ready system; name the accountable owner."
+          }
+        ],
+        "reflection": [
+          "What evidence changes your decision?",
+          "Which error is more costly here?",
+          "What information can you avoid retaining?"
+        ],
+        "submission": "Draft cohort policy: 2–3-page APA-style paper with relevant code, output screenshots and citations. Word/PDF upload and Sunday 11:59 PM deadline need a scheduled cohort; no live deadline is set.",
+        "integrity": "AI coaching on concepts and ungraded practice is allowed with disclosure. Graded reasoning must be your own."
+      },
+      "labTask": "Map missing confidence to needs_data, below 0.8 to human_review, otherwise awaiting_approval. Never mark an action executed.",
+      "miniLabs": [
+        {
+          "title": "Missing-input stress test",
+          "task": "Replace every fourth confidence with None. Re-run and explain the changed results."
+        },
+        {
+          "title": "Scale and subgroup check",
+          "task": "Use the 60-row assignment dataset; compare queues and state a sampling limitation."
+        }
+      ],
+      "readings": [
+        {
+          "title": "Python CSV reference",
+          "url": "https://docs.python.org/3.12/library/csv.html"
+        },
+        {
+          "title": "Python test framework reference",
+          "url": "https://docs.python.org/3.12/library/unittest.html"
+        },
+        {
+          "title": "NIST AI risk framework overview",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+        }
+      ],
+      "quiz": [
+        {
+          "id": "P6M6Q1",
+          "prompt": "What should happen when a required field is absent?",
+          "choices": [
+            "An explicit needs-data branch",
+            "Default success",
+            "Skip review and trust the output."
+          ],
+          "correct": 0,
+          "explanation": "No-code systems still need input contracts, error paths and owners. Connect validation, branching, review and recording. Test negative paths as well as success paths.",
+          "outcomes": [
+            "O1",
+            "O4"
+          ]
+        },
+        {
+          "id": "P6M6Q2",
+          "prompt": "Your team supporting a departmental request desk cannot reproduce a result. What next?",
+          "choices": [
+            "Publish because the report looks complete.",
+            "Reproduce the inputs, versions and checks before accepting the claim.",
+            "Remove failing examples."
+          ],
+          "correct": 1,
+          "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+          "outcomes": [
+            "O3",
+            "O5"
+          ]
+        },
+        {
+          "id": "P6M6Q3",
+          "prompt": "Which artifact best demonstrates build a visual approval flow?",
+          "choices": [
+            "Configure the supplied simulator and export its decision table. Include results and limitations.",
+            "A screenshot with no inputs or explanation.",
+            "An assertion of perfect accuracy."
+          ],
+          "correct": 0,
+          "explanation": "A concrete artifact and observed evidence support review.",
+          "outcomes": [
+            "O2",
+            "O5"
+          ]
+        }
+      ],
+      "liveSession": "Compare two approaches to build a visual approval flow and defend the review boundary.",
+      "announcement": "Module 6: Build a visual approval flow. Review the objective, run practice cases and bring a failure to discussion. Cohort dates pending.",
+      "prerequisite": "P6-M05",
+      "masteryPath": {
+        "remediation": "Re-read the concept, repeat the missing-input task and explain the mistake before retrying.",
+        "enrichment": "Change an assumption, create a counterexample and compare error rates."
+      },
+      "path": "academy/program-6/student/module-06",
+      "proposedWeek": 6
+    },
+    {
+      "id": "P6-M07",
+      "number": 7,
+      "title": "Test hostile instructions",
+      "topic": "security",
+      "family": "routing",
+      "lesson": "Retrieved documents and tool results are data, not authority to change policy. Keep permissions outside content. Test attempts to expand access or extract restricted fields.",
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "activity": {
+        "title": "Test hostile instructions — applied workshop",
+        "objective": "O2: Construct and explain a bounded prototype for a departmental request desk.",
+        "overview": "You support a departmental request desk. Add a hostile snippet and show why it cannot expand the allowlist.",
+        "steps": [
+          {
+            "title": "Concept setup · 10 minutes",
+            "text": "Retrieved documents and tool results are data, not authority to change policy. Keep permissions outside content. Test attempts to expand access or extract restricted fields."
+          },
+          {
+            "title": "Implementation · 20 minutes",
+            "text": "Map each ID to review if confidence is missing or below 0.8, otherwise ready_for_review. Neither route executes an action. Open the starter notebook or visual workflow simulator."
+          },
+          {
+            "title": "Task · 20 minutes",
+            "text": "Add a hostile snippet and show why it cannot expand the allowlist. Record a normal, missing-input and human-review case."
+          },
+          {
+            "title": "Research and discussion · 15 minutes",
+            "text": "Compare with a peer, cite your reading and identify a failure condition."
+          },
+          {
+            "title": "Wrap-up · 5 minutes",
+            "text": "Explain why a simulation is not a production-ready system; name the accountable owner."
+          }
+        ],
+        "reflection": [
+          "What evidence changes your decision?",
+          "Which error is more costly here?",
+          "What information can you avoid retaining?"
+        ],
+        "submission": "Draft cohort policy: 2–3-page APA-style paper with relevant code, output screenshots and citations. Word/PDF upload and Sunday 11:59 PM deadline need a scheduled cohort; no live deadline is set.",
+        "integrity": "AI coaching on concepts and ungraded practice is allowed with disclosure. Graded reasoning must be your own."
+      },
+      "labTask": "Map each ID to review if confidence is missing or below 0.8, otherwise ready_for_review. Neither route executes an action.",
+      "miniLabs": [
+        {
+          "title": "Missing-input stress test",
+          "task": "Replace every fourth confidence with None. Re-run and explain the changed results."
+        },
+        {
+          "title": "Scale and subgroup check",
+          "task": "Use the 60-row assignment dataset; compare queues and state a sampling limitation."
+        }
+      ],
+      "readings": [
+        {
+          "title": "Python CSV reference",
+          "url": "https://docs.python.org/3.12/library/csv.html"
+        },
+        {
+          "title": "Python test framework reference",
+          "url": "https://docs.python.org/3.12/library/unittest.html"
+        },
+        {
+          "title": "NIST AI risk framework overview",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+        }
+      ],
+      "quiz": [
+        {
+          "id": "P6M7Q1",
+          "prompt": "How should source instructions to reveal secrets be treated?",
+          "choices": [
+            "As untrusted content",
+            "As a higher-priority system rule",
+            "Skip review and trust the output."
+          ],
+          "correct": 0,
+          "explanation": "Retrieved documents and tool results are data, not authority to change policy. Keep permissions outside content. Test attempts to expand access or extract restricted fields.",
+          "outcomes": [
+            "O1",
+            "O4"
+          ]
+        },
+        {
+          "id": "P6M7Q2",
+          "prompt": "Your team supporting a departmental request desk cannot reproduce a result. What next?",
+          "choices": [
+            "Publish because the report looks complete.",
+            "Reproduce the inputs, versions and checks before accepting the claim.",
+            "Remove failing examples."
+          ],
+          "correct": 1,
+          "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+          "outcomes": [
+            "O3",
+            "O5"
+          ]
+        },
+        {
+          "id": "P6M7Q3",
+          "prompt": "Which artifact best demonstrates test hostile instructions?",
+          "choices": [
+            "Add a hostile snippet and show why it cannot expand the allowlist. Include results and limitations.",
+            "A screenshot with no inputs or explanation.",
+            "An assertion of perfect accuracy."
+          ],
+          "correct": 0,
+          "explanation": "A concrete artifact and observed evidence support review.",
+          "outcomes": [
+            "O2",
+            "O5"
+          ]
+        }
+      ],
+      "liveSession": "Compare two approaches to test hostile instructions and defend the review boundary.",
+      "announcement": "Module 7: Test hostile instructions. Review the objective, run practice cases and bring a failure to discussion. Cohort dates pending.",
+      "prerequisite": "P6-M06",
+      "masteryPath": {
+        "remediation": "Re-read the concept, repeat the missing-input task and explain the mistake before retrying.",
+        "enrichment": "Change an assumption, create a counterexample and compare error rates."
+      },
+      "path": "academy/program-6/student/module-07",
+      "proposedWeek": 7
+    },
+    {
+      "id": "P6-M08",
+      "number": 8,
+      "title": "Create an evaluation set",
+      "topic": "evaluation",
+      "family": "evaluation",
+      "lesson": "Include ordinary, ambiguous, abstention and adversarial cases. Label expected outcomes before running the candidate. Aggregate accuracy can hide severe failures.",
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "activity": {
+        "title": "Create an evaluation set — applied workshop",
+        "objective": "O3: Evaluate ordinary, ambiguous and adversarial cases against a baseline.",
+        "overview": "You support a departmental request desk. Write six expected outcomes, including two cases that must not trigger action.",
+        "steps": [
+          {
+            "title": "Concept setup · 10 minutes",
+            "text": "Include ordinary, ambiguous, abstention and adversarial cases. Label expected outcomes before running the candidate. Aggregate accuracy can hide severe failures."
+          },
+          {
+            "title": "Implementation · 20 minutes",
+            "text": "Calculate reviewed count, total and review rate for each fictional queue; missing confidence requires review. Open the starter notebook or visual workflow simulator."
+          },
+          {
+            "title": "Task · 20 minutes",
+            "text": "Write six expected outcomes, including two cases that must not trigger action. Record a normal, missing-input and human-review case."
+          },
+          {
+            "title": "Research and discussion · 15 minutes",
+            "text": "Compare with a peer, cite your reading and identify a failure condition."
+          },
+          {
+            "title": "Wrap-up · 5 minutes",
+            "text": "Explain why a simulation is not a production-ready system; name the accountable owner."
+          }
+        ],
+        "reflection": [
+          "What evidence changes your decision?",
+          "Which error is more costly here?",
+          "What information can you avoid retaining?"
+        ],
+        "submission": "Draft cohort policy: 2–3-page APA-style paper with relevant code, output screenshots and citations. Word/PDF upload and Sunday 11:59 PM deadline need a scheduled cohort; no live deadline is set.",
+        "integrity": "AI coaching on concepts and ungraded practice is allowed with disclosure. Graded reasoning must be your own."
+      },
+      "labTask": "Calculate reviewed count, total and review rate for each fictional queue; missing confidence requires review.",
+      "miniLabs": [
+        {
+          "title": "Missing-input stress test",
+          "task": "Replace every fourth confidence with None. Re-run and explain the changed results."
+        },
+        {
+          "title": "Scale and subgroup check",
+          "task": "Use the 60-row assignment dataset; compare queues and state a sampling limitation."
+        }
+      ],
+      "readings": [
+        {
+          "title": "Python CSV reference",
+          "url": "https://docs.python.org/3.12/library/csv.html"
+        },
+        {
+          "title": "Python test framework reference",
+          "url": "https://docs.python.org/3.12/library/unittest.html"
+        },
+        {
+          "title": "NIST AI risk framework overview",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+        }
+      ],
+      "quiz": [
+        {
+          "id": "P6M8Q1",
+          "prompt": "When should expected labels be assigned?",
+          "choices": [
+            "Before viewing candidate outputs",
+            "After seeing which labels maximize the score",
+            "Skip review and trust the output."
+          ],
+          "correct": 0,
+          "explanation": "Include ordinary, ambiguous, abstention and adversarial cases. Label expected outcomes before running the candidate. Aggregate accuracy can hide severe failures.",
+          "outcomes": [
+            "O1",
+            "O4"
+          ]
+        },
+        {
+          "id": "P6M8Q2",
+          "prompt": "Your team supporting a departmental request desk cannot reproduce a result. What next?",
+          "choices": [
+            "Publish because the report looks complete.",
+            "Reproduce the inputs, versions and checks before accepting the claim.",
+            "Remove failing examples."
+          ],
+          "correct": 1,
+          "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+          "outcomes": [
+            "O3",
+            "O5"
+          ]
+        },
+        {
+          "id": "P6M8Q3",
+          "prompt": "Which artifact best demonstrates create an evaluation set?",
+          "choices": [
+            "Write six expected outcomes, including two cases that must not trigger action. Include results and limitations.",
+            "A screenshot with no inputs or explanation.",
+            "An assertion of perfect accuracy."
+          ],
+          "correct": 0,
+          "explanation": "A concrete artifact and observed evidence support review.",
+          "outcomes": [
+            "O2",
+            "O5"
+          ]
+        }
+      ],
+      "liveSession": "Compare two approaches to create an evaluation set and defend the review boundary.",
+      "announcement": "Module 8: Create an evaluation set. Review the objective, run practice cases and bring a failure to discussion. Cohort dates pending.",
+      "prerequisite": "P6-M07",
+      "masteryPath": {
+        "remediation": "Re-read the concept, repeat the missing-input task and explain the mistake before retrying.",
+        "enrichment": "Change an assumption, create a counterexample and compare error rates."
+      },
+      "path": "academy/program-6/student/module-08",
+      "proposedWeek": 8
+    },
+    {
+      "id": "P6-M09",
+      "number": 9,
+      "title": "Assign decision rights",
+      "topic": "governance",
+      "family": "workflow",
+      "lesson": "Name approvers, operators and stop-authority owners. Connect each risk to a control, evidence and review interval. A policy without an operational checkpoint does not enforce itself.",
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "activity": {
+        "title": "Assign decision rights — applied workshop",
+        "objective": "O4: Demonstrate privacy minimization, human approval and recoverable failure.",
+        "overview": "You support a departmental request desk. Create three risk entries with owner, control and evidence.",
+        "steps": [
+          {
+            "title": "Concept setup · 10 minutes",
+            "text": "Name approvers, operators and stop-authority owners. Connect each risk to a control, evidence and review interval. A policy without an operational checkpoint does not enforce itself."
+          },
+          {
+            "title": "Implementation · 20 minutes",
+            "text": "Map missing confidence to needs_data, below 0.8 to human_review, otherwise awaiting_approval. Never mark an action executed. Open the starter notebook or visual workflow simulator."
+          },
+          {
+            "title": "Task · 20 minutes",
+            "text": "Create three risk entries with owner, control and evidence. Record a normal, missing-input and human-review case."
+          },
+          {
+            "title": "Research and discussion · 15 minutes",
+            "text": "Compare with a peer, cite your reading and identify a failure condition."
+          },
+          {
+            "title": "Wrap-up · 5 minutes",
+            "text": "Explain why a simulation is not a production-ready system; name the accountable owner."
+          }
+        ],
+        "reflection": [
+          "What evidence changes your decision?",
+          "Which error is more costly here?",
+          "What information can you avoid retaining?"
+        ],
+        "submission": "Draft cohort policy: 2–3-page APA-style paper with relevant code, output screenshots and citations. Word/PDF upload and Sunday 11:59 PM deadline need a scheduled cohort; no live deadline is set.",
+        "integrity": "AI coaching on concepts and ungraded practice is allowed with disclosure. Graded reasoning must be your own."
+      },
+      "labTask": "Map missing confidence to needs_data, below 0.8 to human_review, otherwise awaiting_approval. Never mark an action executed.",
+      "miniLabs": [
+        {
+          "title": "Missing-input stress test",
+          "task": "Replace every fourth confidence with None. Re-run and explain the changed results."
+        },
+        {
+          "title": "Scale and subgroup check",
+          "task": "Use the 60-row assignment dataset; compare queues and state a sampling limitation."
+        }
+      ],
+      "readings": [
+        {
+          "title": "Python CSV reference",
+          "url": "https://docs.python.org/3.12/library/csv.html"
+        },
+        {
+          "title": "Python test framework reference",
+          "url": "https://docs.python.org/3.12/library/unittest.html"
+        },
+        {
+          "title": "NIST AI risk framework overview",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+        }
+      ],
+      "quiz": [
+        {
+          "id": "P6M9Q1",
+          "prompt": "What makes a register actionable?",
+          "choices": [
+            "Named owners and testable controls",
+            "A risk list without decisions",
+            "Skip review and trust the output."
+          ],
+          "correct": 0,
+          "explanation": "Name approvers, operators and stop-authority owners. Connect each risk to a control, evidence and review interval. A policy without an operational checkpoint does not enforce itself.",
+          "outcomes": [
+            "O1",
+            "O4"
+          ]
+        },
+        {
+          "id": "P6M9Q2",
+          "prompt": "Your team supporting a departmental request desk cannot reproduce a result. What next?",
+          "choices": [
+            "Publish because the report looks complete.",
+            "Reproduce the inputs, versions and checks before accepting the claim.",
+            "Remove failing examples."
+          ],
+          "correct": 1,
+          "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+          "outcomes": [
+            "O3",
+            "O5"
+          ]
+        },
+        {
+          "id": "P6M9Q3",
+          "prompt": "Which artifact best demonstrates assign decision rights?",
+          "choices": [
+            "Create three risk entries with owner, control and evidence. Include results and limitations.",
+            "A screenshot with no inputs or explanation.",
+            "An assertion of perfect accuracy."
+          ],
+          "correct": 0,
+          "explanation": "A concrete artifact and observed evidence support review.",
+          "outcomes": [
+            "O2",
+            "O5"
+          ]
+        }
+      ],
+      "liveSession": "Compare two approaches to assign decision rights and defend the review boundary.",
+      "announcement": "Module 9: Assign decision rights. Review the objective, run practice cases and bring a failure to discussion. Cohort dates pending.",
+      "prerequisite": "P6-M08",
+      "masteryPath": {
+        "remediation": "Re-read the concept, repeat the missing-input task and explain the mistake before retrying.",
+        "enrichment": "Change an assumption, create a counterexample and compare error rates."
+      },
+      "path": "academy/program-6/student/module-09",
+      "proposedWeek": 9
+    },
+    {
+      "id": "P6-M10",
+      "number": 10,
+      "title": "Capstone scope and baseline",
+      "topic": "capstone",
+      "family": "evaluation",
+      "lesson": "Connect claims to reproducible evidence and explain failures. Present baseline, design, controls and rollback. A polished success-only demonstration is not enough.",
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "activity": {
+        "title": "Capstone scope and baseline — applied workshop",
+        "objective": "O5: Defend a no-code knowledge workflows portfolio with reproducible evidence and limitations.",
+        "overview": "You support a departmental request desk. Reproduce one success and one failure; defend the boundary.",
+        "steps": [
+          {
+            "title": "Concept setup · 10 minutes",
+            "text": "Connect claims to reproducible evidence and explain failures. Present baseline, design, controls and rollback. A polished success-only demonstration is not enough."
+          },
+          {
+            "title": "Implementation · 20 minutes",
+            "text": "Calculate reviewed count, total and review rate for each fictional queue; missing confidence requires review. Open the starter notebook or visual workflow simulator."
+          },
+          {
+            "title": "Task · 20 minutes",
+            "text": "Reproduce one success and one failure; defend the boundary. Record a normal, missing-input and human-review case."
+          },
+          {
+            "title": "Research and discussion · 15 minutes",
+            "text": "Compare with a peer, cite your reading and identify a failure condition."
+          },
+          {
+            "title": "Wrap-up · 5 minutes",
+            "text": "Explain why a simulation is not a production-ready system; name the accountable owner."
+          }
+        ],
+        "reflection": [
+          "What evidence changes your decision?",
+          "Which error is more costly here?",
+          "What information can you avoid retaining?"
+        ],
+        "submission": "Draft cohort policy: 2–3-page APA-style paper with relevant code, output screenshots and citations. Word/PDF upload and Sunday 11:59 PM deadline need a scheduled cohort; no live deadline is set.",
+        "integrity": "AI coaching on concepts and ungraded practice is allowed with disclosure. Graded reasoning must be your own."
+      },
+      "labTask": "Calculate reviewed count, total and review rate for each fictional queue; missing confidence requires review.",
+      "miniLabs": [
+        {
+          "title": "Missing-input stress test",
+          "task": "Replace every fourth confidence with None. Re-run and explain the changed results."
+        },
+        {
+          "title": "Scale and subgroup check",
+          "task": "Use the 60-row assignment dataset; compare queues and state a sampling limitation."
+        }
+      ],
+      "readings": [
+        {
+          "title": "Python CSV reference",
+          "url": "https://docs.python.org/3.12/library/csv.html"
+        },
+        {
+          "title": "Python test framework reference",
+          "url": "https://docs.python.org/3.12/library/unittest.html"
+        },
+        {
+          "title": "NIST AI risk framework overview",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+        }
+      ],
+      "quiz": [
+        {
+          "id": "P6M10Q1",
+          "prompt": "What is strongest evidence?",
+          "choices": [
+            "Reproducible tests and candid failure analysis",
+            "A success-only recording",
+            "Skip review and trust the output."
+          ],
+          "correct": 0,
+          "explanation": "Connect claims to reproducible evidence and explain failures. Present baseline, design, controls and rollback. A polished success-only demonstration is not enough.",
+          "outcomes": [
+            "O1",
+            "O4"
+          ]
+        },
+        {
+          "id": "P6M10Q2",
+          "prompt": "Your team supporting a departmental request desk cannot reproduce a result. What next?",
+          "choices": [
+            "Publish because the report looks complete.",
+            "Reproduce the inputs, versions and checks before accepting the claim.",
+            "Remove failing examples."
+          ],
+          "correct": 1,
+          "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+          "outcomes": [
+            "O3",
+            "O5"
+          ]
+        },
+        {
+          "id": "P6M10Q3",
+          "prompt": "Which artifact best demonstrates capstone scope and baseline?",
+          "choices": [
+            "Reproduce one success and one failure; defend the boundary. Include results and limitations.",
+            "A screenshot with no inputs or explanation.",
+            "An assertion of perfect accuracy."
+          ],
+          "correct": 0,
+          "explanation": "A concrete artifact and observed evidence support review.",
+          "outcomes": [
+            "O2",
+            "O5"
+          ]
+        }
+      ],
+      "liveSession": "Compare two approaches to capstone scope and baseline and defend the review boundary.",
+      "announcement": "Module 10: Capstone scope and baseline. Review the objective, run practice cases and bring a failure to discussion. Cohort dates pending.",
+      "prerequisite": "P6-M09",
+      "masteryPath": {
+        "remediation": "Re-read the concept, repeat the missing-input task and explain the mistake before retrying.",
+        "enrichment": "Change an assumption, create a counterexample and compare error rates."
+      },
+      "path": "academy/program-6/student/module-10",
+      "proposedWeek": 10
+    },
+    {
+      "id": "P6-M11",
+      "number": 11,
+      "title": "Capstone implementation clinic",
+      "topic": "capstone",
+      "family": "evaluation",
+      "lesson": "Connect claims to reproducible evidence and explain failures. Present baseline, design, controls and rollback. A polished success-only demonstration is not enough.",
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "activity": {
+        "title": "Capstone implementation clinic — applied workshop",
+        "objective": "O1: Map decision boundaries and evidence requirements for a departmental request desk.",
+        "overview": "You support a departmental request desk. Reproduce one success and one failure; defend the boundary.",
+        "steps": [
+          {
+            "title": "Concept setup · 10 minutes",
+            "text": "Connect claims to reproducible evidence and explain failures. Present baseline, design, controls and rollback. A polished success-only demonstration is not enough."
+          },
+          {
+            "title": "Implementation · 20 minutes",
+            "text": "Calculate reviewed count, total and review rate for each fictional queue; missing confidence requires review. Open the starter notebook or visual workflow simulator."
+          },
+          {
+            "title": "Task · 20 minutes",
+            "text": "Reproduce one success and one failure; defend the boundary. Record a normal, missing-input and human-review case."
+          },
+          {
+            "title": "Research and discussion · 15 minutes",
+            "text": "Compare with a peer, cite your reading and identify a failure condition."
+          },
+          {
+            "title": "Wrap-up · 5 minutes",
+            "text": "Explain why a simulation is not a production-ready system; name the accountable owner."
+          }
+        ],
+        "reflection": [
+          "What evidence changes your decision?",
+          "Which error is more costly here?",
+          "What information can you avoid retaining?"
+        ],
+        "submission": "Draft cohort policy: 2–3-page APA-style paper with relevant code, output screenshots and citations. Word/PDF upload and Sunday 11:59 PM deadline need a scheduled cohort; no live deadline is set.",
+        "integrity": "AI coaching on concepts and ungraded practice is allowed with disclosure. Graded reasoning must be your own."
+      },
+      "labTask": "Calculate reviewed count, total and review rate for each fictional queue; missing confidence requires review.",
+      "miniLabs": [
+        {
+          "title": "Missing-input stress test",
+          "task": "Replace every fourth confidence with None. Re-run and explain the changed results."
+        },
+        {
+          "title": "Scale and subgroup check",
+          "task": "Use the 60-row assignment dataset; compare queues and state a sampling limitation."
+        }
+      ],
+      "readings": [
+        {
+          "title": "Python CSV reference",
+          "url": "https://docs.python.org/3.12/library/csv.html"
+        },
+        {
+          "title": "Python test framework reference",
+          "url": "https://docs.python.org/3.12/library/unittest.html"
+        },
+        {
+          "title": "NIST AI risk framework overview",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+        }
+      ],
+      "quiz": [
+        {
+          "id": "P6M11Q1",
+          "prompt": "What is strongest evidence?",
+          "choices": [
+            "Reproducible tests and candid failure analysis",
+            "A success-only recording",
+            "Skip review and trust the output."
+          ],
+          "correct": 0,
+          "explanation": "Connect claims to reproducible evidence and explain failures. Present baseline, design, controls and rollback. A polished success-only demonstration is not enough.",
+          "outcomes": [
+            "O1",
+            "O4"
+          ]
+        },
+        {
+          "id": "P6M11Q2",
+          "prompt": "Your team supporting a departmental request desk cannot reproduce a result. What next?",
+          "choices": [
+            "Publish because the report looks complete.",
+            "Reproduce the inputs, versions and checks before accepting the claim.",
+            "Remove failing examples."
+          ],
+          "correct": 1,
+          "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+          "outcomes": [
+            "O3",
+            "O5"
+          ]
+        },
+        {
+          "id": "P6M11Q3",
+          "prompt": "Which artifact best demonstrates capstone implementation clinic?",
+          "choices": [
+            "Reproduce one success and one failure; defend the boundary. Include results and limitations.",
+            "A screenshot with no inputs or explanation.",
+            "An assertion of perfect accuracy."
+          ],
+          "correct": 0,
+          "explanation": "A concrete artifact and observed evidence support review.",
+          "outcomes": [
+            "O2",
+            "O5"
+          ]
+        }
+      ],
+      "liveSession": "Compare two approaches to capstone implementation clinic and defend the review boundary.",
+      "announcement": "Module 11: Capstone implementation clinic. Review the objective, run practice cases and bring a failure to discussion. Cohort dates pending.",
+      "prerequisite": "P6-M10",
+      "masteryPath": {
+        "remediation": "Re-read the concept, repeat the missing-input task and explain the mistake before retrying.",
+        "enrichment": "Change an assumption, create a counterexample and compare error rates."
+      },
+      "path": "academy/program-6/student/module-11",
+      "proposedWeek": 11
+    },
+    {
+      "id": "P6-M12",
+      "number": 12,
+      "title": "Capstone evaluation clinic",
+      "topic": "capstone",
+      "family": "evaluation",
+      "lesson": "Connect claims to reproducible evidence and explain failures. Present baseline, design, controls and rollback. A polished success-only demonstration is not enough.",
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "activity": {
+        "title": "Capstone evaluation clinic — applied workshop",
+        "objective": "O2: Construct and explain a bounded prototype for a departmental request desk.",
+        "overview": "You support a departmental request desk. Reproduce one success and one failure; defend the boundary.",
+        "steps": [
+          {
+            "title": "Concept setup · 10 minutes",
+            "text": "Connect claims to reproducible evidence and explain failures. Present baseline, design, controls and rollback. A polished success-only demonstration is not enough."
+          },
+          {
+            "title": "Implementation · 20 minutes",
+            "text": "Calculate reviewed count, total and review rate for each fictional queue; missing confidence requires review. Open the starter notebook or visual workflow simulator."
+          },
+          {
+            "title": "Task · 20 minutes",
+            "text": "Reproduce one success and one failure; defend the boundary. Record a normal, missing-input and human-review case."
+          },
+          {
+            "title": "Research and discussion · 15 minutes",
+            "text": "Compare with a peer, cite your reading and identify a failure condition."
+          },
+          {
+            "title": "Wrap-up · 5 minutes",
+            "text": "Explain why a simulation is not a production-ready system; name the accountable owner."
+          }
+        ],
+        "reflection": [
+          "What evidence changes your decision?",
+          "Which error is more costly here?",
+          "What information can you avoid retaining?"
+        ],
+        "submission": "Draft cohort policy: 2–3-page APA-style paper with relevant code, output screenshots and citations. Word/PDF upload and Sunday 11:59 PM deadline need a scheduled cohort; no live deadline is set.",
+        "integrity": "AI coaching on concepts and ungraded practice is allowed with disclosure. Graded reasoning must be your own."
+      },
+      "labTask": "Calculate reviewed count, total and review rate for each fictional queue; missing confidence requires review.",
+      "miniLabs": [
+        {
+          "title": "Missing-input stress test",
+          "task": "Replace every fourth confidence with None. Re-run and explain the changed results."
+        },
+        {
+          "title": "Scale and subgroup check",
+          "task": "Use the 60-row assignment dataset; compare queues and state a sampling limitation."
+        }
+      ],
+      "readings": [
+        {
+          "title": "Python CSV reference",
+          "url": "https://docs.python.org/3.12/library/csv.html"
+        },
+        {
+          "title": "Python test framework reference",
+          "url": "https://docs.python.org/3.12/library/unittest.html"
+        },
+        {
+          "title": "NIST AI risk framework overview",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+        }
+      ],
+      "quiz": [
+        {
+          "id": "P6M12Q1",
+          "prompt": "What is strongest evidence?",
+          "choices": [
+            "Reproducible tests and candid failure analysis",
+            "A success-only recording",
+            "Skip review and trust the output."
+          ],
+          "correct": 0,
+          "explanation": "Connect claims to reproducible evidence and explain failures. Present baseline, design, controls and rollback. A polished success-only demonstration is not enough.",
+          "outcomes": [
+            "O1",
+            "O4"
+          ]
+        },
+        {
+          "id": "P6M12Q2",
+          "prompt": "Your team supporting a departmental request desk cannot reproduce a result. What next?",
+          "choices": [
+            "Publish because the report looks complete.",
+            "Reproduce the inputs, versions and checks before accepting the claim.",
+            "Remove failing examples."
+          ],
+          "correct": 1,
+          "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+          "outcomes": [
+            "O3",
+            "O5"
+          ]
+        },
+        {
+          "id": "P6M12Q3",
+          "prompt": "Which artifact best demonstrates capstone evaluation clinic?",
+          "choices": [
+            "Reproduce one success and one failure; defend the boundary. Include results and limitations.",
+            "A screenshot with no inputs or explanation.",
+            "An assertion of perfect accuracy."
+          ],
+          "correct": 0,
+          "explanation": "A concrete artifact and observed evidence support review.",
+          "outcomes": [
+            "O2",
+            "O5"
+          ]
+        }
+      ],
+      "liveSession": "Compare two approaches to capstone evaluation clinic and defend the review boundary.",
+      "announcement": "Module 12: Capstone evaluation clinic. Review the objective, run practice cases and bring a failure to discussion. Cohort dates pending.",
+      "prerequisite": "P6-M11",
+      "masteryPath": {
+        "remediation": "Re-read the concept, repeat the missing-input task and explain the mistake before retrying.",
+        "enrichment": "Change an assumption, create a counterexample and compare error rates."
+      },
+      "path": "academy/program-6/student/module-12",
+      "proposedWeek": 12
+    }
+  ],
+  "rubric": [
+    {
+      "criterion": "Scope and assumptions",
+      "points": 15,
+      "outcome": "O1",
+      "bands": {
+        "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+        "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+        "Developing": "50% of points: partial implementation or weak justification.",
+        "Insufficient": "0 points: missing evidence or unsafe result."
+      }
+    },
+    {
+      "criterion": "Correctness and reproducibility",
+      "points": 25,
+      "outcome": "O2",
+      "bands": {
+        "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+        "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+        "Developing": "50% of points: partial implementation or weak justification.",
+        "Insufficient": "0 points: missing evidence or unsafe result."
+      }
+    },
+    {
+      "criterion": "Evaluation and failure analysis",
+      "points": 25,
+      "outcome": "O3",
+      "bands": {
+        "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+        "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+        "Developing": "50% of points: partial implementation or weak justification.",
+        "Insufficient": "0 points: missing evidence or unsafe result."
+      }
+    },
+    {
+      "criterion": "Privacy and human controls",
+      "points": 20,
+      "outcome": "O4",
+      "bands": {
+        "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+        "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+        "Developing": "50% of points: partial implementation or weak justification.",
+        "Insufficient": "0 points: missing evidence or unsafe result."
+      }
+    },
+    {
+      "criterion": "Communication and evidence",
+      "points": 15,
+      "outcome": "O5",
+      "bands": {
+        "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+        "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+        "Developing": "50% of points: partial implementation or weak justification.",
+        "Insufficient": "0 points: missing evidence or unsafe result."
+      }
+    }
+  ],
+  "scheduleNote": "Proposed sequence; dates and pacing require approval.",
+  "credential": {
+    "type": "Certificate of Completion",
+    "issuer": "Scholarion Academy",
+    "eligible": false,
+    "requiredCourseIds": [],
+    "rule": "Every approved required course at C or better. Required-course list and final grading policy TBC.",
+    "sourceDraftRules": "Historical source additionally proposes 70% overall, all labs, capstone pass, and 80% participation/approved alternative. These are draft proposals, not activated issuance rules."
+  },
+  "career": {
+    "portfolio": "no-code knowledge workflows",
+    "services": [
+      "Portfolio review",
+      "Resume evidence workshop",
+      "Interview practice"
+    ],
+    "resumePrompt": "Describe your contribution, synthetic setting, evaluation and measured results. Do not imply production deployment.",
+    "interviewPrompt": "Explain one failure, how you detected it, and why a human remained accountable.",
+    "disclaimer": "Related task skills, not a job, salary or placement guarantee."
+  },
+  "qualityGates": {
+    "structure": "automated check",
+    "syntheticData": "generated",
+    "executedSimulationNotebooks": "verified locally",
+    "SMEReview": "pending",
+    "independentInstructionalReview": "pending",
+    "originalityReview": "pending",
+    "fullAccessibilityAudit": "pending",
+    "recordedCaptionedMedia": "pending",
+    "liveProviderLabsAndLicenses": "pending",
+    "authenticatedLMSAndLTI": "pending",
+    "commonCartridgeValidation": "pending",
+    "productionPublication": "blocked"
+  },
+  "blocks": [
+    {
+      "id": "P6-B1",
+      "modules": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "status": "Draft syllabus"
+    }
+  ],
+  "assessments": [
+    {
+      "id": "P6-B1-Assignment-1",
+      "type": "Assignment",
+      "module": 2,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Write an instruction card with sources, schema, boundaries and two examples. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Assignment-2",
+      "type": "Assignment",
+      "module": 4,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Compare whole-document and sentence-level retrieval on a policy exception. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Assignment-3",
+      "type": "Assignment",
+      "module": 6,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Configure the supplied simulator and export its decision table. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Assignment-4",
+      "type": "Assignment",
+      "module": 8,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Write six expected outcomes, including two cases that must not trigger action. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Assignment-5",
+      "type": "Assignment",
+      "module": 10,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Reproduce one success and one failure; defend the boundary. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Lab-1",
+      "type": "Lab",
+      "module": 4,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Compare whole-document and sentence-level retrieval on a policy exception. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Lab-2",
+      "type": "Lab",
+      "module": 7,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Add a hostile snippet and show why it cannot expand the allowlist. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Lab-3",
+      "type": "Lab",
+      "module": 10,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Reproduce one success and one failure; defend the boundary. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Project-1",
+      "type": "Project",
+      "module": 5,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Define three result fields and reject an out-of-range score. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Project-2",
+      "type": "Project",
+      "module": 10,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Reproduce one success and one failure; defend the boundary. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Quiz-1",
+      "type": "Quiz",
+      "module": 2,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Write an instruction card with sources, schema, boundaries and two examples. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Quiz-2",
+      "type": "Quiz",
+      "module": 3,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Rank source snippets by token overlap and identify an unsupported query. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Quiz-3",
+      "type": "Quiz",
+      "module": 4,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Compare whole-document and sentence-level retrieval on a policy exception. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Quiz-4",
+      "type": "Quiz",
+      "module": 5,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Define three result fields and reject an out-of-range score. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Quiz-5",
+      "type": "Quiz",
+      "module": 7,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Add a hostile snippet and show why it cannot expand the allowlist. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Quiz-6",
+      "type": "Quiz",
+      "module": 8,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Write six expected outcomes, including two cases that must not trigger action. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Quiz-7",
+      "type": "Quiz",
+      "module": 9,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Create three risk entries with owner, control and evidence. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Quiz-8",
+      "type": "Quiz",
+      "module": 10,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Reproduce one success and one failure; defend the boundary. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Final-defense-1",
+      "type": "Final defense",
+      "module": 10,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Reproduce one success and one failure; defend the boundary. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P6-B1-Midterm-1",
+      "type": "Midterm",
+      "module": 10,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a departmental request desk. Reproduce one success and one failure; defend the boundary. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    }
+  ],
+  "capstonePackage": {
+    "brief": "No-code knowledge assistant and automated workflow for a department process.",
+    "milestones": [
+      {
+        "name": "Scope and baseline",
+        "deliverable": "Boundary, data card, baseline and success criteria."
+      },
+      {
+        "name": "Prototype and controls",
+        "deliverable": "Runnable or visual prototype, source log and approval path."
+      },
+      {
+        "name": "Evaluation and peer review",
+        "deliverable": "Held-out cases, failures, peer critique and revisions."
+      },
+      {
+        "name": "Defense and handover",
+        "deliverable": "Five-minute evidence demo, five-minute questions, runbook and limitations."
+      }
+    ],
+    "rubric": [
+      {
+        "criterion": "Scope and assumptions",
+        "points": 15,
+        "outcome": "O1",
+        "bands": {
+          "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+          "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+          "Developing": "50% of points: partial implementation or weak justification.",
+          "Insufficient": "0 points: missing evidence or unsafe result."
+        }
+      },
+      {
+        "criterion": "Correctness and reproducibility",
+        "points": 25,
+        "outcome": "O2",
+        "bands": {
+          "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+          "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+          "Developing": "50% of points: partial implementation or weak justification.",
+          "Insufficient": "0 points: missing evidence or unsafe result."
+        }
+      },
+      {
+        "criterion": "Evaluation and failure analysis",
+        "points": 25,
+        "outcome": "O3",
+        "bands": {
+          "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+          "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+          "Developing": "50% of points: partial implementation or weak justification.",
+          "Insufficient": "0 points: missing evidence or unsafe result."
+        }
+      },
+      {
+        "criterion": "Privacy and human controls",
+        "points": 20,
+        "outcome": "O4",
+        "bands": {
+          "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+          "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+          "Developing": "50% of points: partial implementation or weak justification.",
+          "Insufficient": "0 points: missing evidence or unsafe result."
+        }
+      },
+      {
+        "criterion": "Communication and evidence",
+        "points": 15,
+        "outcome": "O5",
+        "bands": {
+          "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+          "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+          "Developing": "50% of points: partial implementation or weak justification.",
+          "Insufficient": "0 points: missing evidence or unsafe result."
+        }
+      }
+    ],
+    "exemplar": "A fictional approval queue retains missing scores, routes uncertainty to review and never executes updates. Its evidence pack records input versions, thresholds, subgroup counts, failed cases and a rollback owner. Adapt this scaffold to the program brief. This is not a finished capstone solution.",
+    "peerReview": "A peer challenges an unsupported claim and repeats one test; the author documents the response.",
+    "status": "Draft brief; finished program-specific exemplars require SME authoring."
+  },
+  "evaluationPlan": {
+    "pre": "Explain a bounded workflow before instruction and attempt the first practice pool.",
+    "post": "Use unseen synthetic cases and compare outcome-aligned rubric scores.",
+    "survey": [
+      "What was unclear?",
+      "Which failure changed your design?",
+      "Was the workload feasible?"
+    ],
+    "analytics": "Local practice attempts and module checkpoints, not official grades."
+  },
+  "transferPolicy": "No automatic credit. Map outcomes and assessed evidence; an educator approves equivalence and prevents duplicate credit. Dependencies #1–#14 remain TBC."
+}

@@ -1,0 +1,7 @@
+P15-S03 — Control context and structured responses
+Faculty-review draft.
+Outcome: Compare prompt variants using a fixed test set and token budget.
+Lab: Design a response schema for fictional policy questions and evaluate two instruction variants.
+Assessment: Report schema failures and abstentions without claiming a model run that did not occur.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

@@ -1,0 +1,292 @@
+# MASTER DESIGN PROMPT — Scholaris AI Academy
+## 11 Agentic & Generative AI Certificate Programs (design, build, and load into Scholaris Global Learning)
+
+---
+
+## 0. ROLE & MISSION
+
+Act as a team of specialists working under one Lead Academic Architect:
+- Instructional designer and learning-experience designer
+- Agentic AI engineer and ML engineer
+- Curriculum assessment specialist
+- Responsible-AI and compliance reviewer
+- Career-services designer
+
+**Design, build, and load 11 original certificate programs for the Scholaris AI Academy.** The Academy runs on the Scholaris Global Learning platform. OakHaven Global University and DevTech (TechDev University) may offer these programs to their learners.
+
+Each program must be production-ready inside Scholaris. That means:
+- Catalog page
+- Syllabus and course shells
+- Modules, assignments, labs, quizzes, projects and capstone
+- Rubrics, datasets and notebooks
+- Instructor guide
+- Credential and badge definitions
+- Career-services hooks
+
+**Status:** OakHaven is a demonstration catalog. Programs are labeled as Scholaris AI Academy certificates of completion and must not be represented as accredited or university-partnered.
+
+---
+
+## 1. NON-NEGOTIABLE RULES
+
+1. **Originality (clean-room).** The market reference list in Section 3 is for gap analysis and positioning only.
+   - Do not copy any provider's program titles, curriculum outlines, module names, descriptions, marketing copy, images, testimonials, salary claims, or faculty names.
+   - Do not name or imply partnership with Johns Hopkins, MIT, UT Austin/McCombs, Great Learning, or any other institution.
+   - Write every title, outcome and module originally.
+2. **Honest credentials.** Use "Scholaris AI Academy Certificate of Completion" and "Professional Certificate" labels only. Never use "Postgraduate", "PG", "degree" or "accredited" unless an approval actually exists and is recorded.
+3. **Honest career claims.** No salary, placement-rate or job-guarantee claims without verified, cited, current data. Describe career support as services offered, never outcomes guaranteed.
+4. **Current and verified tooling.** Every framework, model and tool named must be checked as current at build time, with version pinned in lab environments. Flag anything deprecated.
+5. **Responsible AI in every program.** Every program includes evaluation, guardrails, human-in-the-loop, privacy, security and bias content scaled to its audience.
+6. **Accessibility.** WCAG 2.2 AA for all content. Captions/transcripts for all media. Alt text. Accessible notebooks and slides.
+7. **Academic integrity.** The Scholaris AI Teaching Assistant explains and coaches but never completes graded work.
+
+---
+
+## 2. ACADEMY ARCHITECTURE
+
+### 2.1 Tracks
+| Track | Audience | Coding level |
+|---|---|---|
+| **Builder** | Engineers, developers, data/ML practitioners | Python required |
+| **No-Code** | Domain experts, analysts, operations staff, managers | None (visual tools, prompting) |
+| **Business & Leadership** | Managers, product leaders, executives | None to light |
+| **Industry** | Finance and healthcare professionals | Light (guided notebooks optional) |
+
+### 2.2 Stackable pathways
+- Short programs stack into longer ones.
+  - Example: the AI-Native Professional certificate credits into either No-Code program.
+  - Example: the Applied Generative & Agentic AI certificate credits into the Agentic AI Systems certificate.
+- Define, for every program, **prerequisites, credit-for-prior-learning rules, and which modules transfer.**
+- Each completed program issues a **verifiable digital credential** (Open Badges 3.0 / W3C Verifiable Credential) plus a printable certificate.
+- Each capstone also issues a **skill badge**.
+
+### 2.3 Delivery modes (per program)
+- Self-paced weekly modules
+- Live weekend sessions (recorded and captioned)
+- Mentored small-group sessions
+- Asynchronous discussion
+- Office hours
+
+State weekly learner hours: target 6–10 hours/week for Builder, 4–6 for others.
+
+---
+
+## 3. THE 11 PROGRAMS
+
+The **market reference** column lists the comparable certificate on the reference site. It is for internal gap analysis only and is never shown to learners.
+
+| # | Scholaris program (original title — refine if needed) | Track | Length | Market reference (internal only) |
+|---|---|---|---|---|
+| 1 | **Professional Certificate in Agentic AI Systems** | Builder | 18 weeks | Certificate Program in Agentic AI (18 wks) |
+| 2 | **Certificate in Applied Generative & Agentic AI** | Builder | 16 weeks | Applied Generative AI and Agentic AI (16 wks) |
+| 3 | **Professional Certificate in Applied AI: Machine Learning, Generative AI & Agents** | Builder | 20 weeks | Certificate Program in AI: Applied ML, GenAI, and Agents (5 months) |
+| 4 | **Certificate in AI Agents for Software Engineering** | Builder | 14 weeks | Generative AI and Agents for Software Development (14 wks) |
+| 5 | **Certificate in No-Code AI, Machine Learning & Agents** | No-Code | 14 weeks | No Code and Agentic AI (14 wks) |
+| 6 | **Certificate in No-Code Generative AI & Agent Workflows** | No-Code | 12 weeks | No-Code Generative AI and Agentic AI (12 wks) |
+| 7 | **AI-Native Professional: Workflows & Agents for Everyday Productivity** | No-Code | 6 weeks | AI-Native Professional: Workflows and Agents for Productivity (6 wks) |
+| 8 | **Certificate in AI Agents for Business Operations** | Business | 12 weeks | Post Graduate Program in AI Agents for Business Applications (12 wks) |
+| 9 | **Certificate in Generative AI & AI Agent Strategy for Leaders** | Business & Leadership | 12 weeks | Postgraduate Program in AI Agents and Generative AI for Business Applications (3 months) |
+| 10 | **Certificate in AI & Agentic AI for Finance** | Industry | 10 weeks | AI and Agentic AI in Finance (10 wks) |
+| 11 | **Certificate in AI & Agentic AI for Healthcare Operations** | Industry | 10 weeks | AI and Agentic AI in Healthcare (10 wks) |
+
+### 3.1 Differentiation rules (avoid overlapping programs)
+- **#1 vs #2 vs #3:**
+  - #2 is the on-ramp: LLM apps, prompting, RAG, single agents.
+  - #1 is production multi-agent systems: orchestration, memory, MCP/tool protocols, evaluation, observability, deployment, security.
+  - #3 is the broadest: classical ML → deep learning → GenAI → agents. It is aimed at learners without an ML foundation.
+- **#4** focuses on the software lifecycle: AI coding assistants, agentic coding workflows, test generation, code review agents, CI/CD agents, secure use in repos.
+- **#5 vs #6:**
+  - #5 includes no-code predictive ML (AutoML, classification/forecasting) plus agents.
+  - #6 is GenAI-only: prompting, knowledge assistants, RAG via no-code tools, workflow automation.
+- **#8 vs #9:**
+  - #8 is for practitioners who implement agents in business processes (low-code).
+  - #9 is for leaders who decide, fund, govern and scale AI: strategy, ROI, operating model, risk, change management.
+- **#10 / #11** are domain programs with sector regulation and risk at the center.
+  - #11 must stay focused on **operations, administration, documentation and population-level analytics**. It must not teach learners to make clinical diagnoses or treatment decisions with AI. Clinical AI content is limited to how such systems are evaluated, regulated and governed.
+
+---
+
+## 4. REQUIRED DESIGN PACKAGE (for EACH of the 11 programs)
+
+1. **Catalog page:** title, one-paragraph description, who it's for, prerequisites, length, weekly hours, delivery mode, learning outcomes, tools used, capstone summary, credential, stackability, career services offered. Use honest claims only.
+2. **Program learning outcomes:** 5 competencies written as measurable outcomes (Bloom's verbs), mapped to every module and assessment.
+3. **Week-by-week curriculum map:** module title, topics, readings/resources, lab, activity, assessment, live session topic.
+4. **Course shells in Scholaris** following the Scholaris course standard (Section 5).
+5. **Hands-on In-Class Activities** for every module, in the Academy activity template (Section 6).
+6. **Labs:**
+   - Builder/Industry tracks: Student Starter notebook with TODOs plus Instructor Solution notebook (EXECUTED), runnable in Colab and the Scholaris Cloud Lab.
+   - No-Code tracks: step-by-step tool walkthroughs with screenshots and a completed reference build.
+7. **Datasets:** generated or properly licensed `.csv`/JSON datasets for every lab. Include a data card covering source, license, fields, intended use, and known biases. **No real personal, financial or patient data.**
+8. **Mini Labs:** 2 per module (starter TODO plus EXECUTED solution).
+9. **Assignments:** an enhanced assignment per course block with a detailed step-by-step walkthrough on a larger dataset.
+10. **Quizzes and exams:** question banks with explanations; randomized pools.
+11. **Projects and capstone:** brief, milestones, deliverables, rubric, sample exemplar, and a demo-day format.
+12. **Rubrics:** analytic rubrics with criteria, rating bands and points, aligned to outcomes.
+13. **Slides and recorded-lecture scripts** for each module (captioned).
+14. **Instructor guide:** timing, facilitation notes, answer keys, common mistakes, live-session plans.
+15. **Student edition** of every activity and worksheet without answers. **Instructor edition** with the answer key and an instructor-led sample prefilled.
+16. **Credential definition:** completion criteria, badge metadata (skills, evidence, criteria URL), certificate template.
+17. **Career-services hooks:** portfolio items produced, resume bullet suggestions, interview practice prompts, relevant job-role mapping (described as roles the skills apply to, not guarantees).
+18. **Evaluation plan:** pre/post skills assessment, module feedback surveys, completion and mastery analytics.
+
+---
+
+## 5. SCHOLARIS COURSE STANDARD (apply per 10-week course block)
+
+Programs **10 weeks or longer** are built from one or more 10-week course blocks. Each block contains:
+- Full syllabus
+- 5 competencies
+- 10 topics/modules over a 10-week outline
+- 5 assignments, 3 labs, 2 projects, 8 quizzes, midterm and final exams
+- Automatic weekly announcements
+- **Sequential module locking**
+
+Scaling rules:
+- **16–20 week programs** = 2 course blocks. The second block's final exam may be replaced by the capstone defense.
+- **12–14 week programs** = 1 extended block, with the extra weeks used for the capstone.
+- **The 6-week program (#7)** uses a scaled standard: 6 modules, 3 assignments, 2 labs, 1 project, 6 quizzes, a final practical assessment, weekly announcements, sequential locking.
+
+Build every block using Scholaris Canvas-parity features:
+- Modules with prerequisites and requirements
+- Mastery Paths for remediation and enrichment
+- Rubrics linked to outcomes
+- Item banks
+- Course Pacing for self-paced cohorts
+- Discussion checkpoints
+- Peer review on projects
+- Learning Mastery Gradebook
+
+---
+
+## 6. HANDS-ON IN-CLASS ACTIVITY TEMPLATE (every module)
+
+1. **Title**
+2. **Objective**
+3. **Activity Overview**
+4. **Step 1:** Concept setup / context
+5. **Step 2: Hands-On Implementation.** Open the Student Starter with TODOs notebook.
+   - *Resources provided:* Student Starter TODO notebook; Instructor Solution notebook (EXECUTED).
+   - No-code tracks substitute the tool walkthrough plus a completed reference build.
+6. **Step 3: Task**
+7. **Step 4: Research, Discussion & Reflection**
+8. **Step 5: Wrap-Up** (5 min, review core concepts)
+9. **Instructor Emphasizes**
+10. **Reflection Questions**
+11. **Submission:**
+    - 2–3-page APA paper with embedded code (where applicable), explanations, and output screenshots
+    - References and citations
+    - Upload via Scholaris LMS as Word or PDF
+    - Due Sunday 11:59 PM
+12. **Reminders**
+
+**Activity package contents:** instructor Colab notebook (EXECUTED), student starter notebook (TODOs), Google Codelab-style walkthrough, generated dataset (.csv), 2 Mini Labs (starter TODO + EXECUTED solution each), and the enhanced assignment walkthrough.
+
+---
+
+## 7. CONTENT SPINE (cover across programs, depth scaled by track)
+
+| Domain | Topics |
+|---|---|
+| Foundations | AI/ML basics, data, model types, LLM fundamentals, tokens/context, model selection, cost and latency |
+| Prompting | Prompt design patterns, structured outputs, few-shot, system prompts, prompt evaluation |
+| Retrieval | Embeddings, chunking, vector search, hybrid search, reranking, RAG evaluation, Agentic RAG |
+| Agent design | Reasoning-and-acting loops, plan-and-execute, reflection/self-critique, tool use and function calling, memory (short/long-term), state machines/graphs |
+| Multi-agent | Orchestrator–worker, hierarchical teams, debate/critique, handoffs, shared state, failure handling |
+| Interoperability | Tool and context protocols (e.g., MCP), agent-to-agent communication, API integration |
+| Frameworks (verify current versions) | LangGraph, LangChain, CrewAI, LlamaIndex, provider agent SDKs; no-code platforms for tracks #5–#7 |
+| Engineering | Testing agents, evaluation datasets, LLM-as-judge with human calibration, observability/tracing, deployment, versioning, rollback |
+| Security | Prompt injection, data exfiltration, tool permissioning, least privilege, sandboxing, secrets, supply-chain risk |
+| Governance | Human-in-the-loop design, guardrails, auditability, bias and fairness, privacy (GDPR/CCPA/HIPAA/NDPA as relevant), AI regulation overview (e.g., EU AI Act), model risk management |
+| Business value | Use-case selection, process mapping, ROI and total cost, build vs buy, change management, adoption metrics |
+| Industry (#10) | Fraud/AML monitoring, credit risk support, financial reporting and reconciliation agents, research assistants, model risk management and audit trails. **No personalized investment advice agents.** |
+| Industry (#11) | Revenue cycle, scheduling, prior-auth paperwork, documentation support, supply chain, population analytics, and evaluating/governing clinical AI. **No diagnostic or treatment-decision agents built by learners.** |
+
+---
+
+## 8. CAPSTONES (one per program — original briefs)
+
+| # | Capstone direction |
+|---|---|
+| 1 | Production multi-agent system with tool protocol integration, evaluation suite, tracing, guardrails, and a deployment runbook |
+| 2 | RAG-powered domain assistant evolved into a single tool-using agent, with an evaluation report |
+| 3 | End-to-end project: ML model → GenAI feature → agentic workflow on one dataset, with a model card |
+| 4 | Agentic coding pipeline: issue → plan → code → tests → review agent, with security and quality gates |
+| 5 | No-code predictive model plus agent that acts on predictions, with a human approval step |
+| 6 | No-code knowledge assistant and automated workflow for a department process |
+| 7 | Personal productivity agent stack with documented time-savings measurement |
+| 8 | Business-process agent (e.g., customer service triage or procurement) with an ROI case and governance plan |
+| 9 | AI strategy and agent adoption roadmap for an organization, with risk register and operating model; board-style presentation |
+| 10 | Finance operations agent (e.g., reconciliation or transaction monitoring support) on synthetic data, with an audit trail and model-risk memo |
+| 11 | Healthcare operations agent (e.g., scheduling or claims-documentation support) on synthetic data, with privacy controls and a governance review |
+
+Capstones may optionally use **Scholaris/Haven sandbox scenarios**, all with synthetic data:
+- Oak Haven Lodging guest services
+- MediGrid order fulfillment (non-clinical)
+- OakHaven admissions navigation
+- HavenConnect support triage
+
+---
+
+## 9. LEARNING ENVIRONMENT
+
+- **Scholaris Cloud Lab** (in-house LTI 1.3 tool): pinned Python environments, GPU where needed, preloaded datasets, sandboxed API keys with spend caps, automatic grade passback for autograded labs.
+- **Colab-compatible notebooks** as a fallback.
+- **No-code tool sandboxes**, with tool licensing verified for educational use.
+- **Scholaris AI Teaching Assistant** per course: answers from published course material with citations; refuses graded work; escalates to the instructor.
+- **Optional presenters:** Amara or Tunde (Haven digital humans) for recorded welcome and recap videos, with AI disclosure.
+
+---
+
+## 10. ASSESSMENT & CREDENTIAL RULES
+
+**Completion requires:**
+- At least 70% overall
+- All labs submitted
+- Capstone passed against its rubric
+- At least 80% attendance or participation in live/mentored components (or an approved async alternative)
+
+**Other rules:**
+- **Mastery:** outcome mastery tracked per competency. Learners below mastery get Mastery Path remediation before the capstone.
+- **Integrity:** AI-use policy per assignment (allowed / allowed with disclosure / not allowed). Capstone defense is live or recorded.
+- **Credentials** carry the program name, competencies, capstone evidence link, issue date and verification URL. No institution names other than the Scholaris AI Academy (and the offering tenant, if approved).
+
+---
+
+## 11. QUALITY GATES (before a program is published)
+
+- [ ] Originality check: no copied titles, outlines or text from reference providers.
+- [ ] Every outcome maps to at least one assessment; every assessment maps to an outcome.
+- [ ] All notebooks run top-to-bottom in a clean environment; solutions are EXECUTED with outputs saved.
+- [ ] All datasets are synthetic or licensed, with data cards.
+- [ ] Tool and framework versions verified current and pinned.
+- [ ] Accessibility audit passed (captions, alt text, contrast, keyboard, notebook accessibility).
+- [ ] Responsible-AI review passed, with industry boundaries enforced for #10 and #11.
+- [ ] Catalog copy contains no unverified salary, placement, accreditation or partnership claims.
+- [ ] Course shells load in Scholaris: sequential locking, quizzes, rubrics, pacing and Cloud Lab launches verified.
+- [ ] Peer review by a second instructional designer and a subject-matter expert.
+
+---
+
+## 12. PRODUCTION ORDER & OUTPUT FORMAT
+
+**Production order:**
+1. Academy architecture, pathways and credential framework
+2. Programs **#2 → #1** (Builder spine)
+3. **#7 → #6 → #5** (No-Code spine)
+4. **#8 → #9**
+5. **#3, #4**
+6. **#10, #11**
+
+**For each program, deliver, in order:**
+1. Catalog page
+2. Outcomes and curriculum map
+3. Course block syllabi
+4. Module-by-module packages: activity, notebooks, mini labs, quiz bank, slides, scripts
+5. Assignments, projects and capstone with rubrics
+6. Instructor guide and answer keys
+7. Student edition
+8. Credential and badge definitions
+9. Scholaris import package (course export/Common Cartridge plus Cloud Lab configs)
+10. Quality-gate checklist results
+
+**Status report after each program:** what is complete, what is drafted, what needs SME review, and any tooling or licensing risks.

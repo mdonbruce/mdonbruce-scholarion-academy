@@ -1,0 +1,6 @@
+// Draft contract only. No deployed runtime. Authorization must derive from authenticated metadata.
+syntax = "proto3";
+package consent.v1;
+service ConsentService { rpc CheckAccess (CheckAccessRequest) returns (CheckAccessResponse); }
+message CheckAccessRequest { string supporter_id = 1; string learner_id = 2; string scope = 3; }
+message CheckAccessResponse { bool allowed = 1; string reason = 2; }

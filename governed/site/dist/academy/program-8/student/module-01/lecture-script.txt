@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a procurement intake process. Draw an input-to-review map with two mandatory human checkpoints.
+
+Core concept
+An assistant can suggest an action without permission to perform it. Name the decision owner, allowed inputs, prohibited outputs and measurable baseline before selecting a model.
+
+Practice contract
+Map each ID to review if confidence is missing or below 0.8, otherwise ready_for_review. Neither route executes an action.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+A named task with allowed actions and a human escalation owner

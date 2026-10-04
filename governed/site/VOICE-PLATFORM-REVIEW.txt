@@ -1,0 +1,34 @@
+HAVEN VOICE SPECIFICATION REVIEW — 2026-10-02
+Source: 04f8585a-d038-4c58-bc31-d1a56b4ab990/Pasted text.txt
+Scope retained: single Scholarion Academy, local only. No public launch, external connectors, biometric capture, payment or payouts enabled.
+
+Before: existing avatar scenarios were rule-based text roleplay. They are not a voice or digital-human rendering service.
+
+Implemented local foundation
+- Instructor navigation: Voice & avatar drafts (#voice-studio).
+- Fictional Amara/Tunde design records with distinct identifiers and explicit absence of trained voice/render models or evaluated languages.
+- Backend-persisted storyboard creation, scene addition, project listing, export, archive and immutable version restore.
+- Change All dry run returns affected scene identifiers; applying requires confirmation and current revision. Only the specified speaker changes; restore creates a new revision.
+- Pairing checks constrain each fictional persona to its own voice-design identifier. English is a script-planning setting, not evaluated speech support. Other languages rejected.
+- Authentication, owner and course boundaries, bounded inputs, revision conflict checks, audit events and immutable history.
+- Generation/capture/clone/train/publish routes refuse execution. No biometric fields or external requests are accepted by this feature.
+
+Required status labels
+SIMULATED: storyboard media workflow and existing text avatar roleplay. Script storage/editing is real, but no output from served audio/video models exists; therefore not LIVE under Section 2.
+DISABLED: generation and digital-double action gates, external routing, real billing/payouts. Disabled gates do not imply those underlying services have been built.
+PLANNED: voice synthesis/recognition/cloning engines; avatar assets and renderer; lip-sync; model/license registry; dataset/training lifecycle; watermark/C2PA; consent/identity/liveness/two-reviewer authorization; streaming conversation and barge-in; voice library; dubbing/music/SFX/audiobooks; kiosk/telephony/XR; external Haven integrations; full role matrix; metering; resumable render jobs; API keys/webhooks; private deployment/SSO/residency.
+CONNECTED: none of the new external voice systems.
+LIVE: no new media-generation capability meets the specification's complete definition of done.
+
+API (local authenticated JSON POST)
+/api/voice-studio/status, pairing, list, create, scene, change-all, history, restore, export, archive.
+All requests use existing instructor session/Bearer, tenant=scholarion and an authorized course. Mutations of existing drafts require id and revision. Change-all supports dryRun=true; apply requires confirmed=true. Restore takes targetRevision. Pairing takes avatar, voice, language. Scene takes speaker and bounded script.
+Generate/clone/capture/train/publish return DISABLED with provider_disabled or consent_required; no output is generated.
+These are local storyboard APIs, not implementation of the specification's full /v1 speech API or OpenAPI/streaming contracts.
+
+Runbook
+Start with python governed_service.py from site. Sign in with an existing authorized local instructor identity. Open Voice & avatar drafts, create a project, add fictional scripts, preview speaker replacements and confirm. Restore a revision to undo or unarchive. Export contains scripts and a content hash; it is not signed provenance. Keep private-governed out of release archives. Do not use real identity evidence, biometric recordings or confidential scripts in this draft workflow.
+
+Validation
+240 Python regression tests passed, including six-scene/two-speaker isolation, restore, stale revision, pairing incompatibility, unsupported language, generation blocks, role/course denial and archive restrictions. JavaScript syntax check passed.
+No served-model output, latency, voice/lip-sync quality, cultural review, full accessibility audit, cross-organization deployment or complete browser E2E is claimed. The complete platform remains unfinished.

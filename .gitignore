@@ -9,3 +9,10 @@ next-env.d.ts
 preview/
 .DS_Store
 coverage/
+
+# Python governed service: runtime identities, bootstrap codes and databases are created on first run — never commit them.
+governed/site/private-governed/
+governed/**/__pycache__/
+governed/**/*.sqlite3
+governed/integrations/HavenConnect-current/node_modules/
+governed/integrations/HavenConnect-current/.wrangler/

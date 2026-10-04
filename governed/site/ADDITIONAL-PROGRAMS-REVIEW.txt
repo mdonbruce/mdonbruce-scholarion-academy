@@ -1,0 +1,38 @@
+ADDITIONAL PROGRAMS — SPECIFICATION RECONCILIATION — 2026-10-02
+Source: c96e5e23-8673-4fe5-a47f-34475b93b22b/Pasted text.txt
+
+Preserved decisions
+Scholarion Academy brand, single-Academy architecture, ten weeks per course, sandbox-only payment, no retirement or automatic transfer.
+Programs #1, #13 and #14 each contain two sequential ten-week blocks (20 weeks total). #12 contains one ten-week block. Source 18/16/8-week durations are superseded by the user's ten-week-course decision.
+
+Existing state found
+#1 and #12 had static catalog outlines; #13 and #14 were absent from programs.json. None of these four was supported by versioned instructor shells.
+
+Implemented
+- Four program designs and public preview routes #program/1, /12, /13, /14; catalog discovery and comparison use updated entries.
+- Seven course block designs, seventy weekly activity briefs, five program competencies each, outcome references, student/instructor guidance, project and capstone briefs, and proposed 100-point rubrics.
+- Versioned program studio accepts all four programs; local AIM310 has the new shells loaded without overwriting existing revisions. Exports include the complete course array.
+- Commons allows mapped versions to be explicitly pinned to these programs. Mappings are not academic equivalences.
+- Four PDF brochures generated from the same design data as public pages, with draft status and unconfigured commercial fields.
+- Client-side Course structured data and program description metadata. Dedicated crawlable HTML pages and production SEO validation remain outstanding.
+- #1 capstone explicitly uses synthetic applicants, bias testing, reason-code review and a human decision; no automated credit decision.
+- #13 retains #9; proposed course-2 mapping has no automatic transfer. Per-course and bundle credential definitions remain proposed.
+- Applications, payment and issuance are disabled. No CEUs, placement rates, testimonials, partner endorsements, or unverified tool-version claims.
+
+Status per program
+#1: DRAFTED / NEEDS SME REVIEW. Two course blocks, upgraded public page, rubric and brochure.
+#12: DRAFTED / NEEDS SME REVIEW. Product-design course, page, rubric and brochure.
+#13: DRAFTED / NEEDS SME REVIEW. Two leadership courses, bundle definitions, page and brochure.
+#14: DRAFTED / NEEDS SME REVIEW. Two applied courses, eight project briefs, page and brochure. No claim of forty completed demos or ten executed practices.
+None is a complete academic delivery package.
+
+Remaining gaps
+Full lessons, starter and executed notebooks, synthetic datasets/data cards, validated assessment banks, slides/scripts, instructor solutions and accessible media are not completed by this update. Activity briefs are not finished lessons or runnable labs.
+Tool versions/licenses require verification before tools are adopted. Regulatory teaching references require current source review. Faculty biography and additional mentors require confirmation.
+Admissions/SIS and financial-aid integration, approved pricing/refund/installment configuration, scheduling and advisor contacts are not connected for these programs. A Support link is not an admissions integration.
+Credential definitions are not signed credentials; eligibility thresholds and issuance need approved policy.
+#13 drafts do not automatically satisfy dependencies in #20 or #25 or authorize #9 waivers. Existing immutable designs retain their original dependency notes until reviewed in a new revision.
+No production publishing occurred. Public pages are local draft previews, not approved offerings.
+
+Validation
+234 Python tests passed. JavaScript syntax checks passed. Live HTTP load/list verified sixteen total program shells and seven new course blocks. Browser verified #13 title, course blocks, draft state and brochure link. Four PDFs rendered to fifteen nonempty pages and visually reviewed; an initial blank-page pagination issue was corrected. Full WCAG audit and authenticated end-to-end browser editing were not performed.

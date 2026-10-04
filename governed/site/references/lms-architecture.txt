@@ -1,0 +1,4938 @@
+# CANVAS-PARITY FEATURE & FUNCTIONALITY PROMPT
+## Scholaris Global Learning LMS (first tenant: OakHaven Global University)
+
+---
+
+## 0. ROLE & GOAL
+
+You are the **LMS Feature-Parity Architect** for Scholaris Global Learning. Build an LMS whose **features, workflows and user experience match what instructors, students, designers and admins expect from Canvas LMS**. Build it in Scholaris's own architecture (multi-tenant, database-per-tenant, SIS as source of truth, outbox events, governed AI).
+
+**Clean-room rule:** Match functionality, not implementation. Do **not** copy Canvas source code, UI assets, icons, or the names "Canvas"/"Instructure". Use Scholaris names for every feature. Write all UI copy originally.
+
+For every feature below, deliver the following. A feature missing any of these is **not done**:
+- UI screens (web responsive plus mobile PWA)
+- REST + GraphQL API and domain events
+- Server-side permissions
+- Seed data for the OakHaven demo tenant
+- Tests, including the accessibility test (WCAG 2.2 AA)
+
+---
+
+## 1. ROLES & PERMISSIONS MODEL
+
+**Course roles:** Teacher, TA, Designer, Student, Observer.
+**Account roles:** Account Admin, Sub-Account Admin, plus custom roles.
+
+- Build a **permissions matrix UI** with granular toggles per role, for example:
+  - Manage course content, Grade submissions, View all grades, Manage sections, Send messages
+  - View/restore deleted content, Manage LTI, Change course state, Masquerade
+- Permissions **inherit down the account → sub-account tree**. A parent admin can **lock** a permission so sub-accounts cannot change it.
+- **Observers** are linked to specific students. They see only the linked student's grades, calendar and submissions, subject to consent.
+- **Act As / masquerade:** admin-only and time-boxed, shown with a persistent banner, fully audited.
+- **Student View:** teachers preview the course as a fake test student. The test student's data is isolated and resettable.
+
+---
+
+## 2. GLOBAL NAVIGATION (left rail, always visible)
+
+| Item | Functionality |
+|---|---|
+| **Account** | Profile, avatar, pronouns, bio, contact methods, notification preferences, files (personal), settings (language, time zone, high-contrast, dyslexia-friendly font, underline links), ePortfolios, QR login for mobile, shared content inbox |
+| **Admin** (admins only) | Account and sub-account admin console (Section 6) |
+| **Dashboard** | Three views: **Card View**, **List View**, **Recent Activity**. See details below the table. |
+| **Courses** | "All Courses" page with current/past/future enrollments, favorite star (controls dashboard cards), published state, search |
+| **Groups** | Student groups across courses; each group has its own home, pages, discussions, files, announcements, people, collaborations, conferences |
+| **Calendar** | Month/week/agenda views, see Section 4 |
+| **Inbox** | Conversations, see Section 5 |
+| **History** | Recently viewed pages and items |
+| **Media** | Media library: record, upload, caption, share (Studio-equivalent) |
+| **Help** | Configurable help menu: search guides, report a problem (creates ticket), ask instructor, feature feedback |
+
+**Dashboard details**
+- **Card View:** color, nickname and image per course card. Icons show unread announcements, discussions and assignments with badges. Cards are reorderable by drag.
+- **List View:** a planner with a day-by-day to-do timeline. Items can be marked complete, and students can add personal to-dos. Supports "new activity" and missing-items filters.
+- **Right sidebar:** To Do (items to grade/submit), Coming Up, Recent Feedback, Start a New Course (if permitted), View Grades.
+- **Global announcements:** account-level banners with dismiss, targeted by role and date.
+
+---
+
+## 3. COURSE NAVIGATION (per-course left menu)
+
+Teachers can **reorder, hide or show** every course tab in Settings → Navigation. Hidden tabs remain reachable for teachers but are invisible to students. Tabs with no content auto-hide from students.
+
+### 3.1 Home
+- Choose the home page type:
+  - Recent Activity stream
+  - A designated Front Page (wiki page)
+  - Modules
+  - Assignments list
+  - Syllabus
+- Sidebar: Publish/Unpublish course, Import existing content, Import from Commons-equivalent, Choose home page, View course stream, New announcement, New analytics, View course notifications, To Do, Coming Up.
+- Course setup checklist for new courses.
+
+### 3.2 Announcements
+- Rich-content announcements with attachments.
+- Options: delay posting (scheduled), allow replies/likes, section-specific targeting, podcast feed.
+- Read/unread tracking, lock replies, and show the latest announcement(s) on the home page.
+
+### 3.3 Syllabus
+- Editable rich-content description on top.
+- **Auto-generated course summary** below it, listing every dated assignment, quiz, discussion and event in date order. It updates automatically when dates change.
+
+### 3.4 Modules (the backbone)
+- Modules contain ordered items: Pages, Assignments, Quizzes, Discussions, Files, Text headers, External URLs, External tools (LTI).
+- Items are drag-and-drop reorderable and can be moved between modules. Indentation levels are supported.
+- **Publish/unpublish** works per module and per item. Unpublished items are invisible to students.
+- **Prerequisites:** a module can be locked until prior modules are complete.
+- **Lock until** a date.
+- **Requirements**, per item: view, mark as done, contribute, submit, or score at least X. The module can require all requirements or any one of them.
+- **Sequential progression:** students must complete items in order. This is **enforced server-side**.
+- The student sees progress icons per item and **Next/Previous navigation buttons** at the bottom of every module item.
+- **Mastery Paths (conditional release):** score ranges on an assessment unlock different follow-up items per student.
+- Duplicate a module, collapse/expand all, view progress for all students (teacher).
+- **Assign-to per module** (differentiation), covering specific sections, groups or students.
+
+### 3.5 Assignments
+- Grouped by **Assignment Groups** with optional weighting and drop rules (drop lowest/highest N, never drop X).
+- **Assignment editor fields:**
+  - Title and rich description
+  - Points
+  - Assignment group
+  - Display grade as: points, percentage, complete/incomplete, letter grade, GPA scale, or not graded
+  - Exclude from final grade
+  - Submission types: online text entry, file upload (with allowed extensions), website URL, media recording, student annotation, external tool, on paper, or no submission
+  - Number of attempts
+  - Group assignment (with group set, grade individually or as a group)
+  - Peer reviews: manual or automatic, count per student, anonymous option, due date
+  - Moderated grading: multiple graders, final grader selects
+  - Anonymous grading
+  - Plagiarism review hook (LTI)
+  - **Assign to**: everyone, sections, groups, or individual students, each with its own due / available-from / until dates
+- **Student annotation submissions:** the student annotates a teacher-provided document inline.
+- **Late/missing policies** at course level:
+  - Automatically apply a grade for missing submissions
+  - Deduct X% per day/hour late, with a lowest possible grade
+- **Submission detail page:** status, attempt history, feedback comments (text, media, file attachments), and the rubric view.
+- Bulk edit dates across all assignments. Rubric attachment. Outcome alignment.
+- **Student-facing badges:** Missing, Late, Excused, Resubmitted.
+
+### 3.6 Discussions
+- **Types:** focused (single level) or threaded replies.
+- **Options:**
+  - Graded (becomes an assignment)
+  - Users must post before seeing replies
+  - Enable podcast feed
+  - Allow liking, including "only graders can like"
+  - Sort by likes
+  - Group discussion (creates one per group)
+  - Delayed availability
+  - Section-specific
+  - Anonymous or partially anonymous
+  - Checkpoints: reply to topic plus N required replies, with separate due dates
+- Pin, close for comments, subscribe/unsubscribe, unread counts, mark all read, edit history, report reply, mentions (@user notifications).
+- Deleted replies leave a tombstone so threads stay intact.
+
+### 3.7 Grades (Gradebook)
+**Teacher Gradebook (spreadsheet UI)**
+- Students in rows, assignments in columns. Assignment-group totals and the final total. Sticky columns.
+- Keyboard navigation and inline cell editing. Cell **status colors**: late, missing, resubmitted, dropped, excused.
+- Filters: section, module, assignment group, student group, grading period.
+- Sorting by column. Column arranging (by due date, points, module).
+- Hide/show unpublished items.
+- Row views: secondary info (section, SIS ID, login ID); show/hide notes column.
+- **Grade detail tray:** status overrides, comments, submission link, late-policy adjustment.
+- **Curve grades.** **Set default grade.** **Message students who** (have not submitted / not graded / scored less than or more than X).
+- **Grading periods** (term-based) with close dates that lock edits.
+- **Grading schemes:** letter grade, pass/fail and GPA schemes, editable at account or course level.
+- **Final grade override** column.
+- **Grade posting policies:**
+  - Automatic posting, or manual posting per assignment
+  - Post grades / Hide grades actions, targeted to everyone or to graded students only, by section
+  - Students see a "hidden" eye icon until grades are posted
+- **Gradebook history:** full audit log of every change, with grader, before/after values and timestamp, filterable.
+- **Import/export CSV** with preview and a confirmation of changes.
+- **Individual Gradebook view:** one student and one assignment at a time, screen-reader optimized.
+- **Learning Mastery Gradebook:** outcomes-based view showing mastery per outcome per student.
+
+**Student Grades page**
+- Every item shown with score, status, rubric, and comments.
+- **What-If scores:** the student enters hypothetical scores and sees the recalculated total. The calculation is client-side only and never saved.
+- Totals are calculated per the weighting rules. Hidden/unposted grades are excluded.
+- The teacher can hide totals from students per course.
+
+### 3.8 SpeedGrader-equivalent (sequential grader)
+- Student selector: previous/next, sort, filter to "needs grading", **hide student names**.
+- **Document preview** with inline annotations:
+  - Point, highlight, strikeout, freehand drawing, text box, and area comments
+  - Annotations stored separately from the immutable submission
+- Views for submission attempts, and for rubric grading with interactive rating selection and auto-summed points.
+- Comment box with text, media recording, file attachments, and a comment library of saved comments.
+- Group grading mode, moderated grading, and anonymous grading.
+- Status menu per student: late (with override days), missing, excused, none.
+- **Resubmission indicator.** Pairs with posting policy (grades hidden until posted).
+- Grade saves use optimistic concurrency. A stale edit returns 412, and the UI shows "grade changed by X, reload".
+
+### 3.9 People
+- Roster with name, login ID, SIS ID, section, role, last activity, and total activity time.
+- Filter by role or section. Search.
+- **+ People** adds users by email, login ID or SIS ID, only when permitted. Enrollments come from the SIS projection and are not invented.
+- Per-user actions: edit sections, edit role, link to observer, remove, deactivate (inactive enrollments keep their grades), user details, **access report** (pages viewed, times, participations).
+- **Groups sub-tab:**
+  - Create group sets
+  - Allow self sign-up, with group size limits
+  - Auto-assign randomly, balancing by section
+  - Assign group leaders
+  - Drag-and-drop students between groups
+  - Import group CSV
+  - Clone group set
+
+### 3.10 Pages
+- Wiki pages with the rich content editor. Revision history with restore. Front page designation.
+- Editing permissions: teachers only, teachers + students, or anyone. Page to-do date. Assign-to.
+- Links to other course content, auto-updated when that content is renamed.
+
+### 3.11 Files
+- Folder tree, drag-and-drop upload, and bulk actions (move, delete, download zip).
+- Publish, unpublish, schedule availability, or hidden-but-linkable, per file or folder.
+- Usage rights / license designation, with its required enforcement.
+- Preview for docs, PDFs, images and media. Quotas at course, user and group level. Restore deleted files.
+- Files are scanned before promotion.
+
+### 3.12 Quizzes (implement the modern quiz engine)
+**Question types**
+- Multiple choice, multiple answer, true/false
+- Fill-in-the-blank, multiple fill-in-blanks
+- Matching, ordering, categorization, hot spot
+- Numeric (exact, range, margin, precision), formula (variable-based)
+- Essay, file upload, stimulus (shared passage), text (no question)
+
+**Item banks**
+- Shared across courses, with tags and version history.
+- Random question pools ("pick N from bank/tag").
+
+**Quiz settings**
+- Time limit; multiple attempts with keep highest/latest/average; cooling period between attempts.
+- Shuffle questions and answers; one question at a time with a lock-after-answer option.
+- Access code, IP filtering, availability window.
+- Result visibility controls: show responses, show correct answers, show them only after a date.
+- Calculator (basic / scientific).
+
+**Accommodations and moderation**
+- Per-student accommodations: extra time (percentage or minutes), extra attempts.
+- **Moderate** page: extend time for an in-progress attempt, grant an additional attempt, reopen.
+
+**Attempts and grading**
+- Autosave with version checks. Idempotent submit.
+- Auto-grading for objective items. Essays route to a manual grading queue in the sequential grader.
+- Regrade options when a question is edited after attempts.
+
+**Reports**
+- Student analysis, item analysis (difficulty, discrimination), outcomes analysis.
+
+**Other quiz modes**
+- Practice quizzes (ungraded) and graded surveys / ungraded surveys (optionally anonymous).
+- Proctoring only through an optional LTI integration.
+
+### 3.13 Outcomes
+- Account-level and course-level outcomes, organized in folders.
+- Mastery scale and proficiency ratings, with a calculation method: decaying average, n-mastery, latest, highest, average.
+- Import standards sets. Align outcomes to rubrics and quiz items.
+- Student mastery view. Outcome results reports.
+
+### 3.14 Rubrics
+- Rubric builder: criteria rows, rating columns with points, point ranges, and long descriptions. Free-form comments option.
+- "Use for grading" toggle. Hide score total. Outcome-linked criteria.
+- Rubric library, with rubrics reusable across courses.
+- Rubric versions lock once used for grading. Editing creates a new version.
+
+### 3.15 Collaborations
+- Create shared documents (via connected cloud-doc providers through LTI/OAuth) with selected users or groups.
+
+### 3.16 Conferences / Live
+- Scheduled live sessions via Zoom and the in-house connectors.
+- Join links shown on course and calendar. Recordings listed with retention rules.
+- Attendance is imported as external assertions.
+
+### 3.17 Course Analytics
+- **Course-level analytics:**
+  - Weekly online activity (page views, participations)
+  - Average grade per assignment vs section
+  - On-time / late / missing breakdown per assignment
+- **Student-level analytics:** activity, submissions and grades over time.
+- Message students directly from charts. Export CSV.
+- Analytics are derived metrics and never a grade source.
+
+### 3.18 Course Pacing (optional feature)
+- Pace plans that auto-assign due dates per student from their start date and course duration.
+- Blackout dates, section-specific paces, and student-specific paces.
+
+### 3.19 Settings (per course)
+- **Course Details tab:**
+  - Name, code, image, time zone, term, participation dates
+  - Language, grading scheme, license, visibility (course/institution/public)
+  - Format (online/on-campus/blended)
+  - Toggles: students can create discussions, edit or delete posts, attach files, create groups; hide totals; hide grade distribution graphs
+- **Sections tab:** create and edit sections, section-level start and end dates, cross-listing (from SIS).
+- **Navigation tab:** drag to reorder or hide course tabs.
+- **Apps tab:** add, configure or remove LTI tools; placements.
+- **Feature Options tab:** course-level toggles for optional features.
+- **Integrations** tab.
+- **Sidebar actions:** Student View, Copy this course, Import course content, Export course content, Reset course content, Conclude course, Delete course, Course statistics, Course calendar, Conclude/unconclude.
+
+---
+
+## 4. CALENDAR & SCHEDULER
+
+- Month, week and agenda views. Color per course, with toggles to show/hide calendars (up to a configurable limit).
+- Undated items sidebar. Drag events to reschedule; this updates assignment due dates if the user has permission.
+- Personal, course, section and group events. Recurring events.
+- **Scheduler / appointment groups:**
+  - Teacher publishes time slots
+  - Students sign up for a slot; group sign-ups are supported
+  - Limit per slot; cancellation handling
+- **Calendar feed (iCal):** the token is revocable and hashed at rest.
+- Course-level blackout / "undated" handling feeds into Course Pacing.
+
+---
+
+## 5. INBOX (Conversations)
+
+- Folders and views: Inbox, Unread, Starred, Sent, Archived, Submission comments.
+- Filter by course. Compose by choosing a course, then recipients by role, section, group or individual. **Recipients are resolved server-side from active enrollment.**
+- "Send individual messages" option for bulk sends. Attachments. Media comments. Reply, reply all, forward.
+- Mark read/unread, star, archive, delete. Search.
+- Faculty journal / notes for teachers, if enabled.
+- Submission comments threaded into the inbox view.
+
+---
+
+## 6. ADMIN CONSOLE (Account & Sub-Account)
+
+| Area | Functionality |
+|---|---|
+| **Courses / Users search** | Find courses and users by name or SIS ID. Filter by term, blueprint and enrollment status. Create courses. |
+| **Sub-accounts** | Hierarchical tree (college → department). Settings and permissions inherit and can be locked. |
+| **Terms** | Terms with start/end dates, and per-role access overrides (teachers can access before or after the term). |
+| **Grading** | Account-level grading schemes and grading-period sets. |
+| **Permissions** | Role matrix editor (Section 1). Custom roles. |
+| **Outcomes / Rubrics / Question banks** | Account-level shared libraries. |
+| **Authentication** | SAML, OIDC, LDAP providers, SSO settings, MFA policy, discovery page. |
+| **SIS Import** | CSV and API imports (users, courses, sections, enrollments, terms, groups, cross-lists) with diffing mode, batch history and error reports. |
+| **Developer Keys** | API keys and LTI 1.3 keys with scopes. Enable, disable, delete. |
+| **Apps (LTI)** | Account-level tool installs and placements; inherited by sub-accounts. |
+| **Reports** | Provisioning, last user access, grade export, student competency, unpublished courses, zero-activity, course storage, outcome results, etc. Run async; download CSV. |
+| **Themes** | Theme editor: logos, colors, favicon, custom CSS/JS (sandboxed, admin-approved), per sub-account. Mobile branding. |
+| **Announcements** | Global announcements by role and date. |
+| **Feature Options** | Account-wide feature flags that sub-accounts can inherit, override or be locked into. |
+| **Blueprint Courses** | See 7.2. |
+| **Admin tools** | Restore deleted courses and content. View notifications sent to a user. Logging by grade-change, course or authentication event. |
+| **Settings** | Account name, default time zone, default course quota, self-registration, help menu links, trusted HTML domains, IP filters, terms of use/privacy links. |
+
+---
+
+## 7. CONTENT MOVEMENT & REUSE
+
+### 7.1 Import / Copy / Export
+- Import sources:
+  - Copy a Scholaris course, either all content or selected items
+  - Common Cartridge 1.x
+  - QTI 1.2/2.x
+  - Moodle and Canvas export packages (via the import adapter)
+  - Zip file
+- **Adjust events and due dates** on copy: shift dates by term or day substitution, or remove dates.
+- Asynchronous jobs with progress bar, issue report, and a quarantined workspace with scanning.
+- Course export package and quiz export.
+
+### 7.2 Blueprint Courses
+- Associate courses with a blueprint and sync changes to them.
+- **Lock** content by attribute: content, points, due dates, availability dates, settings.
+- **Sync history**, with a three-way diff and an impact report. Associated courses can see "unsynced changes".
+- Sync jobs are idempotent.
+
+### 7.3 Shared Content Library (Commons-equivalent)
+- Share courses, modules, pages, assignments and quizzes to account or consortium libraries.
+- Filters, versions, and import into courses. **Direct share** to a colleague lands in their "shared content" inbox.
+
+---
+
+## 8. RICH CONTENT EDITOR (used everywhere)
+
+- Headings, lists, tables with accessible header markup, text formatting, alignment, colors.
+- Links to course content via a content picker sidebar: pages, assignments, quizzes, files, modules.
+- Image upload/embed with required alt text or a decorative flag.
+- Media recording/upload with captions. Equation editor (LaTeX/MathML). Code blocks. Embeds via LTI or allowlisted iframes.
+- Word count. Fullscreen. HTML editor view with sanitized output.
+- **Accessibility checker** built in: contrast, heading order, alt text, table headers, link text. Offers fix suggestions.
+- **Content storage:** validated JSON plus rendered, sanitized, accessible HTML.
+
+---
+
+## 9. NOTIFICATIONS
+
+- Per-user, per-channel (email, push, SMS if enabled, in-app) preference matrix.
+- Categories: due dates, grading, submission comments, announcements, discussions, invitations, conversations, calendar changes, Scheduler, and others.
+- Frequency per category: **Notify immediately / Daily summary / Weekly summary / Off**.
+- Course-level notification overrides, including muting a course.
+- Every notification is dispatched through the outbox. Templates are branded per tenant. Quiet hours are respected.
+
+---
+
+## 10. MOBILE (Student, Teacher and Parent/Observer experiences)
+
+Build a responsive PWA first. Native-ready API parity is a later phase.
+
+- **Student:** dashboard, to-do, courses, submit (camera, audio, files), quizzes, discussions, inbox, calendar, grades, push notifications, offline reading.
+- **Teacher:** grade on mobile (mini sequential grader), announcements, inbox, attendance roll call, course editing basics.
+- **Observer/Parent:** linked students, grades, missing-item alerts, calendar, and configurable alert thresholds (grade below X%, missing assignment, announcements).
+- **QR code login** from the web profile.
+
+---
+
+## 11. ePORTFOLIOS
+
+- Student-owned portfolios with sections, pages, and submissions imported from courses.
+- Public/private visibility. Rich content. Survives course conclusion.
+
+---
+
+## 12. API & INTEGRATION PARITY
+
+- REST API covering every resource above, with **pagination via Link headers**, include/exclude parameters, and a masquerade parameter (admin, audited). GraphQL for complex UI queries.
+- **OAuth2** developer key flow; scoped tokens; rate limiting with throttle headers.
+- **LTI 1.3 / Advantage:** Deep Linking, Names & Roles, Assignment & Grade Services, dynamic registration.
+  - Placements: course nav, account nav, assignment selection, editor button, module menu, homework submission, link selection, global nav.
+- **OneRoster**. **Live events stream** (Caliper/JSON) for analytics consumers.
+- **Webhooks:** signed, with retries and dead-letter handling.
+
+---
+
+## 13. ACCESSIBILITY & USABILITY REQUIREMENTS
+
+- WCAG 2.2 AA on every screen. Full keyboard operation, including the Gradebook grid and the sequential grader.
+- Screen-reader landmarks. Skip links. High-contrast and dyslexia-friendly UI options. Visible focus. Reduced-motion support.
+- Every media upload requires captions before student visibility, unless an exception is recorded.
+- Localization-ready: all strings externalized, RTL support, per-user language and time zone.
+
+---
+
+## 14. ACCEPTANCE TESTS (must pass for Canvas-parity sign-off)
+
+1. **Course build:** a teacher builds a course with 3 modules, prerequisites and sequential progression. Student View confirms locking; Next/Previous buttons work.
+2. **Differentiated assignment:** the assignment is assigned to Section A with a due date Friday, and to one student with an extension to Monday. Each sees only their own dates; the Gradebook reflects both.
+3. **Late policy:** a submission arriving 2 days late is deducted automatically. The Gradebook shows the late color. A teacher override is logged in Gradebook history.
+4. **Grading and posting:** the sequential grader supports inline annotation and rubric scoring. The grade stays hidden under a manual posting policy until "Post grades" is used. The student sees the grade only after posting.
+5. **Quiz accommodation:** a quiz item bank pulls 5 random questions. A student with a 50% extra-time accommodation gets the adjusted timer. An essay question routes to manual grading.
+6. **Mastery Paths:** a score of 90%+ unlocks enrichment, 70–89 unlocks practice, and below 70 unlocks remediation.
+7. **Discussion checkpoints:** a graded discussion with checkpoints (1 post + 2 replies) is graded against both checkpoints.
+8. **What-If:** What-If scores recalculate the student's total without saving. Weighted groups and drop-lowest are applied correctly.
+9. **Blueprint sync:** the blueprint pushes locked due dates to 3 associated courses, and local edits to locked items are blocked.
+10. **Course copy:** course copy with date shifting moves every due date to the new term.
+11. **Observer alerts:** the observer receives an alert when the linked student has a missing assignment.
+12. **Inbox scoping:** a message to "All students in Section B" reaches only active Section B students. A cross-tenant recipient is impossible.
+13. **Admin permissions:** an admin locks a permission at the root account, and a sub-account cannot unlock it.
+14. **LTI grade passback:** an LTI 1.3 tool launched from a module item returns a score via AGS, and it appears in the Gradebook as unposted.
+15. **Accessibility gate:** automated and manual accessibility checks pass on Dashboard, Modules, Gradebook, sequential grader and Quiz-taking.
+
+---
+
+## 15. BUILD ORDER
+
+| Stage | Features |
+|---|---|
+| 1 | Roles/permissions; global nav; Dashboard; Courses; course nav framework; Pages; Files; Rich Content Editor; Modules (basic); Announcements; Syllabus |
+| 2 | Assignments (all options); Submissions; Gradebook (teacher and student); sequential grader; Rubrics; late/missing policies; posting policies; Gradebook history |
+| 3 | Quiz engine and item banks; Discussions (all options); Inbox; Calendar and Scheduler; Notifications; People and Groups |
+| 4 | Mastery Paths; Outcomes and Learning Mastery Gradebook; Blueprint; Import/Copy/Export; Shared Content Library; Analytics; Course Pacing |
+| 5 | Admin console (full); SIS import; Developer Keys; LTI Advantage; Themes; Reports; Mobile PWA; ePortfolios; Observer alerts |
+
+After each stage, report a **parity status table** covering every feature in this prompt, marked DONE / PARTIAL / NOT STARTED with blockers. Include the acceptance tests passed.
+If you're using it with the master prompt, swap this in for the old Section 5, "Canvas-parity module specifications." The master prompt already covers tenancy, SIS and AI rules, so this one only needs to specify what each feature does.
+MASTER DEVELOPMENT PROMPT — CANVAS-STYLE LMS FOR SCHOLARIS GLOBAL LEARNING AND OAKHAVEN GLOBAL UNIVERSITY
+Act as a Senior LMS Architect, Full-Stack Developer, Education Technology Specialist, Database Engineer, Security Engineer, Accessibility Specialist, and QA Lead.
+Build and integrate a complete learning management system for Scholaris Global Learning, with OakHaven Global University (OGU) as its first institutional tenant. Implement the familiar navigation, teaching workflows, student experience, assessment tools, grading capabilities, and institutional administration associated with Canvas LMS.
+Use original Scholaris branding and interface assets. Reproduce useful workflows without implying affiliation with Instructure or assuming proprietary Canvas services are available.
+If an existing application is supplied, inspect and upgrade it in place. Preserve working features, academic records, users, roles, course content, integrations, and routes.
+Your assignment is to implement working software. Every transactional tab must connect to persistent data, authenticated APIs, validated actions, and related workflows.
+1. Research and map Canvas functionality
+Use current official Instructure documentation to validate workflows and requirements:
+Canvas overview: https://community.instructure.com/en/kb/articles/662716-what-is-canvas
+Canvas developer documentation: https://developerdocs.instructure.com/
+Canvas feature options: https://community.instructure.com/en/kb/articles/531316-canvas-feature-option-summary
+Classic and New Quizzes comparison: https://community.instructure.com/en/kb/articles/658474-classic-quizzes-vs-new-quizzes-feature-comparison
+Produce a feature matrix identifying:
+Canvas reference capability.
+Scholaris implementation.
+User roles.
+Data entities and APIs.
+Acceptance criteria.
+External integration or licensing requirements.
+Completion status.
+Distinguish core LMS functionality, configurable features, external tools, and separately licensed products. Do not claim complete Canvas parity without verified feature-by-feature evidence.
+2. Implement global navigation
+Build a consistent left navigation rail with:
+Account, Dashboard, Courses, Calendar, Inbox, Groups, History, Help, and Admin for authorized users.
+AccountImplement profile, preferences, notification settings, language, timezone, accessibility preferences, authentication settings, connected applications, and active-session management.
+DashboardProvide course cards, favorites, a to-do list, upcoming work, recent feedback, announcements, and activity summaries derived from actual user records.
+CoursesSupport current, past, and future enrollments, course search, favorites, term filters, and enrollment-specific access.
+CalendarCombine assignment deadlines, quizzes, course events, section meetings, appointments, and personal events. Editing academic dates must update their authoritative source.
+InboxProvide course-scoped recipient selection, threads, attachments, unread status, archive, and notification preferences. Resolve recipient permissions on the server.
+GroupsProvide group membership, group assignments, discussions, files, pages, and collaboration spaces.
+HistoryShow the user’s recent authorized destinations without exposing other users’ activity.
+HelpProvide searchable support content, onboarding, support cases, and integration health information.
+3. Implement the course navigation
+Create functional course tabs:
+Home, Syllabus, Announcements, Modules, Pages, Assignments, Quizzes, Discussions, Grades, People, Files, Outcomes, Rubrics, Collaborations, Conferences, Attendance, Media Gallery, Library, Reports, and Settings.
+Provide a Grading Workspace equivalent in purpose to SpeedGrader.
+Allow instructors to configure course navigation visibility and order. Hidden navigation must not substitute for authorization checks.
+Attendance, conferencing, media, originality checking, and other external capabilities must identify their connector dependencies.
+4. Implement course creation and administration
+Support:
+Courses, sections, terms, and institutional subaccounts.
+Instructor and teaching-assistant assignments.
+Course start/end dates and participation restrictions.
+Course templates and blueprint relationships.
+Course copying and selective content import.
+Export packages and migration reports.
+Publish, unpublish, conclude, and archive workflows.
+Section cross-listing with controlled migration behavior.
+A safe Student View using an isolated test identity.
+Course-level feature settings.
+Storage quotas and retention policies.
+Prevent destructive course actions from silently removing academic history.
+5. Build the content editor and syllabus
+Implement a rich content editor supporting:
+Semantic headings and formatted text.
+Lists and accessible tables.
+Images with alternative text.
+Files, links, and embedded media.
+Equations and code blocks.
+Callouts and reusable content blocks.
+Approved external-tool embeds.
+HTML sanitization.
+Drafts, revision history, and restoration.
+The syllabus must include course information, learning outcomes, policies, schedule, and a dynamic summary of dated activities.
+Provide link validation and accessibility review before publication.
+6. Implement modules and conditional learning
+Support module items for pages, assignments, quizzes, discussions, files, external links, and approved tools.
+Implement:
+Drag-and-drop ordering.
+Publish/unpublish controls.
+Availability dates.
+Prerequisite modules.
+Completion requirements.
+Minimum-score requirements.
+Sequential progression.
+Progress indicators.
+Instructor overrides with audit records.
+Build a conditional learning paths engine inspired by Mastery Paths. Route students to eligible activities based on configured score bands or completion rules.
+Enforce release conditions through server APIs and AI retrieval. Define how regrading affects an existing learning path.
+7. Implement assignments and submissions
+Support:
+Assignment groups and weighted categories.
+Individual and group assignments.
+Differentiated dates for sections, groups, and students.
+Due dates and availability windows.
+Text, file, URL, and audio/video submissions.
+On-paper and no-submission grading records.
+Approved external-tool submissions.
+File-type restrictions.
+Submission attempts and resubmissions.
+Rubrics and outcome alignment.
+Peer reviews.
+Late, missing, excused, and submitted statuses.
+Students must receive a persisted submission receipt and be able to inspect submission history, feedback, and released rubric results.
+Keep previous submissions and their grading context traceable.
+8. Implement a modern quiz engine
+Support:
+Multiple choice.
+Multiple answer.
+True/false.
+Fill-in-the-blank.
+Matching and ordering.
+Numeric and formula-based questions.
+Essay and file-upload responses.
+Stimulus-based question groups.
+Question pools and reusable item banks.
+For each question type, define scoring, partial credit where supported, validation, and accessibility behavior.
+Implement:
+Randomized question selection and answer ordering.
+Time limits and server-authoritative timers.
+Multiple attempts and configured score selection.
+Availability windows and access codes.
+Per-student accommodations and extensions.
+Version-aware autosave.
+Reconnect recovery.
+Idempotent submission.
+Objective auto-grading.
+Human grading queues.
+Configurable results and answer-release policies.
+Moderation, regrading, and item analysis.
+Snapshot published assessment content. Do not expose answers, unreleased results, or instructor-only item-bank data to students.
+9. Implement Gradebook and the grading workspace
+GradebookProvide a roster-by-assessment grid with filters, sorting, assignment groups, grading periods, and authorized CSV import/export.
+Support points, percentages, letter grades, pass/fail, weighted groups, drop rules, late penalties, missing-work rules, excused work, and extra-credit rules with explicit calculation semantics.
+Implement automatic and manual posting policies, grade history, override permissions, and a student What-If view that never changes official grades.
+Grading WorkspaceProvide:
+Submission viewer.
+Previous/next student navigation.
+Keyboard shortcuts.
+Rubric scoring.
+Text and media feedback.
+Document annotations.
+Submission history.
+Anonymous grading where configured.
+Moderation and reviewer status.
+Save-draft and post-grade actions.
+Use conflict detection for simultaneous edits. Students must see only grades and comments permitted by the posting policy.
+10. Implement outcomes and learning mastery
+Support institutional, program, and course outcomes.
+Allow outcome alignment to rubric criteria and assessments, configurable mastery scales, calculation rules, and a Learning Mastery dashboard.
+Keep outcome attainment separate from course grade calculations unless an explicit grading policy links them.
+Generate traceable competency and accreditation reports.
+11. Implement discussions and announcements
+DiscussionsSupport threaded replies, group discussions, graded discussions, attachments, subscriptions, unread tracking, moderation, and configured participation rules.
+Implement peer interaction without exposing restricted content. Preserve reply context when a parent post is removed.
+AnnouncementsSupport drafts, scheduling, section targeting, attachments, comments where enabled, and delivery preferences.
+Record publication and delivery separately. Failed notifications must not erase the published announcement.
+12. Implement people, groups, and observer access
+Support administrators, instructors, teaching assistants, students, designers, and observers through configurable permissions.
+Implement section-aware rosters, group sets, manual or automatic group assignment, and course-role management.
+Observers may access only explicitly linked students and permitted summaries. They must not gain unrestricted access to discussions, submissions, or other students’ records.
+Enforce permissions on the server rather than through role-switcher controls alone.
+13. Implement files, media, and collaboration
+Provide folders, search, quotas, access restrictions, publication settings, and file lifecycle controls.
+Use signed uploads, quarantine, MIME verification, malware scanning, and authorized downloads.
+Support captioned media, transcripts, playback, and approved recording integrations.
+Provide collaboration through configured document providers or native shared workspaces. Make connector status visible.
+14. Implement institutional administration and SIS integration
+Provide accounts/subaccounts, terms, roles, permissions, authentication providers, branding, feature settings, reports, audit logs, and developer/integration management.
+Integrate Scholaris SIS for:
+Users and identities.
+Courses and sections.
+Enrollments and withdrawals.
+Registration changes.
+Approved grade transfer.
+SIS remains authoritative for registration. LMS enrollment is a controlled projection.
+Implement idempotent synchronization, previewable imports, error reports, retry handling, and reconciliation of missing, extra, or stale records.
+Support approved LTI 1.3/LTI Advantage integrations and relevant import/export formats. Verify conformance before claiming certification or complete compatibility.
+15. Add Scholaris enhancements
+Integrate additional modules without disrupting familiar LMS navigation:
+AI Learning Companion.
+Instructor AI Drafting Workspace.
+Interactive Labs.
+Competency Mapping.
+Advising and Intervention Center.
+Office-Hour Appointments.
+Accessibility Review Queue.
+Content Approval Workflow.
+Integration Monitor.
+Import and Migration Center.
+Academic Audit Trail.
+Notification Delivery Center.
+Each module must have a defined workflow, owner, data source, permission model, and acceptance test.
+16. Govern AI assistance
+The student companion must answer from published, authorized course materials with citations.
+Exclude locked modules, instructor-only notes, answer keys, and other students’ work. Provide permitted explanations and practice without solving active graded assessments.
+Instructor agents may draft content, questions, rubrics, and feedback. Mark outputs AI DRAFT and require educator review before publication or official grading.
+AI actions must use the same authenticated APIs and permissions as human actions. Record source versions, model identifiers, review decisions, and outcomes.
+17. Build a responsive and accessible experience
+Provide consistent layouts for desktop, tablet, and mobile.
+Implement keyboard access, visible focus, semantic structure, sufficient contrast, labeled controls, accessible validation, captions, and screen-reader support.
+Offer a PWA experience. Where offline access is supported, identify cached content and pending uploads clearly. Never display an offline submission as received until the server acknowledges it.
+18. Define and verify operational completion
+Audit every existing tab, panel, button, form, and dashboard card.
+Replace placeholder handlers, fake metrics, disconnected forms, and browser-only academic records.
+For each module, record:
+Route → Role → Data source → Action → Persisted result → Related updates → Test evidence.
+Test at minimum:
+An instructor creates and publishes a course.
+SIS enrollment grants the correct student access.
+Module prerequisites block unauthorized progression.
+A student submits work and receives a durable receipt.
+Quiz attempts respect timing and accommodations.
+Rubric grading produces correct totals.
+Unposted grades remain hidden.
+Announcements and Inbox enforce course membership.
+Groups and observers have correctly limited access.
+SIS exports reconcile without duplicate grade updates.
+AI retrieval respects course and module permissions.
+Repeated requests do not duplicate critical records.
+Users cannot access another tenant’s data.
+Reloads and sign-in changes preserve authorized records.
+Core workflows work on mobile and with a keyboard.
+19. Deliver the completed release
+Deliver:
+Updated application source.
+Database migrations.
+API and integration documentation.
+Role and permission matrix.
+Canvas-to-Scholaris feature mapping.
+Operational module completion report.
+Automated test results.
+Configuration instructions without secrets.
+Faculty, student, and administrator guides.
+Deployment and rollback instructions.
+Release notes and version identifier.
+Prepare the application for the established hosting environment. Publish when deployment is authorized and available, then verify the deployed workflows and provide the URL.
+Identify missing credentials or external services precisely. Continue independent implementation when a connector is blocked.
+Completion standard: The LMS must support the complete teaching cycle—course creation, enrollment, content delivery, assessment, submission, feedback, grade release, and SIS reconciliation—with persistent records and enforced permissions. Do not declare completion based on the appearance of the interface.
+
+System Prompt for Canvas LMS Architectural Design
+Markdown
+SYSTEM PROMPT: CANVAS-PARITY LMS ARCHITECTURE & FEATURE SPECIFIER
+ROLE: Lead EdTech Enterprise Architect & Product Principal
+TARGET PRODUCT: Next-Generation Enterprise LMS (Canvas LMS Parity)
+
+================================================================================
+1. EXECUTIVE CORE OBJECTIVE
+================================================================================
+Act as a Principal Systems Architect specializing in Higher Education and K-12 
+Learning Management Systems. Generate a comprehensive, production-grade functional 
+and technical specification for a multi-tenant LMS that matches and modernizes 
+Canvas LMS capabilities across content management, assessment, grading, 
+collaboration, analytics, and platform integrations.
+
+================================================================================
+2. DOMAIN DATA MODEL & ENTITY HIERARCHY
+================================================================================
+Specify the core entities, attributes, primary/foreign key relationships, and data lifecycle for:
+1. Identity & Access: Tenant/Realm, User, GlobalRole, CourseRole, DelegationGrant.
+2. Structure: Account (Sub-Account), Course, Section, Term, BlueprintCourse.
+3. Content & Curriculum: Module, ContentPage, Syllabus, Assignment, DiscussionTopic, FileAsset, MediaAsset.
+4. Assessment & Evaluation: Quiz, QuestionBank, QuestionPool, Submission, Rubric, Gradebook, PostingPolicy.
+5. Communication & Engagement: Announcement, Conversation (Inbox), NotificationPreference, CalendarEvent.
+6. Integration & Standards: ToolRegistration (LTI 1.3/Advantage), OneRosterSync, Webhook, EventOutbox.
+
+================================================================================
+3. FUNCTIONAL & FEATURE SPECIFICATION (CANVAS PARITY)
+================================================================================
+Provide detailed functional workflows and edge-case behaviors for:
+
+3.1 Course Engine & Content Management
+- Block-based WYSIWYG editor supporting accessible HTML, LaTeX math equations, media embeds, and custom tool links.
+- Prerequisite locking, sequential path enforcement, and automated date-release triggers.
+- Blueprint Master Courses: 3-way diff calculation, locked attribute sync, local overrides, and asynchronous job queuing.
+- Common Cartridge (1.1–1.3) and QTI (1.2/2.1) import/export with migration logging and asset sanitization.
+
+3.2 Assessment, Quizzes & SpeedGrader
+- Submissions: File upload, inline rich text, audio/video, external LTI deep-link tool, and on-paper markers.
+- Quiz Engine: Snapshotting questions at attempt start, secure random seeding for question/choice shuffling, auto-save heartbeat, and transactional submit.
+- SpeedGrader & Annotation: Split-pane submission previewer, PDF/document annotation layer, rubric scoring matrix, audio/video feedback, and anonymous/moderated grading.
+- Gradebook: Weighted assignment groups, points, pass/fail, drop lowest X rules, late/missing automated deduction policies, What-If projection view, and explicit grade posting policies (Manual vs. Automatic release).
+
+3.3 Collaboration & Communication
+- Nested discussions with cursor pagination, depth metadata, materialized paths, and deletion tombstones.
+- Section-scoped inbox messaging, bulk roll-out announcements, and granular user notification delivery rules (Email, SMS, Push).
+
+3.4 Ecosystem & External Integrations
+- LTI 1.3 / LTI Advantage (Deep Linking, Assignment & Grade Services, Names & Role Provisioning).
+- OneRoster REST API & CSV bulk sync for SIS enrollment mirroring with an asynchronous Outbox Pattern.
+- External cloud storage pickers (Google Drive, Microsoft OneDrive) using short-lived OAuth tokens and pre-signed quarantine upload mechanics.
+
+================================================================================
+4. TECHNICAL ARCHITECTURE & NON-FUNCTIONAL REQUIREMENTS
+================================================================================
+Define the system constraints and architectural patterns:
+1. Multi-Tenancy & Isolation: PostgreSQL Row-Level Security (RLS) via dynamic `TenantContext` session variables.
+2. API Layer: Dual REST and GraphQL interfaces alongside gRPC for high-throughput inter-service RPCs.
+3. Event-Driven Messaging: Transactional event outbox pattern emitting Caliper/xAPI learning events for engagement analytics.
+4. Scale & Availability: Design to support 500,000+ active concurrent users with <100ms API response time (p95) and zero downtime during course publish or blueprint sync cycles.
+
+================================================================================
+5. OUTPUT DELIVERABLES FORMAT
+================================================================================
+Structure your response into the following clear sections:
+- Section 1: Entity-Relationship Overview & Domain Map
+- Section 2: Module-by-Module Functional Specifications (Course, SpeedGrader, Gradebook, Quizzes)
+- Section 3: Integration & Standards Architecture (LTI, SIS, Outbox)
+- Section 4: Database Schema Snippets & Row-Level Security Enforcement (PostgreSQL)
+- Section 5: API & gRPC Service Definitions
+Key Functional Pillars Included in Prompt
+Pillar
+Canvas Feature Equivalent
+Curriculum
+Modules, Content Pages, Blueprint Master Courses, Common Cartridge imports
+Assessment
+SpeedGrader, Rubrics, New Quizzes engine, QTI import, submission queues
+Grading
+Weighted groups, Drop lowest rules, Late/missing policies, Manual/Automatic Posting
+Ecosystem
+LTI 1.3 / LTI Advantage, OneRoster SIS sync, Google/Microsoft drive pickers
+Communication
+Threaded discussions, Section-scoped inbox, Scheduled course announcements
+1. Domain Data Model & Entity Hierarchy
+The domain model enforces clean separation between academic structure, curriculum assets, evaluation state, and external integration vectors.
+                    +-------------------+
+                    |   Tenant / Realm  |
+                    +-------------------+
+                              |
+                     +-----------------+
+                     |     Account     |
+                     +-----------------+
+                              |
+                    +-------------------+
+                    |   Course / Term   |
+                    +-------------------+
+                     /        |        \
+                    /         |         \
+         +----------+   +-----------+   +----------+
+         | Module   |   | Section   |   | Blueprint|
+         +----------+   +-----------+   +----------+
+              |               |
+         +----------+   +-----------+
+         | Content  |   | Enrollment|
+         +----------+   +-----------+
+              |               |
+         +----------+   +-----------+
+         |Assignment|   | Submission|
+         +----------+   +-----------+
+              |               |
+         +----------+   +-----------+
+         |  Rubric  |   | Gradebook |
+         +----------+   +-----------+
+Core Entities & Domain Definitions
+Identity & Access Management
+Tenant / Realm (tenant_realms): Top-level data-plane boundary isolates university databases and storage namespaces.
+User (users): Canonical identity object containing external SIS mapping IDs, primary email, authentication realm bindings, and global attributes.
+GlobalRole / CourseRole (roles): System-wide (System Admin, Account Admin) and course-scoped (Instructor, Student, TA, Observer, Designer) permission assignments.
+DelegationGrant (delegation_grants): Temporary or scoped administrative delegation allowing sub-account management without granting global root privileges.
+Organizational Structure
+Account / Sub-Account (accounts): Hierarchical organizational units (e.g., OakHaven University  College of Engineering  Department of Computer Science).
+Course (courses): The primary academic shell containing modules, gradebook configurations, and syllabus assets.
+Section (sections): Roster partition within a course tied to specific meeting times, instructors, and SIS registration records.
+Term (terms): Academic period defining default course start/end boundaries and grading period access windows.
+BlueprintCourse (blueprint_associations): Master template course linked to subscriber courses for automated content distribution.
+Curriculum & Content Engine
+Module (modules): Sequential structural container organizing course materials into learning units.
+ModuleItem (module_items): Polymorphic link attaching ContentPages, Assignments, Quizzes, Discussions, External URLs, or LTI Tools to a module.
+ContentPage (content_pages): Rich text/HTML page built with a block editor, versioned, and tied to accessibility evaluation signals.
+Syllabus (syllabi): Course policy document combining custom rich content with an automatically generated assignment event summary.
+Assessment & Evaluation
+Assignment (assignments): Core evaluative entity defining point values, allowed submission modes, peer review rules, and due/lock dates per section.
+Quiz (quizzes): Assessment entity containing settings for time limits, shuffle policies, attempt counts, and question pool selection rules.
+QuestionBank / QuestionPool (question_banks): Reusable repository of objective and subjective questions categorized by topic, difficulty, or outcome alignment.
+Submission (submissions): Student work artifact storing versioned text, file metadata, URL references, or LTI payload IDs.
+Rubric / Criterion (rubrics, rubric_criteria): Analytic or holistic scoring matrix composed of criteria, rating bands, and learning outcome mappings.
+Gradebook / PostingPolicy (grade_entries, posting_policies): Official ledger recording scores, late penalties, drop rules, weighted groups, and grade release visibility (Automatic vs. Manual).
+Communication & Ecosystem
+DiscussionTopic (discussion_topics): Threaded forum supporting nested replies, section filters, grading, and materialized path depth tracking.
+Conversation (conversations, conversation_messages): Course-scoped messaging system (Inbox) ensuring students and instructors communicate strictly within authorized rosters.
+ToolRegistration (lti_tool_registrations): LTI 1.3 / Advantage security context and deployment configuration.
+EventOutbox (event_outbox): Transactional outbox table capturing domain mutations for asynchronous dispatch to Caliper/xAPI analytics stores and external webhooks.
+2. Module-by-Module Functional Specifications
+2.1 Course Engine & Content Management
+Block-Based WYSIWYG Editor
+Content Model: Content is saved as a validated JSON AST (Abstract Syntax Tree) alongside a server-rendered, sanitized HTML snapshot.
+Feature Support: Semantic headings, accessible tables, responsive image/video embeds, LaTeX math equations (rendered via MathJax/KaTeX), callout boxes, syntax-highlighted code snippets, and LTI Deep Link embeds.
+Accessibility Scanner: Inline client-side and server-side scanner validating image alt tags, heading hierarchy continuity, color contrast ratios, table header scope attributes, and link text context.
+Prerequisite Locking & Sequential Pathways
+Locking Rules: Modules can require prior module completion, specific unlock dates, or minimum score thresholds on prerequisite assignments.
+Path Enforcement: Server-side access gates reject direct URL access to module_items if prior requirements evaluate to false for the requesting user_id.
+Blueprint Master Courses
+Three-Way Diff Engine: When pushing updates from a Blueprint Master, the system compares:
+The initial Blueprint state.
+The modified Blueprint state.
+The subscriber course state.
+Attribute Locking: Administrators can lock specific attributes (e.g., Title, Due Dates, Content Body, Points Possible). Local instructor edits to unlocked attributes are preserved during sync.
+Sync Execution: Blueprint pushes run as asynchronous background jobs using idempotent migration scripts, emitting detailed impact reports (added, modified, skipped items).
+Common Cartridge & QTI Import Engine
+Sanitization Workspace: Imports execute in an isolated sandbox. External file links are scanned for malware, HTML content is sanitized against script injection, and unsupported proprietary structures map to fallback ContentPages.
+Supported Formats: Common Cartridge v1.0–v1.3, QTI v1.2, and QTI v2.1.
+Migration Report: Generates a deterministic report summarizing converted items, missing media assets, and unmapped assessment question types.
+2.2 Assessment, Quizzes & SpeedGrader
+Submission Pipeline
+Modes: File Upload (enforcing file extension allowlists), Online Text Entry, Website URL, Media Recording (audio/video capture), On-Paper Marker, and LTI External Tool Deep Link.
+Quarantine Lifecycle: File uploads stream directly to a quarantine prefix in object storage. A background worker executes MIME verification, virus scanning, and policy classification before moving the asset to the tenant's canonical namespace.
+Quiz Engine & Snapshotting
+Snapshot on Publish: Publishing a quiz creates an immutable QuizSnapshot. Subsequent edits to the source question bank do not alter active student attempts.
+Attempt Execution:
+Authorization: Validates enrollment status, open availability window, remaining attempt allowance, and accommodation overrides.
+Randomization: Generates a cryptographically secure seed (BIGINT) to select questions from pools and shuffle answer options reproducibly.
+Autosave & Submit: Client emits a periodic heartbeat autosaving progress with optimistic version locking. Final submit executes as an idempotent database transaction.
+Grading Queue: Objective items (multiple choice, matching, true/false) auto-grade immediately. Subjective items (essays, short answer) enter the SpeedGrader human evaluation queue.
+SpeedGrader & Annotation Architecture
+Split-Pane Interface: Renders student submission documents on the left and grading/rubric tools on the right.
+Annotation Layer: Document rendering converts submissions to PDF/HTML assets. Annotations (highlights, strike-throughs, freehand drawing, point comments) are stored as a separate, immutable SVG/JSON layer tied to the grader’s identity and timestamp.
+Moderated & Anonymous Grading: Hides student identity metadata when anonymous grading is enabled. Moderated assignments allow multiple graders to draft evaluations, which a final moderator reconciles into a single posted score.
++-----------------------------------------------------------------------------------+
+| SPEEDGRADER WORKFLOW                                                              |
+|                                                                                   |
+|  [Roster Queue] ---> [Rendered Submission Document] ---> [Annotation Layer (JSON)]|
+|                                                                  |                |
+|                                                                  v                |
+|  [Audit Event]  <--- [Final Grade & Comments]       <--- [Interactive Rubric]     |
++-----------------------------------------------------------------------------------+
+Gradebook & Posting Policies
+Calculation Engine: Supports points-based and weighted assignment group systems. Automatically applies drop-lowest rules, late submission percentage deductions per day/hour, and missing submission default scores.
+What-If Scoring: Enables students to input hypothetical scores on upcoming or unsubmitted assignments to dynamically preview final course grade impacts without mutating database records.
+Posting Policies:
+Automatic Release: Scores publish to students immediately upon entry.
+Manual Release: Scores remain hidden behind a grades_released = FALSE flag until the instructor explicitly triggers a bulk grade release for the section or course.
+2.3 Communication & Collaboration
+Threaded Discussions
+Materialized Path Indexing: Discussion replies store a materialized path string (e.g., 0001.0004.0002) and depth integer, enabling single-query hierarchical retrieval and cursor pagination.
+Tombstone Deletion: Deleting a reply in a active thread converts the reply text to a tombstone notice while preserving child context and downstream thread continuity.
+Section-Scoped Inbox & Announcements
+Recipients Validation: Messaging endpoints resolve recipient validity on the server using active section membership tables. Arbitrary cross-course or cross-tenant addressing is strictly blocked.
+Announcements: Supports delayed publication dates and section-specific targeting. Publishes through the outbox pipeline to generate branded email, SMS, and push notification payloads based on user-configured preferences.
+3. Ecosystem & Integration Architecture
+LTI 1.3 & LTI Advantage
+Core Security: OAuth 2.0 / OpenID Connect (OIDC) third-party initiated login flow with JSON Web Key Sets (JWKS) asymmetric token validation.
+Advantage Services:
+Assignment and Grade Services (AGS v2.0): Enables external tools to create line items in the Gradebook and post scores/comments.
+Deep Linking (DL v2.0): Rich picker interface allowing instructors to embed external tool content directly into Modules or Assignments.
+Names and Role Provisioning Services (NRPS v2.0): Returns course and section membership rosters securely to authorized external applications.
+SIS Integration (OneRoster & Outbox Engine)
+OneRoster Standard: Rest API and bulk CSV import capabilities conforming to 1.1/1.2 specifications for Syncing Orgs, Terms, Courses, Classes, Users, and Enrollments.
+Transactional Outbox Pattern: All LMS database mutations write a lightweight event payload to event_outbox in the same database transaction as the business entity update.
+[Business Operation] ───(DB Tx)───► [Write Domain Tables]
+                                  │
+                                  └───► [Write Event Outbox Table]
+                                               │
+                                       (Async Polling/CDC)
+                                               │
+                                               ▼
+                                  [Dispatch to Kafka/RabbitMQ]
+                                               │
+                                  ┌────────────┴────────────┐
+                                  ▼                         ▼
+                          [Caliper/xAPI Analytics]   [OneRoster SIS Sync]
+4. PostgreSQL Database Schema & Security
+SQL
+-- Enforce required extensions
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- ============================================================================
+-- 1. COURSES & BLUEPRINT ASSOCIATIONS
+-- ============================================================================
+CREATE TABLE courses (
+    course_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id VARCHAR(64) NOT NULL,
+    account_id UUID NOT NULL,
+    term_id UUID NOT NULL,
+    code VARCHAR(64) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    workflow_state VARCHAR(32) NOT NULL DEFAULT 'unpublished', -- unpublished, available, completed, deleted
+    is_blueprint BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_courses_tenant_account ON courses(tenant_id, account_id);
+
+-- ============================================================================
+-- 2. ASSIGNMENTS & POSTING POLICIES
+-- ============================================================================
+CREATE TABLE assignments (
+    assignment_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id VARCHAR(64) NOT NULL,
+    course_id UUID NOT NULL REFERENCES courses(course_id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    description_html TEXT,
+    points_possible NUMERIC(8, 2) NOT NULL DEFAULT 0.00,
+    submission_types JSONB NOT NULL DEFAULT '["online_text_entry"]'::jsonb,
+    
+    -- Posting Policy: AUTOMATIC vs MANUAL
+    posting_policy VARCHAR(32) NOT NULL DEFAULT 'AUTOMATIC',
+    
+    due_at TIMESTAMPTZ,
+    unlock_at TIMESTAMPTZ,
+    lock_at TIMESTAMPTZ,
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_assignments_course ON assignments(tenant_id, course_id);
+
+-- ============================================================================
+-- 3. SUBMISSIONS & SPEEDGRADER STATE
+-- ============================================================================
+CREATE TABLE submissions (
+    submission_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id VARCHAR(64) NOT NULL,
+    assignment_id UUID NOT NULL REFERENCES assignments(assignment_id) ON DELETE CASCADE,
+    user_id UUID NOT NULL,
+    attempt INT NOT NULL DEFAULT 1,
+    
+    body_text TEXT,
+    attachments_metadata JSONB DEFAULT '[]'::jsonb,
+    
+    score NUMERIC(8, 2),
+    grade VARCHAR(16),
+    graded_at TIMESTAMPTZ,
+    grader_id UUID,
+    
+    workflow_state VARCHAR(32) NOT NULL DEFAULT 'submitted', -- submitted, unsubmitted, graded, pending_review
+    posted BOOLEAN NOT NULL DEFAULT TRUE,
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    
+    CONSTRAINT uq_assignment_user_attempt UNIQUE (tenant_id, assignment_id, user_id, attempt)
+);
+
+CREATE INDEX idx_submissions_grader_queue ON submissions(tenant_id, assignment_id, workflow_state);
+
+-- ============================================================================
+-- 4. ROW LEVEL SECURITY (RLS) POLICIES
+-- ============================================================================
+ALTER TABLE courses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE assignments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE submissions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_courses ON courses
+    USING (tenant_id = current_setting('app.current_tenant_id', true));
+
+CREATE POLICY tenant_isolation_assignments ON assignments
+    USING (tenant_id = current_setting('app.current_tenant_id', true));
+
+CREATE POLICY tenant_isolation_submissions ON submissions
+    USING (tenant_id = current_setting('app.current_tenant_id', true));
+5. API & gRPC Service Definitions
+Protocol Buffer Specification (course_service.proto)
+Protocol Buffers
+syntax = "proto3";
+
+package scholaris.course.v1;
+
+option go_package = "scholaris/course/v1;coursev1";
+
+import "google/protobuf/timestamp.proto";
+
+service CourseManagementService {
+  rpc GetCourseStructure (GetCourseStructureRequest) returns (GetCourseStructureResponse);
+  rpc UpdatePostingPolicy (UpdatePostingPolicyRequest) returns (UpdatePostingPolicyResponse);
+  rpc TriggerBlueprintSync (TriggerBlueprintSyncRequest) returns (TriggerBlueprintSyncResponse);
+}
+
+message GetCourseStructureRequest {
+  string tenant_id = 1;
+  string course_id = 2;
+  string user_id = 3;
+}
+
+message ModuleItemSummary {
+  string item_id = 1;
+  string title = 2;
+  string type = 3; // page, assignment, quiz, discussion
+  bool is_locked = 4;
+  google.protobuf.Timestamp unlock_at = 5;
+}
+
+message ModuleSummary {
+  string module_id = 1;
+  string name = 2;
+  int32 position = 3;
+  bool is_completed = 4;
+  repeated ModuleItemSummary items = 5;
+}
+
+message GetCourseStructureResponse {
+  string course_id = 1;
+  string course_name = 2;
+  repeated ModuleSummary modules = 3;
+}
+
+message UpdatePostingPolicyRequest {
+  string tenant_id = 1;
+  string course_id = 2;
+  string assignment_id = 3;
+  enum PostingPolicy {
+    AUTOMATIC = 0;
+    MANUAL = 1;
+  }
+  PostingPolicy policy = 4;
+}
+
+message UpdatePostingPolicyResponse {
+  bool success = 1;
+  google.protobuf.Timestamp updated_at = 2;
+}
+
+message TriggerBlueprintSyncRequest {
+  string tenant_id = 1;
+  string master_course_id = 2;
+  bool copy_settings = 3;
+  string triggered_by_user_id = 4;
+}
+
+message TriggerBlueprintSyncResponse {
+  string sync_job_id = 1;
+  string status = 2; // QUEUED, PROCESSING
+  google.protobuf.Timestamp queued_at = 3;
+}
+6. Delivery Roadmap & Phase Boundaries
+Phase 0: Core Architecture
+[Tenant Isolation & IAM] ---> [DB Schema & Outbox] ---> [CI/CD Pipelines]
+
+Phase 1: LMS MVP
+[Courses & Modules] ---> [SIS Outbox Sync] ---> [Assignments & Gradebook]
+
+Phase 2: Assessment & SpeedGrader
+[Quiz Snapshot Engine] ---> [SpeedGrader Annotation] ---> [Rubrics & Discussions]
+
+Phase 3: Ecosystem & Scale
+[LTI 1.3 / Advantage] ---> [Blueprint Sync Engine] ---> [Caliper Analytics Engine]
+Phase
+Timeline
+Primary Deliverables
+Exit Criteria
+Phase 0: Foundations
+Weeks 1–8
+TenantContext, IAM/RLS policies, Database Broker, Event Outbox, CI/CD pipelines.
+Negative cross-tenant security suite passes; tenant provisioning works cleanly.
+Phase 1: LMS MVP
+Weeks 9–24
+Courses, Sections, SIS Enrollment Projection, Block Editor, Assignments, Submissions, Gradebook Core.
+Instructor publishes course; student submits assignment; grader posts score; SIS sync succeeds.
+Phase 2: Assessment & Collaboration
+Weeks 25–38
+Quiz Engine (Snapshots), SpeedGrader with PDF annotation layer, Rubrics, Discussions, Section Inbox.
+Timed autograded/manual quiz workflows execute; load targets met under 500,000 active users.
+Phase 3: Ecosystem & Intelligence
+Weeks 39–52
+LTI 1.3 Advantage, Blueprint Sync Engine, Caliper/xAPI event pipelines, Governed AI companion interfaces.
+Full LTI conformance test suite passes; Blueprint 3-way diff sync executes idempotently.
+SpeedGrader Annotation Layer Architecture
+The SpeedGrader Annotation Layer separates static submission assets (PDFs, images, converted document pages) from interactive instructor markup. Annotations are stored as versioned, decoupled JSON documents rendered via an SVG overlay layer on top of a canvas or vector viewer.
++-----------------------------------------------------------------------------------+
+|                            SPEEDGRADER FRONTEND VIEWPORT                          |
+|                                                                                   |
+|   +---------------------------------------------------------------------------+   |
+|   |                     Page Render Layer (Canvas / PDF.js)                   |   |
+|   +---------------------------------------------------------------------------+   |
+|                                         |                                         |
+|                                         v (Coordinate Space Normalization)        |
+|   +---------------------------------------------------------------------------+   |
+|   |                   SVG Annotation Layer (DOM Overlay)                      |   |
+|   |  - Highlights   - Freehand Paths   - Point Comments   - Text Strikethroughs |   |
+|   +---------------------------------------------------------------------------+   |
++-----------------------------------------------------------------------------------+
+                                         |
+                            (REST / gRPC WebSocket Delta)
+                                         |
+                                         v
++-----------------------------------------------------------------------------------+
+|                        ANNOTATION PERSISTENCE SERVICE                             |
+|    - Normalizes multi-page viewport coordinates [x, y, w, h] to relative %        |
+|    - Enforces ACLs (Grader draft vs. Student visible vs. Moderated state)         |
+|    - Stores immutable annotation revisions in PostgreSQL (JSONB)                  |
++-----------------------------------------------------------------------------------+
+Core Data Schema (PostgreSQL)
+Annotations are versioned, bound to specific document pages, and support collaborative or moderated evaluation workflows through draft state flags.
+SQL
+-- Enforce UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- ============================================================================
+-- 1. ANNOTATION DOCUMENTS (Container for a submission attempt's markups)
+-- ============================================================================
+CREATE TABLE submission_annotation_documents (
+    annotation_doc_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id VARCHAR(64) NOT NULL,
+    submission_id UUID NOT NULL,
+    attachment_id UUID NOT NULL, -- Target file asset within the submission
+    author_id UUID NOT NULL,     -- Instructor or TA creator
+    
+    workflow_state VARCHAR(32) NOT NULL DEFAULT 'DRAFT', 
+    -- DRAFT (Instructor working state), PUBLISHED (Student visible), SUPERSEDED
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    
+    CONSTRAINT uq_tenant_submission_attachment_author 
+        UNIQUE (tenant_id, submission_id, attachment_id, author_id)
+);
+
+CREATE INDEX idx_annotation_docs_lookup 
+    ON submission_annotation_documents(tenant_id, submission_id, attachment_id);
+
+-- ============================================================================
+-- 2. ANNOTATION ENTITIES (Individual vector paths, comments, and highlights)
+-- ============================================================================
+CREATE TABLE annotation_items (
+    item_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    annotation_doc_id UUID NOT NULL REFERENCES submission_annotation_documents(annotation_doc_id) ON DELETE CASCADE,
+    tenant_id VARCHAR(64) NOT NULL,
+    
+    page_number INT NOT NULL CHECK (page_number > 0),
+    annotation_type VARCHAR(32) NOT NULL, 
+    -- HIGHLIGHT, STRIKETHROUGH, POINT_COMMENT, FREEHAND_PATH, TEXT_BOX, BOUNDING_BOX
+    
+    -- Normalized geometry relative to page bounds [0.0 to 1.0]
+    geometry JSONB NOT NULL,
+    
+    -- Styling parameters (stroke color, width, opacity, fill)
+    style JSONB NOT NULL DEFAULT '{"color": "#FFD700", "opacity": 0.4}'::jsonb,
+    
+    -- Optional content for text comments / point pins
+    content TEXT,
+    
+    -- Discussion threads on point comments
+    replies JSONB NOT NULL DEFAULT '[]'::jsonb,
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_annotation_items_doc_page 
+    ON annotation_items(annotation_doc_id, page_number);
+
+-- ============================================================================
+-- ROW LEVEL SECURITY (RLS)
+-- ============================================================================
+ALTER TABLE submission_annotation_documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE annotation_items ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_annotation_docs ON submission_annotation_documents
+    USING (tenant_id = current_setting('app.current_tenant_id', true));
+
+CREATE POLICY tenant_isolation_annotation_items ON annotation_items
+    USING (tenant_id = current_setting('app.current_tenant_id', true));
+Geometry JSONB Specifications
+To handle document re-scaling and zoom levels across desktop and mobile screens, coordinate systems are stored strictly as percentages ( to ) relative to total page height and width.
+1. Highlight / Text Selection (HIGHLIGHT)
+JSON
+{
+  "type": "HIGHLIGHT",
+  "geometry": {
+    "rects": [
+      { "x": 0.1250, "y": 0.3420, "width": 0.6500, "height": 0.0180 },
+      { "x": 0.1000, "y": 0.3620, "width": 0.4200, "height": 0.0180 }
+    ]
+  },
+  "style": {
+    "color": "#FFF066",
+    "opacity": 0.45
+  }
+}
+2. Freehand Ink Stroke (FREEHAND_PATH)
+JSON
+{
+  "type": "FREEHAND_PATH",
+  "geometry": {
+    "path": "M 0.231 0.412 L 0.235 0.418 L 0.242 0.425 L 0.250 0.430",
+    "stroke_width": 2.5
+  },
+  "style": {
+    "color": "#E53E3E",
+    "opacity": 0.90
+  }
+}
+3. Point Comment Pin & Thread (POINT_COMMENT)
+JSON
+{
+  "type": "POINT_COMMENT",
+  "geometry": {
+    "x": 0.4520,
+    "y": 0.1890
+  },
+  "style": {
+    "color": "#3182CE",
+    "icon": "pin"
+  },
+  "content": "Please verify this derivation against Equation 3.2 in Chapter 4.",
+  "replies": [
+    {
+      "reply_id": "8c2f1e20-91ab-4a2c-b19d-7f411bfa03e8",
+      "author_id": "student-uuid-1234",
+      "author_role": "STUDENT",
+      "content": "I updated this in the resubmission.",
+      "created_at": "2026-09-30T19:42:00Z"
+    }
+  ]
+}
+Key Operational Controls
+Resolution Independence: All coordinates inside the geometry payload are relative ratios. Frontends render SVG elements dynamically over page viewport layers:
+
+
+PDF Flattening & Export Pipeline: When exporting a graded document to PDF, a server-side headless chrome renderer or PDF engine (like PDFium) rasterizes the SVG layer directly into the underlying document stream, embedding annotations into standard PDF annotation objects (/Annots).
+Moderated Grading Isolation: Separate submission_annotation_documents records exist for each assigned grader. When "Anonymous/Moderated Grading" is active, graders cannot see each other's annotation layers until the final moderator publishes the composite evaluation.
+This WebSocket message protocol governs real-time, low-latency collaborative annotation editing within SpeedGrader. It handles multi-grader state synchronization, operational transformation/deltas, live cursor/selection presence, and optimistic locking reconciliation for instructors and TAs evaluating the same submission attempt.
+Protocol Overview & Connection Lifecycle
+Transport: Secure WebSockets (wss://) with fallback to HTTP/2 Server-Sent Events (SSE) + REST.
+Serialization: JSON over WebSocket (text frame) for standard client payloads; optional Protocol Buffers over WebSocket (binary frame) for dense freehand path streams.
+Authentication: Handled during handshake via session token or JWT in subprotocol header (Sec-WebSocket-Protocol: speedgrader-v1, token.<jwt_token>).
+  Client (Instructor)                                  SpeedGrader WebSocket Node
+       |                                                            |
+       |----- (1) HTTP Upgrade (Sec-WebSocket-Protocol) ----------->|
+       |<---- (2) 101 Switching Protocols (Ack Connection) ---------|
+       |                                                            |
+       |<---- (3) SESSION_INIT (Full Document & Active Presence) ---|
+       |                                                            |
+       |----- (4) ANNOTATION_DELTA (Create/Update/Delete) --------->|
+       |<---- (5) ANNOTATION_ACK (Server Timestamp & Sequence) -----|
+       |<==== (6) ANNOTATION_BROADCAST (To Other Active Graders) ====|
+Top-Level Message Envelope Schema
+Every WebSocket frame follows a strict top-level envelope containing routing, tracing, and tenant metadata.
+JSON
+{
+  "protocol_version": "v1.2",
+  "event_id": "evt_99f2b1a8-3c4d-4e5f-a6b7-8c9d0e1f2a3b",
+  "tenant_id": "oakhaven-global-university",
+  "submission_id": "sub_a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+  "attachment_id": "att_f1e2d3c4-b5a6-9788-7766-554433221100",
+  "sender": {
+    "user_id": "usr_77665544-3322-1100-aabb-ccddeeff0011",
+    "role": "INSTRUCTOR",
+    "display_name": "Dr. Aris Thorne"
+  },
+  "sequence_number": 1042,
+  "timestamp": "2026-09-30T20:15:00.123Z",
+  "type": "ANNOTATION_DELTA",
+  "payload": {}
+}
+Event Types & Payload Schemas
+1. SESSION_INIT (Server  Client)
+Sent immediately upon successful WebSocket handshake to establish state and active collaborators.
+JSON
+{
+  "type": "SESSION_INIT",
+  "payload": {
+    "annotation_doc_id": "doc_3a2b1c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+    "workflow_state": "DRAFT",
+    "current_sequence": 1041,
+    "active_presence": [
+      {
+        "user_id": "usr_88776655-4433-2211-0011-223344556677",
+        "display_name": "Prof. Marcus Vance",
+        "color": "#3182CE",
+        "active_page": 2,
+        "selected_annotation_id": "ann_00112233-4455-6677-8899-aabbccddeeff"
+      }
+    ],
+    "annotations": [
+      {
+        "item_id": "ann_00112233-4455-6677-8899-aabbccddeeff",
+        "page_number": 2,
+        "annotation_type": "HIGHLIGHT",
+        "geometry": {
+          "rects": [{ "x": 0.12, "y": 0.34, "width": 0.65, "height": 0.02 }]
+        },
+        "style": { "color": "#FFF066", "opacity": 0.45 }
+      }
+    ]
+  }
+}
+2. PRESENCE_UPDATE (Client  Server)
+Bi-directional event tracking viewport changes, active page context, and cursor movements for live collaborative indicators.
+JSON
+{
+  "type": "PRESENCE_UPDATE",
+  "payload": {
+    "active_page": 3,
+    "viewport": {
+      "zoom_level": 1.25,
+      "scroll_top_ratio": 0.42
+    },
+    "cursor": {
+      "x": 0.4512,
+      "y": 0.6789
+    },
+    "selected_annotation_id": "ann_ff998877-6655-4433-2211-00aabbccddeeff"
+  }
+}
+3. ANNOTATION_DELTA (Client  Server)
+Emitted when a grader creates, updates, moves, or deletes a vector markup item or point comment.
+Operation Types: CREATE, UPDATE, DELETE
+JSON
+{
+  "type": "ANNOTATION_DELTA",
+  "payload": {
+    "operation": "CREATE",
+    "item": {
+      "item_id": "ann_ff998877-6655-4433-2211-00aabbccddeeff",
+      "page_number": 3,
+      "annotation_type": "POINT_COMMENT",
+      "geometry": {
+        "x": 0.4512,
+        "y": 0.6789
+      },
+      "style": {
+        "color": "#E53E3E",
+        "icon": "pin"
+      },
+      "content": "Verify margin of error calculations here."
+    }
+  }
+}
+4. COMMENT_REPLY (Bi-directional)
+Appends a child reply thread to an existing point comment or bounding box annotation.
+JSON
+{
+  "type": "COMMENT_REPLY",
+  "payload": {
+    "parent_annotation_id": "ann_ff998877-6655-4433-2211-00aabbccddeeff",
+    "reply_id": "rep_11223344-5566-7788-9900-aabbccddeeff",
+    "content": "I addressed this in the revision note.",
+    "created_at": "2026-09-30T20:15:02.000Z"
+  }
+}
+5. ANNOTATION_ACK (Server  Sender)
+Confirms successful persistence and assigns an authoritative server sequence number.
+JSON
+{
+  "type": "ANNOTATION_ACK",
+  "payload": {
+    "event_id": "evt_99f2b1a8-3c4d-4e5f-a6b7-8c9d0e1f2a3b",
+    "item_id": "ann_ff998877-6655-4433-2211-00aabbccddeeff",
+    "sequence_number": 1042,
+    "saved_at": "2026-09-30T20:15:00.145Z"
+  }
+}
+6. CONFLICT_REJECTION (Server  Sender)
+Emitted when concurrent edits violate optimistic locking bounds (e.g., editing an annotation deleted by a co-grader).
+JSON
+{
+  "type": "CONFLICT_REJECTION",
+  "payload": {
+    "failed_event_id": "evt_99f2b1a8-3c4d-4e5f-a6b7-8c9d0e1f2a3b",
+    "item_id": "ann_ff998877-6655-4433-2211-00aabbccddeeff",
+    "error_code": "RESOURCE_MUTATED_OR_DELETED",
+    "message": "The annotation was modified by another instructor.",
+    "current_state": null
+  }
+}
+Heartbeat & Connection Recovery
+Ping/Pong Cycle: Client sends {"type": "PING"} every 15 seconds. Server responds with {"type": "PONG"}. If no frame arrives within 45 seconds, connection terminates.
+Reconnection Protocol: On reconnection, the client includes last_sequence_number in the SESSION_INIT request:
+
+The server replays missed ANNOTATION_DELTA frames from Redis cache or returns a SESSION_INIT snapshot if the disconnect gap exceeds buffer retention.
+System Architecture & Export Pipeline
+The PDF Flattening Engine takes a raw student submission PDF, fetches its associated SpeedGrader SVG/JSON annotation layer from PostgreSQL, normalizes coordinate spaces, rasterizes/vectors vector primitives, and bakes them directly into the PDF's primary content stream (/Contents).
++-----------------------------------------------------------------------------------+
+|                            PDF FLATTENING PIPELINE                                |
++-----------------------------------------------------------------------------------+
+                                         |
+  [Client PDF Request] ---> [Submission PDF Engine] + [PostgreSQL Annotation Items]
+                                         |
+                                         v
+                    +-----------------------------------------+
+                    | PDFium Go CGO Worker Pool               |
+                    | 1. Load Document (`FPDF_LoadMemDocument`)|
+                    | 2. Iterate Pages & Retrieve Geometries  |
+                    | 3. Render Vector/Text Markup Stream     |
+                    | 4. Create `/Annots` & Flatten Page      |
+                    +-----------------------------------------+
+                                         |
+                                         v
+                      [Flattened PDF Stream (Byte Array)]
+                                         |
+                                         v
+                     [S3/GCS Pre-Signed Export Storage URL]
+2. Coordinate System Normalization Matrix
+SpeedGrader UI geometries are saved as relative ratios () to guarantee screen-resolution independence. PDFium uses standard PDF points () with an origin  located at the bottom-left of the page media box.
+Transformation Equations
+For a given page with PDF dimensions  and :
+
+
+
+
+Note: Because PDF -coordinates increase moving upward, top-down web coordinates () must be flipped relative to .
+3. Go + PDFium Flattening Implementation
+This Go implementation uses the native [github.com/klippa-app/go-pdfium](https://github.com/klippa-app/go-pdfium) CGO bindings to parse geometry primitives, construct native PDF annotation objects, and execute atomic page flattening (FPDFPage_Flatten).
+Go
+package pdfiumexporter
+
+import (
+"encoding/json"
+"fmt"
+
+"github.com/klippa-app/go-pdfium"
+"github.com/klippa-app/go-pdfium/requests"
+)
+
+type AnnotationItem struct {
+ItemID         string          `json:"item_id"`
+PageNumber     int             `json:"page_number"` // 1-indexed
+AnnotationType string          `json:"annotation_type"`
+Geometry       json.RawMessage `json:"geometry"`
+Style          AnnotationStyle `json:"style"`
+Content        string          `json:"content,omitempty"`
+}
+
+type AnnotationStyle struct {
+Color   string  `json:"color"` // Hex format e.g. "#E53E3E"
+Opacity float64 `json:"opacity"`
+}
+
+type PointGeometry struct {
+X float64 `json:"x"`
+Y float64 `json:"y"`
+}
+
+type HighlightGeometry struct {
+Rects []Rect `json:"rects"`
+}
+
+type Rect struct {
+X      float64 `json:"x"`
+Y      float64 `json:"y"`
+Width  float64 `json:"width"`
+Height float64 `json:"height"`
+}
+
+// FlattenDocument executes PDFium page mutation and bakes annotations into the static content stream.
+func FlattenDocument(
+instance pdfium.Pdfium,
+pdfBytes []byte,
+annotations []AnnotationItem,
+) ([]byte, error) {
+// 1. Load PDF Document from Memory
+doc, err := instance.FPDF_LoadMemDocument(&requests.FPDF_LoadMemDocument{
+Data: pdfBytes,
+})
+if err != nil {
+return nil, fmt.Errorf("failed to load PDF in PDFium: %w", err)
+}
+defer instance.FPDF_CloseDocument(&requests.FPDF_CloseDocument{
+Document: doc.Document,
+})
+
+// 2. Group Annotations by Page Number
+pageMap := make(map[int][]AnnotationItem)
+for _, item := range annotations {
+pageMap[item.PageNumber] = append(pageMap[item.PageNumber], item)
+}
+
+// 3. Process Each Page
+pageCountResp, err := instance.FPDF_GetPageCount(&requests.FPDF_GetPageCount{
+Document: doc.Document,
+})
+if err != nil {
+return nil, err
+}
+
+for pageIdx := 0; pageIdx < pageCountResp.PageCount; pageIdx++ {
+pageNumber := pageIdx + 1
+items, exists := pageMap[pageNumber]
+if !exists || len(items) == 0 {
+continue
+}
+
+// Open Page
+page, err := instance.FPDF_LoadPage(&requests.FPDF_LoadPage{
+Document: doc.Document,
+Index:    pageIdx,
+})
+if err != nil {
+return nil, fmt.Errorf("failed to load page %d: %w", pageNumber, err)
+}
+
+// Get Page Dimensions in Points
+widthResp, _ := instance.FPDF_GetPageWidthF(&requests.FPDF_GetPageWidthF{Page: page.Page})
+heightResp, _ := instance.FPDF_GetPageHeightF(&requests.FPDF_GetPageHeightF{Page: page.Page})
+pageWidth := widthResp.Width
+pageHeight := heightResp.Height
+
+// 4. Inject Native PDF Annotations
+for _, item := range items {
+switch item.AnnotationType {
+case "HIGHLIGHT":
+var geom HighlightGeometry
+if err := json.Unmarshal(item.Geometry, &geom); err == nil {
+for _, r := range geom.Rects {
+// Coordinate Conversion
+pdfX := r.X * pageWidth
+pdfY := (1.0 - r.Y - r.Height) * pageHeight
+pdfW := r.Width * pageWidth
+pdfH := r.Height * pageHeight
+
+// Add Native Highlight Annotation to PDF Page
+_, _ = instance.FPDFPage_CreateAnnot(&requests.FPDFPage_CreateAnnot{
+Page:     page.Page,
+Subtype:  pdfium.FPDF_ANNOT_HIGHLIGHT,
+Rect:     &pdfium.FPDF_FS_RECTF{Left: float32(pdfX), Top: float32(pdfY + pdfH), Right: float32(pdfX + pdfW), Bottom: float32(pdfY)},
+})
+}
+}
+
+case "POINT_COMMENT":
+var geom PointGeometry
+if err := json.Unmarshal(item.Geometry, &geom); err == nil {
+pdfX := geom.X * pageWidth
+pdfY := (1.0 - geom.Y) * pageHeight
+
+// Create Text Pin Annotation
+annot, _ := instance.FPDFPage_CreateAnnot(&requests.FPDFPage_CreateAnnot{
+Page:    page.Page,
+Subtype: pdfium.FPDF_ANNOT_TEXT,
+Rect:    &pdfium.FPDF_FS_RECTF{Left: float32(pdfX), Top: float32(pdfY + 16), Right: float32(pdfX + 16), Bottom: float32(pdfY)},
+})
+
+// Set Text Contents
+_ = instance.FPDFAnnot_SetStringValue(&requests.FPDFAnnot_SetStringValue{
+Annotation: annot.Annotation,
+Key:        "Contents",
+Value:      item.Content,
+})
+}
+}
+}
+
+// 5. Flatten All Page Annotations into Page Content Stream
+_, err = instance.FPDFPage_Flatten(&requests.FPDFPage_Flatten{
+Page: page.Page,
+Flag: pdfium.FPDF_FLATTEN_PRINT, // Bake for print/viewing compatibility
+})
+if err != nil {
+return nil, fmt.Errorf("failed to flatten annotations on page %d: %w", pageNumber, err)
+}
+
+// Close Page Handle
+_ = instance.FPDF_ClosePage(&requests.FPDF_ClosePage{Page: page.Page})
+}
+
+// 6. Save Document Bytes
+saveResp, err := instance.FPDF_SaveAsCopy(&requests.FPDF_SaveAsCopy{
+Document: doc.Document,
+Flags:    pdfium.FPDF_SAVE_NO_INCREMENTAL,
+})
+if err != nil {
+return nil, fmt.Errorf("failed to serialize flattened PDF: %w", err)
+}
+
+return saveResp.FileBytes, nil
+}
+4. Key Performance Controls
+Optimization Layer
+Implementation Rule
+CGO Worker Pool
+Reuses a bounded pool of pre-initialized PDFium worker processes/goroutines to eliminate FPDF_InitLibrary per-request overhead.
+Stream-Based I/O
+Leverages FPDF_SaveAsCopy directly into memory buffers or pre-signed storage streams to eliminate intermediate local disk reads/writes.
+Font Substitution
+Maps point comment callout fonts to standard PDF Base-14 fonts (Helvetica, Times-Roman) to prevent font embedding bloat during flattening.
+Because PDFium relies on underlying C bindings (CGO), creating and destroying library instances per request creates severe lock contention and memory fragmentation. This implementation uses a thread-safe worker pool pattern that manages a fixed set of initialized PDFium instances with worker channels, context cancellation, and grace shutdown controls.
+Go
+package pdfiumexporter
+
+import (
+"context"
+"errors"
+"fmt"
+"log"
+"sync"
+"time"
+
+"github.com/klippa-app/go-pdfium"
+"github.com/klippa-app/go-pdfium/single_threaded"
+)
+
+var (
+ErrPoolClosed   = errors.New("worker pool is closed")
+ErrJobCancelled = errors.New("job context cancelled prior to execution")
+)
+
+// ExportJob represents a single SpeedGrader PDF flattening task.
+type ExportJob struct {
+JobID       string
+SubmissionID string
+PDFBytes    []byte
+Annotations []AnnotationItem
+
+// Result handling
+ResultChan  chan ExportResult
+Ctx         context.Context
+}
+
+// ExportResult contains the processed PDF byte payload or execution errors.
+type ExportResult struct {
+JobID          string
+FlattenedBytes []byte
+Duration       time.Duration
+Err            error
+}
+
+// PDFWorkerPool manages a fixed set of PDFium single-threaded worker instances.
+type PDFWorkerPool struct {
+poolSize   int
+jobsChan   chan ExportJob
+workerWg   sync.WaitGroup
+closeOnce  sync.Once
+isClosed   bool
+closedLock sync.RWMutex
+
+// PDFium engine pool reference
+pdfiumPool pdfium.Pool
+}
+
+// NewPDFWorkerPool initializes a high-concurrency PDFium worker pool.
+func NewPDFWorkerPool(poolSize int, bufferSize int) (*PDFWorkerPool, error) {
+if poolSize <= 0 {
+poolSize = 4 // Default to sensible core count fallback
+}
+
+// Initialize single-threaded PDFium instance pool
+// go-pdfium single_threaded mode prevents C-level thread affinity crashes
+p := single_threaded.Init(single_threaded.Config{})
+
+pool := &PDFWorkerPool{
+poolSize:   poolSize,
+jobsChan:   make(chan ExportJob, bufferSize),
+pdfiumPool: p,
+}
+
+// Start worker goroutines
+pool.workerWg.Add(poolSize)
+for i := 1; i <= poolSize; i++ {
+go pool.worker(i)
+}
+
+log.Printf("[PDFWorkerPool] Initialized pool with %d workers and buffer depth %d", poolSize, bufferSize)
+return pool, nil
+}
+
+// Submit enqueues an export job into the channel. Returns error if pool is closed.
+func (p *PDFWorkerPool) Submit(job ExportJob) error {
+p.closedLock.RLock()
+defer p.closedLock.RUnlock()
+
+if p.isClosed {
+return ErrPoolClosed
+}
+
+p.jobsChan <- job
+return nil
+}
+
+// worker is the long-running execution loop binding 1 PDFium instance per goroutine.
+func (p *PDFWorkerPool) worker(workerID int) {
+defer p.workerWg.Done()
+
+// Acquire a dedicated PDFium handle for this worker's lifetime
+instance, err := p.pdfiumPool.GetInstance(time.Second * 10)
+if err != nil {
+log.Printf("[Worker %d] Failed to acquire PDFium instance: %v", workerID, err)
+return
+}
+defer func() {
+_ = instance.Close()
+}()
+
+log.Printf("[Worker %d] Started and ready for export jobs", workerID)
+
+for job := range p.jobsChan {
+// Check for cancellation before executing heavy rendering
+if job.Ctx != nil && job.Ctx.Err() != nil {
+job.ResultChan <- ExportResult{
+JobID: job.JobID,
+Err:   ErrJobCancelled,
+}
+continue
+}
+
+startTime := time.Now()
+
+// Execute core PDFium flattening engine call
+flattenedBytes, err := FlattenDocument(instance, job.PDFBytes, job.Annotations)
+elapsed := time.Since(startTime)
+
+res := ExportResult{
+JobID:          job.JobID,
+FlattenedBytes: flattenedBytes,
+Duration:       elapsed,
+Err:            err,
+}
+
+// Dispatch result back to caller channel
+select {
+case job.ResultChan <- res:
+case <-time.After(2 * time.Second):
+log.Printf("[Worker %d] Timed out delivering result for Job %s", workerID, job.JobID)
+}
+}
+
+log.Printf("[Worker %d] Shutdown complete", workerID)
+}
+
+// Shutdown gracefully drains remaining jobs and destroys PDFium instances.
+func (p *PDFWorkerPool) Shutdown(ctx context.Context) error {
+var shutdownErr error
+
+p.closeOnce.Do(func() {
+p.closedLock.Lock()
+p.isClosed = true
+p.closedLock.Unlock()
+
+// Close job queue to stop workers from accepting new jobs
+close(p.jobsChan)
+
+// Wait for active workers to complete with context deadline
+done := make(chan struct{})
+go func() {
+p.workerWg.Wait()
+close(done)
+}()
+
+select {
+case <-done:
+log.Println("[PDFWorkerPool] All workers drained successfully")
+case <-ctx.Done():
+shutdownErr = fmt.Errorf("shutdown context deadline exceeded: %w", ctx.Err())
+log.Println("[PDFWorkerPool] Forcefully shutting down pool...")
+}
+
+// Close underlying PDFium library pool
+if err := p.pdfiumPool.Close(); err != nil {
+log.Printf("[PDFWorkerPool] Error closing PDFium pool: %v", err)
+}
+})
+
+return shutdownErr
+}
+Example Usage & Dispatch Pattern
+Go
+func main() {
+// Initialize a worker pool matching CPU core capacity (e.g., 8 workers, buffer 100)
+pool, err := NewPDFWorkerPool(8, 100)
+if err != nil {
+log.Fatalf("Failed to create worker pool: %v", err)
+}
+
+ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+defer cancel()
+
+// Construct result channel for async response
+resultChan := make(chan ExportResult, 1)
+
+job := ExportJob{
+JobID:        "export_job_99812",
+SubmissionID: "sub_33421",
+PDFBytes:     []byte("%PDF-1.7 ..."), // Raw submission PDF bytes
+Annotations:  []AnnotationItem{},     // Parsed SpeedGrader JSON annotations
+ResultChan:   resultChan,
+Ctx:          ctx,
+}
+
+// Submit job to pool
+if err := pool.Submit(job); err != nil {
+log.Fatalf("Failed to submit job: %v", err)
+}
+
+// Wait for result
+select {
+case res := <-resultChan:
+if res.Err != nil {
+log.Fatalf("Export failed for job %s: %v", res.JobID, res.Err)
+}
+fmt.Printf("Successfully generated flattened PDF (%d bytes) in %v\n", 
+len(res.FlattenedBytes), res.Duration)
+
+case <-ctx.Done():
+log.Fatal("Overall request context timed out waiting for PDF export")
+}
+
+// Graceful shutdown on application signal
+shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+defer shutdownCancel()
+_ = pool.Shutdown(shutdownCtx)
+}
+Architecture & Concurrency Highlights
+single_threaded.Init() Binding: Uses go-pdfium's single-threaded configuration, which pins PDFium runtime bindings to isolated OS-level worker threads. This avoids CGO memory corruption caused by cross-thread C pointer swapping.
+Goroutine-Bound PDFium Instances: Calls p.pdfiumPool.GetInstance() once per worker lifecycle inside worker(). Reusing PDFium instances avoids C library allocation overhead per document export.
+Graceful Shutdown (Shutdown): Uses a thread-safe sync.Once and RWMutex guard to prevent new job submissions while allowing pending items in the channel buffer to drain safely before releasing PDFium resources.
+Context-Aware Pre-Check: Evaluates job.Ctx.Err() inside the worker loop before running flattening calculations, skipping rendering for clients that disconnected or canceled their HTTP request.
+SYSTEM PROMPT — CanvasParity LMS Architecture & Feature Specification
+Use this prompt to design, build, or govern an LMS that operates like Canvas LMS.
+1. Agent Identity
+You are the CanvasParity LMS Architect & Specification Generator. Your role is to produce accurate, complete, structured, implementationready descriptions of LMS features, workflows, data models, and behaviors that match Canvas LMS functionality.
+You must describe Canvasequivalent features, not proprietary code or copyrighted text.
+2. Core LMS Objects (CanvasParity)
+Your LMS must support the following canonical objects:
+User
+Course
+Section
+Module
+ModuleItem
+Page
+Assignment
+Quiz
+QuestionBank
+Submission
+Rubric
+DiscussionTopic
+Announcement
+File
+Folder
+Outcome
+Gradebook
+Enrollment
+Group
+CalendarEvent
+Each object must include Canvasequivalent attributes, relationships, access rules, and lifecycle behaviors.
+3. Course Structure & Navigation (CanvasParity)
+Your LMS must implement:
+Course Navigation Menu
+Home
+Modules
+Assignments
+Discussions
+Quizzes
+Grades
+People
+Pages
+Files
+Syllabus
+Outcomes
+Announcements
+Conferences (optional)
+Collaborations
+Rubrics
+Settings
+Course Home Options
+Modules view
+Syllabus view
+Assignments list
+Pages list
+Course activity stream
+Modules
+Sequential module progression
+Prerequisites
+Requirements (view, submit, score ≥ X, mark done)
+Lock/unlock dates
+Publish/unpublish
+Draganddrop ordering
+Module items:
+Page
+Assignment
+Quiz
+Discussion
+External tool (LTI)
+File
+Text header
+4. Content Authoring (CanvasParity)
+Rich Content Editor (RCE)
+Your LMS must support:
+Headings
+Tables
+Images
+Video
+Audio
+Math equations (LaTeX)
+Code blocks
+Callouts
+Embedded tools (LTI)
+Accessible HTML output
+Reusable content blocks
+Pages
+Version history
+Publish/unpublish
+Template support
+Inline media embedding
+Link to course items
+Accessibility checker
+5. Assignments (CanvasParity)
+Assignment Types
+No submission
+Online submission:
+Text entry
+File upload
+URL
+Media recording
+Onpaper
+External tool (LTI)
+Assignment Settings
+Points
+Submission type
+Allowed file types
+Group assignment
+Peer review
+Anonymous grading
+Moderation workflow
+Due date
+Available from / until
+Assign to (sections, groups, individuals)
+Plagiarism checker integration
+SpeedGraderParity
+Inline document rendering
+Annotation tools
+Rubric panel
+Comment sidebar
+Keyboard navigation
+Grade entry
+Media feedback
+Student view toggle
+6. Quizzes (CanvasParity)
+Quiz Types
+Classic quizzes
+New quizzes (modern engine)
+Question Types
+Multiple choice
+Multiple answer
+True/false
+Fillintheblank
+Matching
+Ordering
+Essay
+File upload
+Stimulus + linked questions
+Quiz Features
+Time limit
+Attempts allowed
+Shuffle answers
+Shuffle questions
+Question banks
+Item banks
+Accommodations
+Lockdown browser (optional)
+Autograding for objective items
+Manual grading for essays
+Quiz statistics
+7. Discussions (CanvasParity)
+Threaded replies
+Nested replies
+@mentions
+Attachments
+Media recording
+Group discussions
+Graded discussions
+Peer replies required
+Anonymous discussions (optional)
+Moderation tools
+8. Announcements (CanvasParity)
+Scheduled publishing
+Coursewide notifications
+Rich content editor
+Attachments
+Commenting (optional)
+9. Gradebook (CanvasParity)
+Features
+Weighted assignment groups
+Drop lowest scores
+Late/missing policies
+Excused assignments
+Grade posting policies:
+Automatic
+Manual
+Anonymous grading
+Moderation
+WhatIf grades
+Export/import CSV
+Grade history
+Gradebook Views
+Individual gradebook
+Gradebook grid
+Learning mastery (Outcomes)
+10. Outcomes & Mastery (CanvasParity)
+Rubric alignment
+Outcome scoring
+Mastery paths
+Learning mastery gradebook
+Outcome reporting
+11. Files & Media (CanvasParity)
+Course file repository
+Folder structure
+Quotas
+Versioning
+Preview inline
+Media transcoding
+Alttext enforcement
+File locking
+12. People & Enrollment (CanvasParity)
+Roles
+Teacher
+TA
+Designer
+Student
+Observer
+Admin
+Enrollment Features
+Add/remove users
+Sectionbased access
+Rolebased permissions
+SISimported enrollments
+Course groups
+Group sets
+13. Calendar (CanvasParity)
+Course events
+Assignment due dates
+Section meetings
+iCal feed
+Draganddrop date changes
+14. SIS Integration (CanvasParity)
+SIS import
+SIS export
+Grade passback
+Enrollment sync
+Course creation sync
+Section sync
+Error reporting
+15. LTI & External Tools (CanvasParity)
+LTI 1.1
+LTI Advantage (1.3)
+Deep linking
+Assignment & Grade Services
+Names & Roles
+External tool placements:
+Modules
+Assignments
+Course navigation
+User navigation
+16. Blueprint Courses (CanvasParity)
+Master course
+Associated courses
+Locked objects
+Sync rules
+Differential updates
+Override protection
+Sync history
+17. Course Settings (CanvasParity)
+Course details
+Start/end dates
+Visibility
+License
+Feature options
+Navigation ordering
+Section management
+External apps
+18. Student Experience (CanvasParity)
+ToDo list
+Recent feedback
+Grades view
+Module progression
+Mobilefriendly UI
+Accessibility compliance (WCAG 2.1 AA)
+19. Admin Experience (CanvasParity)
+Accountlevel settings
+Subaccounts
+Term management
+SIS imports
+Reporting
+Analytics
+Feature flags
+Authentication configuration
+20. AI Agent Behavior (Optional)
+If used with AI:
+Only answer from published course content
+Never solve graded work
+Cite sources
+Respect module release rules
+Respect role permissions
+Respect SIS boundaries
+SYSTEM PROMPT — CanvasParity LMS Feature & Functionality Specification
+Use this prompt to design an LMS that operates like Canvas LMS.
+1. Agent Identity
+You are the CanvasParity LMS Architect & Feature Specification Generator. Your role is to produce complete, accurate, implementationready descriptions of LMS features, workflows, and behaviors that match Canvas LMS functionality.
+You must describe Canvasequivalent features, not proprietary code or copyrighted text.
+2. Core LMS Objects (CanvasParity)
+Your LMS must support the following canonical objects:
+User
+Course
+Section
+Module
+ModuleItem
+Page
+Assignment
+Quiz
+QuestionBank / ItemBank
+Submission
+Rubric
+DiscussionTopic
+Announcement
+File / Folder
+Outcome
+Gradebook
+Enrollment
+Group / GroupSet
+CalendarEvent
+Each object must include Canvasequivalent attributes, relationships, access rules, and lifecycle behaviors.
+3. Course Structure & Navigation
+Course Navigation Menu
+Your LMS must support Canvasstyle navigation:
+Home
+Modules
+Assignments
+Discussions
+Quizzes
+Grades
+People
+Pages
+Files
+Syllabus
+Outcomes
+Announcements
+Conferences (optional)
+Collaborations
+Rubrics
+Settings
+Course Home Options
+Modules view
+Syllabus view
+Assignments list
+Pages list
+Course activity stream
+4. Modules (CanvasParity)
+Module Features
+Publish/unpublish
+Lock/unlock dates
+Sequential progression
+Prerequisites
+Requirements:
+View item
+Mark as done
+Score ≥ X
+Submit assignment
+Draganddrop ordering
+Module items:
+Page
+Assignment
+Quiz
+Discussion
+External tool (LTI)
+File
+Text header
+ServerEnforced Rules
+Sequential locking
+Prerequisite validation
+Release conditions
+5. Content Authoring (CanvasParity)
+Rich Content Editor (RCE)
+Your LMS must support:
+Headings
+Tables
+Images
+Video
+Audio
+Math equations (LaTeX)
+Code blocks
+Callouts
+Embedded tools (LTI)
+Accessible HTML output
+Reusable blocks
+Pages
+Version history
+Publish/unpublish
+Inline media embedding
+Link to course items
+Accessibility checker
+6. Assignments (CanvasParity)
+Submission Types
+No submission
+Online:
+Text entry
+File upload
+URL
+Media recording
+Onpaper
+External tool (LTI)
+Assignment Settings
+Points
+Allowed file types
+Group assignment
+Peer review
+Anonymous grading
+Moderation workflow
+Due date
+Available from / until
+Assign to (sections, groups, individuals)
+Plagiarism checker integration
+SpeedGraderParity
+Inline document rendering
+Annotation tools
+Rubric panel
+Comment sidebar
+Keyboard navigation
+Media feedback
+Grade entry
+Student view toggle
+7. Quizzes (CanvasParity)
+Quiz Types
+Classic quizzes
+New quizzes (modern engine)
+Question Types
+Multiple choice
+Multiple answer
+True/false
+Fillintheblank
+Matching
+Ordering
+Essay
+File upload
+Stimulus + linked questions
+Quiz Features
+Time limit
+Attempts allowed
+Shuffle answers
+Shuffle questions
+Question banks / item banks
+Accommodations
+Autograding for objective items
+Manual grading for essays
+Quiz statistics
+Lockdown browser (optional)
+8. Discussions (CanvasParity)
+Threaded replies
+Nested replies
+@mentions
+Attachments
+Media recording
+Group discussions
+Graded discussions
+Peer replies required
+Anonymous discussions (optional)
+Moderation tools
+9. Announcements (CanvasParity)
+Scheduled publishing
+Coursewide notifications
+Rich content editor
+Attachments
+Optional commenting
+10. Gradebook (CanvasParity)
+Gradebook Features
+Weighted assignment groups
+Drop lowest scores
+Late/missing policies
+Excused assignments
+Grade posting policies:
+Automatic
+Manual
+Anonymous grading
+Moderation
+WhatIf grades
+Export/import CSV
+Grade history
+Gradebook Views
+Gradebook grid
+Individual gradebook
+Learning mastery (Outcomes)
+11. Outcomes & Mastery Paths
+Rubric alignment
+Outcome scoring
+Mastery paths
+Learning mastery gradebook
+Outcome reporting
+12. Files & Media (CanvasParity)
+Course file repository
+Folder structure
+Quotas
+Versioning
+Inline preview
+Media transcoding
+Alttext enforcement
+File locking
+13. People & Enrollment
+Roles
+Teacher
+TA
+Designer
+Student
+Observer
+Admin
+Enrollment Features
+Add/remove users
+Sectionbased access
+Rolebased permissions
+SISimported enrollments
+Course groups
+Group sets
+14. Calendar
+Course events
+Assignment due dates
+Section meetings
+iCal feed
+Draganddrop date changes
+15. SIS Integration
+SIS import
+SIS export
+Grade passback
+Enrollment sync
+Course creation sync
+Section sync
+Error reporting
+16. LTI & External Tools
+LTI 1.1
+LTI Advantage (1.3)
+Deep linking
+Assignment & Grade Services
+Names & Roles
+External tool placements:
+Modules
+Assignments
+Course navigation
+User navigation
+17. Blueprint Courses
+Master course
+Associated courses
+Locked objects
+Sync rules
+Differential updates
+Override protection
+Sync history
+18. Course Settings
+Course details
+Start/end dates
+Visibility
+License
+Feature options
+Navigation ordering
+Section management
+External apps
+19. Student Experience
+ToDo list
+Recent feedback
+Grades view
+Module progression
+Mobilefriendly UI
+Accessibility compliance (WCAG 2.1 AA)
+20. Admin Experience
+Accountlevel settings
+Subaccounts
+Term management
+SIS imports
+Reporting
+Analytics
+Feature flags
+Authentication configuration
+21. AI Agent Behavior (Optional)
+If used with AI:
+Only answer from published course content
+Never solve graded work
+Cite sources
+Respect module release rules
+Respect role permissions
+Respect SIS boundaries
+CanvasParity LMS Feature Blueprint (EngineeringReady Specification)
+A structured, modular breakdown of Canvasequivalent LMS features for system design, engineering, and AI orchestration.
+1. Core Domain Model
+Primary Objects
+Course
+Section
+Module
+ModuleItem
+Page
+Assignment
+Quiz
+QuestionBank / ItemBank
+Submission
+Rubric
+DiscussionTopic
+Announcement
+File / Folder
+Outcome
+Gradebook
+Enrollment
+Group / GroupSet
+CalendarEvent
+User
+Relationships
+Course → Sections
+Course → Modules → ModuleItems
+Course → Assignments / Quizzes / Discussions
+Course → Files / Pages / Outcomes
+User → Enrollments → Roles
+Assignment → Submissions → Grades
+Quiz → Attempts → Scores
+Rubric → Assignment / Outcome alignment
+2. Course Experience
+Course Navigation
+Home
+Modules
+Assignments
+Discussions
+Quizzes
+Grades
+People
+Pages
+Files
+Syllabus
+Outcomes
+Announcements
+Settings
+Course Home Options
+Modules view
+Syllabus view
+Activity stream
+Assignments list
+Pages list
+3. Modules Engine
+Module Features
+Publish/unpublish
+Lock/unlock dates
+Sequential progression
+Prerequisites
+Requirements:
+View
+Mark as done
+Score threshold
+Submit assignment
+Draganddrop ordering
+Module Items
+Page
+Assignment
+Quiz
+Discussion
+External tool (LTI)
+File
+Text header
+ServerEnforced Logic
+Sequential locking
+Prerequisite validation
+Release conditions
+4. Content Authoring
+Rich Content Editor
+Supports:
+Headings
+Tables
+Images
+Video
+Audio
+Math (LaTeX)
+Code blocks
+Callouts
+LTI embeds
+Accessible HTML
+Reusable blocks
+Pages
+Version history
+Publish/unpublish
+Inline media embedding
+Link to course items
+Accessibility checker
+5. Assignments
+Submission Types
+No submission
+Online:
+Text
+File
+URL
+Media recording
+Onpaper
+External tool (LTI)
+Assignment Settings
+Points
+Allowed file types
+Group assignment
+Peer review
+Anonymous grading
+Moderation
+Due date
+Available from / until
+Assign to (sections, groups, individuals)
+Plagiarism checker integration
+SpeedGraderParity
+Inline document rendering
+Annotation tools
+Rubric panel
+Comment sidebar
+Keyboard navigation
+Media feedback
+Grade entry
+Student view toggle
+6. Quizzes
+Quiz Types
+Classic quizzes
+New quizzes
+Question Types
+Multiple choice
+Multiple answer
+True/false
+Fillintheblank
+Matching
+Ordering
+Essay
+File upload
+Stimulus + linked questions
+Quiz Features
+Time limit
+Attempts allowed
+Shuffle answers
+Shuffle questions
+Question banks / item banks
+Accommodations
+Autograding
+Manual grading
+Quiz statistics
+Lockdown browser (optional)
+7. Discussions
+Threaded replies
+Nested replies
+@mentions
+Attachments
+Media recording
+Group discussions
+Graded discussions
+Peer replies required
+Anonymous discussions (optional)
+Moderation tools
+8. Announcements
+Scheduled publishing
+Rich content editor
+Attachments
+Optional commenting
+Coursewide notifications
+9. Gradebook
+Features
+Weighted assignment groups
+Drop lowest scores
+Late/missing policies
+Excused assignments
+Grade posting policies:
+Automatic
+Manual
+Anonymous grading
+Moderation
+WhatIf grades
+Export/import CSV
+Grade history
+Views
+Gradebook grid
+Individual gradebook
+Learning mastery
+10. Outcomes & Mastery
+Rubric alignment
+Outcome scoring
+Mastery paths
+Learning mastery gradebook
+Outcome reporting
+11. Files & Media
+Course file repository
+Folder structure
+Quotas
+Versioning
+Inline preview
+Media transcoding
+Alttext enforcement
+File locking
+12. People & Enrollment
+Roles
+Teacher
+TA
+Designer
+Student
+Observer
+Admin
+Enrollment Features
+Add/remove users
+Sectionbased access
+Rolebased permissions
+SISimported enrollments
+Course groups
+Group sets
+13. Calendar
+Course events
+Assignment due dates
+Section meetings
+iCal feed
+Draganddrop date changes
+14. SIS Integration
+SIS import
+SIS export
+Grade passback
+Enrollment sync
+Course creation sync
+Section sync
+Error reporting
+15. LTI & External Tools
+LTI 1.1
+LTI Advantage (1.3)
+Deep linking
+Assignment & Grade Services
+Names & Roles
+External tool placements:
+Modules
+Assignments
+Course navigation
+User navigation
+16. Blueprint Courses
+Master course
+Associated courses
+Locked objects
+Sync rules
+Differential updates
+Override protection
+Sync history
+17. Course Settings
+Course details
+Start/end dates
+Visibility
+License
+Feature options
+Navigation ordering
+Section management
+External apps
+18. Student Experience
+ToDo list
+Recent feedback
+Grades view
+Module progression
+Mobilefriendly UI
+Accessibility compliance (WCAG 2.1 AA)
+19. Admin Experience
+Accountlevel settings
+Subaccounts
+Term management
+SIS imports
+Reporting
+Analytics
+Feature flags
+Authentication configuration
+📘 CanvasParity LMS Data Model (EngineeringReady)
+Tables, relationships, and domain structure modeled after Canvas LMS behavior.
+1. User Domain
+User
+id
+name
+email
+login_id
+sis_user_id
+timezone
+locale
+avatar_url
+created_at
+updated_at
+Role
+id
+name (Teacher, TA, Designer, Student, Observer, Admin)
+permissions (JSON)
+Enrollment
+id
+user_id
+course_id
+section_id
+role_id
+sis_enrollment_id
+state (active, invited, completed, inactive)
+created_at
+updated_at
+2. Course Domain
+Course
+id
+account_id
+name
+course_code
+sis_course_id
+term_id
+start_at
+end_at
+is_public
+default_view (modules, syllabus, assignments, pages)
+license
+workflow_state (created, claimed, available, completed)
+created_at
+updated_at
+Section
+id
+course_id
+name
+sis_section_id
+start_at
+end_at
+created_at
+updated_at
+3. Modules Domain
+Module
+id
+course_id
+name
+position
+unlock_at
+require_sequential_progress
+prerequisite_module_ids (array)
+published
+created_at
+updated_at
+ModuleItem
+id
+module_id
+content_type (Page, Assignment, Quiz, Discussion, File, ExternalTool, Header)
+content_id
+position
+requirement_type (view, mark_done, score, submit)
+score_threshold
+published
+created_at
+updated_at
+4. Content Authoring Domain
+Page
+id
+course_id
+title
+body_json (validated JSON)
+body_html (rendered accessible HTML)
+published
+front_page
+created_at
+updated_at
+File
+id
+course_id
+folder_id
+filename
+content_type
+size
+url
+thumbnail_url
+locked
+created_at
+updated_at
+Folder
+id
+course_id
+name
+parent_folder_id
+created_at
+updated_at
+5. Assignments Domain
+Assignment
+id
+course_id
+name
+description_json
+description_html
+points
+submission_types (array)
+allowed_extensions (array)
+group_assignment (boolean)
+peer_reviews (boolean)
+anonymous_grading (boolean)
+moderation_enabled (boolean)
+due_at
+available_from
+available_until
+assign_to (sections, groups, individuals)
+published
+created_at
+updated_at
+Submission
+id
+assignment_id
+user_id
+submitted_at
+submission_type
+body_text
+body_html
+file_ids (array)
+url
+media_recording_url
+score
+graded_at
+grader_id
+state (submitted, graded, unsubmitted)
+created_at
+updated_at
+6. Rubrics Domain
+Rubric
+id
+course_id
+title
+criteria (JSON array)
+ratings (JSON array)
+points_possible
+published_version_id
+created_at
+updated_at
+RubricAssessment
+id
+rubric_id
+submission_id
+criterion_scores (JSON)
+total_score
+grader_id
+created_at
+updated_at
+7. Quizzes Domain
+Quiz
+id
+course_id
+title
+description_json
+description_html
+quiz_type (classic, new)
+time_limit
+shuffle_answers
+shuffle_questions
+allowed_attempts
+published
+created_at
+updated_at
+QuestionBank / ItemBank
+id
+course_id
+name
+questions (JSON array)
+created_at
+updated_at
+QuizAttempt
+id
+quiz_id
+user_id
+started_at
+submitted_at
+score
+answers (JSON)
+accommodations (JSON)
+created_at
+updated_at
+8. Discussions Domain
+DiscussionTopic
+id
+course_id
+title
+body_json
+body_html
+group_discussion
+graded
+points
+due_at
+published
+created_at
+updated_at
+DiscussionEntry
+id
+topic_id
+user_id
+parent_entry_id
+body_json
+body_html
+created_at
+updated_at
+9. Announcements Domain
+Announcement
+id
+course_id
+title
+body_json
+body_html
+scheduled_at
+published
+created_at
+updated_at
+10. Gradebook Domain
+Gradebook
+course_id
+assignment_groups (JSON)
+late_policy (JSON)
+missing_policy (JSON)
+posting_policy (manual, automatic)
+created_at
+updated_at
+GradeEntry
+id
+assignment_id
+user_id
+score
+posted_at
+grader_id
+created_at
+updated_at
+11. Outcomes Domain
+Outcome
+id
+course_id
+title
+description
+rubric_criterion_id
+mastery_points
+created_at
+updated_at
+OutcomeResult
+id
+outcome_id
+user_id
+score
+evidence (JSON)
+created_at
+updated_at
+12. Calendar Domain
+CalendarEvent
+id
+course_id
+title
+start_at
+end_at
+location
+event_type (assignment, meeting, exam)
+created_at
+updated_at
+13. SIS Integration Domain
+SISImport
+id
+account_id
+workflow_state
+progress
+data_file_url
+error_report_url
+created_at
+updated_at
+14. LTI Domain
+ExternalTool
+id
+course_id
+name
+consumer_key
+shared_secret
+launch_url
+placements (modules, assignments, navigation)
+created_at
+updated_at
+CanvasParity LMS API Specification (REST + GraphQL)
+Engineeringready endpoints, schemas, and behaviors modeled after Canvas LMS.
+1. REST API — CanvasParity Endpoints
+1.1 Courses
+GET /api/courses
+List courses visible to the authenticated user.
+GET /api/courses/{course_id}
+Retrieve course details.
+POST /api/courses
+Create a new course.
+PUT /api/courses/{course_id}
+Update course settings.
+DELETE /api/courses/{course_id}
+Archive or delete a course.
+1.2 Sections
+GET /api/courses/{course_id}/sections
+List sections.
+POST /api/courses/{course_id}/sections
+Create section.
+PUT /api/sections/{section_id}
+Update section.
+1.3 Modules
+GET /api/courses/{course_id}/modules
+List modules.
+POST /api/courses/{course_id}/modules
+Create module.
+PUT /api/modules/{module_id}
+Update module (publish, lock, prerequisites).
+GET /api/modules/{module_id}/items
+List module items.
+POST /api/modules/{module_id}/items
+Create module item.
+1.4 Pages
+GET /api/courses/{course_id}/pages
+List pages.
+GET /api/courses/{course_id}/pages/{page_id}
+Retrieve page.
+POST /api/courses/{course_id}/pages
+Create page.
+PUT /api/courses/{course_id}/pages/{page_id}
+Update page.
+DELETE /api/courses/{course_id}/pages/{page_id}
+Delete page.
+1.5 Assignments
+GET /api/courses/{course_id}/assignments
+List assignments.
+GET /api/courses/{course_id}/assignments/{assignment_id}
+Retrieve assignment.
+POST /api/courses/{course_id}/assignments
+Create assignment.
+PUT /api/courses/{course_id}/assignments/{assignment_id}
+Update assignment.
+GET /api/assignments/{assignment_id}/submissions
+List submissions.
+POST /api/assignments/{assignment_id}/submissions
+Submit work.
+1.6 Submissions
+GET /api/submissions/{submission_id}
+Retrieve submission.
+PUT /api/submissions/{submission_id}
+Grade submission.
+1.7 Quizzes
+GET /api/courses/{course_id}/quizzes
+List quizzes.
+POST /api/courses/{course_id}/quizzes
+Create quiz.
+GET /api/quizzes/{quiz_id}
+Retrieve quiz.
+POST /api/quizzes/{quiz_id}/attempts
+Start attempt.
+PUT /api/attempts/{attempt_id}
+Submit attempt.
+1.8 Discussions
+GET /api/courses/{course_id}/discussions
+List discussions.
+POST /api/courses/{course_id}/discussions
+Create discussion.
+GET /api/discussions/{topic_id}/entries
+List replies.
+POST /api/discussions/{topic_id}/entries
+Post reply.
+1.9 Announcements
+GET /api/courses/{course_id}/announcements
+List announcements.
+POST /api/courses/{course_id}/announcements
+Create announcement.
+1.10 Gradebook
+GET /api/courses/{course_id}/grades
+List grades for user.
+GET /api/courses/{course_id}/gradebook
+Instructor gradebook view.
+PUT /api/gradebook/entries/{entry_id}
+Update grade.
+1.11 Files
+GET /api/courses/{course_id}/files
+List files.
+POST /api/courses/{course_id}/files
+Upload file (signed URL workflow).
+1.12 People
+GET /api/courses/{course_id}/users
+List enrolled users.
+POST /api/courses/{course_id}/enrollments
+Enroll user.
+1.13 Calendar
+GET /api/calendar/events
+List events.
+POST /api/calendar/events
+Create event.
+1.14 SIS Integration
+POST /api/sis/imports
+Upload SIS file.
+GET /api/sis/imports/{import_id}
+Check import status.
+1.15 LTI
+GET /api/courses/{course_id}/external_tools
+List LTI tools.
+POST /api/courses/{course_id}/external_tools
+Register LTI tool.
+2. GraphQL API — CanvasParity Schema
+2.1 Query Root
+graphql
+type Query {
+  course(id: ID!): Course
+  courses: [Course]
+  module(id: ID!): Module
+  assignment(id: ID!): Assignment
+  quiz(id: ID!): Quiz
+  user(id: ID!): User
+  me: User
+}
+2.2 Course Type
+graphql
+type Course {
+  id: ID!
+  name: String!
+  courseCode: String
+  term: Term
+  sections: [Section]
+  modules: [Module]
+  assignments: [Assignment]
+  quizzes: [Quiz]
+  discussions: [DiscussionTopic]
+  pages: [Page]
+  files: [File]
+  outcomes: [Outcome]
+}
+2.3 Module Type
+graphql
+type Module {
+  id: ID!
+  name: String!
+  position: Int!
+  published: Boolean!
+  items: [ModuleItem]
+}
+2.4 Assignment Type
+graphql
+type Assignment {
+  id: ID!
+  name: String!
+  descriptionHtml: String
+  points: Int
+  dueAt: DateTime
+  submissions: [Submission]
+}
+2.5 Quiz Type
+graphql
+type Quiz {
+  id: ID!
+  title: String!
+  descriptionHtml: String
+  timeLimit: Int
+  attemptsAllowed: Int
+  questions: [Question]
+}
+2.6 Submission Type
+graphql
+type Submission {
+  id: ID!
+  user: User!
+  submittedAt: DateTime
+  score: Float
+  bodyHtml: String
+  files: [File]
+}
+2.7 Discussion Type
+graphql
+type DiscussionTopic {
+  id: ID!
+  title: String!
+  bodyHtml: String
+  entries: [DiscussionEntry]
+}
+2.8 Gradebook Type
+graphql
+type Gradebook {
+  course: Course!
+  entries: [GradeEntry]
+}
+3. Authentication & Authorization
+OAuth2 / OIDC
+JWT access tokens
+Rolebased access control
+Sectionbased permissions
+SIScontrolled enrollment states
+4. Pagination, Filtering, Sorting
+REST:
+?page=1&per_page=20
+?search=term
+?sort=name
+GraphQL:
+Relaystyle connections (optional)
+5. Error Handling
+REST
+json
+{
+  "error": "NotFound",
+  "message": "Assignment not found"
+}
+GraphQL
+graphql
+{
+  "errors": [
+    {
+      "message": "Unauthorized",
+      "path": ["assignment"]
+    }
+  ]
+}
+CanvasParity LMS Architecture Diagram (Mermaid)
+Full LMS architecture modeled after Canvas LMS behavior.
+mermaid
+flowchart TD
+
+    %% ===========================
+    %%  CLIENT LAYER
+    %% ===========================
+    subgraph Client["Client Layer"]
+        WebUI["Web App (React/Vue)"]
+        MobileApp["Mobile App (iOS/Android)"]
+        LTIConsumer["External LTI Tools"]
+    end
+
+    %% ===========================
+    %%  API GATEWAY
+    %% ===========================
+    APIGateway["API Gateway / Load Balancer"]
+
+    Client --> APIGateway
+
+    %% ===========================
+    %%  APPLICATION SERVICES
+    %% ===========================
+    subgraph AppServices["Application Services Layer"]
+        CourseSvc["Course Service"]
+        ModuleSvc["Module Service"]
+        PageSvc["Page Service"]
+        AssignmentSvc["Assignment Service"]
+        SubmissionSvc["Submission Service"]
+        QuizSvc["Quiz/Assessment Service"]
+        DiscussionSvc["Discussion Service"]
+        GradebookSvc["Gradebook Service"]
+        FileSvc["Files & Media Service"]
+        CalendarSvc["Calendar Service"]
+        PeopleSvc["People/Enrollment Service"]
+        OutcomeSvc["Outcomes/Mastery Service"]
+        SISProxy["SIS Integration Proxy"]
+        LTISvc["LTI Integration Service"]
+    end
+
+    APIGateway --> CourseSvc
+    APIGateway --> ModuleSvc
+    APIGateway --> PageSvc
+    APIGateway --> AssignmentSvc
+    APIGateway --> SubmissionSvc
+    APIGateway --> QuizSvc
+    APIGateway --> DiscussionSvc
+    APIGateway --> GradebookSvc
+    APIGateway --> FileSvc
+    APIGateway --> CalendarSvc
+    APIGateway --> PeopleSvc
+    APIGateway --> OutcomeSvc
+    APIGateway --> SISProxy
+    APIGateway --> LTISvc
+
+    %% ===========================
+    %%  DATA LAYER
+    %% ===========================
+    subgraph DataLayer["Data Layer"]
+        CourseDB["Courses DB"]
+        ModuleDB["Modules DB"]
+        PageDB["Pages DB"]
+        AssignmentDB["Assignments DB"]
+        SubmissionDB["Submissions DB"]
+        QuizDB["Quizzes DB"]
+        DiscussionDB["Discussions DB"]
+        GradebookDB["Gradebook DB"]
+        FileStorage["Object Storage (S3/GCS/Azure Blob)"]
+        CalendarDB["Calendar DB"]
+        PeopleDB["Enrollment DB"]
+        OutcomeDB["Outcomes DB"]
+        SISQueue["SIS Import Queue"]
+    end
+
+    CourseSvc --> CourseDB
+    ModuleSvc --> ModuleDB
+    PageSvc --> PageDB
+    AssignmentSvc --> AssignmentDB
+    SubmissionSvc --> SubmissionDB
+    QuizSvc --> QuizDB
+    DiscussionSvc --> DiscussionDB
+    GradebookSvc --> GradebookDB
+    FileSvc --> FileStorage
+    CalendarSvc --> CalendarDB
+    PeopleSvc --> PeopleDB
+    OutcomeSvc --> OutcomeDB
+    SISProxy --> SISQueue
+
+    %% ===========================
+    %%  INTEGRATIONS
+    %% ===========================
+    subgraph Integrations["External Integrations"]
+        SIS["Student Information System"]
+        LTITools["LTI Tools (Turnitin, Zoom, etc.)"]
+        Auth["Identity Provider (OIDC/SAML)"]
+    end
+
+    SISProxy --> SIS
+    LTISvc --> LTITools
+    APIGateway --> Auth
+📘 What this diagram gives you
+A complete Canvasparity LMS architecture with:
+Client Layer
+Web app
+Mobile app
+External LTI tools
+API Gateway
+Unified entry point
+Routing
+Auth enforcement
+Application Services
+Canvasequivalent microservices:
+Courses
+Modules
+Pages
+Assignments
+Submissions
+Quizzes
+Discussions
+Gradebook
+Files & Media
+Calendar
+People & Enrollment
+Outcomes
+SIS Proxy
+LTI Service
+Data Layer
+Canvasstyle persistence:
+PostgreSQL / MySQL / Aurora
+Object storage for files
+Queues for SIS imports
+Integrations
+SIS
+LTI
+Identity provider
+CanvasParity LMS SQL DDL (Full Database Schema)
+Implementationready SQL tables for a Canvaslike LMS.
+Below is the complete SQL schema, structured for PostgreSQL. (If you want MySQL or Aurora, I can generate that too.)
+1. User Domain
+sql
+CREATE TABLE users (
+    id BIGSERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    login_id TEXT UNIQUE,
+    sis_user_id TEXT,
+    timezone TEXT,
+    locale TEXT,
+    avatar_url TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE roles (
+    id BIGSERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    permissions JSONB NOT NULL
+);
+
+CREATE TABLE enrollments (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT REFERENCES users(id),
+    course_id BIGINT REFERENCES courses(id),
+    section_id BIGINT REFERENCES sections(id),
+    role_id BIGINT REFERENCES roles(id),
+    sis_enrollment_id TEXT,
+    state TEXT CHECK (state IN ('active','invited','completed','inactive')),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+2. Course Domain
+sql
+CREATE TABLE courses (
+    id BIGSERIAL PRIMARY KEY,
+    account_id BIGINT,
+    name TEXT NOT NULL,
+    course_code TEXT,
+    sis_course_id TEXT,
+    term_id BIGINT,
+    start_at TIMESTAMP,
+    end_at TIMESTAMP,
+    is_public BOOLEAN DEFAULT FALSE,
+    default_view TEXT,
+    license TEXT,
+    workflow_state TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE sections (
+    id BIGSERIAL PRIMARY KEY,
+    course_id BIGINT REFERENCES courses(id),
+    name TEXT NOT NULL,
+    sis_section_id TEXT,
+    start_at TIMESTAMP,
+    end_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+3. Modules Domain
+sql
+CREATE TABLE modules (
+    id BIGSERIAL PRIMARY KEY,
+    course_id BIGINT REFERENCES courses(id),
+    name TEXT NOT NULL,
+    position INT NOT NULL,
+    unlock_at TIMESTAMP,
+    require_sequential_progress BOOLEAN DEFAULT FALSE,
+    prerequisite_module_ids BIGINT[],
+    published BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE module_items (
+    id BIGSERIAL PRIMARY KEY,
+    module_id BIGINT REFERENCES modules(id),
+    content_type TEXT NOT NULL,
+    content_id BIGINT,
+    position INT NOT NULL,
+    requirement_type TEXT,
+    score_threshold INT,
+    published BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+4. Content Authoring Domain
+sql
+CREATE TABLE pages (
+    id BIGSERIAL PRIMARY KEY,
+    course_id BIGINT REFERENCES courses(id),
+    title TEXT NOT NULL,
+    body_json JSONB,
+    body_html TEXT,
+    published BOOLEAN DEFAULT FALSE,
+    front_page BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE folders (
+    id BIGSERIAL PRIMARY KEY,
+    course_id BIGINT REFERENCES courses(id),
+    name TEXT NOT NULL,
+    parent_folder_id BIGINT REFERENCES folders(id),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE files (
+    id BIGSERIAL PRIMARY KEY,
+    course_id BIGINT REFERENCES courses(id),
+    folder_id BIGINT REFERENCES folders(id),
+    filename TEXT NOT NULL,
+    content_type TEXT,
+    size BIGINT,
+    url TEXT,
+    thumbnail_url TEXT,
+    locked BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+5. Assignments Domain
+sql
+CREATE TABLE assignments (
+    id BIGSERIAL PRIMARY KEY,
+    course_id BIGINT REFERENCES courses(id),
+    name TEXT NOT NULL,
+    description_json JSONB,
+    description_html TEXT,
+    points INT,
+    submission_types TEXT[],
+    allowed_extensions TEXT[],
+    group_assignment BOOLEAN DEFAULT FALSE,
+    peer_reviews BOOLEAN DEFAULT FALSE,
+    anonymous_grading BOOLEAN DEFAULT FALSE,
+    moderation_enabled BOOLEAN DEFAULT FALSE,
+    due_at TIMESTAMP,
+    available_from TIMESTAMP,
+    available_until TIMESTAMP,
+    assign_to JSONB,
+    published BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE submissions (
+    id BIGSERIAL PRIMARY KEY,
+    assignment_id BIGINT REFERENCES assignments(id),
+    user_id BIGINT REFERENCES users(id),
+    submitted_at TIMESTAMP,
+    submission_type TEXT,
+    body_text TEXT,
+    body_html TEXT,
+    file_ids BIGINT[],
+    url TEXT,
+    media_recording_url TEXT,
+    score FLOAT,
+    graded_at TIMESTAMP,
+    grader_id BIGINT REFERENCES users(id),
+    state TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+6. Rubrics Domain
+sql
+CREATE TABLE rubrics (
+    id BIGSERIAL PRIMARY KEY,
+    course_id BIGINT REFERENCES courses(id),
+    title TEXT NOT NULL,
+    criteria JSONB,
+    ratings JSONB,
+    points_possible INT,
+    published_version_id BIGINT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE rubric_assessments (
+    id BIGSERIAL PRIMARY KEY,
+    rubric_id BIGINT REFERENCES rubrics(id),
+    submission_id BIGINT REFERENCES submissions(id),
+    criterion_scores JSONB,
+    total_score FLOAT,
+    grader_id BIGINT REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+7. Quizzes Domain
+sql
+CREATE TABLE quizzes (
+    id BIGSERIAL PRIMARY KEY,
+    course_id BIGINT REFERENCES courses(id),
+    title TEXT NOT NULL,
+    description_json JSONB,
+    description_html TEXT,
+    quiz_type TEXT,
+    time_limit INT,
+    shuffle_answers BOOLEAN,
+    shuffle_questions BOOLEAN,
+    allowed_attempts INT,
+    published BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE question_banks (
+    id BIGSERIAL PRIMARY KEY,
+    course_id BIGINT REFERENCES courses(id),
+    name TEXT NOT NULL,
+    questions JSONB,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE quiz_attempts (
+    id BIGSERIAL PRIMARY KEY,
+    quiz_id BIGINT REFERENCES quizzes(id),
+    user_id BIGINT REFERENCES users(id),
+    started_at TIMESTAMP,
+    submitted_at TIMESTAMP,
+    score FLOAT,
+    answers JSONB,
+    accommodations JSONB,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+8. Discussions Domain
+sql
+CREATE TABLE discussion_topics (
+    id BIGSERIAL PRIMARY KEY,
+    course_id BIGINT REFERENCES courses(id),
+    title TEXT NOT NULL,
+    body_json JSONB,
+    body_html TEXT,
+    group_discussion BOOLEAN DEFAULT FALSE,
+    graded BOOLEAN DEFAULT FALSE,
+    points INT,
+    due_at TIMESTAMP,
+    published BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE discussion_entries (
+    id BIGSERIAL PRIMARY KEY,
+    topic_id BIGINT REFERENCES discussion_topics(id),
+    user_id BIGINT REFERENCES users(id),
+    parent_entry_id BIGINT REFERENCES discussion_entries(id),
+    body_json JSONB,
+    body_html TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+9. Announcements Domain
+sql
+CREATE TABLE announcements (
+    id BIGSERIAL PRIMARY KEY,
+    course_id BIGINT REFERENCES courses(id),
+    title TEXT NOT NULL,
+    body_json JSONB,
+    body_html TEXT,
+    scheduled_at TIMESTAMP,
+    published BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+10. Gradebook Domain
+sql
+CREATE TABLE gradebook (
+    course_id BIGINT PRIMARY KEY REFERENCES courses(id),
+    assignment_groups JSONB,
+    late_policy JSONB,
+    missing_policy JSONB,
+    posting_policy TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE grade_entries (
+    id BIGSERIAL PRIMARY KEY,
+    assignment_id BIGINT REFERENCES assignments(id),
+    user_id BIGINT REFERENCES users(id),
+    score FLOAT,
+    posted_at TIMESTAMP,
+    grader_id BIGINT REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+11. Outcomes Domain
+sql
+CREATE TABLE outcomes (
+    id BIGSERIAL PRIMARY KEY,
+    course_id BIGINT REFERENCES courses(id),
+    title TEXT NOT NULL,
+    description TEXT,
+    rubric_criterion_id BIGINT,
+    mastery_points INT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE outcome_results (
+    id BIGSERIAL PRIMARY KEY,
+    outcome_id BIGINT REFERENCES outcomes(id),
+    user_id BIGINT REFERENCES users(id),
+    score FLOAT,
+    evidence JSONB,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+12. Calendar Domain
+sql
+CREATE TABLE calendar_events (
+    id BIGSERIAL PRIMARY KEY,
+    course_id BIGINT REFERENCES courses(id),
+    title TEXT NOT NULL,
+    start_at TIMESTAMP,
+    end_at TIMESTAMP,
+    location TEXT,
+    event_type TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+13. SIS Integration Domain
+sql
+CREATE TABLE sis_imports (
+    id BIGSERIAL PRIMARY KEY,
+    account_id BIGINT,
+    workflow_state TEXT,
+    progress INT,
+    data_file_url TEXT,
+    error_report_url TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+CanvasParity LMS UI/UX Wireframe Specification
+Full UX blueprint modeled after Canvas LMS behavior.
+This is written in a structured, engineeringready format so your team can convert it into Figma, Adobe XD, Sketch, or React components.
+1. Global UI Framework
+Top Navigation Bar
+Institution logo
+Global search
+Inbox
+Calendar
+User menu (profile, settings, logout)
+Notifications
+Left Course Navigation Menu
+Home
+Modules
+Assignments
+Discussions
+Quizzes
+Grades
+People
+Pages
+Files
+Syllabus
+Outcomes
+Announcements
+Settings
+UI Principles
+Clean, minimal, Canvaslike layout
+High contrast, WCAG 2.1 AA compliant
+Responsive grid (desktop, tablet, mobile)
+Consistent iconography
+Semantic HTML for accessibility
+2. Course Home Wireframe
+Layout
+Code
+---------------------------------------------------------
+| Course Banner (Title, Code, Term)                     |
+---------------------------------------------------------
+| Course Home Selector:                                 |
+|  • Modules                                            |
+|  • Syllabus                                           |
+|  • Assignments                                        |
+|  • Pages                                              |
+|  • Activity Stream                                    |
+---------------------------------------------------------
+| Selected View Content                                 |
+---------------------------------------------------------
+Features
+Instructor can choose default home page
+Students see ToDo list on right sidebar
+Recent feedback widget
+3. Modules Page Wireframe
+Layout
+Code
+---------------------------------------------------------
+| MODULES                                               |
+---------------------------------------------------------
+| Module 1                                              |
+|   [Item] Page                                         |
+|   [Item] Assignment                                   |
+|   [Item] Quiz                                         |
+|   [Item] Discussion                                   |
+|   [Item] External Tool                                |
+---------------------------------------------------------
+| Module 2                                              |
+|   ...                                                 |
+---------------------------------------------------------
+Features
+Draganddrop module ordering
+Publish/unpublish toggle
+Lock/unlock date indicator
+Prerequisite badges
+Requirement icons (view, mark done, submit, score ≥ X)
+4. Assignment Page Wireframe
+Layout
+Code
+---------------------------------------------------------
+| Assignment Title                                      |
+| Points | Due Date | Available From/Until              |
+---------------------------------------------------------
+| Rich Content Description                               |
+---------------------------------------------------------
+| Submission Type Panel                                  |
+|  • Text Entry                                          |
+|  • File Upload                                         |
+|  • URL                                                 |
+|  • Media Recording                                     |
+---------------------------------------------------------
+| Submit Button                                          |
+---------------------------------------------------------
+| Sidebar:                                               |
+|  • Rubric                                              |
+|  • Peer Review                                         |
+|  • Group Assignment                                    |
+|  • Plagiarism Report                                   |
+---------------------------------------------------------
+Instructor View
+Edit assignment
+SpeedGrader button
+Grade summary
+5. SpeedGrader Wireframe
+Layout
+Code
+---------------------------------------------------------
+| Student Selector (dropdown)                           |
+---------------------------------------------------------
+| Document Viewer (PDF, DOCX, images)                   |
+| Annotation Toolbar                                     |
+---------------------------------------------------------
+| Right Panel:                                           |
+|  • Rubric                                              |
+|  • Grade Entry                                         |
+|  • Comments                                            |
+|  • Media Feedback                                      |
+---------------------------------------------------------
+Features
+Keyboard navigation
+Inline annotations
+Rubric scoring
+Anonymous grading mode
+6. Quiz Page Wireframe
+Layout
+Code
+---------------------------------------------------------
+| Quiz Title                                            |
+| Instructions                                           |
+| Time Limit | Attempts Allowed                          |
+---------------------------------------------------------
+| Start Quiz Button                                      |
+---------------------------------------------------------
+Attempt View
+Code
+---------------------------------------------------------
+| Question Panel                                         |
+|  • Multiple Choice                                     |
+|  • Multiple Answer                                     |
+|  • True/False                                          |
+|  • Fill-in-the-Blank                                   |
+|  • Matching                                            |
+|  • Ordering                                            |
+|  • Essay                                               |
+|  • File Upload                                         |
+---------------------------------------------------------
+| Navigation Sidebar                                     |
+|  • Question list                                       |
+|  • Flags                                               |
+---------------------------------------------------------
+| Submit Quiz Button                                     |
+---------------------------------------------------------
+7. Discussion Page Wireframe
+Layout
+Code
+---------------------------------------------------------
+| Discussion Title                                       |
+| Rich Content Description                               |
+---------------------------------------------------------
+| Reply Box                                              |
+---------------------------------------------------------
+| Threaded Replies                                       |
+|   • User Avatar                                        |
+|   • Reply Content                                      |
+|   • @mentions                                          |
+|   • Attachments                                        |
+|   • Media                                              |
+---------------------------------------------------------
+Features
+Nested replies
+Group discussions
+Graded discussions
+Anonymous mode (optional)
+8. Gradebook Wireframe
+Grid View
+Code
+---------------------------------------------------------
+| Student Name | Assignment 1 | Assignment 2 | ...      |
+---------------------------------------------------------
+| Student A    | 95           | 88           | ...      |
+| Student B    | 100          | 92           | ...      |
+---------------------------------------------------------
+Features
+Late/missing indicators
+Manual/automatic posting policies
+Filters (sections, groups, assignment groups)
+Export/import CSV
+WhatIf grades (student view)
+9. Files Page Wireframe
+Layout
+Code
+---------------------------------------------------------
+| Folder Tree (left)                                    |
+---------------------------------------------------------
+| File List (right)                                     |
+|  • File name                                           |
+|  • Size                                                |
+|  • Type                                                |
+|  • Modified                                            |
+|  • Lock toggle                                         |
+---------------------------------------------------------
+Features
+Draganddrop upload
+Versioning
+Inline preview
+Alttext enforcement
+10. People Page Wireframe
+Layout
+Code
+---------------------------------------------------------
+| People                                                 |
+---------------------------------------------------------
+| User List                                              |
+|  • Name                                                |
+|  • Role                                                |
+|  • Section                                             |
+|  • Last Activity                                       |
+---------------------------------------------------------
+Features
+Add/remove users
+Edit roles
+Group sets
+11. Calendar Wireframe
+Layout
+Code
+---------------------------------------------------------
+| Month View                                             |
+---------------------------------------------------------
+| Events:                                                |
+|  • Assignments                                         |
+|  • Quizzes                                             |
+|  • Discussions                                         |
+|  • Meetings                                            |
+---------------------------------------------------------
+Features
+Draganddrop date changes
+iCal feed
+Multicourse overlay
+CanvasParity MultiAgent AI System Prompt
+Fiveagent architecture for LMS intelligence, governance, grading assistance, SIS boundaries, and content retrieval.
+1. AI Orchestrator Agent (Root Controller)
+Identity
+You are the AI Orchestrator for a Canvasparity LMS.
+Responsibilities
+Authenticate requests
+Resolve tenant, course, user role
+Classify task
+Route to the correct agent
+Enforce LMS permissions
+Enforce SIS boundaries
+Enforce module release rules
+Enforce gradedwork guard
+Validate citations
+Audit all decisions
+Routing Table
+Course Q&A → Teaching Assistant
+Assignment feedback → Rubric Feedback Agent
+SIS questions → SIS Proxy Agent
+LMS structure questions → LMS Proxy Agent
+Content retrieval → Retrieval Agent
+Global Rules
+No solving graded work
+No access to locked/unpublished content
+No crosscourse memory
+No PII leakage
+No role escalation
+No SIS enrollment inference
+Citations required for all factual claims
+2. Teaching Assistant Agent (CanvasParity)
+Identity
+You are the Teaching Assistant for a Canvasparity LMS.
+Allowed Sources
+Published course content
+Visible modules
+Pages
+Assignments (instructions only)
+Quizzes (instructions only)
+Syllabus
+Instructorapproved transcripts
+Assigned readings
+Forbidden
+Solving graded assessments
+Accessing locked modules
+Accessing unpublished content
+Accessing instructoronly notes
+Comparing students
+Inferring misconduct
+Capabilities
+Explain course concepts
+Summarize readings
+Clarify assignment instructions
+Navigate modules
+Provide study guidance
+Cite all sources
+Fallback
+“I cannot verify that from your approved course materials. Please ask your instructor.”
+3. Rubric Feedback Agent (CanvasParity SpeedGrader Companion)
+Identity
+You are the Rubric Feedback Generator for a Canvasparity LMS.
+Inputs
+Assignment prompt
+Published rubric
+Student submission
+Authorized exemplars
+Outputs
+Criterionlevel evidence
+Score ranges
+Feedback suggestions
+All marked AI DRAFT
+Constraints
+Instructor review required
+Cannot post grades
+Cannot modify rubric
+Cannot compare students
+Cannot infer misconduct
+Safety
+No hallucinated evidence
+No ungrounded claims
+No unauthorized content access
+4. SIS Proxy Agent (CanvasParity SIS Boundary Guardian)
+Identity
+You are the SIS Proxy Agent.
+Responsibilities
+Interpret SIS import events
+Validate registration rules:
+Status
+Holds
+Prerequisites
+Conflicts
+Capacity
+Credit limits
+Project enrollment into LMS
+Detect missing/extra/stale access
+Enforce SIS authority
+Forbidden
+Creating LMS enrollments without SIS
+Modifying SIS records
+Inferring enrollment from IdP attributes
+5. LMS Proxy Agent (CanvasParity LMS Domain Expert)
+Identity
+You are the LMS Proxy Agent.
+Responsibilities
+Explain LMS features
+Navigate Canvasparity objects:
+Courses
+Modules
+Pages
+Assignments
+Quizzes
+Discussions
+Gradebook
+Files
+Calendar
+Clarify workflows:
+Publishing
+Grading
+Moderation
+Module progression
+Assignment groups
+LTI placements
+Forbidden
+Changing authoritative SIS data
+Posting grades
+Accessing unpublished content
+6. Retrieval Agent (CanvasParity Content Retrieval)
+Identity
+You are the Retrieval Agent.
+Responsibilities
+Retrieve only allowed content
+Filter by:
+Enrollment
+Role
+Module release
+Accommodation rules
+Provide grounded citations
+Reject requests for locked/unpublished content
+Forbidden
+Accessing instructoronly notes
+Accessing other students’ submissions
+Accessing future modules
+7. MultiAgent Governance Rules
+All Agents Must
+Respect LMS permissions
+Respect SIS boundaries
+Respect module release rules
+Cite all sources
+Abstain on weak evidence
+Log all decisions
+Maintain strict tenant isolation
+No Agent May
+Solve graded work
+Access locked/unpublished content
+Leak PII
+Infer enrollment
+Modify academic truth
+Escalate privileges
+Access crosscourse memory
+8. MultiAgent Topology Summary
+Code
+AI Orchestrator
+   ├── Teaching Assistant
+   ├── Rubric Feedback Agent
+   ├── SIS Proxy Agent
+   ├── LMS Proxy Agent
+   └── Retrieval Agent
+Each agent has strict boundaries, clear responsibilities, and Canvasparity behavior.
+CanvasParity LMS — Kubernetes Microservice Deployment YAML
+Productiongrade microservice topology modeled after Canvas LMS.
+yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: canvas-lms
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: course-service
+  namespace: canvas-lms
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: course-service
+  template:
+    metadata:
+      labels:
+        app: course-service
+    spec:
+      containers:
+        - name: course-service
+          image: registry.example.com/course-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: course-db-secret
+                  key: url
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-service
+  namespace: canvas-lms
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module-service
+  template:
+    metadata:
+      labels:
+        app: module-service
+    spec:
+      containers:
+        - name: module-service
+          image: registry.example.com/module-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: module-db-secret
+                  key: url
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: assignment-service
+  namespace: canvas-lms
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: assignment-service
+  template:
+    metadata:
+      labels:
+        app: assignment-service
+    spec:
+      containers:
+        - name: assignment-service
+          image: registry.example.com/assignment-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: assignment-db-secret
+                  key: url
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: submission-service
+  namespace: canvas-lms
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: submission-service
+  template:
+    metadata:
+      labels:
+        app: submission-service
+    spec:
+      containers:
+        - name: submission-service
+          image: registry.example.com/submission-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: submission-db-secret
+                  key: url
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quiz-service
+  namespace: canvas-lms
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: quiz-service
+  template:
+    metadata:
+      labels:
+        app: quiz-service
+    spec:
+      containers:
+        - name: quiz-service
+          image: registry.example.com/quiz-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: quiz-db-secret
+                  key: url
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discussion-service
+  namespace: canvas-lms
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: discussion-service
+  template:
+    metadata:
+      labels:
+        app: discussion-service
+    spec:
+      containers:
+        - name: discussion-service
+          image: registry.example.com/discussion-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: discussion-db-secret
+                  key: url
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gradebook-service
+  namespace: canvas-lms
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: gradebook-service
+  template:
+    metadata:
+      labels:
+        app: gradebook-service
+    spec:
+      containers:
+        - name: gradebook-service
+          image: registry.example.com/gradebook-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: gradebook-db-secret
+                  key: url
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: file-service
+  namespace: canvas-lms
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: file-service
+  template:
+    metadata:
+      labels:
+        app: file-service
+    spec:
+      containers:
+        - name: file-service
+          image: registry.example.com/file-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: STORAGE_BUCKET
+              value: canvas-files
+            - name: STORAGE_PROVIDER
+              value: s3
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sis-proxy-service
+  namespace: canvas-lms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sis-proxy-service
+  template:
+    metadata:
+      labels:
+        app: sis-proxy-service
+    spec:
+      containers:
+        - name: sis-proxy-service
+          image: registry.example.com/sis-proxy-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SIS_ENDPOINT
+              value: https://sis.example.com/api
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lti-service
+  namespace: canvas-lms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: lti-service
+  template:
+    metadata:
+      labels:
+        app: lti-service
+    spec:
+      containers:
+        - name: lti-service
+          image: registry.example.com/lti-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: LTI_KEYS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: lti-secret
+                  key: keys
+📘 What this YAML gives you
+A full Canvasparity LMS deployment with:
+Microservices
+Course
+Module
+Page
+Assignment
+Submission
+Quiz
+Discussion
+Gradebook
+Files
+SIS Proxy
+LTI Service
+Productiongrade features
+Namespaces
+Secrets
+Replicas
+Environment variables
+Container ports
+Modular deployments
+CanvasParity Event Model (Analytics, Audit, Outbox)
+If you want the LMS to support:
+Learning analytics
+Engagement signals
+Risk detection
+Instructor dashboards
+Outbox pattern for reliable events
+Audit trails for compliance
+This gives you the full event schema, event bus, analytics pipeline, and audit model.
+2. CanvasParity Mobile App Wireframes
+If you want:
+iOS/Android UX
+Mobile navigation
+Offline mode
+Push notifications
+Mobileoptimized modules, assignments, quizzes
+This gives you the complete mobile UI/UX blueprint.
+3. CanvasParity AI Safety & Governance Policy
+If you want:
+AI guardrails
+Gradedwork protection
+SIS boundary enforcement
+Retrieval ACLs
+Audit logging
+Multiagent governance rules
+This gives you the enterprise AI governance framework for your LMS.
+4. CanvasParity CI/CD Pipeline (GitHub Actions / GitLab CI)
+If you want:
+Automated builds
+Microservice deployment
+Database migrations
+Container scanning
+Kubernetes rollout automation
+This gives you the full CI/CD pipeline for your LMS.
+1 — Event Model 2 — Mobile App Wireframes 3 — AI Safety & Governance Policy 4 — CI/CD Pipeline
+CanvasParity Event Model (Analytics, Audit, Outbox)
+Full event schema + analytics pipeline + audit model.
+1.1 Event Categories
+Your LMS emits events in four domains:
+A. Learning Analytics Events
+module.viewed
+page.viewed
+assignment.opened
+assignment.submitted
+quiz.started
+quiz.submitted
+discussion.posted
+file.downloaded
+grade.received
+B. Engagement Events
+login
+logout
+notification.clicked
+calendar.event.viewed
+course.home.visited
+C. System Events
+course.published
+module.published
+assignment.published
+quiz.published
+file.uploaded
+lti.launch
+D. Audit Events
+grade.changed
+role.changed
+enrollment.added
+enrollment.removed
+sis.import.started
+sis.import.completed
+sis.import.failed
+1.2 Event Schema (Canonical)
+json
+{
+  "event_id": "uuid",
+  "event_type": "string",
+  "timestamp": "ISO8601",
+  "actor": {
+    "user_id": "int",
+    "role": "string"
+  },
+  "context": {
+    "course_id": "int",
+    "section_id": "int",
+    "module_id": "int",
+    "assignment_id": "int",
+    "quiz_id": "int"
+  },
+  "metadata": {
+    "ip": "string",
+    "user_agent": "string",
+    "device": "string"
+  }
+}
+1.3 Outbox Pattern (Reliable Delivery)
+Outbox Table
+sql
+CREATE TABLE outbox_events (
+    id BIGSERIAL PRIMARY KEY,
+    event_type TEXT NOT NULL,
+    payload JSONB NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    processed BOOLEAN DEFAULT FALSE
+);
+Outbox Worker
+Reads unprocessed events
+Publishes to event bus
+Marks processed
+1.4 Analytics Pipeline
+Flow
+Code
+LMS → Outbox → Kafka/Kinesis → Stream Processor → Warehouse → Dashboards
+Warehouse Tables
+fact_events
+fact_submissions
+fact_quiz_attempts
+dim_users
+dim_courses
+dim_terms
+1.5 Audit Model
+Audit Table
+sql
+CREATE TABLE audit_log (
+    id BIGSERIAL PRIMARY KEY,
+    actor_id BIGINT,
+    action TEXT,
+    target_type TEXT,
+    target_id BIGINT,
+    before JSONB,
+    after JSONB,
+    timestamp TIMESTAMP DEFAULT NOW()
+);
+📱 2. CanvasParity Mobile App Wireframes (iOS/Android)
+Full mobile UX blueprint.
+2.1 Mobile Navigation
+Bottom tab bar:
+Home
+Courses
+Calendar
+ToDo
+Inbox
+2.2 Course Home (Mobile)
+Code
+-----------------------------------------
+| Course Banner                          |
+-----------------------------------------
+| Modules                                |
+| Assignments                            |
+| Quizzes                                |
+| Discussions                            |
+| Grades                                 |
+-----------------------------------------
+2.3 Modules (Mobile)
+Code
+-----------------------------------------
+| Module 1                               |
+|   • Page                                |
+|   • Assignment                          |
+|   • Quiz                                |
+-----------------------------------------
+| Module 2                               |
+-----------------------------------------
+Features:
+Swipe navigation
+Progress indicators
+Requirement badges
+2.4 Assignment (Mobile)
+Code
+-----------------------------------------
+| Assignment Title                        |
+| Points | Due Date                       |
+-----------------------------------------
+| Description (collapsible)               |
+-----------------------------------------
+| Submit Button                           |
+-----------------------------------------
+| Submission Types                        |
+-----------------------------------------
+2.5 Quiz (Mobile)
+Code
+-----------------------------------------
+| Quiz Title                              |
+| Start Quiz Button                        |
+-----------------------------------------
+| Question View                            |
+| Navigation Drawer                        |
+-----------------------------------------
+2.6 Discussion (Mobile)
+Code
+-----------------------------------------
+| Discussion Title                         |
+-----------------------------------------
+| Reply Box                                |
+-----------------------------------------
+| Threaded Replies                         |
+-----------------------------------------
+2.7 Grades (Mobile)
+Code
+-----------------------------------------
+| Assignment | Score | Status             |
+-----------------------------------------
+🛡️ 3. CanvasParity AI Safety & Governance Policy
+Enterprisegrade AI governance for LMS.
+3.1 Core Principles
+No solving graded work
+No access to locked/unpublished content
+No PII leakage
+No role escalation
+No SIS inference
+No crosscourse memory
+Citations required
+Abstain on weak evidence
+3.2 AI Permission Matrix
+Agent
+Allowed
+Forbidden
+Teaching Assistant
+Published content
+Graded work
+Rubric Agent
+Feedback drafts
+Posting grades
+SIS Proxy
+SIS validation
+Enrollment changes
+LMS Proxy
+Feature guidance
+Accessing unpublished content
+Retrieval Agent
+Allowed content
+Instructoronly notes
+3.3 AI Audit Requirements
+Every AI action must log:
+User
+Role
+Course
+Agent
+Input
+Output
+Retrieval sources
+Safety checks
+Final decision
+3.4 AI Risk Signals
+Repeated gradedwork requests
+Attempts to access locked modules
+Attempts to infer SIS data
+Attempts to bypass permissions
+3.5 AI Intervention Actions
+Soft refusal
+Redirect to instructor
+Safety warning
+Escalation to admin
+⚙️ 4. CanvasParity CI/CD Pipeline (GitHub Actions + GitLab CI)
+Full DevOps automation for LMS microservices.
+4.1 GitHub Actions Pipeline
+yaml
+name: LMS CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build Docker image
+        run: docker build -t lms-service:${{ github.sha }} .
+      - name: Run tests
+        run: npm test
+
+  push-image:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to registry
+        run: echo $CR_PAT | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+      - name: Push image
+        run: docker push ghcr.io/org/lms-service:${{ github.sha }}
+
+  deploy:
+    needs: push-image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply Kubernetes manifests
+        run: kubectl apply -f k8s/
+4.2 GitLab CI Pipeline
+yaml
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script:
+    - docker build -t lms-service:$CI_COMMIT_SHA .
+
+test:
+  stage: test
+  script:
+    - npm test
+
+deploy:
+  stage: deploy
+  script:
+    - kubectl apply -f k8s/
+  environment:
+    name: production
+
+1. CanvasParity LMS — Business Requirements Document (BRD)
+Executivelevel functional blueprint
+1. Vision
+Deliver a modern, accessible, AIenhanced LMS with full Canvaslevel functionality, optimized for higher education, workforce development, and hybrid learning.
+2. Scope
+InScope
+Course creation & management
+Modules, assignments, quizzes, discussions
+Gradebook & outcomes
+SIS integration
+LTI ecosystem
+Mobile apps
+AI teaching assistant (governed)
+Analytics & reporting
+OutofScope
+Nonacademic CRM
+Financial aid systems
+Custom SIS development
+3. Personas
+Students
+Instructors
+Teaching Assistants
+Designers
+Department Chairs
+IT Admins
+SIS Administrators
+4. HighLevel Use Cases
+Create and publish courses
+Build modules and learning paths
+Author pages, assignments, quizzes
+Grade submissions
+Provide feedback
+Track student progress
+Manage enrollments
+Integrate external tools
+Access mobile learning
+5. Functional Requirements
+Course Management
+Create, duplicate, import, export courses
+Publish/unpublish
+Blueprint master courses
+Modules
+Sequential progression
+Requirements & prerequisites
+Lock/unlock dates
+Assignments
+Multiple submission types
+Group work
+Peer review
+Rubrics
+SpeedGrader parity
+Quizzes
+Classic + modern engine
+Item banks
+Autograding
+Accommodations
+Discussions
+Threaded replies
+Group discussions
+Graded discussions
+Gradebook
+Weighted groups
+Late/missing policies
+Moderation
+CSV import/export
+Files
+Folder structure
+Versioning
+Inline preview
+People
+Roles
+Sections
+Groups
+Calendar
+Multicourse overlay
+Draganddrop
+SIS
+Enrollment sync
+Grade passback
+Course provisioning
+AI
+Teaching assistant
+Rubric feedback
+LMS guidance
+SIS validation
+Strict safety rules
+6. NonFunctional Requirements
+WCAG 2.1 AA accessibility
+99.9% uptime
+<200ms API latency
+Horizontal scalability
+Multitenant isolation
+FERPA compliance
+SOC 2 readiness
+7. Success Metrics
+Course creation time ↓
+Student engagement ↑
+Instructor grading time ↓
+Mobile usage ↑
+SIS errors ↓
+AI adoption ↑
+📘 2. CanvasParity LMS — Technical Requirements Document (TRD)
+Engineeringlevel specification
+1. System Architecture
+Microservices
+API gateway
+Event bus
+Outbox pattern
+Object storage
+PostgreSQL
+Redis caching
+Kubernetes deployment
+2. Data Architecture
+Fully normalized SQL schema
+Multitenant isolation
+Rowlevel security
+Audit tables
+Event warehouse
+3. API Requirements
+REST
+CRUD for all LMS objects
+Pagination
+Filtering
+Sorting
+OAuth2/OIDC auth
+GraphQL
+Course graph
+Module graph
+Assignment graph
+Quiz graph
+Submission graph
+4. Microservice Boundaries
+Course Service
+Module Service
+Page Service
+Assignment Service
+Submission Service
+Quiz Service
+Discussion Service
+Gradebook Service
+File Service
+SIS Proxy
+LTI Service
+5. Security Requirements
+JWT access tokens
+Rolebased access control
+Sectionbased permissions
+SIS authority enforcement
+Rate limiting
+Encryption at rest & in transit
+6. Performance Requirements
+10k concurrent users
+1M events/day
+100k submissions/day
+50k quiz attempts/day
+7. Observability
+Structured logs
+Distributed tracing
+Metrics (Prometheus)
+Dashboards (Grafana)
+8. Disaster Recovery
+Daily backups
+Pointintime recovery
+Multiregion failover
+📘 3. CanvasParity LMS — Accreditation & Compliance Package
+Institutionready compliance framework
+1. FERPA
+Student data isolation
+Rolebased access
+No unauthorized disclosure
+AI agents cannot access PII
+2. ADA / WCAG 2.1 AA
+Keyboard navigation
+Screen reader support
+High contrast mode
+Alttext enforcement
+Accessible math & media
+3. SOC 2
+Access controls
+Change management
+Logging & monitoring
+Incident response
+Vendor management
+4. ISO 27001
+Risk assessment
+Security controls
+Asset management
+Encryption policies
+5. GDPR (if applicable)
+Right to access
+Right to delete
+Data minimization
+Lawful basis
+6. Academic Integrity
+AI cannot solve graded work
+AI cannot access locked modules
+AI cannot compare students
+AI cannot infer misconduct
+7. AI Governance
+Multiagent safety
+Retrieval boundaries
+SIS boundaries
+Audit logging
+Intervention rules
+📘 4. CanvasParity LMS — Full Product Roadmap (6–18 Months)
+Strategic rollout plan
+Phase 0 — MVP (Months 1–3)
+Courses
+Modules
+Pages
+Assignments
+Basic gradebook
+File storage
+Basic mobile app
+Basic analytics
+AI teaching assistant (limited)
+Phase 1 — Core LMS (Months 4–6)
+Quizzes
+Discussions
+Rubrics
+SpeedGrader parity
+Calendar
+Groups
+Outcomes
+LTI 1.3
+SIS import/export
+Phase 2 — Enterprise (Months 7–12)
+Blueprint courses
+Moderation workflows
+Advanced gradebook
+Item banks
+Mobile offline mode
+Multitenant admin portal
+Full analytics dashboards
+AI rubric feedback agent
+AI LMS proxy agent
+Phase 3 — Intelligence Layer (Months 12–18)
+Predictive analytics
+Risk detection
+Personalized learning paths
+AI course designer (governed)
+AI SIS proxy
+AI compliance engine
+Instructor workload optimize
+
+

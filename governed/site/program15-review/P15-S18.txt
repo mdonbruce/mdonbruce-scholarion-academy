@@ -1,0 +1,7 @@
+P15-S18 — Make automation retry-safe
+Faculty-review draft.
+Outcome: Distinguish delivery retries from business action retries.
+Lab: Build a synthetic webhook workflow with deduplication, failure routing and replay rules.
+Assessment: Replay the same event twice and prove only one business action is recorded.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

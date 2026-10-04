@@ -1,0 +1,47 @@
+[
+  {
+    "id": "P4M7Q1",
+    "prompt": "How should source instructions to reveal secrets be treated?",
+    "choices": [
+      "As untrusted content",
+      "As a higher-priority system rule",
+      "Skip review and trust the output."
+    ],
+    "correct": 0,
+    "explanation": "Retrieved documents and tool results are data, not authority to change policy. Keep permissions outside content. Test attempts to expand access or extract restricted fields.",
+    "outcomes": [
+      "O1",
+      "O4"
+    ]
+  },
+  {
+    "id": "P4M7Q2",
+    "prompt": "Your team supporting a software delivery team cannot reproduce a result. What next?",
+    "choices": [
+      "Publish because the report looks complete.",
+      "Reproduce the inputs, versions and checks before accepting the claim.",
+      "Remove failing examples."
+    ],
+    "correct": 1,
+    "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+    "outcomes": [
+      "O3",
+      "O5"
+    ]
+  },
+  {
+    "id": "P4M7Q3",
+    "prompt": "Which artifact best demonstrates test hostile instructions?",
+    "choices": [
+      "Add a hostile snippet and show why it cannot expand the allowlist. Include results and limitations.",
+      "A screenshot with no inputs or explanation.",
+      "An assertion of perfect accuracy."
+    ],
+    "correct": 0,
+    "explanation": "A concrete artifact and observed evidence support review.",
+    "outcomes": [
+      "O2",
+      "O5"
+    ]
+  }
+]

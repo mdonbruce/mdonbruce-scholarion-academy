@@ -1,0 +1,20 @@
+{
+  "programId": 1,
+  "issuer": "Scholarion Academy",
+  "type": "unsigned-artwork-definition",
+  "skills": [
+    "O1: Map decision boundaries and evidence requirements for a multi-agent service desk.",
+    "O2: Construct and explain a bounded prototype for a multi-agent service desk.",
+    "O3: Evaluate ordinary, ambiguous and adversarial cases against a baseline.",
+    "O4: Demonstrate privacy minimization, human approval and recoverable failure.",
+    "O5: Defend a agent systems engineering portfolio with reproducible evidence and limitations."
+  ],
+  "criteria": "Every approved required course at C or better; required course list TBC",
+  "evidenceRequired": [
+    "Approved final course grades",
+    "Reviewed capstone evidence"
+  ],
+  "criteriaUrl": null,
+  "verificationUrl": null,
+  "issued": false
+}

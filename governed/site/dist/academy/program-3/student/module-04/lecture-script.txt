@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support an operations analysis team. Split records into development and test sets and evaluate a fixed rule.
+
+Core concept
+Tuning on held-out labels creates optimistic estimates. Preserve a final test set and compare with a simple baseline. This offline exercise evaluates a rule, not a trained ML model.
+
+Practice contract
+Calculate reviewed count, total and review rate for each fictional queue; missing confidence requires review.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+Repeated tuning on held-out labels

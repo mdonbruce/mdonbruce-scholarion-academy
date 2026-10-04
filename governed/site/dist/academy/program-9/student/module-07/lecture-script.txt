@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support an AI investment committee. Design a pilot with feedback and a stop condition.
+
+Core concept
+Adoption includes redesign, training and escalation, not tool access alone. Usage metrics do not establish quality or business value.
+
+Practice contract
+Compare 8 baseline minutes per record with 2 assisted minutes plus 7 review minutes for missing/low confidence, or 1 minute otherwise.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+Activity, not effectiveness

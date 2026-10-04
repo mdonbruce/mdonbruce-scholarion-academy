@@ -1,0 +1,31 @@
+Programs #15–#25 specification reconciliation — 2026-10-02
+Source: attachment 2ebc63e2-d285-4b72-aa45-0127515daf57/Pasted text.txt
+
+User decisions retained: Scholarion Academy; single Academy; every course ten weeks; no automatic credit transfer; sandbox payments only.
+
+Existing coverage
+- Programs #15–#25 have saved, versioned instructor design shells, competency/outcome outlines, capstone and rubric drafts, and review notes. Program #26 remains separately available.
+- Program #15 has its twenty-session intensive design. Catalog and consolidation register expose draft status and dependencies.
+- Instructor access is checked against authenticated course membership. Publication remains blocked.
+
+Gap closed in this update
+- Added Curriculum Commons, reachable from instructor navigation and program design studio.
+- Loaded 22 shared module mappings as version-one drafts in local AIM310 context.
+- Instructors can write a new immutable version, inspect prior versions, and explicitly pin a mapped module version to a loaded program #15–#25 draft.
+- Subsequent module edits do not change pins. Pin changes require the current revision and create immutable history records and audit events.
+- Program draft JSON exports now resolve the selected module versions and include their content and pin metadata.
+- Course-scoped authorization prevents access across unauthorized contexts. This is a design library, not live LMS synchronization.
+
+Unclosed specification requirements
+- Complete original lessons, runnable labs, validated assessment banks, accessible media and instructor solutions across all eleven programs are not complete; current shells must not be represented as finished courses.
+- Shared mappings need educator-authored content and academic review; no pins were selected automatically.
+- Bundle sequencing, #1–#14 dependencies, transfer/waiver approvals and non-duplication rules require authoritative academic decisions. No credit is awarded by this library.
+- Confirmed fees/refund settings, live schedules and production integrations remain outside this update. Enrollment, publication and real checkout remain disabled.
+- Academic release workflow and live-cohort adoption of Commons versions are not implemented by this increment.
+
+Validation
+- 232 Python regression tests passed, including four new Commons tests for access, immutability, idempotency, stale revisions and explicit upgrades without silent pin migration.
+- JavaScript syntax checks passed for Commons and updated design studio.
+- Live HTTP load/list returned 22 module versions and publication=false.
+- Browser checked the Commons route and confirmed unauthorized-session blocking. Authenticated browser editing and a full accessibility audit were not performed in this increment.
+- Local pilot only; not deployed to production.

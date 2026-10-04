@@ -1,0 +1,47 @@
+[
+  {
+    "id": "P5M4Q1",
+    "prompt": "What causes evaluation leakage?",
+    "choices": [
+      "Repeated tuning on held-out labels",
+      "Keeping test examples unseen during tuning",
+      "Skip review and trust the output."
+    ],
+    "correct": 0,
+    "explanation": "Tuning on held-out labels creates optimistic estimates. Preserve a final test set and compare with a simple baseline. This offline exercise evaluates a rule, not a trained ML model.",
+    "outcomes": [
+      "O1",
+      "O4"
+    ]
+  },
+  {
+    "id": "P5M4Q2",
+    "prompt": "Your team supporting a predictive service queue cannot reproduce a result. What next?",
+    "choices": [
+      "Publish because the report looks complete.",
+      "Reproduce the inputs, versions and checks before accepting the claim.",
+      "Remove failing examples."
+    ],
+    "correct": 1,
+    "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+    "outcomes": [
+      "O3",
+      "O5"
+    ]
+  },
+  {
+    "id": "P5M4Q3",
+    "prompt": "Which artifact best demonstrates separate training and evaluation?",
+    "choices": [
+      "Split records into development and test sets and evaluate a fixed rule. Include results and limitations.",
+      "A screenshot with no inputs or explanation.",
+      "An assertion of perfect accuracy."
+    ],
+    "correct": 0,
+    "explanation": "A concrete artifact and observed evidence support review.",
+    "outcomes": [
+      "O2",
+      "O5"
+    ]
+  }
+]

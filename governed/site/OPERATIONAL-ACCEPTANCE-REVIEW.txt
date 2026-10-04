@@ -1,0 +1,28 @@
+OPERATIONAL ACCEPTANCE SPEC REVIEW — 2026-10-02
+Source: attachment 6e8a213b-999c-49b4-8d7b-23858864622f/Pasted text.txt.
+
+The source assumes six autonomous departments and an event bus exist. They do not exist in this pilot. The prior department module is a policy preview/readiness page. This assumption must not be used as evidence of completion.
+
+ADDED
+Draft protobuf schemas for identity, admissions, registration, finance, consent, LMS, SIS synchronization and inference, in contracts/<service>/v1. These are source contracts only, not compiled, compatibility-tested or deployed. No generated gateway or client stubs yet.
+Persistent authenticated local acceptance evidence register with ten acceptance areas, five capability status tiles, release/owner/reference/findings records, and audit attribution. Student access denied; Scholarion instructor pilot access only. Evidence remains unverified; production_allowed is always false. This register is not an OAT orchestrator or a deployment-enforced release gate. It cannot approve a release.
+
+NOT IMPLEMENTED / NOT VERIFIED
+1. SSO/MFA: identity broker, federation, SCIM, passkeys, TOTP, recovery and enterprise consent are absent. Current tokens remain local pilot credentials.
+2. SIS sync: no Canvas credentials or Registration system of record; no synchronization worker, CDC, reconciliation, retries, dead-letter replay or exports.
+3. Live inference: current extractive assistant is not a model gateway; no live providers, budgets, streaming, rollout controller or inference SLO evidence.
+4. gRPC: draft contracts only; no compiled stubs, mesh, mTLS, per-RPC authorization, reflection, tracing, compatibility CI or runtime.
+5. OAT: no complete learner journey, load/chaos/DR suite, independent security review, full manual accessibility assessment, operational ownership or three-role sign-off. All acceptance areas remain unverified.
+No production deployment performed and no compliance, availability or latency targets claimed.
+
+DEPENDENCIES
+Part E finance/identity policy remains missing. Staging hosting, sandbox identity broker/provider, Canvas instance and AI provider need configuration. Expected peak concurrency is unspecified. Full architectural separation from existing devtech pilot identity/database fixtures remains outstanding.
+
+LOCAL USE
+python site/governed_service.py
+http://127.0.0.1:4180/#operational-acceptance
+Use a private instructor pilot token. Record evidence references only; do not paste secrets or learner records.
+API: POST /api/acceptance/status and /api/acceptance/record with existing bearer authentication and tenant/course context. Record fields: area, release, owner, reference, note. No approval or waiver API is exposed.
+
+VERIFICATION
+14 acceptance-register tests (including 10 inherited pilot checks): unauthorized access, invalid evidence, audit record, persisted evidence and preventing client-supplied pass/production flags. JavaScript syntax check. No browser/accessibility or gRPC compiler acceptance performed.

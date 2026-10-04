@@ -1,0 +1,859 @@
+.action-green,
+.meetnow,
+.panelhead > button,
+.queuebar button:last-child,
+.formdialog form > button[type="submit"] {
+  background: #1f7a42 !important;
+  color: #fff !important;
+  border-color: #1f7a42 !important;
+  box-shadow: 0 4px 12px #1f7a4230;
+}
+.action-green:hover,
+.meetnow:hover,
+.panelhead > button:hover,
+.queuebar button:last-child:hover,
+.formdialog form > button[type="submit"]:hover {
+  background: #176336 !important;
+}
+.channel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.channel-heading .sectionlabel {
+  margin-right: auto;
+}
+.channel-heading button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #cfc6b8;
+  border-radius: 8px;
+  background: #fff;
+  color: #1f6039;
+  display: grid;
+  place-items: center;
+}
+.channel-heading button svg {
+  width: 16px;
+}
+.formdialog,
+.calldialog {
+  background: #fff !important;
+  color: #25231f !important;
+  opacity: 1 !important;
+  border: 1px solid #bdb5aa !important;
+  box-shadow: 0 24px 80px #0007 !important;
+  z-index: 70 !important;
+}
+.formdialog input,
+.formdialog textarea,
+.formdialog select {
+  background: #fff !important;
+  color: #25231f !important;
+  border: 1px solid #bfb7aa !important;
+}
+.formdialog [data-slot="dialog-title"],
+.formdialog [data-slot="dialog-description"] {
+  color: #25231f !important;
+}
+.formdialog [data-slot="dialog-description"] {
+  color: #5f5951 !important;
+}
+.calldialog {
+  max-width: 600px !important;
+}
+.calldialog .callroom {
+  padding: 8px 10px 18px;
+}
+.calldialog .ai-call-strip {
+  background: #eaf3e8 !important;
+  color: #183e28 !important;
+  border: 1px solid #cadac8 !important;
+}
+.calldialog .callroom > p {
+  color: #386746 !important;
+}
+.presence-refresh {
+  margin-left: auto;
+  border: 1px solid #b9d0bd;
+  border-radius: 9px;
+  background: #e7f4e9;
+  color: #245e37;
+  padding: 8px 11px;
+  font-weight: 750;
+}
+.presence-refresh i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2da35a;
+  margin-right: 6px;
+}
+.presence-refresh small {
+  display: block;
+  font-weight: 500;
+  margin-top: 2px;
+}
+.feed.read {
+  opacity: 0.72;
+}
+.videogrid > div.you {
+  outline: 3px solid #d3a23f;
+}
+.videogrid > div.you:after {
+  content: "Joined";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #2b7a45;
+  color: #fff;
+  padding: 4px 7px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+.meetingdialog {
+  opacity: 1 !important;
+  box-shadow: 0 24px 80px #0008 !important;
+}
+.meetingdialog .ai-meeting-note {
+  color: #183e28 !important;
+}
+.meetingdialog .ai-meeting-note span {
+  color: #183e28 !important;
+}
+@media (max-width: 760px) {
+  .formdialog,
+  .calldialog {
+    max-height: 90vh !important;
+    overflow: auto !important;
+  }
+  .presence-refresh {
+    margin-left: 0;
+  }
+  .channel-heading button {
+    display: grid;
+  }
+}
+
+/* Fluent, uniform interactive call and meeting system */
+.shell {
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: clamp(14px, 0.35vw + 12px, 16px);
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+[role="button"],
+a {
+  transition:
+    color 0.16s ease,
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+button:not(:disabled),
+[role="button"],
+a {
+  cursor: pointer;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #e0b64f;
+  outline-offset: 2px;
+}
+.call-type-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 12px 0;
+}
+.call-type-tabs button {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #9bb9a3;
+  border-radius: 10px;
+  background: #edf6ef;
+  color: #185832;
+  font-weight: 750;
+}
+.call-type-tabs button:hover,
+.call-type-tabs button.active {
+  color: #fff;
+  background: #1f7a42;
+  border-color: #1f7a42;
+  box-shadow: 0 5px 14px #1f7a4238;
+}
+.call-type-tabs svg {
+  width: 18px;
+}
+.call-action {
+  background: #1f7a42 !important;
+  color: #fff !important;
+  border-color: #1f7a42 !important;
+}
+.call-action:hover {
+  background: #176336 !important;
+  transform: translateY(-1px);
+}
+.call-video-preview {
+  width: min(100%, 420px);
+  height: 220px;
+  margin: 12px auto 8px;
+  border: 3px solid #1f7a42;
+  border-radius: 14px;
+  background: #111;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+.call-session-notes {
+  max-height: 110px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  overflow-y: auto;
+  text-align: left;
+  border: 1px solid #c7d9ca;
+  border-radius: 10px;
+  background: #f2f8f2;
+  color: #23432d;
+}
+.call-session-notes b,
+.call-session-notes span {
+  display: block;
+}
+.call-session-notes span {
+  padding-top: 6px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+.meeting-camera-preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+.headeractions > button,
+.action-green,
+.call-action,
+.joined-control {
+  background-color: #1f7a42 !important;
+  border-color: #1f7a42 !important;
+  color: #fff !important;
+}
+.panelhead button:hover,
+.headeractions > button:hover,
+.action-green:hover {
+  background-color: #176336 !important;
+  box-shadow: 0 5px 15px #1f7a4235;
+}
+@media (max-width: 760px) {
+  .call-video-preview {
+    height: 180px;
+  }
+  .call-type-tabs button {
+    min-height: 42px;
+  }
+}
+
+/* Dynamic full-screen navigation and compact app rail */
+.brandbar {
+  min-height: 0;
+  padding: 8px 7px !important;
+  overflow: hidden;
+}
+.fullscreen-logo {
+  position: relative;
+  flex: 0 0 auto;
+  width: 76px;
+  height: 48px;
+  margin: 0 0 5px;
+  padding: 2px;
+  border: 1px solid #ffffff22;
+  border-radius: 9px;
+  background: #ffffff0b;
+  color: #fff;
+  cursor: pointer;
+}
+.fullscreen-logo:hover,
+.fullscreen-logo:focus-visible {
+  background: #ffffff18;
+  border-color: #d8b75b;
+}
+.fullscreen-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.fullscreen-logo > svg {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 13px;
+  height: 13px;
+  padding: 2px;
+  border-radius: 3px;
+  background: #1f7a42;
+}
+.brandbar > nav {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #6b604f transparent;
+}
+.brandbar nav button {
+  min-height: 39px !important;
+  height: 39px !important;
+  gap: 1px !important;
+  font-size: 10px !important;
+}
+.brandbar nav button svg {
+  width: 17px !important;
+  height: 17px !important;
+}
+.brandbar .profile {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  margin-top: 5px;
+  font-size: 11px;
+}
+.messages article footer button {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 5px 7px;
+}
+.messages article footer button:hover {
+  color: #fff;
+  background: #1f7a42;
+}
+@media (max-height: 760px) {
+  .brandbar nav button {
+    min-height: 34px !important;
+    height: 34px !important;
+  }
+  .brandbar nav button span {
+    font-size: 9px !important;
+  }
+  .fullscreen-logo {
+    height: 40px;
+  }
+}
+
+/* Keep every meeting participant and control visible */
+.meetingdialog {
+  width: min(960px, calc(100vw - 28px)) !important;
+  max-width: 960px !important;
+  max-height: calc(100vh - 24px) !important;
+  overflow: hidden !important;
+}
+.meetingroom {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  max-height: calc(100vh - 72px);
+  min-height: 0;
+}
+.meetingroom .ai-meeting-note {
+  margin: 8px 0 !important;
+  padding: 9px 12px !important;
+}
+.meetingroom .videogrid {
+  min-height: 0;
+  overflow-y: auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+.meetingroom .videogrid > div {
+  height: 150px !important;
+  min-height: 130px;
+}
+.meetingroom .videogrid i {
+  width: 62px;
+  height: 62px;
+  font-size: 18px;
+}
+.meetingroom footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  padding: 9px 0 2px !important;
+  background: #171a17;
+}
+.meetingroom .joined-control {
+  background: #247b43 !important;
+  color: #fff !important;
+  border-color: #247b43 !important;
+}
+@media (max-width: 760px) {
+  .meetingroom .videogrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .meetingroom .videogrid > div {
+    height: 125px !important;
+    min-height: 110px;
+  }
+  .meetingroom .ai-meeting-note {
+    grid-template-columns: auto 1fr;
+  }
+  .meetingroom .ai-meeting-note button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
+
+/* Version 16: HavenViz dark operations command center */
+.havenviz {
+  display: grid;
+  grid-template-rows: auto auto minmax(230px, 1fr) minmax(150px, 0.72fr) auto;
+  gap: 9px !important;
+  padding: 10px !important;
+  background: #111512 !important;
+  color: #f7f4ed;
+}
+.havenviz .viz-ask {
+  grid-template-columns: minmax(300px, 0.72fr) minmax(520px, 1.28fr) !important;
+  padding: 13px 16px !important;
+  border: 1px solid #343b35;
+  border-radius: 12px !important;
+  background: linear-gradient(115deg, #1b211c, #152d20) !important;
+}
+.havenviz .viz-ask h2 {
+  max-width: none;
+  margin: 2px 0 4px !important;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 22px !important;
+  line-height: 1.12 !important;
+}
+.havenviz .viz-ask p {
+  color: #e0b64f !important;
+}
+.havenviz .viz-ask span {
+  color: #c8d0c9 !important;
+  font-size: 13px !important;
+}
+.havenviz .viz-ask form {
+  grid-template-columns: minmax(250px, 1fr) 145px auto;
+  padding: 6px !important;
+  background: #ffffff0b;
+  border: 1px solid #ffffff12;
+}
+.havenviz .viz-ask form input,
+.havenviz .viz-ask form select,
+.havenviz .viz-ask form button {
+  min-height: 36px !important;
+  height: 36px;
+}
+.havenviz .viz-highlights {
+  margin: 0 !important;
+  gap: 9px !important;
+}
+.havenviz .viz-highlights article {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2px 10px;
+  min-height: 66px;
+  padding: 9px 12px !important;
+  border-color: #303632;
+  border-radius: 10px;
+  background: #1b1f1c;
+}
+.havenviz .viz-highlights article span,
+.havenviz .viz-highlights article small {
+  color: #aeb7b0;
+}
+.havenviz .viz-highlights article b {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  color: #e4ba53;
+  font:
+    700 24px/1 Georgia,
+    serif !important;
+}
+.havenviz .viz-grid {
+  min-height: 0;
+  gap: 9px;
+  grid-template-columns: 1.55fr 0.65fr;
+}
+.havenviz .viz-chart,
+.havenviz .ai-highlights,
+.havenviz .viz-records,
+.havenviz .viz-sources {
+  min-height: 0;
+  padding: 12px !important;
+  border-color: #303632;
+  border-radius: 11px;
+  background: #1b1f1c;
+  color: #f7f4ed;
+}
+.havenviz .viz-cardhead h3,
+.havenviz .ai-highlights h3 {
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.havenviz .viz-cardhead span,
+.havenviz .ai-highlights p,
+.havenviz .record-table span,
+.havenviz .viz-sources span {
+  color: #aeb7b0;
+}
+.havenviz .viz-cardhead select {
+  height: 34px;
+  color: #f7f4ed;
+  border-color: #424a44;
+  background: #252b26;
+}
+.havenviz .bar-chart {
+  height: 135px !important;
+  padding: 8px 0 0 !important;
+}
+.havenviz .bar-chart button {
+  color: #c9d0ca;
+  gap: 3px;
+}
+.havenviz .bar-chart button i {
+  background: linear-gradient(#d7a842, #7a5620);
+}
+.havenviz .drill-note {
+  padding: 7px 9px !important;
+  color: #cdd9cf;
+  background: #26362b;
+}
+.havenviz .ai-highlights {
+  overflow: auto;
+  background: linear-gradient(150deg, #201e18, #1b1f1c) !important;
+}
+.havenviz .ai-highlights > svg {
+  color: #e0b64f;
+}
+.havenviz .ai-highlights h3 {
+  margin: 3px 0 6px !important;
+  font-size: 19px;
+}
+.havenviz .ai-highlights p,
+.havenviz .ai-highlights li {
+  margin: 5px 0;
+  font-size: 13px !important;
+  line-height: 1.35 !important;
+}
+.havenviz .ai-highlights button {
+  color: #fff;
+  border-color: #516056;
+  background: #29322c;
+}
+.havenviz .viz-records {
+  margin-top: 0 !important;
+  overflow: hidden;
+}
+.havenviz .record-table {
+  max-height: 120px;
+  margin-top: 5px !important;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+.havenviz .record-table article {
+  padding: 6px !important;
+  border-color: #343b36;
+}
+.havenviz .record-table em {
+  color: #d9eadc;
+  background: #294332;
+}
+.havenviz .viz-sources {
+  padding: 8px 12px !important;
+  margin-top: 0 !important;
+}
+.havenviz .viz-sources em {
+  color: #7ee09b;
+}
+
+@media (max-width: 1180px) {
+  .havenviz {
+    grid-template-rows: auto auto auto auto auto;
+  }
+  .havenviz .viz-ask {
+    grid-template-columns: 1fr !important;
+  }
+  .havenviz .viz-grid {
+    grid-template-columns: 1fr;
+  }
+  .havenviz .record-table {
+    max-height: 180px;
+  }
+}
+@media (max-width: 760px) {
+  .havenviz {
+    display: block;
+    overflow-y: auto;
+  }
+  .havenviz > * {
+    margin-bottom: 9px !important;
+  }
+  .havenviz .viz-ask form {
+    grid-template-columns: 1fr;
+  }
+  .havenviz .viz-highlights {
+    grid-template-columns: 1fr 1fr;
+  }
+  .havenviz .bar-chart {
+    height: 125px !important;
+  }
+}
+
+/* Compact, high-visibility working surfaces */
+.headeractions > button {
+  background: #1f7a42 !important;
+  color: #fff !important;
+  border-color: #1f7a42 !important;
+  cursor: pointer;
+  box-shadow: 0 3px 10px #1f7a4230;
+}
+.headeractions > button:hover,
+.headeractions > button:focus-visible {
+  background: #176336 !important;
+  transform: translateY(-1px);
+}
+.headeractions > button:active {
+  transform: translateY(0);
+}
+.headeractions > button i {
+  background: #ffd15b !important;
+  border: 1px solid #fff;
+}
+.brief .action-green,
+.calendarbar .action-green {
+  min-width: max-content;
+  font-weight: 750;
+}
+
+.work {
+  min-height: 0;
+  overflow: hidden;
+}
+.havenviz {
+  flex: 1;
+  min-height: 0 !important;
+  height: auto;
+  padding: 12px !important;
+  gap: 10px !important;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  font-size: 14px;
+}
+.viz-ask {
+  padding: 20px 22px !important;
+  min-height: 0 !important;
+  border-radius: 18px !important;
+  gap: 18px !important;
+}
+.viz-ask h2 {
+  font-size: 30px !important;
+  line-height: 1.08 !important;
+  margin: 5px 0 7px !important;
+}
+.viz-ask p {
+  font-size: 12px !important;
+  margin: 0 !important;
+}
+.viz-ask span {
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+.viz-ask form {
+  padding: 10px !important;
+  gap: 8px !important;
+}
+.viz-ask form input,
+.viz-ask form select,
+.viz-ask form button {
+  min-height: 40px !important;
+  font-size: 14px !important;
+}
+.viz-highlights {
+  gap: 8px !important;
+  margin: 10px 0 !important;
+}
+.viz-highlights article {
+  padding: 11px 14px !important;
+}
+.viz-highlights article b {
+  font-size: 25px !important;
+}
+.viz-layout {
+  gap: 12px !important;
+}
+.viz-chart,
+.ai-highlights,
+.drill-panel {
+  padding: 16px !important;
+}
+.viz-chart h3,
+.ai-highlights h3,
+.drill-panel h3 {
+  margin-top: 0 !important;
+}
+.bar-chart {
+  height: 165px !important;
+  padding-top: 12px !important;
+}
+.drill-note {
+  padding: 8px 10px !important;
+  margin-top: 7px !important;
+}
+.viz-records {
+  margin-top: 9px !important;
+}
+.record-table {
+  margin-top: 7px !important;
+}
+.record-table article {
+  padding: 8px 6px !important;
+}
+.viz-sources {
+  margin-top: 9px !important;
+  padding: 12px 16px !important;
+}
+.ai-highlights p,
+.ai-highlights li,
+.drill-panel p {
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+
+.copilot {
+  padding: 14px !important;
+  gap: 12px !important;
+  font-size: 14px;
+}
+.copilot-top {
+  padding: 18px 22px !important;
+  border-radius: 18px !important;
+  min-height: 0 !important;
+}
+.copilot-top h2 {
+  font-size: 30px !important;
+  line-height: 1.08 !important;
+  margin: 4px 0 7px !important;
+}
+.copilot-top p {
+  font-size: 12px !important;
+  margin: 0 !important;
+}
+.copilot-top span {
+  font-size: 14px !important;
+}
+.copilot-grid {
+  gap: 12px !important;
+}
+.copilot-grid > aside,
+.copilot-grid > main {
+  padding: 14px !important;
+}
+.copilot-grid > aside h3 {
+  margin: 0 0 9px !important;
+}
+.copilot-grid > aside button {
+  padding: 9px !important;
+  gap: 8px !important;
+}
+.copilot-grid > aside button small {
+  font-size: 12px !important;
+  line-height: 1.25 !important;
+}
+.copilot-thread {
+  min-height: 180px !important;
+  max-height: 265px !important;
+}
+.copilot-thread > div {
+  padding: 10px 12px !important;
+}
+.copilot-thread p {
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  margin: 4px 0 !important;
+}
+.copilot-prompts {
+  gap: 6px !important;
+  margin: 8px 0 !important;
+}
+.copilot-prompts button {
+  font-size: 12px !important;
+  padding: 7px 9px !important;
+}
+.copilot form textarea {
+  min-height: 58px !important;
+}
+.copilot footer {
+  gap: 7px !important;
+  padding-top: 9px !important;
+}
+.copilot footer button,
+.copilot footer a {
+  font-size: 12px !important;
+  padding-inline: 10px !important;
+}
+
+@media (max-width: 1100px) {
+  .viz-ask {
+    grid-template-columns: 1fr !important;
+  }
+  .viz-ask form {
+    width: 100% !important;
+  }
+  .copilot-grid {
+    grid-template-columns: 220px minmax(0, 1fr) !important;
+  }
+}
+@media (max-width: 760px) {
+  .headeractions {
+    gap: 5px;
+  }
+  .headeractions > button {
+    width: 36px;
+    height: 36px;
+  }
+  .havenviz,
+  .copilot {
+    padding: 10px !important;
+  }
+  .viz-ask,
+  .copilot-top {
+    padding: 15px !important;
+  }
+  .viz-ask h2,
+  .copilot-top h2 {
+    font-size: 25px !important;
+  }
+  .copilot-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .havenviz {
+    padding: 8px !important;
+  }
+  .bar-chart {
+    height: 145px !important;
+  }
+}

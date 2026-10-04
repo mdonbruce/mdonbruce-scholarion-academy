@@ -1,0 +1,21 @@
+PROGRAMS #15–#25 — SPEC RECONCILIATION
+Source: 00de3e91-afd7-4506-beab-c6736b44b4cd/Pasted text.txt
+User decisions retained: Scholarion Academy; single Academy; all courses ten weeks; sandbox only. Source 5/6/8/12-week variants do not override these decisions. Multi-course pathways are not compressed into a ten-week full curriculum.
+
+Existing: eleven catalog entries, detailed twenty-session #15 design, shared-module mapping and public draft previews. #16–#25 had no structured weekly shells. Consolidation stopped at #25.
+
+Implemented and loaded locally
+- Eleven course-scoped program design shells (#15–#25) loaded into the existing instructor review context AIM310. Ten weekly outlines and five competencies each, outcome IDs, draft activity edition guidance, capstone/rubric fields, dependency warnings and explicit unmet gates. #15 preserves its existing twenty sessions.
+- Instructor-only Program design studio lists shells, opens weekly/outcome maps, saves educator notes as append-only revisions, and exports a draft JSON package. Load is idempotent and never replaces revisions. Instructor access requires active course membership; learners cannot access drafts. No LMS enrollment or published lesson is created by shell loading.
+- Public agentic catalog excludes all unapproved drafts and honestly shows no approved offerings open for enrollment. Existing draft previews remain separately labeled. Publication is disabled server-side; no synthetic approval, pricing, cohort dates or enrollments added.
+- Consolidation includes #1–#26 and proposal-only #27. Separate language/transformer Commons mapping added as commons-22 without renumbering existing IDs. No >60% overlap claim without weighted assessment evidence. All programs retained; #27 not built.
+
+Spec gaps still open
+Full finished course packages, original lesson/video scripts, captioned recordings, student/instructor activity documents, executed dual-framework labs, data cards, quiz banks, full assessments, brochures and textbook chapter verification remain incomplete. Draft shell outcomes and generic rubric are scaffolds requiring SME work, not release-ready curricula.
+No live cohort administration, rolling batches, capacity reservation, installments, refund/deferral policies, Cloud Lab keys, LTI grading, official certificate verification, validated credit transfer or academic publication workflow. Missing #13 affects #20/#25; bundle timing for #17/#24 requires explicit sequencing approval. Lead faculty is source-supplied; no additional instructors or job guarantees invented.
+The existing self-paced hub handles #28–#38. The live-program hub does not yet implement every requested filter, the 8–10-question recommendation flow or a combined comparison of all programs. Existing readiness and draft catalog tools are available separately. No claim of complete catalog-spec fulfillment.
+
+Validation
+225 Python tests pass; three new tests verify eleven IDs, twenty #15 sessions, ten-week structure, idempotent loading, immutable revision history, stale edits, role/course authorization and publication denial. JavaScript syntax checks passed. Consolidation output checked for 27 entries and 22 stable modules. No production deployment or accessibility conformance claimed.
+
+Open the local instructor route #program-studio. The public-only view is #agentic-catalog. Design exports are drafts; existing backend submission/grade workflows remain unchanged.

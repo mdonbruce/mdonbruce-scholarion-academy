@@ -1,0 +1,7 @@
+P15-S15 — Package a recoverable release
+Faculty-review draft.
+Outcome: Separate build artifacts, configuration and runtime health.
+Lab: Write container and deployment designs for the synthetic support platform, with rollback steps.
+Assessment: Demonstrate local startup/shutdown and specify which cloud checks remain unrun.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

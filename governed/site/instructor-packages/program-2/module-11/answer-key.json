@@ -1,0 +1,47 @@
+[
+  {
+    "id": "P2M11Q1",
+    "prompt": "What fits an aggregate audit log?",
+    "choices": [
+      "An outcome count without message text",
+      "All private conversations indefinitely",
+      "Skip review and trust the output."
+    ],
+    "correct": 0,
+    "explanation": "Temporary context, approved knowledge and audit records have different access and retention needs. Storing everything increases exposure and retains stale conclusions. Define correction and deletion paths.",
+    "outcomes": [
+      "O1",
+      "O4"
+    ]
+  },
+  {
+    "id": "P2M11Q2",
+    "prompt": "Your team supporting an internal knowledge desk cannot reproduce a result. What next?",
+    "choices": [
+      "Publish because the report looks complete.",
+      "Reproduce the inputs, versions and checks before accepting the claim.",
+      "Remove failing examples."
+    ],
+    "correct": 1,
+    "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+    "outcomes": [
+      "O3",
+      "O5"
+    ]
+  },
+  {
+    "id": "P2M11Q3",
+    "prompt": "Which artifact best demonstrates separate memory by purpose?",
+    "choices": [
+      "Classify five fields into context, knowledge or aggregate audit data. Include results and limitations.",
+      "A screenshot with no inputs or explanation.",
+      "An assertion of perfect accuracy."
+    ],
+    "correct": 0,
+    "explanation": "A concrete artifact and observed evidence support review.",
+    "outcomes": [
+      "O2",
+      "O5"
+    ]
+  }
+]

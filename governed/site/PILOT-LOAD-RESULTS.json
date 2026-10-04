@@ -1,0 +1,28 @@
+{
+  "scope": "Local synthetic HTTP workload; not production or model-provider capacity acceptance",
+  "timestamp": 1790969398.915688,
+  "results": [
+    {
+      "concurrentLearners": 15,
+      "requests": 60,
+      "unexpectedErrors": 0,
+      "statusCounts": {
+        "200": 60
+      },
+      "readP95Milliseconds": 387.48,
+      "writeP95Milliseconds": 575.22,
+      "passed": true
+    },
+    {
+      "concurrentLearners": 45,
+      "requests": 180,
+      "unexpectedErrors": 0,
+      "statusCounts": {
+        "200": 180
+      },
+      "readP95Milliseconds": 542.59,
+      "writeP95Milliseconds": 1088.99,
+      "passed": true
+    }
+  ]
+}

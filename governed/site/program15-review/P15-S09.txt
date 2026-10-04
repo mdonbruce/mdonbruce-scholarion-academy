@@ -1,0 +1,7 @@
+P15-S09 — Make evaluation reproducible
+Faculty-review draft.
+Outcome: Distinguish deterministic tests, human labels and model judgments.
+Lab: Create held-out cases, trace identifiers and regression thresholds for the handbook assistant.
+Assessment: Show a deliberately degraded candidate fails the release threshold.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

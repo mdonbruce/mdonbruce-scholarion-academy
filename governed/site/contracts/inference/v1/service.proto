@@ -1,0 +1,6 @@
+// Draft contract only. No deployed runtime. Authorization must derive from authenticated metadata.
+syntax = "proto3";
+package inference.v1;
+service TutorService { rpc StreamAnswer (StreamAnswerRequest) returns (stream StreamAnswerResponse); }
+message StreamAnswerRequest { string course_id = 1; string question = 2; }
+message StreamAnswerResponse { string text = 1; repeated string source_ids = 2; }

@@ -1,0 +1,20 @@
+{
+  "programId": 11,
+  "issuer": "Scholarion Academy",
+  "type": "unsigned-artwork-definition",
+  "skills": [
+    "O1: Map decision boundaries and evidence requirements for a synthetic scheduling office.",
+    "O2: Construct and explain a bounded prototype for a synthetic scheduling office.",
+    "O3: Evaluate ordinary, ambiguous and adversarial cases against a baseline.",
+    "O4: Demonstrate privacy minimization, human approval and recoverable failure.",
+    "O5: Defend a non-clinical operations support portfolio with reproducible evidence and limitations."
+  ],
+  "criteria": "Every approved required course at C or better; required course list TBC",
+  "evidenceRequired": [
+    "Approved final course grades",
+    "Reviewed capstone evidence"
+  ],
+  "criteriaUrl": null,
+  "verificationUrl": null,
+  "issued": false
+}

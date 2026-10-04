@@ -1,0 +1,47 @@
+[
+  {
+    "id": "P1M20Q1",
+    "prompt": "What is strongest evidence?",
+    "choices": [
+      "Reproducible tests and candid failure analysis",
+      "A success-only recording",
+      "Skip review and trust the output."
+    ],
+    "correct": 0,
+    "explanation": "Connect claims to reproducible evidence and explain failures. Present baseline, design, controls and rollback. A polished success-only demonstration is not enough.",
+    "outcomes": [
+      "O1",
+      "O4"
+    ]
+  },
+  {
+    "id": "P1M20Q2",
+    "prompt": "Your team supporting a multi-agent service desk cannot reproduce a result. What next?",
+    "choices": [
+      "Publish because the report looks complete.",
+      "Reproduce the inputs, versions and checks before accepting the claim.",
+      "Remove failing examples."
+    ],
+    "correct": 1,
+    "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+    "outcomes": [
+      "O3",
+      "O5"
+    ]
+  },
+  {
+    "id": "P1M20Q3",
+    "prompt": "Which artifact best demonstrates capstone scope and baseline?",
+    "choices": [
+      "Reproduce one success and one failure; defend the boundary. Include results and limitations.",
+      "A screenshot with no inputs or explanation.",
+      "An assertion of perfect accuracy."
+    ],
+    "correct": 0,
+    "explanation": "A concrete artifact and observed evidence support review.",
+    "outcomes": [
+      "O2",
+      "O5"
+    ]
+  }
+]

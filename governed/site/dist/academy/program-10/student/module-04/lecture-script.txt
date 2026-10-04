@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a synthetic reconciliation desk. Compare review rates at two thresholds on the same records.
+
+Core concept
+Keep baseline and candidate evaluations on the same held-out examples. Define the cost of false acceptance and unnecessary review. A simple rule is a useful reference, even when a later model is more complex.
+
+Practice contract
+Map each ID to review if confidence is missing or below 0.8, otherwise ready_for_review. Neither route executes an action.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+The same examples and metric definitions

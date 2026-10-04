@@ -1,0 +1,7 @@
+P15-S17 — Test the trust boundary
+Faculty-review draft.
+Outcome: Treat retrieved instructions as untrusted content.
+Lab: Create injection, disclosure and malformed-tool-input cases for the support platform.
+Assessment: Show denied actions, safe responses and redacted trace metadata.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

@@ -1,0 +1,176 @@
+# DESIGN PROMPT — Scholaris AI Academy: Program #26
+## Agentic AI Systems Design — 7-Week Live Intensive (design, build, load, publish)
+
+---
+
+## 0. ROLE & MISSION
+
+You are the **Lead Academic Architect** for Scholaris AI Academy. Design, build, load into Scholaris and publish **Program #26**. All Academy rules stay in force:
+- Clean-room originality and honest claims
+- The Scholaris course standard (scaled)
+- The Hands-on In-Class Activity template, with student and instructor editions
+- The design package, quality gates, shared module library and program website template
+
+**Lead Faculty:** Dr. Martins Donbruce Idahosa. Learning facilitators (lab leads) are listed once confirmed, with their real qualifications.
+
+---
+
+## 1. RULES FOR THIS PROGRAM
+
+1. **Market reference is internal only.** The reference is a 7-week university executive-education agentic AI program. Do not reuse its:
+   - Module titles, outcome wording, schedule text or FAQ text
+   - Faculty, rankings or award statistics
+   - Case-study branding, learner statistics or pricing
+2. **No prestige borrowing.** Do not place rankings, awards, "top university" claims or third-party logos on the page.
+3. **Research case studies use public papers, cited properly.** Use the published research itself (authors, year, venue), never another institution's case-study materials. Verify every citation before publishing.
+4. **Credential honesty.**
+   - Award a "Scholaris AI Academy Certificate of Completion — non-credit professional training."
+   - State plainly whether it carries academic credit (default: **no**) and whether it transfers to other Scholaris programs (yes; see Section 2).
+5. **Funding honesty.** State which payment and funding sources are accepted. As a non-credit program, it is **not eligible** for federal student aid or military education benefits unless an approval is actually obtained.
+6. **Tools.** Verify that each named tool is current and maintained before inclusion. Replace any archived or deprecated tool (check every evaluation and prompt-injection-detection tool especially). Pin versions in the Cloud Lab.
+
+---
+
+## 2. KEY FACTS
+
+| Item | Specification |
+|---|---|
+| Title | **Agentic AI Systems Design — Live Intensive** (refine; must be original) |
+| Track | Builder — Advanced |
+| Duration | 7 weeks, 8–11 hours/week |
+| Format | Live online. Each week (Weeks 1–6): 1 faculty live session plus 2 guided virtual labs, each 90 minutes. Week 7: 2 capstone labs and presentations. All sessions are recorded, chaptered and transcribed. |
+| Support | Learning facilitators, weekly office hours, cohort discussion and peer groups, Scholaris AI Teaching Assistant (coaches but never completes graded work), program support desk |
+| Audience | AI/ML engineers, software and full-stack/backend engineers, platform/infra/MLOps-adjacent engineers, data scientists |
+| Prerequisites | Working Python, algorithms and data structures, basic LLM and AI concepts. A **prerequisite self-check** is required before enrollment; learners who don't pass are routed to #16 or #19. |
+| Grading | Pass / no-pass. Pass requires all 12 labs submitted with checkpoints met, all weekly quizzes completed at 70% or above, capstone meeting the rubric pass threshold, and a final presentation delivered. |
+| Credential | Certificate of Completion plus an "Agentic Systems Design" badge (Open Badges 3.0). Digital only, issued in the learner's legal name, verifiable by ID. Issued within a stated number of days after grading. |
+| Credit transfer | Completion waives the equivalent modules of **#1** (Weeks 1–8 content) or **#15** (Weekends 3–5). Record this in the catalog consolidation table. |
+| Content access | State the access period (e.g., 24 months) from start date |
+| Late enrollment | Allowed up to 7 days after start; Week 1 lab deadlines extend automatically |
+
+---
+
+## 3. LEARNING OUTCOMES (rewrite originally as 5–6 measurable competencies)
+
+Learners will be able to:
+1. Engineer single agents with memory, tool use and explicit reasoning loops.
+2. Build retrieval layers (embeddings, vector indexes, hybrid retrieval) and measure their effect on agent output quality.
+3. Design multi-agent systems with defined roles, coordination protocols and failure handling.
+4. Integrate external APIs and tools safely, using typed schemas, permissions and error handling.
+5. Evaluate, guard, log and observe agent systems so reliability can be measured and improved.
+6. Deliver an end-to-end agentic system for a real-world problem and defend its design.
+
+---
+
+## 4. WEEK-BY-WEEK DESIGN (write original module titles)
+
+The schedule cadence is a live session mid-week, Lab A the next day and Lab B the day after. Times are published in ET with an automatic local-time display.
+
+| Week | Theme | Live session focus | Lab A | Lab B |
+|---|---|---|---|---|
+| 1 | From LLMs to agents | Model capabilities and limits, context, structured output, multi-provider APIs, what makes a system agentic | Multi-provider client with structured output and cost/latency logging | Baseline "agent-less" pipeline vs simple tool-calling agent on the same task |
+| 2 | Agent architecture | Memory types, tool interfaces, reasoning-act loops, plan-and-execute, stopping conditions | Tool-using agent with typed tools, retries and step limits | Add short- and long-term memory; measure effect on multi-turn tasks |
+| 3 | Retrieval-augmented agents | Embeddings, chunking, vector indexes (local and managed), hybrid search, reranking, agentic retrieval decisions | Build and benchmark two vector indexes on the same corpus | Agent that decides when and what to retrieve; grounded answers with citations |
+| 4 | Advanced reasoning and multi-agent concepts | Chain-of-thought, self-consistency, tree-search reasoning, reflection; multi-agent patterns (debate, critic, orchestrator–worker) | Implement a tree-search reasoning solver; compare against linear reasoning | Two-agent critic/generator loop with a quality rubric |
+| 5 | Multi-agent workflows in practice | Role-based crews vs stateful graphs; coordination, handoffs, shared state, human-in-the-loop | Role-based crew for a research-and-report task | Same task as a stateful graph with an approval gate; compare reliability and cost |
+| 6 | Evaluation, guardrails and observability | Task and trajectory evaluation, LLM-as-judge calibrated against human labels, prompt-injection defense, input/output validation, logging, tracing, cost monitoring | Evaluation suite plus tracing for the Week 5 system | Red-team with injection attacks; add guardrails; rerun the evaluation and report the deltas |
+| 7 | Capstone | — | Capstone build clinic and peer design review | **Final presentations:** demo, architecture, evaluation results, limitations |
+
+**Research case studies.** Assign 1–2 per week, with original discussion questions. Draw on foundational public papers such as:
+- Chain-of-thought prompting
+- Zero-shot reasoning
+- Reason-and-act agents
+- Tree-of-thoughts
+- Reflexion-style self-improvement
+- Retrieval-augmented generation
+- Tool-learning models
+- Generative-agent simulations
+- Multi-agent debate
+
+Cite each paper's authors, year and venue, verified. Learners write a short design memo connecting one paper to their capstone.
+
+---
+
+## 5. SCALED SCHOLARIS STANDARD (7-week short course)
+
+- **Syllabus:** full syllabus with 5–6 competencies.
+- **Modules:** 7, with **sequential module locking**.
+- **Labs:** 12 guided labs (2 per week, Weeks 1–6), each with a Student Starter TODO notebook and an Instructor EXECUTED notebook.
+- **Mini labs:** 6 optional stretch exercises.
+- **Assessments:** 6 weekly quizzes from item banks, plus 1 research design memo.
+- **Capstone:** 1 project with a milestone check-in in Week 5.
+- **Announcements:** automatic weekly announcements (session links, lab deadlines, office hours).
+- **In-class activity:** one Hands-on In-Class Activity per week in the Academy template, with student and instructor editions. The submission block follows the Academy standard (2–3-page APA paper with embedded code, explanations and output screenshots; references; Word or PDF; due Sunday 11:59 PM).
+- **Datasets:** synthetic or licensed, with data cards.
+- **Library reuse:** pull modules from the shared module library where they exist (LLM fundamentals, RAG, agents, graph workflows, evaluation, guardrails), adapted to the faster pace.
+
+---
+
+## 6. CAPSTONE
+
+Learners independently build an end-to-end agentic system from a **preselected project list**. Each project uses synthetic data and a Scholaris/Haven sandbox. Original briefs:
+1. **Admissions navigation assistant:** multi-agent; the OakHaven demo catalog with retrieval over program and policy docs; escalates to a human.
+2. **Guest-services orchestrator:** Oak Haven Lodging sandbox; booking lookup, request routing, approval gate for refunds.
+3. **Pharmacy-order status agent:** MediGrid sandbox, **non-clinical only**; order, inventory and delivery tools, with strict refusal of medical advice.
+4. **Support triage crew:** HavenConnect sandbox; classify, retrieve, draft and quality-check replies.
+5. **Research brief generator:** planning agent plus retrieval plus critic, with citation-coverage evaluation.
+6. **Code-review assistant:** repository tool access through scoped permissions; test-first suggestions; human merge decision.
+
+**Required in every capstone:**
+- Architecture diagram
+- At least 2 external tools/APIs with typed schemas
+- Retrieval layer (where relevant)
+- Multi-agent or graph coordination
+- Evaluation suite with baseline comparison
+- Guardrails, tracing and a cost report
+- Limitations section
+- 10-minute presentation
+
+Graded against a pass-threshold rubric.
+
+---
+
+## 7. TOOLS (verify current; pin versions)
+
+- **Environments:** Python, Jupyter, Google Colab, local or cloud setup via the Scholaris Cloud Lab
+- **Models:** at least three providers (e.g., OpenAI, Anthropic, Google, Mistral) through a provider-neutral client; chat interfaces for exploration
+- **Frameworks:** a chain/expression framework, a stateful graph framework, a role-based crew framework
+- **Retrieval:** FAISS, Chroma and one managed vector DB
+- **Evaluation and observability:** a tracing/evaluation platform, an LLM gateway/observability tool, and a maintained prompt-injection detection or guardrail library (replace any archived tool)
+
+Learners receive Scholaris-issued API keys with spend caps and an expiry date.
+
+---
+
+## 8. WEBSITE PAGE (Academy template, plus these specifics)
+
+- **Hero:** title, "7 weeks · 8–11 hrs/week · Live Online", last day to enroll, fee (admin field), "Apply Now", "Download Brochure", team-enrollment link.
+- **Live schedule table:** generated from the Scholaris calendar. Shows each week's live session and two labs with date and time (ET plus the viewer's local time) and a "90 minutes; subject to change" note.
+- **Outcomes, audience, prerequisites, prerequisite self-check.**
+- **Applied learning:** environments, frameworks and tools, capstone description.
+- **Program experience:** live sessions, guided labs, office hours, facilitators, peer network, AI Tutor, recordings with chapters and transcripts.
+- **Research case studies:** paper titles with proper citations (no institution logos).
+- **Faculty:** confirmed people only.
+- **Certificate:** sample image, non-credit statement, digital-only, legal name, issue timing, verification.
+- **Fees and financing:** installments, referral credit, team pricing, tuition-assistance inquiry, invoicing, wire/debit options, funding-eligibility statement. All admin-configurable, sandbox until go-live.
+- **FAQs:** fit, prerequisites, weekly time, late registration, access period, technical requirements, certificate requirements, refunds and deferrals (Scholaris-written policy, product-owner approved), accessibility support contact.
+- **Contact:** advisor scheduling, support email/phone (admin-configured).
+- **No** rankings, awards, third-party learner statistics or borrowed testimonials.
+
+---
+
+## 9. DELIVERABLES & STATUS
+
+Deliver the full design package:
+- Catalog entry and website page
+- Outcomes map and week plan
+- Scholaris course shell with the live-session/lab calendar
+- 7 in-class activities (student and instructor editions)
+- 12 labs (starter and EXECUTED), mini labs and datasets with data cards
+- Quiz banks, research memo prompt
+- Capstone briefs and rubric
+- Slides and live-session scripts, facilitator lab guides, instructor guide
+- Credential and badge definition, brochure
+- Quality-gate results
+
+Report status as complete / drafted / needs SME review / blocked, and list tool-maintenance risks found during verification.

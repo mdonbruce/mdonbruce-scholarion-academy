@@ -1,0 +1,51 @@
+SCHOLARION PRODUCT WORKFLOW REVIEW — 2026-10-02
+Source: attachment befe3c52-2f18-4c9a-b545-0857e507941a/Pasted text.txt.
+
+Implemented this update: authenticated database-derived learner/instructor dashboard at #dashboard; course membership view at #live-courses; exact formula descriptions and record links; saved submission activity and personal calendar; unavailable metrics explicitly identified. All new dashboard data labeled Demo. Updates use explicit refresh, not a real-time event bus. Posted grades only for students; instructors see drafts in their own courses. No new AI prediction claims.
+Actual stack: static JavaScript frontend, Python HTTP service, SQLite tenant pilot databases. Canvas, event bus, enterprise SSO, live inference, gRPC runtime and OAT orchestrator are NOT installed. Existing draft contracts and status pages do not constitute those services.
+
+WORKFLOW MAP
+Labels below describe the intended workflow. 'Pending' means no implemented operational process; it is not automation currently running.
+Step | Mode | Owner | Trigger/action | Record written | Human gate | Current state
+Inquiry | Automated | Admissions | Form submitted -> create prospect | Prospect | Flagged content | Pending
+Application | Manual | Learner | Submit profile/program | Application | Flagged review | Pending
+Readiness | AI-Enhanced | Admissions | Evaluate prerequisites | Readiness evidence | Flagged cases | Pending
+Admit | Automated | Admissions | Valid readiness -> offer | Decision | Every denial | Pending
+Identity | Automated | Identity | Provider callback -> verify | Minimal verified metadata | Retry exhaustion | Rules only, disconnected
+Consent | Manual | Learner | Grant scoped supporter access | Versioned consent | Learner authorization | Pending
+Payment | Automated | Finance | Signed processor event -> ledger | Payment and invoice | Exceptions/refunds | Rules only, disconnected
+Enrollment | Automated | Registration | Approved prerequisites/payment -> saga | Enrollment | Overrides | Pending
+Provisioning | Automated | LMS | Enrollment event -> course access | LMS enrollment | Failures reviewed | Pending
+Onboarding | Automated | LMS | Access granted -> checklist | Orientation progress | None | Pending
+Weekly learning | Manual | Learner | Read and complete content | Completion | Faculty approves content | Local browser demonstration
+Support | Manual | Learner/instructor | Submit support request | Tenant help record | Staff handles response | Create/archive operational; no replies/SLA
+Monitoring | Automated | LMS | Activity event -> recompute metrics | Derived metrics | Intervention review | Read-time dashboard calculations only
+Interventions | AI-Enhanced | Success coach | Risk signal -> outreach | Intervention case | Human coach | Pending
+Assessment/feedback | Manual | Learner/instructor | Submit, grade, publish | Immutable receipts/grade versions | Instructor | Local backend operational
+Final grading | Manual | Instructor | Complete roster -> approve | Approved roster | Instructor | Per-submission grades only
+SIS posting | Automated | Sync service | Approved roster -> transcript | Transcript | Mismatches | Pending
+Next course | Automated | Registration | Completion event -> unlock | Eligibility | Overrides | Pending
+Credential | Automated | Identity | Program eligibility -> issue | Signed credential | Revocation | Local badge/credential demonstration
+Alumni portfolio | Manual | Learner | Choose public projects | Disclosure settings | Learner consent | Pending
+
+DASHBOARD BLUEPRINT
+Learner: header identity + Demo + refreshed time; KPI strip active courses/receipts/assignments without submission/support requests; main authorized course and submission records; side personal calendar; alerts show unavailable data explicitly. Implemented local slice; no outcome mastery/streak/time-to-completion sources.
+Instructor: same authenticated header; KPI strip active courses/receipts/ungraded receipts/support requests; main course receipts and draft/published grades; side personal calendar; future alerts require deadlines and staff assignments. Implemented local slice.
+Support staff: header queue/team; KPI strip open requests, first-response and resolution time, SLA breaches; main assignment/reply queue; side approved knowledge; alert escalations. Blueprint only: current help records lack response/resolution timestamps and staff assignment.
+Administrator: header release/tenant; KPI strip funnel/enrollment/completion/revenue/drift/AI cost; main departmental reports; side approvals; alert verified operational failures. Blueprint only: unavailable systems must not produce fabricated numbers.
+
+STAGE STATUS
+1 Partial: database dashboard operational. Account, inbox, history, cross-course actions, real-time counters and auto calendar integrations remain incomplete.
+2 Partial: server submissions/grades, basic discussion/calendar/support records. Quizzes, Zoom, attendance and most course tabs remain demonstration/unconnected.
+3 Pending: complete help desk, routing, replies, SLAs, omnichannel and copilot. Existing support intake/archive is not this full module.
+4 Pending: no SIS or credential trigger service.
+5 Partial: structural curriculum review exists; no complete generation/protected publication.
+6 Pending: no authorized learner switcher.
+7 Partial: dashboard counts now query records; no predictive analytics or support/admin metrics.
+8 Not passed: targeted tests only; no end-to-end full journey, full accessibility or production acceptance. Local package refreshed; no staging infrastructure or production publishing.
+
+VERIFICATION
+14 dashboard tests including existing pilot tests: persisted submission changes counts; other learner's receipt hidden; unpublished grade hidden; unavailable metrics explicit. JavaScript syntax verified. No browser/accessibility acceptance performed for this update.
+
+LIMITATIONS
+Legacy routes still contain static/demo surfaces. Not all seed records elsewhere carry a Demo label. Scholarion physical isolation from other existing pilot tenant fixtures remains unresolved. These are explicit gaps, not completed deliverables.

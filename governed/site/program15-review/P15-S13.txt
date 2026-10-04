@@ -1,0 +1,7 @@
+P15-S13 — Coordinate specialists with bounded delegation
+Faculty-review draft.
+Outcome: Assign responsibilities and prevent circular delegation.
+Lab: Build a fictional conference planner with explicit roles and a maximum delegation depth.
+Assessment: Inject a circular request and verify termination with a review record.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

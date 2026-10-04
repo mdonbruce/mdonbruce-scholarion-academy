@@ -1,0 +1,38 @@
+Scholarion Academy local development release — 2026-10-02
+
+Run: python site/governed_service.py
+Open: http://127.0.0.1:4180/#calendar
+This is a local pilot, not a production or fully operational enterprise release.
+Fresh installation generates pilot tokens in site/private-governed/identities.json.
+Tokens and tenant databases are excluded from the release archive.
+
+Changed primary tabs on port 4180
+Calendar: personal events stored in tenant database; create, list, archive, restore.
+Discussions: course-member-visible posts; create, list, owner archive/restore.
+Help: private support requests visible to owner and enrolled instructor; create,
+list, archive/restore. No external support delivery.
+Assignments / Grades: route to the existing persistent AIM310 submission and
+versioned grade service instead of browser-only sample panels.
+All writes require a pilot token and active course membership. Record changes
+emit an outbox event in the same transaction. Archive retains records.
+
+Limitations and remaining surfaces
+Dashboard, catalog, core teaching packages, labs, quizzes, projects, credential
+wallet, agent builder and admin screens still include static or local-preview
+behavior. Calendar does not update academic deadlines. Discussions have no replies
+or moderation workflow yet. Support has no staff assignment or notification worker.
+SIS, billing, payroll, SSO, production tenancy, external LMS connectors, live model
+generation, LTI and signed credentials are not operational. No cloud target or
+production credentials were provided. The complete requested scope remains open.
+
+Source review
+The supplied document is architecture guidance, not executable deployment code.
+It contains example credentials, invalid identifiers, mock adapter configuration,
+and destructive infrastructure defaults. These were not applied. Existing tenant
+databases and learner work were preserved; no cloud infrastructure was provisioned.
+
+Verification
+13 hub test executions pass (10 baseline governed-service tests plus 3 hub tests).
+New tests cover calendar creation, archive/restore, invalid date rejection and
+stale-version conflicts. JavaScript syntax validated. Full end-to-end enterprise
+acceptance and accessibility conformance have not been established.

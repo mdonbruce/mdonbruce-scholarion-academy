@@ -1,0 +1,7 @@
+P15-S04 — Measure retrieval before generation
+Faculty-review draft.
+Outcome: Evaluate lexical and semantic retrieval independently of answer style.
+Lab: Chunk a synthetic catalog, define relevance labels and compare retrieval candidates.
+Assessment: Calculate recall at k from the labeled set and explain a missed relevant record.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

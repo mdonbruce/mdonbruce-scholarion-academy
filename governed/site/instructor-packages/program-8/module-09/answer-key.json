@@ -1,0 +1,47 @@
+[
+  {
+    "id": "P8M9Q1",
+    "prompt": "When should expected labels be assigned?",
+    "choices": [
+      "Before viewing candidate outputs",
+      "After seeing which labels maximize the score",
+      "Skip review and trust the output."
+    ],
+    "correct": 0,
+    "explanation": "Include ordinary, ambiguous, abstention and adversarial cases. Label expected outcomes before running the candidate. Aggregate accuracy can hide severe failures.",
+    "outcomes": [
+      "O1",
+      "O4"
+    ]
+  },
+  {
+    "id": "P8M9Q2",
+    "prompt": "Your team supporting a procurement intake process cannot reproduce a result. What next?",
+    "choices": [
+      "Publish because the report looks complete.",
+      "Reproduce the inputs, versions and checks before accepting the claim.",
+      "Remove failing examples."
+    ],
+    "correct": 1,
+    "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+    "outcomes": [
+      "O3",
+      "O5"
+    ]
+  },
+  {
+    "id": "P8M9Q3",
+    "prompt": "Which artifact best demonstrates create an evaluation set?",
+    "choices": [
+      "Write six expected outcomes, including two cases that must not trigger action. Include results and limitations.",
+      "A screenshot with no inputs or explanation.",
+      "An assertion of perfect accuracy."
+    ],
+    "correct": 0,
+    "explanation": "A concrete artifact and observed evidence support review.",
+    "outcomes": [
+      "O2",
+      "O5"
+    ]
+  }
+]

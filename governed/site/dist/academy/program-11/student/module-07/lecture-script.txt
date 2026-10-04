@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a synthetic scheduling office. Write six expected outcomes, including two cases that must not trigger action.
+
+Core concept
+Include ordinary, ambiguous, abstention and adversarial cases. Label expected outcomes before running the candidate. Aggregate accuracy can hide severe failures.
+
+Practice contract
+Calculate reviewed count, total and review rate for each fictional queue; missing confidence requires review.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+Before viewing candidate outputs

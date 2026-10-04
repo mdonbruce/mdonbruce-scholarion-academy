@@ -1,0 +1,221 @@
+# DESIGN PROMPT — Scholaris AI Academy: Self-Paced "Agentic AI Courses & Certifications" Line
+## Programs #28–#38 (short courses, specializations, professional certificates) + catalog hub
+
+---
+
+## 0. ROLE & MISSION
+
+You are the **Lead Academic Architect and Catalog Designer** for Scholaris AI Academy. Build a **self-paced, stackable product line**: short courses, guided projects, specializations and professional certificates. It complements the Academy's live and cohort programs (#1–#26).
+
+Deliver:
+1. The upgraded **Agentic AI Courses & Certifications** catalog hub (Section 4).
+2. 11 self-paced offerings, **#28–#38** (Section 3).
+3. A product page for each.
+4. Everything loaded into Scholaris as self-paced courses.
+
+All Academy rules apply:
+- Clean-room originality and honest claims
+- Shared module library and quality gates
+- Hands-on In-Class Activity template, with student and instructor editions
+- Program website template
+
+**Lead Faculty:** Dr. Martins Donbruce Idahosa. Other instructors are listed only once confirmed.
+
+---
+
+## 1. RULES
+
+1. **Market references are internal only.** The references are agentic AI offerings on a large MOOC marketplace from universities, technology companies and training providers.
+   - Never reuse their titles, course/module names, outcome wording, project briefs, quizzes, videos, instructor names, partner logos, learner counts, ratings, statistics or pricing.
+   - Never imply partnership with any university or technology company.
+2. **Vendor neutrality.** Where a reference program centered on one vendor's platform, design a **provider-neutral** version: one cloud-platform lab, chosen and verified, with alternatives noted.
+3. **Credentials.** Use only the Scholaris AI Academy types defined in Section 2. Never use "Professional Certificate from [company]", "university-backed" or "industry-recognized" unless a real agreement or approval exists.
+4. **Statistics and claims.** Market, hiring or salary figures appear only from current, cited primary sources, dated on the page. Ratings and enrollment counts come only from real Scholaris data.
+5. **Tools.** Verify current versions and licenses, pin them in the Cloud Lab, and name them in plain text with a no-affiliation disclaimer.
+6. **Data.** All datasets are synthetic or licensed, with data cards.
+7. **Textbook alignment.**
+   - Python content references Gaddis, *Starting Out with Python*, 6th ed.
+   - ML/DL content may reference Raschka et al. (PyTorch, scikit-learn) and Géron, 3rd ed. (TensorFlow/Keras) as recommended readings, mapped in the instructor guide.
+8. **Sandbox.** Subscription, audit and payment flows run in sandbox until go-live.
+
+---
+
+## 2. SELF-PACED PRODUCT STANDARD
+
+### 2.1 Product types
+| Type | Size | Credential |
+|---|---|---|
+| **Guided Project** | 1–2 hours, one hands-on build in the Cloud Lab | Completion badge |
+| **Short Course** | 4–6 modules, 8–16 hours | Course Certificate |
+| **Specialization** | 3–6 short courses plus a capstone project | Specialization Certificate plus badge |
+| **Professional Certificate** | 4–8 short courses, job-role aligned, plus a portfolio capstone | Professional Certificate (Scholaris) plus badge |
+
+### 2.2 Short-course module structure (every module)
+- 4–8 short videos (6–10 min each), captioned, with transcripts and chapters
+- Readings: original notes plus cited public papers and docs
+- **Ungraded lab:** Student Starter TODO notebook, with the Instructor EXECUTED notebook revealed after submission
+- **Graded quiz** from an item bank: randomized, explanations shown, 80% pass, retakes with a cooldown
+- **Graded programming assignment**, autograded in the Scholaris Cloud Lab with Learning Tools Interoperability (LTI) grade passback (Builder courses)
+- Discussion prompt
+- **Hands-on In-Class Activity** (Academy template) for instructor-led or corporate cohorts that license the course. The student self-paced edition replaces the APA submission with an autograded deliverable; the instructor edition keeps the full template and answer key.
+
+### 2.3 Course and credential rules
+- **Final project per course:** peer-reviewed (minimum 3 reviews, rubric-based) or autograded.
+- **Mapping to the Scholaris course standard:** a specialization or professional certificate is mapped as one or more **10-week standard blocks** for credit-equivalence purposes. Record the equivalent assignments, labs, projects and quizzes so self-paced credentials can transfer into the live programs.
+- **Pacing:** suggested deadlines with automatic resets, Course Pacing support, and sequential module locking that is optional per course.
+- **Access models** (decision required, sandbox):
+  - (a) Free audit: content visible, graded items locked
+  - (b) Paid per course or credential
+  - (c) "Scholaris Plus" subscription
+- **AI support:** the Scholaris AI Teaching Assistant coaches but never completes graded work.
+- **Stacking and transfer:** completed specializations and professional certificates waive the equivalent modules in live programs (#1, #2, #15, #16, #18). Record every rule in the catalog consolidation table.
+
+---
+
+## 3. THE 11 OFFERINGS
+
+| # | Scholaris offering (original title — refine) | Type | Size | Market reference (internal only) | Overlap / transfer |
+|---|---|---|---|---|---|
+| 28 | **RAG & Agentic AI Engineer** | Professional Certificate | 8 courses, ~3 months | RAG and Agentic AI Professional Certificate (tech company) | Waives #2 retrieval and agent modules |
+| 29 | **AI Agent Developer: Foundations to Applications** | Professional Certificate | 4 courses, ~15 hrs each | AI Agents: From Foundations to Applications (tech company) | Provider-neutral; one cloud agent platform lab |
+| 30 | **AI Agents & Agentic Systems in Python** | Specialization | 3 courses | AI Agents and Agentic AI in Python (university) | Core of #31 |
+| 31 | **AI Agent Developer — Extended** | Specialization | 6 courses (#30's 3 + 3 more) | AI Agent Developer Specialization (university) | Contains #30 plus courses 4–6 below |
+| 32 | **Agentic Design Patterns** | Short Course | 5 modules | Agentic AI (AI education company) | Prerequisite-free entry point |
+| 33 | **Agentic AI Engineering with Graph Orchestration & MCP** | Specialization | 3 courses | Agentic AI Engineering Specialization (training provider) | Waives #15 Weekends 3–6 |
+| 34 | **Agentic AI for Leaders: A Strategic Primer** | Short Course | 4–5 modules, no code | Agentic AI and AI Agents: A Primer for Leaders (university) | Credits toward #9, #13, #20 |
+| 35 | **Building Stateful Agents with Graph Workflows** | Guided Project | ~2 hrs | AI Agents in LangGraph (short course) | Lab reused in #1, #15 |
+| 36 | **Multi-Agent Teams with Role-Based Crews** | Guided Project | ~2 hrs | Multi AI Agent Systems with crewAI (short course) | Lab reused in #1, #14, #15 |
+| 37 | **AI & Machine Learning Foundations with TensorFlow and PyTorch** | Specialization | 4 courses | Category description: ML, data training, model evaluation, TF/PyTorch | Self-paced counterpart of #18 Weeks 1–5 |
+| 38 | **Neural Networks, Deep Learning & NLP for Agent Builders** | Specialization | 4 courses | Category description: neural networks, NLP | Self-paced counterpart of #18 Weeks 5–8; prerequisite path into #28–#33 |
+
+### 3.1 Course-level design requirements (write all titles and content originally)
+
+**#28 RAG & Agentic AI Engineer (Professional Certificate, 8 courses)**
+1. LLM application foundations: APIs, prompting, structured output
+2. Building LLM apps with a chain/orchestration framework and a simple UI
+3. Embeddings and vector databases
+4. RAG pipelines: chunking, retrieval, reranking, evaluation
+5. Advanced and agentic RAG: routing, self-correction, GraphRAG intro
+6. Building tool-using agents
+7. Multi-agent systems and MCP integration
+8. **Capstone:** production-shaped RAG + agent application with evaluation, guardrails and deployment
+
+**#29 AI Agent Developer: Foundations to Applications (Professional Certificate, 4 courses)**
+1. Agent fundamentals and design: autonomy, tools, memory, planning
+2. Building agents with an agent SDK: provider-neutral core plus one cloud agent service lab
+3. Multi-agent orchestration and enterprise integration: APIs, identity, permissions, connectors
+4. **Deploying and operating agents**, with a capstone: deploy, monitor, evaluate and govern an enterprise agent (Scholaris/Haven sandbox scenario)
+
+**#30 AI Agents & Agentic Systems in Python (Specialization, 3 courses)**
+1. Agents in Python from first principles: the agent loop, tool calling, memory, without a framework
+2. Agent architecture patterns: planner/executor, router, reflection, multi-agent, safety boundaries
+3. Agentic workflows with a framework, with a capstone: a Python agent that automates a multi-step knowledge-work task
+
+**#31 AI Agent Developer — Extended (Specialization, 6 courses)**
+- Courses 1–3 = #30
+- 4. Prompt engineering for agents and assistants
+- 5. AI-assisted data analysis: an agent with a code-execution tool, with validation of results
+- 6. **Trustworthy generative AI:** reliability, verification, bias, privacy, disclosure
+- **Capstone:** a trustworthy agent with an evaluation report
+
+**#32 Agentic Design Patterns (Short Course, 5 modules)**
+1. What makes AI agentic; levels of autonomy
+2. Reflection and self-critique
+3. Tool use
+4. Planning
+5. Multi-agent collaboration plus **error analysis and evaluation-driven development**
+
+Each module has a framework-free Python lab.
+
+**#33 Agentic AI Engineering with Graph Orchestration & MCP (Specialization, 3 courses)**
+1. Agentic pipelines with chains, tools and structured data validation
+2. Stateful graph agents: routing, persistence, human-in-the-loop, debugging, recovery
+3. MCP-powered agentic systems: servers, clients, interoperability, security, scaling
+- **Capstone:** a graph agent consuming two custom MCP servers
+
+**#34 Agentic AI for Leaders (Short Course, no code)**
+- What agents can and can't do
+- Use-case identification and process redesign
+- Risk, governance and human oversight
+- Build/buy/partner decisions and cost
+- Leading adoption
+- **Final project:** agent opportunity brief with a governance plan
+
+**#35 Guided Project — Stateful Agents with Graph Workflows**
+Build a routing graph with tool nodes, a checkpoint and a human approval step.
+
+**#36 Guided Project — Multi-Agent Teams with Role-Based Crews**
+Build a 3-agent researcher/analyst/writer crew in sequential and hierarchical modes, and compare the outputs with a rubric.
+
+**#37 AI & ML Foundations with TensorFlow and PyTorch (Specialization, 4 courses)**
+1. Python and data for ML: Gaddis-aligned refresher, NumPy, pandas, visualization
+2. Supervised and unsupervised learning with scikit-learn: **data training pipelines**, feature engineering, cross-validation
+3. **Model evaluation:** metrics, confusion matrices, ROC/PR, calibration, error analysis, fairness checks
+4. First neural networks in **PyTorch and TensorFlow/Keras** (parallel labs)
+- **Capstone:** end-to-end model with an evaluation report and model card
+
+**#38 Neural Networks, Deep Learning & NLP for Agent Builders (Specialization, 4 courses)**
+1. Deep learning: backpropagation, optimizers, regularization, training at scale (PyTorch and TensorFlow labs)
+2. CNNs and transfer learning
+3. **NLP:** text processing, embeddings, sequence models, attention and transformers
+4. From transformers to LLMs and agents: fine-tuning a small model, embeddings for retrieval, how LLMs power agents
+- **Capstone:** fine-tuned NLP model plugged into a retrieval agent as a tool
+
+---
+
+## 4. CATALOG HUB — "Agentic AI Courses & Certifications" (upgrade)
+
+### 4.1 Intro copy (original)
+> **Agentic AI Courses & Certifications**
+> Artificial intelligence courses at Scholaris AI Academy take you from core concepts — machine learning, neural networks, and natural language processing — through training data, model evaluation, and real-world applications, all the way to building AI agents that plan, use tools, and collaborate. You'll practice with widely used frameworks such as TensorFlow and PyTorch, plus modern retrieval and agent tooling, and earn credentials that stack from a two-hour guided project to a full professional certificate or live cohort program.
+
+### 4.2 Hub structure
+- **Product-type tabs:** Guided Projects · Short Courses · Specializations · Professional Certificates · Live & Cohort Programs (#1–#26).
+- **Filters:** level, duration, product type, format (self-paced / live), coding required, skills (ML, deep learning, NLP, TensorFlow, PyTorch, RAG, agents, multi-agent, MCP, evaluation, governance), access model (audit / paid / subscription).
+- **Rails:** "Start here" (#32, #37, #34), "Most popular" (real Scholaris data only; otherwise hidden), "New", "Build agents in Python", "For leaders".
+- **Learning-path diagram:** self-paced → live progression:
+  - #37 → #38 → #32 → #30/#31 → #28 → live #15 or #1
+  - #34 → #20 → #13/#25
+  - #35 and #36 as quick-start projects
+- **Each card shows:** type, title, level, hours, course count, skills, credential, price or access model, and transfer credit ("Counts toward #15").
+- **Comparison table, "Which path is right for me?" quiz, credential explainer** (types, verification, stacking), **for-teams inquiry**, **category FAQs** (original).
+- **Build requirements:** responsive, WCAG 2.2 AA, ItemList/Course structured data, SEO metadata, data driven from the Scholaris catalog.
+
+---
+
+## 5. PRODUCT PAGES (#28–#38)
+
+Use the Academy program template, adapted for self-paced:
+- Hero: type, level, total hours, suggested pace (e.g., "~3 months at 6 hrs/week")
+- **"What's included":** course list with hours each, and the skills you'll gain
+- Projects and capstone
+- Credential sample and verification
+- Instructors (confirmed only)
+- Access model and price (sandbox)
+- Transfer credit into live programs
+- Prerequisite self-check, FAQs (original), related offerings
+
+---
+
+## 6. BUILD ORDER & REPORTING
+
+1. Update the **catalog consolidation report** with #28–#38: overlaps with #1–#27, transfer rules, merge/retire recommendations.
+2. Self-paced product standard and Cloud Lab autograder templates.
+3. #32 → #35 → #36 (quick wins, reusing library labs).
+4. #37 → #38 (foundations, dual-framework labs).
+5. #30 → #31 → #33.
+6. #28 → #29.
+7. #34.
+8. Hub upgrade and all product pages.
+
+**Per offering, deliver:**
+- Course outlines and video scripts
+- Starter and EXECUTED notebooks
+- Autograded assignments with test suites
+- Quiz banks, peer-review rubrics, capstone briefs
+- In-class activity editions (student and instructor)
+- Datasets with data cards
+- Credential and badge definitions
+- Product page, quality-gate results
+
+**Status report:** complete / drafted / needs SME review / blocked, with tool, licensing and claims risks.

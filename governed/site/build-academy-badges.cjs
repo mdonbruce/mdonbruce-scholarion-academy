@@ -1,0 +1,5 @@
+const fs=require('fs'),path=require('path'),B=require('./dist/badge-template.js');
+const ps=JSON.parse(fs.readFileSync(path.join(__dirname,'dist','academy','programs.json'),'utf8'));
+for(const p of ps){const dir=path.join(__dirname,'dist','academy','program-'+p.id);fs.writeFileSync(path.join(dir,'program-badge.svg'),B.svg({id:p.id,title:p.title,type:'Certificate',style:[5,6,7].includes(p.id)?'micro':'ribbon'}));fs.writeFileSync(path.join(dir,'capstone-badge.svg'),B.svg({id:p.id,title:p.career.portfolio,type:'Capstone skill badge',style:'seal'}));fs.writeFileSync(path.join(dir,'badge-definition.json'),JSON.stringify({programId:p.id,issuer:'Scholarion Academy',type:'unsigned-artwork-definition',skills:p.outcomes,criteria:'Every approved required course at C or better; required course list TBC',evidenceRequired:['Approved final course grades','Reviewed capstone evidence'],criteriaUrl:null,verificationUrl:null,issued:false},null,2));}
+console.log('Generated 11 program badges, 11 capstone badges and 11 unsigned definitions.');
+

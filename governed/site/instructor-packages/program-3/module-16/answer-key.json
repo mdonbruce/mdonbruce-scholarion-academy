@@ -1,0 +1,47 @@
+[
+  {
+    "id": "P3M16Q1",
+    "prompt": "Who resolves conflicting outputs?",
+    "choices": [
+      "A defined coordinator rule or human owner",
+      "The agent that writes most",
+      "Skip review and trust the output."
+    ],
+    "correct": 0,
+    "explanation": "Multiple agents still require an accountable workflow. Define narrow input/output contracts, shared state and a stopping rule. Escalate unresolved conflicts instead of creating endless debate.",
+    "outcomes": [
+      "O1",
+      "O4"
+    ]
+  },
+  {
+    "id": "P3M16Q2",
+    "prompt": "Your team supporting an operations analysis team cannot reproduce a result. What next?",
+    "choices": [
+      "Publish because the report looks complete.",
+      "Reproduce the inputs, versions and checks before accepting the claim.",
+      "Remove failing examples."
+    ],
+    "correct": 1,
+    "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+    "outcomes": [
+      "O3",
+      "O5"
+    ]
+  },
+  {
+    "id": "P3M16Q3",
+    "prompt": "Which artifact best demonstrates assign bounded agent roles?",
+    "choices": [
+      "Specify researcher, checker and coordinator roles. Include results and limitations.",
+      "A screenshot with no inputs or explanation.",
+      "An assertion of perfect accuracy."
+    ],
+    "correct": 0,
+    "explanation": "A concrete artifact and observed evidence support review.",
+    "outcomes": [
+      "O2",
+      "O5"
+    ]
+  }
+]

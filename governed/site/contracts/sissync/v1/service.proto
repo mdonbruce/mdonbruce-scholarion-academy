@@ -1,0 +1,6 @@
+// Draft contract only. No deployed runtime. Authorization must derive from authenticated metadata.
+syntax = "proto3";
+package sissync.v1;
+service SyncService { rpc GetSyncStatus (GetSyncStatusRequest) returns (GetSyncStatusResponse); }
+message GetSyncStatusRequest { string operation_id = 1; }
+message GetSyncStatusResponse { string status = 1; string exception_id = 2; }

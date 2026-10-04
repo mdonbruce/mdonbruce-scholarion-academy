@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a synthetic scheduling office. Route fictional administrative cases and minimize the audit trail.
+
+Core concept
+Administrative scheduling and documentation can use bounded support, but ambiguous information must route to trained people. Never use real patient data or recommend diagnosis or treatment here.
+
+Practice contract
+Map each ID to review if confidence is missing or below 0.8, otherwise ready_for_review. Neither route executes an action.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+Synthetic scheduling support

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "P6M4Q1",
+    "prompt": "What is a chunking risk?",
+    "choices": [
+      "Separating an exception from its condition",
+      "Making all source facts invalid",
+      "Skip review and trust the output."
+    ],
+    "correct": 0,
+    "explanation": "Chunking trades context against noise. Splitting conditions from exceptions can change meaning. Overlap preserves continuity but duplicates evidence and increases retrieval volume.",
+    "outcomes": [
+      "O1",
+      "O4"
+    ]
+  },
+  {
+    "id": "P6M4Q2",
+    "prompt": "Your team supporting a departmental request desk cannot reproduce a result. What next?",
+    "choices": [
+      "Publish because the report looks complete.",
+      "Reproduce the inputs, versions and checks before accepting the claim.",
+      "Remove failing examples."
+    ],
+    "correct": 1,
+    "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+    "outcomes": [
+      "O3",
+      "O5"
+    ]
+  },
+  {
+    "id": "P6M4Q3",
+    "prompt": "Which artifact best demonstrates preserve evidence boundaries?",
+    "choices": [
+      "Compare whole-document and sentence-level retrieval on a policy exception. Include results and limitations.",
+      "A screenshot with no inputs or explanation.",
+      "An assertion of perfect accuracy."
+    ],
+    "correct": 0,
+    "explanation": "A concrete artifact and observed evidence support review.",
+    "outcomes": [
+      "O2",
+      "O5"
+    ]
+  }
+]

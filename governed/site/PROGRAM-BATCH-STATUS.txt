@@ -1,0 +1,41 @@
+PROGRAMS 15–25 STATUS — 2026-10-02
+Latest attachment 9a1a5de7-4266-4b65-a6a2-0bbc97e119c2 matches the previously approved program specification and completes its deliverables/status-report ending. Retention and program-15-first approval persists; no second approval requested.
+
+Added operational advisory prerequisite check: ten scored questions in Python, APIs, prompting and data; deterministic route recommendations; explanations for every answer; #15 curriculum link. Server validates input. No records stored, no identity data collected, no admission/denial/credit/enrollment action. Recommendations use provisional authored thresholds, not a validated placement instrument. Faculty calibration remains required.
+
+PROGRAM | STATUS | EVIDENCE / GAP
+15 | Drafted; needs SME review | 20 session briefs, 5 competencies, 10 project outlines, capstone rubric, completion rules. Not full teaching packages. Domain notebooks, datasets/cards, slides/scripts, detailed rubrics and final bank incomplete.
+16 | Drafted catalog; needs SME review | 5-weekend outline; full modules/materials not built.
+17 | Drafted catalog; blocked | Component integration, new application course and duration reconciliation missing.
+18 | Drafted catalog; needs SME review | Full 8-week materials and model-card capstone missing.
+19 | Drafted catalog; needs SME review | Full 5-week prompt/evaluation materials missing.
+20 | Drafted catalog; blocked | #13 Course 1 dependency unavailable.
+21 | Drafted catalog; needs SME review | Full data curriculum and licensed textbook chapter alignment unavailable.
+22 | Drafted catalog; needs SME review | Full 12-week pipelines and pinned lab environments missing.
+23 | Drafted catalog; needs SME review | Full product curriculum and assessment packages missing.
+24 | Drafted catalog; blocked | Component sequencing, 32-week reconciliation and 12-week capstone missing.
+25 | Drafted catalog; blocked | #13 Courses 1–2 unavailable; practicum incomplete.
+No program is complete or published into Canvas. All 11 remain retained.
+
+AUTONOMOUS PROCESS STATUS
+6.1 Build/publish: draft generation and structural checks only, no faculty release/Canvas publication.
+6.2 Readiness: local advisory self-check operational; not admissions service integration or placement certification.
+6.3 Credit/pathways: mapped proposals only; no automatic credit or enrollment.
+6.4 Scheduling: unavailable.
+6.5 Lab/key provisioning: unavailable.
+6.6 Live sessions: unavailable.
+6.7 Feedback: local receipt/manual grade backend exists; no program-15 integrated auto-grading/mastery.
+6.8 Tutor: local extractive pilot only; no program-15 source indexing or mentor scheduling.
+6.9 Capstone: rubric definition only, no lifecycle workflow.
+6.10 Final check: policy draft only, no administered bank/remediation workflow.
+6.11 Electives: names only; access windows and issuance unavailable.
+6.12 Credentials: visual/local demo only; no verified program-15 issuance.
+6.13 Refreshers: unavailable.
+6.14 Career: service descriptions only.
+6.15 Catalog: static data generation, no event-driven synchronization.
+6.16 Health: existing saved-record dashboard is not program/cohort analytics.
+
+RISKS / QUALITY GATES
+Versions and educational licenses not verified; no Cloud Lab image published. No new third-party technical compatibility claim made. Synthetic data requirement remains; no real learner records used. Approval of consolidation is not faculty approval. Part E finance/identity policy, #13/#14, cohort settings and external services remain missing. No prices, dates, seats, testimonials, outcome statistics or affiliations invented.
+Tests: seven prerequisite rule tests and JavaScript syntax check. Full end-to-end program operation and accessibility acceptance not performed.
+Open http://127.0.0.1:4180/#readiness-check

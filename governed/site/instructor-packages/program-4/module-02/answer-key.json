@@ -1,0 +1,47 @@
+[
+  {
+    "id": "P4M2Q1",
+    "prompt": "Which test is stronger?",
+    "choices": [
+      "An independently specified boundary result",
+      "Repeating the implementation calculation",
+      "Skip review and trust the output."
+    ],
+    "correct": 0,
+    "explanation": "Generated code needs independent correctness and security checks. Test behavior and edge cases rather than copying the implementation. Keep secrets out of prompts.",
+    "outcomes": [
+      "O1",
+      "O4"
+    ]
+  },
+  {
+    "id": "P4M2Q2",
+    "prompt": "Your team supporting a software delivery team cannot reproduce a result. What next?",
+    "choices": [
+      "Publish because the report looks complete.",
+      "Reproduce the inputs, versions and checks before accepting the claim.",
+      "Remove failing examples."
+    ],
+    "correct": 1,
+    "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+    "outcomes": [
+      "O3",
+      "O5"
+    ]
+  },
+  {
+    "id": "P4M2Q3",
+    "prompt": "Which artifact best demonstrates review generated code?",
+    "choices": [
+      "Write normal, boundary and malformed-input tests. Include results and limitations.",
+      "A screenshot with no inputs or explanation.",
+      "An assertion of perfect accuracy."
+    ],
+    "correct": 0,
+    "explanation": "A concrete artifact and observed evidence support review.",
+    "outcomes": [
+      "O2",
+      "O5"
+    ]
+  }
+]

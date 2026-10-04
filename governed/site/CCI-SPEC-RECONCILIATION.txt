@@ -1,0 +1,67 @@
+Scholarion Academy — Curriculum & Course Intelligence
+Source: user attachment 5139d463-9b85-41d6-91c2-718d1895e44d/Pasted text.txt
+
+The supplied specification ends mid-sentence in section 4.2. It references sections
+5 (Curriculum Exchange) and 6 (approval roles), neither of which is present. The
+user has been asked for the missing text. External exchange and publication remain
+disabled; the implementation does not invent approval authority.
+
+Existing development reused
+- Authenticated local pilot session and active-course permissions.
+- Ten-week curriculum package validator and saved curriculum review history.
+- Scholarion Academy catalog, branding and non-credit credential terminology.
+- Immutable audit outbox and shared workspace API client.
+
+New connected capability
+- Curriculum Intelligence route for authorized instructors, linked from workspace
+  navigation, with a responsive card library inspired by the supplied screenshot.
+- Program/course design forms create clearly labeled template scaffolds. These are
+  not claimed to be full AI-generated courses, executed labs or finished curricula.
+- Persistent curriculum graph with all 20 node types and 12 relationship types
+  enumerated in the available specification. Attributes use a bounded allowlist.
+- Existing structurally valid course review packages convert into graph drafts;
+  only known curriculum fields are projected. This is local reuse, not an external
+  Scholaris/OakHaven package transfer.
+- Node/link editing, advanced graph editing, semantic-version progression,
+  append-only snapshots, optimistic conflicts and change histories.
+- Outcome/assessment/module alignment checks; source/license/date evidence flags;
+  stale resource flags; accessibility evidence and lab-execution evidence flags;
+  unsupported claim-language checks. These rules are metadata checks, not academic,
+  legal, accessibility or accreditation determinations.
+- Draft -> in_review -> changes_requested / reviewed workflow. Content authors
+  cannot review their own draft. Reviewed does not authorize release.
+- Downloadable JSON evidence packs with the saved graph hash and review history.
+- Draft comparison: versions, status, outcomes, assessments and evidence gap counts.
+- Course-scoped records and endpoints; learners cannot access draft authoring.
+
+Preserved decisions
+- Scholarion Academy branding. The OakHaven screenshot is a layout reference, not
+  permission to copy degree labels, credit claims or institutional identity.
+- Courses remain ten weeks, following the user's explicit earlier instruction.
+- Certificates remain non-credit. Written articulation/recognition remains a future
+  approval workflow; the current graph rejects a credit-recognition claim.
+- No external institutional connection, database, identities, learner records,
+  grades or enrollments are imported. No production deployment is performed.
+
+Not complete / dependent on further work
+- Missing remainder of 4.2 and sections 5/6, licensed exchange package schemas,
+  owner approvals on both sides and branding-decision records.
+- Hosted generation of complete original teaching materials, executed notebooks,
+  item-quality analysis and educator-verified content originality.
+- Standards/taxonomy imports with verified licensing/version data; currently
+  modeled as draft nodes and evidence references only.
+- Detailed program overlap/waiver analysis, automatic curricular recommendations
+  from live aggregate course health, and versioned publication to the learner LMS.
+- Complete accessibility audit, staging acceptance and production readiness.
+
+Verification
+- Full Python suite: 204 test executions passed. The initial targeted run of new
+  CCI tests plus existing review regressions also passed (13 tests).
+- Tests cover immutable graph versions, stale edits, role/course isolation,
+  independent review, blocked exchange/publication, non-credit/schema boundaries,
+  alignment/freshness/claims findings and conversion of a full standard fixture
+  containing 10 modules and 400 question-bank items.
+- JavaScript syntax validation passed for the new workspace.
+- Browser verified the new route, Scholarion branding, connected UI controls and
+  signed-out permission feedback. Authenticated workflow correctness was tested
+  through the service tests, not a complete authenticated browser acceptance run.

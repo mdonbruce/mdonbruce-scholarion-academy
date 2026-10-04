@@ -1,0 +1,7 @@
+P15-S01 — Build a repeatable agent workspace
+Faculty-review draft.
+Outcome: Separate configuration, secrets and request execution.
+Lab: Build a synthetic request client with timeout, bounded concurrency and environment-based configuration.
+Assessment: Show that missing secrets fail safely and cancelled requests terminate.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

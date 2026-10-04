@@ -1,0 +1,57 @@
+Scholarion Academy LMS architecture review — 2026-10-02
+Source: System Prompt for Canvas LMS Architectural Design.docx.
+Full extracted source: references/lms-architecture.txt.
+
+The attachment repeats and expands the earlier LMS parity specification. Existing
+screens and browser data do not meet its operational definition. This change adds
+a tenant-database-backed text submission and grading slice, not full LMS parity.
+
+Implemented in this change
+- Migration 002: assignments, immutable submission receipts and grade versions.
+- Server checks token tenant, active course membership and student/instructor role.
+- Student lists expose only that student's submissions and released grades.
+- Idempotent text submissions; conflicting reuse of a request key is rejected.
+- Instructor grading creates a new unposted version. Explicit release/hide creates
+  another version; prior records remain available to authorized instructors.
+- Version mismatch returns HTTP 412. Mutation and outbox event share a transaction.
+- UI connected at http://127.0.0.1:4180/#server-coursework.
+- Seed scope: one AIM310 practice assignment in each separate tenant database.
+  The 11 program packages remain browser previews, not migrated live enrollments.
+
+REST contract (POST with Bearer pilot token; tenant, course in JSON)
+/api/coursework/list: assignments and authorized submissions; no hidden grade data.
+/api/coursework/submit: assignment, body, request_key; returns retained receipt.
+/api/coursework/grade: submission, version, score 0–100, feedback.
+/api/coursework/post: submission, version, posted boolean.
+/api/coursework/history: submission; instructor-only version history.
+200 success; 400 invalid request; 403 denied; 412 conflicting version/request key.
+
+Feature comparison
+PARTIAL: roles and identity — pilot tokens only; federation, custom role hierarchy,
+observer links, support grants and masquerade absent.
+PARTIAL: navigation, dashboard, syllabus, modules, pages and announcements — existing
+local previews; not backed by a full authenticated course/content service.
+PARTIAL: assignments, submissions and gradebook — database text workflow now present;
+differentiated dates, late policies, weighted groups, rubric scoring, annotations,
+file uploads, moderation and advanced sequential grading remain absent.
+PARTIAL: discussions, quizzes, outcomes, rubrics, pacing, calendar and analytics —
+local demonstrations/content exist, not complete server implementations.
+PARTIAL: files and media — download resources exist; quarantine/scanning/caption
+publication controls and quota enforcement remain absent.
+PARTIAL: admin console and notifications — preview interfaces/outbox exist; real
+account administration and delivery workers remain absent.
+NOT STARTED: cloud collaborations, conferences, blueprint synchronization, QTI and
+Common Cartridge import, shared-content service, PWA/offline, portfolios, OAuth
+developer keys, GraphQL, LTI Advantage, OneRoster and signed webhook delivery.
+
+Validation
+16 service tests pass (10 governed-agent checks and 6 coursework checks).
+Includes hidden grade behavior, release/hide history, stale writes, idempotency,
+student grading denial, immutable submissions and invalid numeric score rejection.
+Catalog/assets validation passes. Live HTTP list returns authorized assignments.
+Browser student connection and submission successfully returned a receipt.
+
+Acceptance disposition
+No full parity scenario signed off. Scenario 4's manual posting and concurrency
+subsets work; annotation and rubric scoring remain incomplete. WCAG 2.2 AA needs
+automated and manual acceptance testing. No production deployment performed.

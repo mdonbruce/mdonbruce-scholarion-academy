@@ -1,0 +1,47 @@
+[
+  {
+    "id": "P9M8Q1",
+    "prompt": "What is a bottleneck?",
+    "choices": [
+      "The constrained step limiting throughput",
+      "Always the newest technology",
+      "Skip review and trust the output."
+    ],
+    "correct": 0,
+    "explanation": "Map queues, decisions and rework rather than ideal steps only. Improving a fast step may not improve the bottleneck. Measure cycle time before choosing an intervention.",
+    "outcomes": [
+      "O1",
+      "O4"
+    ]
+  },
+  {
+    "id": "P9M8Q2",
+    "prompt": "Your team supporting an AI investment committee cannot reproduce a result. What next?",
+    "choices": [
+      "Publish because the report looks complete.",
+      "Reproduce the inputs, versions and checks before accepting the claim.",
+      "Remove failing examples."
+    ],
+    "correct": 1,
+    "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+    "outcomes": [
+      "O3",
+      "O5"
+    ]
+  },
+  {
+    "id": "P9M8Q3",
+    "prompt": "Which artifact best demonstrates map operational bottlenecks?",
+    "choices": [
+      "Map an intake queue and select one measurable intervention. Include results and limitations.",
+      "A screenshot with no inputs or explanation.",
+      "An assertion of perfect accuracy."
+    ],
+    "correct": 0,
+    "explanation": "A concrete artifact and observed evidence support review.",
+    "outcomes": [
+      "O2",
+      "O5"
+    ]
+  }
+]

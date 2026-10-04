@@ -18,5 +18,5 @@ export default [
       "@typescript-eslint/no-explicit-any": "warn",
     },
   },
-  { ignores: [".next/", "preview/", "node_modules/"] },
+  { ignores: [".next/", "preview/", "node_modules/", "governed/"] },
 ];

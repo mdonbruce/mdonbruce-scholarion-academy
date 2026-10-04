@@ -1,0 +1,17 @@
+PROGRAM 26 — TEN-WEEK DESIGN RECONCILIATION
+Source: a445d630-c089-40ef-80ef-14068dee4676/Pasted text.txt
+Scholarion Academy branding and single-Academy architecture retained. Explicit user ten-week instruction supersedes source seven-week duration. External institution capstones are replaced with synthetic Academy/support/research/code-review scenarios; no external integrations enabled.
+
+Existing: seven-week public draft, no stored program 26 design shell, missing consolidation relations.
+Delivered: ten-week draft design and updated catalog entry; twelve core lab briefs across weeks 1–6; weeks 7–10 allocated to reliability, research memo, capstone integration and defense. Five measurable competencies, weekly outcome maps, ten student/instructor activity guidance pairs, six optional stretch briefs, research memo prompt and a 100-point capstone rubric. Detailed shell loaded into the existing AIM310 instructor design context without overwriting earlier shell revisions. Consolidation lists #26→#1 and #26→#15 as proposals only.
+Website: #program/26 now uses the structured design; includes prerequisite self-report routing, ten-week outline, lab briefs, faculty, capstone, non-credit/funding disclosure, unmet policy fields, support links and a downloadable draft HTML brochure. Cohort application button disabled. No fabricated dates, seats, fee, recordings or certificate verification.
+
+Not completed
+The lab deliverables are briefs, not runnable starter/executed domain notebooks. Full quiz banks, datasets/data cards, original complete lesson scripts/slides, facilitator guides, cited paper set, maintained tool/version verification, key vault, Cloud Lab execution, calendar-generated ET/local sessions, recordings, actual attendance and lab grading, automated late-entry extensions, publication and signed credential issuance are still unimplemented or unverified. Weekly activity guidance is not a finished worked instructor edition. The prerequisite check is advisory self-report, not an admission decision.
+No current vendor/library/citation verification was performed; no current-maintenance claim or pinning is made. Tool approval remains a release gate.
+
+Unspecified policy
+Capstone pass threshold, days to issue, content access months, cohort dates/time zone, fee, finance/refund/deferral policy and verified contacts remain unset. Source example access period was not treated as an approved policy. Weekly quiz 70% and twelve lab requirements are draft design fields, not live eligibility evaluation. No approved automatic waiver or external academic credit.
+
+Validation
+225 regression tests pass, plus three new Program26 tests pass (10 weeks/12 unique labs/6 stretches, rubric total, unset policy gates and exact detailed shell integration). JavaScript syntax verified. Local design only; no production publication and no full academic-package completion claim.

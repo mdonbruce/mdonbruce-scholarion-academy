@@ -1,0 +1,47 @@
+[
+  {
+    "id": "P6M2Q1",
+    "prompt": "What belongs in an instruction card?",
+    "choices": [
+      "An explicit missing-evidence rule",
+      "An instruction to always sound certain",
+      "Skip review and trust the output."
+    ],
+    "correct": 0,
+    "explanation": "Specify the task, allowed evidence, output fields and escalation condition. Examples demonstrate format; they do not grant new permissions. Missing support should lead to an unresolved result.",
+    "outcomes": [
+      "O1",
+      "O4"
+    ]
+  },
+  {
+    "id": "P6M2Q2",
+    "prompt": "Your team supporting a departmental request desk cannot reproduce a result. What next?",
+    "choices": [
+      "Publish because the report looks complete.",
+      "Reproduce the inputs, versions and checks before accepting the claim.",
+      "Remove failing examples."
+    ],
+    "correct": 1,
+    "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+    "outcomes": [
+      "O3",
+      "O5"
+    ]
+  },
+  {
+    "id": "P6M2Q3",
+    "prompt": "Which artifact best demonstrates write bounded instructions?",
+    "choices": [
+      "Write an instruction card with sources, schema, boundaries and two examples. Include results and limitations.",
+      "A screenshot with no inputs or explanation.",
+      "An assertion of perfect accuracy."
+    ],
+    "correct": 0,
+    "explanation": "A concrete artifact and observed evidence support review.",
+    "outcomes": [
+      "O2",
+      "O5"
+    ]
+  }
+]

@@ -1,0 +1,52 @@
+SCHOLARION ACADEMY — DEVELOPMENT COMPARISON, 2026-10-02
+
+Scope: the three attached specifications, existing site/dist source, supplied
+catalog records and the core-program teaching packages. Source documents contain
+repeated and expanded specifications. The 3,246 extracted source lines are an
+inventory, NOT 3,246 unique features or completed manual reviews.
+
+FEATURE                         STATUS       EVIDENCE / REMAINING GAP
+Brand and approved artwork      PARTIAL      Scholarion visible branding and approved assets retained. Historical source names remain in internal source inventory.
+11 core program content         PARTIAL      academy-data.js, academy/program-1..11. Draft activity/assessment scaffolds; substantive complete lessons, exemplars, media and academic review missing.
+Program 26                      PARTIAL      catalog-data.js record and program page. No 12 topic-specific live-provider labs, delivery calendar, prerequisite gate or complete seven-week teaching package.
+Self-paced 28–38                 PARTIAL      Catalog records, product previews and new self-paced hub. Product-type filtering and badge generator links work. Full short-course content, autograders, peer-review workflow and access models missing.
+Catalog product filters         PARTIAL      Existing query/track/format/level; new self-paced type filter. Skill/access-model/duration filters, SEO structured data and path quiz missing.
+Core badge artwork              PARTIAL      22 program/capstone SVG assets and dynamic badge builder. Artwork is unsigned; no issued achievement implied.
+Prerequisites/module locking    PARTIAL      academy.js browser checkpoint locking. Server enforcement and official mastery rules missing.
+Assignments/submissions         PARTIAL      course-work.js connects all 11 core assessment lists to text attempts, receipt IDs, history and export. Browser-only, one demo learner. File upload, differentiated availability and authenticated persistence missing.
+Rubrics                         PARTIAL      Existing displayed analytic criteria. New review score is manually entered; interactive criterion scoring and outcome mastery aggregation missing.
+Grade posting                   PARTIAL      Saved reviews begin unposted; explicit post/hide; resubmission prevents an old review being shown as a current review. Server authorization, concurrent update protection and full grade history viewer missing.
+What-If                         PARTIAL      Posted/current scores plus transient hypothetical values; unweighted practice average. Weighted groups, drop rules and official totals missing.
+Pacing                          PARTIAL      Per-core-program start date and computed suggested dates, resettable without modifying attempts. Calendar integration, accommodations and official deadlines missing.
+Discussions                     PARTIAL      Browser-local top-level contributions and one reply level. Multi-user service, checkpoints, moderation, subscriptions and graded discussions missing.
+Roles and accounts              PARTIAL      Demonstration role switch and informational permissions. NO authenticated identity, tenant isolation or server-enforced authorization.
+Agents                          PARTIAL      Local builder snapshots, deterministic guardrails and aggregate proposal demonstration. Hosted inference, production knowledge indexing and authenticated policy enforcement missing.
+Credential pipeline             PARTIAL      Local eligibility rule tests and wallet/certificate previews. Approved required-course lists, signing, baked badges, verification/revocation, durable ledger and email connector missing.
+Pages/files/content editor      PARTIAL      Local module authoring. Full rich editor, revision restoration, scanned uploads, storage quotas and accessible media workflow missing.
+Calendar/inbox/groups           PARTIAL      Existing demo screens; no authoritative scheduling, scoped recipient service or multi-user group service.
+REST/GraphQL/SIS/LTI/outbox      NOT STARTED  No working authenticated backend in inspected application. Requires application architecture and implementation, not a cosmetic UI change.
+Imports/blueprints/QTI          NOT STARTED  Native student content ZIPs are not validated cartridge or QTI imports; no blueprint synchronization engine.
+PWA/observer/SSO                NOT STARTED  No verified production implementation or acceptance evidence.
+Accessibility acceptance       PARTIAL      Semantic new controls and browser inspection. No claim of WCAG 2.2 AA conformance or completed manual screen-reader audit.
+
+VERIFIED THIS CHANGE
+- node site/test-course-work.cjs: date rollover/validation, empty submission rejection,
+  preserved attempt copies, hidden grade default, post visibility, stale-attempt
+  review exclusion, score validation, review history and practice averages.
+- Browser: Program 7 sample submission saved with receipt and survived reload;
+  start date persisted; unposted feedback stayed hidden; posting displayed 84
+  in the practice grade view.
+- Existing validation: 35 catalog IDs/assets/routes; 33 agent-core tests;
+  19 credential-rule tests; 140 badge render checks plus 2 edge cases.
+
+ACCEPTANCE POSITION
+None of the 15 full LMS-parity acceptance scenarios is signed off. Partial
+local behavior for course progression, manual posting and What-If is not an
+end-to-end server test. No production deployment has occurred.
+
+NEXT IMPLEMENTATION DEPENDENCIES
+1. Persistent authenticated backend with tenant, enrollment and permission model.
+2. Move submission, grading and content release enforcement to that backend.
+3. Complete and academically review authored teaching content and assessment banks.
+4. Configure and verify Cloud Lab/LTI, SIS, notification and credential connectors.
+5. Run each source acceptance scenario, security isolation and accessibility review.

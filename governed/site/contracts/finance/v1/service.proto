@@ -1,0 +1,6 @@
+// Draft contract only. No deployed runtime. Authorization must derive from authenticated metadata.
+syntax = "proto3";
+package finance.v1;
+service BillingService { rpc CreateInvoice (CreateInvoiceRequest) returns (CreateInvoiceResponse); }
+message CreateInvoiceRequest { string learner_id = 1; string registration_id = 2; string idempotency_key = 3; }
+message CreateInvoiceResponse { string invoice_id = 1; string status = 2; }

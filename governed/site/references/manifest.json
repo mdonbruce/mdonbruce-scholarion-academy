@@ -1,0 +1,157 @@
+[
+  {
+    "file": "program-1.html",
+    "bytes": 8025,
+    "sha256": "57e71aaac7c12b11add5e51d154839a19cbebaa60835f1cfd625f97c46f9e1e2"
+  },
+  {
+    "file": "program-12.html",
+    "bytes": 6485,
+    "sha256": "bb1fb414879f2dbfa31b1af782d7f6782d3b1e354d2fcd584b09d7dff6f52cd4"
+  },
+  {
+    "file": "index (5).html",
+    "bytes": 12045,
+    "sha256": "51ca09474fe9eb744e3ab4c23650a027581df891680cf0920168b293beb5bd5f"
+  },
+  {
+    "file": "scholaris-ai-academy-logo (1).svg",
+    "bytes": 2226,
+    "sha256": "02b27ed7597c86cb016408f301f37842ea23bfc4543f762e179831f7302f2269"
+  },
+  {
+    "file": "programs (1).json",
+    "bytes": 4239,
+    "sha256": "3819df83d3fd13b524821b1093cbd0d7466305517198a695e71c9e2d69f44f95"
+  },
+  {
+    "file": "README (4).md",
+    "bytes": 1308,
+    "sha256": "4bc85e1313681af4f00dd5fd586ab265f0ad44df2a7b6602a452424ec0864e30"
+  },
+  {
+    "file": "Scholarion_conversation_record.md",
+    "bytes": 10361,
+    "sha256": "2210d9bd112c982e7301a6201ddcaeac42dd2d43fc450d9dc6c99649d73ed41c"
+  },
+  {
+    "file": "README (1).txt",
+    "bytes": 1093,
+    "sha256": "de399bd59d4c3334950cfaa9c4696fb7c2432c10c5d6bc4fd88d9eea203d06cb"
+  },
+  {
+    "file": "Pasted text(20261001-203023).txt",
+    "bytes": 20172,
+    "sha256": "592e25a5ce750211d528ffb7e865d9218f96d2d33f3c4a25ee74d13bdee0f1b6"
+  },
+  {
+    "file": "Pasted text(20261001-210419).txt",
+    "bytes": 172316,
+    "sha256": "185d20a91649b985437f2fd4d0d137771b2eb8003dfe0b6e69af83288121852e"
+  },
+  {
+    "file": "Pasted text(20261001-195120).txt",
+    "bytes": 19136,
+    "sha256": "8a3f9206d53bc359567a61082540e3a1cd7ba0fa1b0b67a19501bc9dd09d297a"
+  },
+  {
+    "file": "Pasted markdown(20261001-203254).md",
+    "bytes": 21438,
+    "sha256": "11d750cb03ae59184bf4440ffa401ba117f2cc24b458acd078627ffb7acd2c43"
+  },
+  {
+    "file": "Pasted text(20261001-204212).txt",
+    "bytes": 15109,
+    "sha256": "6451db435bfdd0c3a9b059f48f773df6dedad342edff7b0ab2153d23e52dc075"
+  },
+  {
+    "file": "Pasted text(20261001-203825).txt",
+    "bytes": 12855,
+    "sha256": "759483d7a37ea7f0e8304a48f2e73c7e729d749369b7383bcfed8866558c834c"
+  },
+  {
+    "file": "scholaris_ai_academy_site_v2.zip",
+    "bytes": 22012,
+    "sha256": "483891ed540399f402e562dbec5148d69f2e85cf1ef45a497580365f7605a0ad"
+  },
+  {
+    "file": "scholaris_ai_academy_site.zip",
+    "bytes": 12796,
+    "sha256": "1ca06524a5b9dac5c192207793e911f098dcd5b13401296a7e61d2737fd84b29"
+  },
+  {
+    "file": "scholarion_initial_v0_1.zip",
+    "bytes": 5760,
+    "sha256": "a762176e900f51738d26f8ff7be3eabb089758de8234fe39415b2e225a1e8415"
+  },
+  {
+    "file": "scholarion_v0_2.zip",
+    "bytes": 7549,
+    "sha256": "a3002b126bd30ca47390c4ad47f088174a2a08b3720e6fee9acdb9c6f10591ca"
+  },
+  {
+    "file": "scholarion_v0_3.zip",
+    "bytes": 10147,
+    "sha256": "29379fb1a8c1bc99e2d9e85afa4bd99910be2147272630d803f0f7cc006a1c5b"
+  },
+  {
+    "file": "scholarion_v0_4.zip",
+    "bytes": 22310,
+    "sha256": "d8f097e3264bc4da311d8013d6427e8dc76c4037b3a081316c505071d2d6cadb"
+  },
+  {
+    "file": "app (1).html",
+    "bytes": 9743,
+    "sha256": "8aa9a4d113783daee854366430325a856bec74727ccb85fa7c7a26e471a2173e"
+  },
+  {
+    "file": "faculty (1).html",
+    "bytes": 9235,
+    "sha256": "0231a715b7be4cbc948417e303e9b2e1190b67cbb50dc7f562c8ca1283c2e7e0"
+  },
+  {
+    "file": "admin (1).html",
+    "bytes": 9337,
+    "sha256": "e5e49539d9beb6261e8d26946f92d77f1d039d6e036ef00b47b94fbf60df2e0a"
+  },
+  {
+    "file": "login (1).html",
+    "bytes": 8044,
+    "sha256": "000f1d3afddba14414a4e9fa1e452aef5259de4236e647cd24e27e635fd3c366"
+  },
+  {
+    "file": "lms (1).html",
+    "bytes": 9758,
+    "sha256": "b23c64f40a34f9073882787cd500e9788ec763292d59eb72e06434c390d08241"
+  },
+  {
+    "file": "proctor (1).html",
+    "bytes": 5869,
+    "sha256": "ce0440eb7960df0e9ac50cb444cb21ee82d55cf0ec8814cac5ddb35a56bc986e"
+  },
+  {
+    "file": "proctor (5).html",
+    "bytes": 5869,
+    "sha256": "ce0440eb7960df0e9ac50cb444cb21ee82d55cf0ec8814cac5ddb35a56bc986e"
+  },
+  {
+    "file": "index (1) (1).html",
+    "bytes": 10014,
+    "sha256": "e8540dc0dbabad819446dd84e3a0ea17b035ce7b5cb973d6f86e5215cffd399f"
+  },
+  {
+    "file": "index (2) (1).html",
+    "bytes": 17104,
+    "sha256": "5a7994219a11c142c97a1d03051fac931600b92293c0fb1a4da384e14ed4b111"
+  },
+  {
+    "file": "index (3) (1).html",
+    "bytes": 17230,
+    "sha256": "14e8ba10ceb1680499b52e2a6d21a93982867c9fb03cabca0948a371cd0b37f4"
+  },
+  {
+    "file": "index (4) (1).html",
+    "bytes": 11798,
+    "sha256": "da9f02e0559eb2829d78320da3926b2b5751462cd8522c91720f192146328270"
+  }
+]

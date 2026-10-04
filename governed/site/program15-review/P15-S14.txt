@@ -1,0 +1,7 @@
+P15-S14 — Evaluate multi-hop retrieval
+Faculty-review draft.
+Outcome: Compare baseline retrieval with graph-assisted evidence traversal.
+Lab: Create a small synthetic relationship graph and labeled multi-hop questions.
+Assessment: Report evidence coverage and a case where added graph complexity does not help.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

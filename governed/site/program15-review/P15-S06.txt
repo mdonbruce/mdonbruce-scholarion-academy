@@ -1,0 +1,7 @@
+P15-S06 — Constrain the tool-using loop
+Faculty-review draft.
+Outcome: Bound tool permissions, retries and execution steps.
+Lab: Create a read-only synthetic inventory agent with typed tool inputs and an action budget.
+Assessment: Reject an unauthorized write and stop a repeated tool failure within the budget.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

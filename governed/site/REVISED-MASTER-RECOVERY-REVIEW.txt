@@ -1,0 +1,25 @@
+REVISED MASTER SPECIFICATION — SINGLE-ACADEMY DECISION AND RECOVERY
+Source: 59e47eef-529b-4a8d-b32c-c88e62804c91/Pasted text.txt
+
+User decision: Keep the single-Academy architecture. Scholarion Academy remains the learner brand. Ten-week courses remain unchanged. The new document's institutional tenancy, guest institutions, placement sync, tenant licensing, global identity broker, tenant-console provisioning and historical naming reversal are not adopted. No external institution data plane has been enabled.
+
+Comparison with existing build
+The revised document mainly replaces the former Academy-only boundary with multi-institution tenancy. Its LMS, records, catalog, commerce, credentials, AI, Cloud Lab, analytics and security requirements largely repeat the previous master. The existing MASTER-PLATFORM-RECONCILIATION.txt remains the baseline for those gaps. The new 11-step scenario cannot be accepted as written because provisioning and licensing institutional tenants conflict with the user's decision. No full-platform completion is claimed.
+
+Gap closed
+Operator CLI recovery.py makes an online consistent SQLite backup through SQLite's backup API, including committed WAL data. It records a SHA-256 checksum and table counts. The isolated drill creates a separate restored database, runs integrity and foreign-key checks and compares row counts. It never replaces the active database. Snapshots and restored copies stay under private-governed/recovery, excluded from release packages and static HTTP serving. No browser backup/restore mutation endpoint is exposed to instructors or learners.
+
+Application integration
+The authenticated capability API returns a limited last-successful-drill report: timestamps, integrity outcomes and elapsed time, without table names, learner data, filesystem paths or identity keys. Platform capabilities displays this evidence and its limits. An old successful drill is dated; it is not a claim about subsequent changes or a failed later attempt.
+
+Operator runbook (from site directory)
+python recovery.py backup
+python recovery.py drill --snapshot UUID_RETURNED_BY_BACKUP
+python recovery.py backup-and-drill
+An explicit --data directory can target an isolated test dataset. Keep recovery directories private. Do not upload them as release artifacts. Credentials, uploaded files and secrets are intentionally not included in the SQLite snapshot. Retention, encryption and off-site storage need an approved policy before deployment. No automatic pruning or live replacement is provided.
+
+Verification
+Four new tests cover live changes surviving the drill, snapshot tampering, traversal rejection and row-count mismatch. A drill against the current local pilot passed integrity/foreign keys/count comparison. Full regression result is recorded in RECOVERY-TEST-RESULT.txt. JavaScript syntax checked. This is not PostgreSQL point-in-time recovery, an externally anchored signature, a complete application restore or proof of production RPO/RTO.
+
+Still outstanding
+Canvas parity; authoritative enrollment and records projections; complete approved #1–#38 program definitions; sandbox commerce; signed interoperable credentials; Cloud Lab LTI and sandbox infrastructure; organization-account isolation; external model/SSO/email/video integrations; privacy lifecycle; managed keys; full accessibility/security acceptance; staging infrastructure and PostgreSQL/off-site recovery. Existing report and capability board retain those limitations. Local-only, no production deployment.

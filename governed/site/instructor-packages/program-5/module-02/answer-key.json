@@ -1,0 +1,47 @@
+[
+  {
+    "id": "P5M2Q1",
+    "prompt": "How should missing confidence be handled?",
+    "choices": [
+      "Flag it and send the record for review",
+      "Silently replace it with perfect confidence",
+      "Skip review and trust the output."
+    ],
+    "correct": 0,
+    "explanation": "Missing values and duplicates change metric denominators. Separate schema checks from business rules; reject malformed records visibly rather than silently converting them to ordinary inputs.",
+    "outcomes": [
+      "O1",
+      "O4"
+    ]
+  },
+  {
+    "id": "P5M2Q2",
+    "prompt": "Your team supporting a predictive service queue cannot reproduce a result. What next?",
+    "choices": [
+      "Publish because the report looks complete.",
+      "Reproduce the inputs, versions and checks before accepting the claim.",
+      "Remove failing examples."
+    ],
+    "correct": 1,
+    "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+    "outcomes": [
+      "O3",
+      "O5"
+    ]
+  },
+  {
+    "id": "P5M2Q3",
+    "prompt": "Which artifact best demonstrates inspect data quality?",
+    "choices": [
+      "Count invalid and missing values before selecting records for analysis. Include results and limitations.",
+      "A screenshot with no inputs or explanation.",
+      "An assertion of perfect accuracy."
+    ],
+    "correct": 0,
+    "explanation": "A concrete artifact and observed evidence support review.",
+    "outcomes": [
+      "O2",
+      "O5"
+    ]
+  }
+]

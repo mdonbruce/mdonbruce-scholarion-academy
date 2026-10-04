@@ -1,0 +1,2880 @@
+[
+  {
+    "program": 1,
+    "title": "Professional Certificate in Agentic AI Systems",
+    "brand": "Scholarion Academy",
+    "faculty": "Dr. Martins Donbruce Idahosa",
+    "facultyBio": null,
+    "state": "draft",
+    "weeks": 10,
+    "totalWeeks": 20,
+    "courses": [
+      {
+        "id": "P01-B1",
+        "title": "Agent foundations",
+        "weeks": 10,
+        "sequence": 1,
+        "modules": [
+          {
+            "week": 1,
+            "title": "Bound autonomy before building",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B1-W1-O1",
+                "competency": "C1",
+                "text": "Produce and explain an evidence artifact for: bound autonomy before building."
+              },
+              {
+                "id": "P1-B1-W1-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, bound autonomy before building. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 2,
+            "title": "Measure model cost and context",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B1-W2-O1",
+                "competency": "C2",
+                "text": "Produce and explain an evidence artifact for: measure model cost and context."
+              },
+              {
+                "id": "P1-B1-W2-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, measure model cost and context. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 3,
+            "title": "Specify instruction and output contracts",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B1-W3-O1",
+                "competency": "C3",
+                "text": "Produce and explain an evidence artifact for: specify instruction and output contracts."
+              },
+              {
+                "id": "P1-B1-W3-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, specify instruction and output contracts. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 4,
+            "title": "Make tools retry-safe",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B1-W4-O1",
+                "competency": "C4",
+                "text": "Produce and explain an evidence artifact for: make tools retry-safe."
+              },
+              {
+                "id": "P1-B1-W4-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, make tools retry-safe. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 5,
+            "title": "Retrieve from a traceable corpus",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B1-W5-O1",
+                "competency": "C5",
+                "text": "Produce and explain an evidence artifact for: retrieve from a traceable corpus."
+              },
+              {
+                "id": "P1-B1-W5-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, retrieve from a traceable corpus. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 6,
+            "title": "Route questions to supporting evidence",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B1-W6-O1",
+                "competency": "C1",
+                "text": "Produce and explain an evidence artifact for: route questions to supporting evidence."
+              },
+              {
+                "id": "P1-B1-W6-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, route questions to supporting evidence. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 7,
+            "title": "Compare bounded planning loops",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B1-W7-O1",
+                "competency": "C2",
+                "text": "Produce and explain an evidence artifact for: compare bounded planning loops."
+              },
+              {
+                "id": "P1-B1-W7-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, compare bounded planning loops. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 8,
+            "title": "Budget and expire agent memory",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B1-W8-O1",
+                "competency": "C3",
+                "text": "Produce and explain an evidence artifact for: budget and expire agent memory."
+              },
+              {
+                "id": "P1-B1-W8-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, budget and expire agent memory. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 9,
+            "title": "Reconcile two synthetic evidence sources",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B1-W9-O1",
+                "competency": "C4",
+                "text": "Produce and explain an evidence artifact for: reconcile two synthetic evidence sources."
+              },
+              {
+                "id": "P1-B1-W9-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, reconcile two synthetic evidence sources. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 10,
+            "title": "Defend the foundation build",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B1-W10-O1",
+                "competency": "C5",
+                "text": "Produce and explain an evidence artifact for: defend the foundation build."
+              },
+              {
+                "id": "P1-B1-W10-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, defend the foundation build. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          }
+        ],
+        "finalAssessment": "Midterm project and foundation exam"
+      },
+      {
+        "id": "P01-B2",
+        "title": "Production multi-agent systems",
+        "weeks": 10,
+        "sequence": 2,
+        "modules": [
+          {
+            "week": 1,
+            "title": "Route between small and hosted models",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B2-W1-O1",
+                "competency": "C1",
+                "text": "Produce and explain an evidence artifact for: route between small and hosted models."
+              },
+              {
+                "id": "P1-B2-W1-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, route between small and hosted models. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 2,
+            "title": "Coordinate workers and reviewers",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B2-W2-O1",
+                "competency": "C2",
+                "text": "Produce and explain an evidence artifact for: coordinate workers and reviewers."
+              },
+              {
+                "id": "P1-B2-W2-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, coordinate workers and reviewers. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 3,
+            "title": "Compare explicit orchestration patterns",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B2-W3-O1",
+                "competency": "C3",
+                "text": "Produce and explain an evidence artifact for: compare explicit orchestration patterns."
+              },
+              {
+                "id": "P1-B2-W3-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, compare explicit orchestration patterns. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 4,
+            "title": "Constrain protocol tools and identities",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B2-W4-O1",
+                "competency": "C4",
+                "text": "Produce and explain an evidence artifact for: constrain protocol tools and identities."
+              },
+              {
+                "id": "P1-B2-W4-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, constrain protocol tools and identities. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 5,
+            "title": "Review agent-assisted repository changes",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B2-W5-O1",
+                "competency": "C5",
+                "text": "Produce and explain an evidence artifact for: review agent-assisted repository changes."
+              },
+              {
+                "id": "P1-B2-W5-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, review agent-assisted repository changes. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 6,
+            "title": "Calibrate evaluation against human judgments",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B2-W6-O1",
+                "competency": "C1",
+                "text": "Produce and explain an evidence artifact for: calibrate evaluation against human judgments."
+              },
+              {
+                "id": "P1-B2-W6-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, calibrate evaluation against human judgments. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 7,
+            "title": "Trace failures and hostile inputs",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B2-W7-O1",
+                "competency": "C2",
+                "text": "Produce and explain an evidence artifact for: trace failures and hostile inputs."
+              },
+              {
+                "id": "P1-B2-W7-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, trace failures and hostile inputs. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 8,
+            "title": "Rehearse deploy and rollback",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B2-W8-O1",
+                "competency": "C3",
+                "text": "Produce and explain an evidence artifact for: rehearse deploy and rollback."
+              },
+              {
+                "id": "P1-B2-W8-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, rehearse deploy and rollback. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 9,
+            "title": "Audit a synthetic lending recommendation",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B2-W9-O1",
+                "competency": "C4",
+                "text": "Produce and explain an evidence artifact for: audit a synthetic lending recommendation."
+              },
+              {
+                "id": "P1-B2-W9-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, audit a synthetic lending recommendation. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 10,
+            "title": "Defend the multi-agent evidence package",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P1-B2-W10-O1",
+                "competency": "C5",
+                "text": "Produce and explain an evidence artifact for: defend the multi-agent evidence package."
+              },
+              {
+                "id": "P1-B2-W10-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, defend the multi-agent evidence package. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          }
+        ],
+        "finalAssessment": "Capstone defense"
+      }
+    ],
+    "modules": [
+      {
+        "week": 1,
+        "title": "Bound autonomy before building",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P1-B1-W1-O1",
+            "competency": "C1",
+            "text": "Produce and explain an evidence artifact for: bound autonomy before building."
+          },
+          {
+            "id": "P1-B1-W1-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, bound autonomy before building. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 2,
+        "title": "Measure model cost and context",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P1-B1-W2-O1",
+            "competency": "C2",
+            "text": "Produce and explain an evidence artifact for: measure model cost and context."
+          },
+          {
+            "id": "P1-B1-W2-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, measure model cost and context. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 3,
+        "title": "Specify instruction and output contracts",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P1-B1-W3-O1",
+            "competency": "C3",
+            "text": "Produce and explain an evidence artifact for: specify instruction and output contracts."
+          },
+          {
+            "id": "P1-B1-W3-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, specify instruction and output contracts. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 4,
+        "title": "Make tools retry-safe",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P1-B1-W4-O1",
+            "competency": "C4",
+            "text": "Produce and explain an evidence artifact for: make tools retry-safe."
+          },
+          {
+            "id": "P1-B1-W4-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, make tools retry-safe. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 5,
+        "title": "Retrieve from a traceable corpus",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P1-B1-W5-O1",
+            "competency": "C5",
+            "text": "Produce and explain an evidence artifact for: retrieve from a traceable corpus."
+          },
+          {
+            "id": "P1-B1-W5-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, retrieve from a traceable corpus. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 6,
+        "title": "Route questions to supporting evidence",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P1-B1-W6-O1",
+            "competency": "C1",
+            "text": "Produce and explain an evidence artifact for: route questions to supporting evidence."
+          },
+          {
+            "id": "P1-B1-W6-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, route questions to supporting evidence. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 7,
+        "title": "Compare bounded planning loops",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P1-B1-W7-O1",
+            "competency": "C2",
+            "text": "Produce and explain an evidence artifact for: compare bounded planning loops."
+          },
+          {
+            "id": "P1-B1-W7-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, compare bounded planning loops. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 8,
+        "title": "Budget and expire agent memory",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P1-B1-W8-O1",
+            "competency": "C3",
+            "text": "Produce and explain an evidence artifact for: budget and expire agent memory."
+          },
+          {
+            "id": "P1-B1-W8-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, budget and expire agent memory. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 9,
+        "title": "Reconcile two synthetic evidence sources",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P1-B1-W9-O1",
+            "competency": "C4",
+            "text": "Produce and explain an evidence artifact for: reconcile two synthetic evidence sources."
+          },
+          {
+            "id": "P1-B1-W9-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, reconcile two synthetic evidence sources. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 10,
+        "title": "Defend the foundation build",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P1-B1-W10-O1",
+            "competency": "C5",
+            "text": "Produce and explain an evidence artifact for: defend the foundation build."
+          },
+          {
+            "id": "P1-B1-W10-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, defend the foundation build. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      }
+    ],
+    "sessions": [],
+    "competencies": [
+      {
+        "id": "C1",
+        "text": "Justify bounded agent autonomy against a non-agent baseline."
+      },
+      {
+        "id": "C2",
+        "text": "Implement grounded retrieval and retry-safe tool contracts."
+      },
+      {
+        "id": "C3",
+        "text": "Compare planning, memory and multi-agent designs using test evidence."
+      },
+      {
+        "id": "C4",
+        "text": "Evaluate reliability, bias, permissions and human-review controls."
+      },
+      {
+        "id": "C5",
+        "text": "Defend a monitored system and a recoverable deployment plan."
+      }
+    ],
+    "projects": [
+      {
+        "title": "Two-source evidence reconciliation",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      },
+      {
+        "title": "Source-quality research brief",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      },
+      {
+        "title": "Synthetic credit-review recommendation dossier",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      }
+    ],
+    "capstone": "Synthetic credit-review recommendation dossier. Educational simulation only: synthetic applicant audit, protected-attribute bias tests, reason-code review and an explicit human-underwriter decision. Never make a final credit decision.",
+    "rubric": [
+      {
+        "criterion": "Problem and assumptions",
+        "points": 15
+      },
+      {
+        "criterion": "Artifact and reproducibility",
+        "points": 25
+      },
+      {
+        "criterion": "Evaluation evidence",
+        "points": 25
+      },
+      {
+        "criterion": "Human oversight and risk",
+        "points": 25
+      },
+      {
+        "criterion": "Defense and communication",
+        "points": 10
+      }
+    ],
+    "audience": "Python-capable builders",
+    "prerequisites": "Python required.",
+    "weeklyHours": [
+      8,
+      10
+    ],
+    "learningHours": [
+      160,
+      200
+    ],
+    "commercial": {
+      "fee": null,
+      "currency": null,
+      "startDate": null,
+      "deadline": null,
+      "timezone": null,
+      "installments": null,
+      "refundPolicy": null,
+      "advisorEmail": null,
+      "advisorPhone": null,
+      "mode": "sandbox",
+      "applicationsEnabled": false
+    },
+    "credential": {
+      "title": "Scholarion Academy Certificate of Completion",
+      "badge": "Professional Certificate in Agentic AI Systems",
+      "issuanceEnabled": false,
+      "ceu": false,
+      "perCourse": false,
+      "bundleBadge": false
+    },
+    "dependencyNotes": "Transfer and non-duplication mappings remain proposed; no automatic credit.",
+    "notes": "",
+    "publicationAllowed": false,
+    "gaps": [
+      "Complete original lessons, slide scripts and licensed readings",
+      "Executable starter and instructor notebooks with synthetic data cards",
+      "Validated quizzes, assignments and scoring policies",
+      "Confirmed tool versions and educational licenses",
+      "Faculty biography, delivery schedule and support capacity",
+      "Approved finance, completion and academic publication configuration"
+    ]
+  },
+  {
+    "program": 12,
+    "title": "Certificate in Designing & Building AI Products and Services",
+    "brand": "Scholarion Academy",
+    "faculty": "Dr. Martins Donbruce Idahosa",
+    "facultyBio": null,
+    "state": "draft",
+    "weeks": 10,
+    "totalWeeks": 10,
+    "courses": [
+      {
+        "id": "P12-B1",
+        "title": "AI product design",
+        "weeks": 10,
+        "sequence": 1,
+        "modules": [
+          {
+            "week": 1,
+            "title": "Frame a problem worth solving",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P12-B1-W1-O1",
+                "competency": "C1",
+                "text": "Produce and explain an evidence artifact for: frame a problem worth solving."
+              },
+              {
+                "id": "P12-B1-W1-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, frame a problem worth solving. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 2,
+            "title": "Choose a learning method for a product need",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P12-B1-W2-O1",
+                "competency": "C2",
+                "text": "Produce and explain an evidence artifact for: choose a learning method for a product need."
+              },
+              {
+                "id": "P12-B1-W2-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, choose a learning method for a product need. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 3,
+            "title": "Compare neural architectures and data demands",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P12-B1-W3-O1",
+                "competency": "C3",
+                "text": "Produce and explain an evidence artifact for: compare neural architectures and data demands."
+              },
+              {
+                "id": "P12-B1-W3-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, compare neural architectures and data demands. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 4,
+            "title": "Specify consent and provenance for generated media",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P12-B1-W4-O1",
+                "competency": "C4",
+                "text": "Produce and explain an evidence artifact for: specify consent and provenance for generated media."
+              },
+              {
+                "id": "P12-B1-W4-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, specify consent and provenance for generated media. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 5,
+            "title": "Prototype a grounded information assistant",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P12-B1-W5-O1",
+                "competency": "C5",
+                "text": "Produce and explain an evidence artifact for: prototype a grounded information assistant."
+              },
+              {
+                "id": "P12-B1-W5-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, prototype a grounded information assistant. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 6,
+            "title": "Choose an agent interaction pattern",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P12-B1-W6-O1",
+                "competency": "C1",
+                "text": "Produce and explain an evidence artifact for: choose an agent interaction pattern."
+              },
+              {
+                "id": "P12-B1-W6-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, choose an agent interaction pattern. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 7,
+            "title": "Storyboard control and error recovery",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P12-B1-W7-O1",
+                "competency": "C2",
+                "text": "Produce and explain an evidence artifact for: storyboard control and error recovery."
+              },
+              {
+                "id": "P12-B1-W7-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, storyboard control and error recovery. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 8,
+            "title": "Design a human and machine operating model",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P12-B1-W8-O1",
+                "competency": "C3",
+                "text": "Produce and explain an evidence artifact for: design a human and machine operating model."
+              },
+              {
+                "id": "P12-B1-W8-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, design a human and machine operating model. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 9,
+            "title": "Test economics and societal risk assumptions",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P12-B1-W9-O1",
+                "competency": "C4",
+                "text": "Produce and explain an evidence artifact for: test economics and societal risk assumptions."
+              },
+              {
+                "id": "P12-B1-W9-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, test economics and societal risk assumptions. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 10,
+            "title": "Pitch a responsible product proposal",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P12-B1-W10-O1",
+                "competency": "C5",
+                "text": "Produce and explain an evidence artifact for: pitch a responsible product proposal."
+              },
+              {
+                "id": "P12-B1-W10-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, pitch a responsible product proposal. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          }
+        ],
+        "finalAssessment": "Capstone defense"
+      }
+    ],
+    "modules": [
+      {
+        "week": 1,
+        "title": "Frame a problem worth solving",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P12-B1-W1-O1",
+            "competency": "C1",
+            "text": "Produce and explain an evidence artifact for: frame a problem worth solving."
+          },
+          {
+            "id": "P12-B1-W1-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, frame a problem worth solving. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 2,
+        "title": "Choose a learning method for a product need",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P12-B1-W2-O1",
+            "competency": "C2",
+            "text": "Produce and explain an evidence artifact for: choose a learning method for a product need."
+          },
+          {
+            "id": "P12-B1-W2-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, choose a learning method for a product need. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 3,
+        "title": "Compare neural architectures and data demands",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P12-B1-W3-O1",
+            "competency": "C3",
+            "text": "Produce and explain an evidence artifact for: compare neural architectures and data demands."
+          },
+          {
+            "id": "P12-B1-W3-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, compare neural architectures and data demands. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 4,
+        "title": "Specify consent and provenance for generated media",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P12-B1-W4-O1",
+            "competency": "C4",
+            "text": "Produce and explain an evidence artifact for: specify consent and provenance for generated media."
+          },
+          {
+            "id": "P12-B1-W4-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, specify consent and provenance for generated media. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 5,
+        "title": "Prototype a grounded information assistant",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P12-B1-W5-O1",
+            "competency": "C5",
+            "text": "Produce and explain an evidence artifact for: prototype a grounded information assistant."
+          },
+          {
+            "id": "P12-B1-W5-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, prototype a grounded information assistant. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 6,
+        "title": "Choose an agent interaction pattern",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P12-B1-W6-O1",
+            "competency": "C1",
+            "text": "Produce and explain an evidence artifact for: choose an agent interaction pattern."
+          },
+          {
+            "id": "P12-B1-W6-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, choose an agent interaction pattern. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 7,
+        "title": "Storyboard control and error recovery",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P12-B1-W7-O1",
+            "competency": "C2",
+            "text": "Produce and explain an evidence artifact for: storyboard control and error recovery."
+          },
+          {
+            "id": "P12-B1-W7-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, storyboard control and error recovery. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 8,
+        "title": "Design a human and machine operating model",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P12-B1-W8-O1",
+            "competency": "C3",
+            "text": "Produce and explain an evidence artifact for: design a human and machine operating model."
+          },
+          {
+            "id": "P12-B1-W8-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, design a human and machine operating model. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 9,
+        "title": "Test economics and societal risk assumptions",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P12-B1-W9-O1",
+            "competency": "C4",
+            "text": "Produce and explain an evidence artifact for: test economics and societal risk assumptions."
+          },
+          {
+            "id": "P12-B1-W9-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, test economics and societal risk assumptions. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 10,
+        "title": "Pitch a responsible product proposal",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P12-B1-W10-O1",
+            "competency": "C5",
+            "text": "Produce and explain an evidence artifact for: pitch a responsible product proposal."
+          },
+          {
+            "id": "P12-B1-W10-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, pitch a responsible product proposal. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      }
+    ],
+    "sessions": [],
+    "competencies": [
+      {
+        "id": "C1",
+        "text": "Match learning methods and neural architectures to a justified product problem."
+      },
+      {
+        "id": "C2",
+        "text": "Validate data, cost and technical assumptions in a product design."
+      },
+      {
+        "id": "C3",
+        "text": "Assess retrieval and tool-using agents for fit and failure risk."
+      },
+      {
+        "id": "C4",
+        "text": "Design accessible human oversight and error recovery."
+      },
+      {
+        "id": "C5",
+        "text": "Pitch an evidence-based business case and implementation roadmap."
+      }
+    ],
+    "projects": [
+      {
+        "title": "Grounded assistant concept",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      },
+      {
+        "title": "Human oversight storyboard",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      },
+      {
+        "title": "Opportunity evidence map",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      },
+      {
+        "title": "Product brief and stakeholder pitch",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      }
+    ],
+    "capstone": "Product brief and stakeholder pitch.",
+    "rubric": [
+      {
+        "criterion": "Problem and assumptions",
+        "points": 15
+      },
+      {
+        "criterion": "Artifact and reproducibility",
+        "points": 25
+      },
+      {
+        "criterion": "Evaluation evidence",
+        "points": 25
+      },
+      {
+        "criterion": "Human oversight and risk",
+        "points": 25
+      },
+      {
+        "criterion": "Defense and communication",
+        "points": 10
+      }
+    ],
+    "audience": "Product managers and innovation leads",
+    "prerequisites": "No coding background required.",
+    "weeklyHours": [
+      6,
+      6
+    ],
+    "learningHours": [
+      60,
+      60
+    ],
+    "commercial": {
+      "fee": null,
+      "currency": null,
+      "startDate": null,
+      "deadline": null,
+      "timezone": null,
+      "installments": null,
+      "refundPolicy": null,
+      "advisorEmail": null,
+      "advisorPhone": null,
+      "mode": "sandbox",
+      "applicationsEnabled": false
+    },
+    "credential": {
+      "title": "Scholarion Academy Certificate of Completion",
+      "badge": "Certificate in Designing & Building AI Products and Services",
+      "issuanceEnabled": false,
+      "ceu": false,
+      "perCourse": false,
+      "bundleBadge": false
+    },
+    "dependencyNotes": "Transfer and non-duplication mappings remain proposed; no automatic credit.",
+    "notes": "",
+    "publicationAllowed": false,
+    "gaps": [
+      "Complete original lessons, slide scripts and licensed readings",
+      "Executable starter and instructor notebooks with synthetic data cards",
+      "Validated quizzes, assignments and scoring policies",
+      "Confirmed tool versions and educational licenses",
+      "Faculty biography, delivery schedule and support capacity",
+      "Approved finance, completion and academic publication configuration"
+    ]
+  },
+  {
+    "program": 13,
+    "title": "Applied AI Leadership Bundle: Generative and Agentic AI for Organizational Transformation",
+    "brand": "Scholarion Academy",
+    "faculty": "Dr. Martins Donbruce Idahosa",
+    "facultyBio": null,
+    "state": "draft",
+    "weeks": 10,
+    "totalWeeks": 20,
+    "courses": [
+      {
+        "id": "P13-B1",
+        "title": "Generative AI leadership",
+        "weeks": 10,
+        "sequence": 1,
+        "modules": [
+          {
+            "week": 1,
+            "title": "Set a leadership learning agenda",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B1-W1-O1",
+                "competency": "C1",
+                "text": "Produce and explain an evidence artifact for: set a leadership learning agenda."
+              },
+              {
+                "id": "P13-B1-W1-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, set a leadership learning agenda. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 2,
+            "title": "Challenge claims about generative systems",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B1-W2-O1",
+                "competency": "C2",
+                "text": "Produce and explain an evidence artifact for: challenge claims about generative systems."
+              },
+              {
+                "id": "P13-B1-W2-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, challenge claims about generative systems. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 3,
+            "title": "Build a privacy-aware prompt playbook",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B1-W3-O1",
+                "competency": "C3",
+                "text": "Produce and explain an evidence artifact for: build a privacy-aware prompt playbook."
+              },
+              {
+                "id": "P13-B1-W3-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, build a privacy-aware prompt playbook. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 4,
+            "title": "Map opportunities across business functions",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B1-W4-O1",
+                "competency": "C4",
+                "text": "Produce and explain an evidence artifact for: map opportunities across business functions."
+              },
+              {
+                "id": "P13-B1-W4-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, map opportunities across business functions. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 5,
+            "title": "Draft accountable AI-use rules",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B1-W5-O1",
+                "competency": "C5",
+                "text": "Produce and explain an evidence artifact for: draft accountable ai-use rules."
+              },
+              {
+                "id": "P13-B1-W5-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, draft accountable ai-use rules. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 6,
+            "title": "Assess readiness and workforce support",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B1-W6-O1",
+                "competency": "C1",
+                "text": "Produce and explain an evidence artifact for: assess readiness and workforce support."
+              },
+              {
+                "id": "P13-B1-W6-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, assess readiness and workforce support. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 7,
+            "title": "Compare augmentation and task redesign",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B1-W7-O1",
+                "competency": "C2",
+                "text": "Produce and explain an evidence artifact for: compare augmentation and task redesign."
+              },
+              {
+                "id": "P13-B1-W7-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, compare augmentation and task redesign. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 8,
+            "title": "Prioritize opportunities with evidence",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B1-W8-O1",
+                "competency": "C3",
+                "text": "Produce and explain an evidence artifact for: prioritize opportunities with evidence."
+              },
+              {
+                "id": "P13-B1-W8-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, prioritize opportunities with evidence. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 9,
+            "title": "Assign owners and measurable milestones",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B1-W9-O1",
+                "competency": "C4",
+                "text": "Produce and explain an evidence artifact for: assign owners and measurable milestones."
+              },
+              {
+                "id": "P13-B1-W9-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, assign owners and measurable milestones. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 10,
+            "title": "Defend an organizational AI strategy",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B1-W10-O1",
+                "competency": "C5",
+                "text": "Produce and explain an evidence artifact for: defend an organizational ai strategy."
+              },
+              {
+                "id": "P13-B1-W10-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, defend an organizational ai strategy. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          }
+        ],
+        "finalAssessment": "Course project defense"
+      },
+      {
+        "id": "P13-B2",
+        "title": "Agentic AI leadership",
+        "weeks": 10,
+        "sequence": 2,
+        "modules": [
+          {
+            "week": 1,
+            "title": "Estimate agent value and total cost",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B2-W1-O1",
+                "competency": "C1",
+                "text": "Produce and explain an evidence artifact for: estimate agent value and total cost."
+              },
+              {
+                "id": "P13-B2-W1-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, estimate agent value and total cost. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 2,
+            "title": "Compare platforms through a sandbox prototype",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B2-W2-O1",
+                "competency": "C2",
+                "text": "Produce and explain an evidence artifact for: compare platforms through a sandbox prototype."
+              },
+              {
+                "id": "P13-B2-W2-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, compare platforms through a sandbox prototype. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 3,
+            "title": "Map enterprise interfaces and approvals",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B2-W3-O1",
+                "competency": "C3",
+                "text": "Produce and explain an evidence artifact for: map enterprise interfaces and approvals."
+              },
+              {
+                "id": "P13-B2-W3-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, map enterprise interfaces and approvals. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 4,
+            "title": "Prepare an agent incident response exercise",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B2-W4-O1",
+                "competency": "C4",
+                "text": "Produce and explain an evidence artifact for: prepare an agent incident response exercise."
+              },
+              {
+                "id": "P13-B2-W4-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, prepare an agent incident response exercise. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 5,
+            "title": "Select business-function agent patterns",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B2-W5-O1",
+                "competency": "C5",
+                "text": "Produce and explain an evidence artifact for: select business-function agent patterns."
+              },
+              {
+                "id": "P13-B2-W5-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, select business-function agent patterns. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 6,
+            "title": "Specify a measurable pilot",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B2-W6-O1",
+                "competency": "C1",
+                "text": "Produce and explain an evidence artifact for: specify a measurable pilot."
+              },
+              {
+                "id": "P13-B2-W6-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, specify a measurable pilot. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 7,
+            "title": "Test safety and operational boundaries",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B2-W7-O1",
+                "competency": "C2",
+                "text": "Produce and explain an evidence artifact for: test safety and operational boundaries."
+              },
+              {
+                "id": "P13-B2-W7-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, test safety and operational boundaries. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 8,
+            "title": "Design an accountable governance review",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B2-W8-O1",
+                "competency": "C3",
+                "text": "Produce and explain an evidence artifact for: design an accountable governance review."
+              },
+              {
+                "id": "P13-B2-W8-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, design an accountable governance review. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 9,
+            "title": "Plan adoption and evaluate value",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B2-W9-O1",
+                "competency": "C4",
+                "text": "Produce and explain an evidence artifact for: plan adoption and evaluate value."
+              },
+              {
+                "id": "P13-B2-W9-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, plan adoption and evaluate value. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 10,
+            "title": "Defend responsible agent adoption",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P13-B2-W10-O1",
+                "competency": "C5",
+                "text": "Produce and explain an evidence artifact for: defend responsible agent adoption."
+              },
+              {
+                "id": "P13-B2-W10-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, defend responsible agent adoption. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          }
+        ],
+        "finalAssessment": "Capstone defense"
+      }
+    ],
+    "modules": [
+      {
+        "week": 1,
+        "title": "Set a leadership learning agenda",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P13-B1-W1-O1",
+            "competency": "C1",
+            "text": "Produce and explain an evidence artifact for: set a leadership learning agenda."
+          },
+          {
+            "id": "P13-B1-W1-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, set a leadership learning agenda. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 2,
+        "title": "Challenge claims about generative systems",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P13-B1-W2-O1",
+            "competency": "C2",
+            "text": "Produce and explain an evidence artifact for: challenge claims about generative systems."
+          },
+          {
+            "id": "P13-B1-W2-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, challenge claims about generative systems. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 3,
+        "title": "Build a privacy-aware prompt playbook",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P13-B1-W3-O1",
+            "competency": "C3",
+            "text": "Produce and explain an evidence artifact for: build a privacy-aware prompt playbook."
+          },
+          {
+            "id": "P13-B1-W3-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, build a privacy-aware prompt playbook. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 4,
+        "title": "Map opportunities across business functions",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P13-B1-W4-O1",
+            "competency": "C4",
+            "text": "Produce and explain an evidence artifact for: map opportunities across business functions."
+          },
+          {
+            "id": "P13-B1-W4-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, map opportunities across business functions. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 5,
+        "title": "Draft accountable AI-use rules",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P13-B1-W5-O1",
+            "competency": "C5",
+            "text": "Produce and explain an evidence artifact for: draft accountable ai-use rules."
+          },
+          {
+            "id": "P13-B1-W5-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, draft accountable ai-use rules. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 6,
+        "title": "Assess readiness and workforce support",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P13-B1-W6-O1",
+            "competency": "C1",
+            "text": "Produce and explain an evidence artifact for: assess readiness and workforce support."
+          },
+          {
+            "id": "P13-B1-W6-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, assess readiness and workforce support. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 7,
+        "title": "Compare augmentation and task redesign",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P13-B1-W7-O1",
+            "competency": "C2",
+            "text": "Produce and explain an evidence artifact for: compare augmentation and task redesign."
+          },
+          {
+            "id": "P13-B1-W7-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, compare augmentation and task redesign. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 8,
+        "title": "Prioritize opportunities with evidence",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P13-B1-W8-O1",
+            "competency": "C3",
+            "text": "Produce and explain an evidence artifact for: prioritize opportunities with evidence."
+          },
+          {
+            "id": "P13-B1-W8-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, prioritize opportunities with evidence. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 9,
+        "title": "Assign owners and measurable milestones",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P13-B1-W9-O1",
+            "competency": "C4",
+            "text": "Produce and explain an evidence artifact for: assign owners and measurable milestones."
+          },
+          {
+            "id": "P13-B1-W9-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, assign owners and measurable milestones. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 10,
+        "title": "Defend an organizational AI strategy",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P13-B1-W10-O1",
+            "competency": "C5",
+            "text": "Produce and explain an evidence artifact for: defend an organizational ai strategy."
+          },
+          {
+            "id": "P13-B1-W10-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, defend an organizational ai strategy. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      }
+    ],
+    "sessions": [],
+    "competencies": [
+      {
+        "id": "C1",
+        "text": "Prioritize organizational opportunities using value, effort and risk evidence."
+      },
+      {
+        "id": "C2",
+        "text": "Design privacy-aware generative workflows and responsible AI-use rules."
+      },
+      {
+        "id": "C3",
+        "text": "Evaluate agent platforms, integrations and operating costs."
+      },
+      {
+        "id": "C4",
+        "text": "Specify governance, incident response and measurable pilot controls."
+      },
+      {
+        "id": "C5",
+        "text": "Defend an adoption roadmap with owners, metrics and human accountability."
+      }
+    ],
+    "projects": [
+      {
+        "title": "Private prompt playbook",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      },
+      {
+        "title": "Organizational opportunity portfolio",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      },
+      {
+        "title": "AI strategy presentation",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      },
+      {
+        "title": "Agent adoption and governance plan",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      }
+    ],
+    "capstone": "Agent adoption and governance plan.",
+    "rubric": [
+      {
+        "criterion": "Problem and assumptions",
+        "points": 15
+      },
+      {
+        "criterion": "Artifact and reproducibility",
+        "points": 25
+      },
+      {
+        "criterion": "Evaluation evidence",
+        "points": 25
+      },
+      {
+        "criterion": "Human oversight and risk",
+        "points": 25
+      },
+      {
+        "criterion": "Defense and communication",
+        "points": 10
+      }
+    ],
+    "audience": "Organizational leaders and managers",
+    "prerequisites": "No coding background required.",
+    "weeklyHours": null,
+    "learningHours": null,
+    "commercial": {
+      "fee": null,
+      "currency": null,
+      "startDate": null,
+      "deadline": null,
+      "timezone": null,
+      "installments": null,
+      "refundPolicy": null,
+      "advisorEmail": null,
+      "advisorPhone": null,
+      "mode": "sandbox",
+      "applicationsEnabled": false
+    },
+    "credential": {
+      "title": "Scholarion Academy Certificate of Completion",
+      "badge": "Applied AI Leadership Bundle: Generative and Agentic AI for Organizational Transformation",
+      "issuanceEnabled": false,
+      "ceu": false,
+      "perCourse": true,
+      "bundleBadge": true
+    },
+    "dependencyNotes": "Retain #9; proposed mapping from #13 course 2 requires academic approval. No automatic credit and no retirement.",
+    "notes": "",
+    "publicationAllowed": false,
+    "gaps": [
+      "Complete original lessons, slide scripts and licensed readings",
+      "Executable starter and instructor notebooks with synthetic data cards",
+      "Validated quizzes, assignments and scoring policies",
+      "Confirmed tool versions and educational licenses",
+      "Faculty biography, delivery schedule and support capacity",
+      "Approved finance, completion and academic publication configuration"
+    ]
+  },
+  {
+    "program": 14,
+    "title": "Certificate in Applied Agentic AI: Systems, Design & Impact",
+    "brand": "Scholarion Academy",
+    "faculty": "Dr. Martins Donbruce Idahosa",
+    "facultyBio": null,
+    "state": "draft",
+    "weeks": 10,
+    "totalWeeks": 20,
+    "courses": [
+      {
+        "id": "P14-B1",
+        "title": "Applied agent foundations",
+        "weeks": 10,
+        "sequence": 1,
+        "modules": [
+          {
+            "week": 1,
+            "title": "Choose a bounded applied-agent problem",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B1-W1-O1",
+                "competency": "C1",
+                "text": "Produce and explain an evidence artifact for: choose a bounded applied-agent problem."
+              },
+              {
+                "id": "P14-B1-W1-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, choose a bounded applied-agent problem. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 2,
+            "title": "Model autonomy and stopping conditions",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B1-W2-O1",
+                "competency": "C2",
+                "text": "Produce and explain an evidence artifact for: model autonomy and stopping conditions."
+              },
+              {
+                "id": "P14-B1-W2-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, model autonomy and stopping conditions. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 3,
+            "title": "Build a structured generation baseline",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B1-W3-O1",
+                "competency": "C3",
+                "text": "Produce and explain an evidence artifact for: build a structured generation baseline."
+              },
+              {
+                "id": "P14-B1-W3-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, build a structured generation baseline. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 4,
+            "title": "Compare plans against observable evidence",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B1-W4-O1",
+                "competency": "C4",
+                "text": "Produce and explain an evidence artifact for: compare plans against observable evidence."
+              },
+              {
+                "id": "P14-B1-W4-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, compare plans against observable evidence. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 5,
+            "title": "Coordinate specialist workers",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B1-W5-O1",
+                "competency": "C5",
+                "text": "Produce and explain an evidence artifact for: coordinate specialist workers."
+              },
+              {
+                "id": "P14-B1-W5-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, coordinate specialist workers. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 6,
+            "title": "Connect a recoverable workflow",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B1-W6-O1",
+                "competency": "C1",
+                "text": "Produce and explain an evidence artifact for: connect a recoverable workflow."
+              },
+              {
+                "id": "P14-B1-W6-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, connect a recoverable workflow. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 7,
+            "title": "Review a synthetic report with citations",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B1-W7-O1",
+                "competency": "C2",
+                "text": "Produce and explain an evidence artifact for: review a synthetic report with citations."
+              },
+              {
+                "id": "P14-B1-W7-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, review a synthetic report with citations. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 8,
+            "title": "Expose a scoped database tool",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B1-W8-O1",
+                "competency": "C3",
+                "text": "Produce and explain an evidence artifact for: expose a scoped database tool."
+              },
+              {
+                "id": "P14-B1-W8-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, expose a scoped database tool. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 9,
+            "title": "Test tool-protocol denial cases",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B1-W9-O1",
+                "competency": "C4",
+                "text": "Produce and explain an evidence artifact for: test tool-protocol denial cases."
+              },
+              {
+                "id": "P14-B1-W9-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, test tool-protocol denial cases. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 10,
+            "title": "Defend an integrated midterm prototype",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B1-W10-O1",
+                "competency": "C5",
+                "text": "Produce and explain an evidence artifact for: defend an integrated midterm prototype."
+              },
+              {
+                "id": "P14-B1-W10-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, defend an integrated midterm prototype. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          }
+        ],
+        "finalAssessment": "Course project defense"
+      },
+      {
+        "id": "P14-B2",
+        "title": "Applied agent delivery",
+        "weeks": 10,
+        "sequence": 2,
+        "modules": [
+          {
+            "week": 1,
+            "title": "Route retrieval across data sources",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B2-W1-O1",
+                "competency": "C1",
+                "text": "Produce and explain an evidence artifact for: route retrieval across data sources."
+              },
+              {
+                "id": "P14-B2-W1-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, route retrieval across data sources. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 2,
+            "title": "Measure grounding and trace quality",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B2-W2-O1",
+                "competency": "C2",
+                "text": "Produce and explain an evidence artifact for: measure grounding and trace quality."
+              },
+              {
+                "id": "P14-B2-W2-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, measure grounding and trace quality. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 3,
+            "title": "Estimate product value under uncertainty",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B2-W3-O1",
+                "competency": "C3",
+                "text": "Produce and explain an evidence artifact for: estimate product value under uncertainty."
+              },
+              {
+                "id": "P14-B2-W3-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, estimate product value under uncertainty. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 4,
+            "title": "Design transparent approval interfaces",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B2-W4-O1",
+                "competency": "C4",
+                "text": "Produce and explain an evidence artifact for: design transparent approval interfaces."
+              },
+              {
+                "id": "P14-B2-W4-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, design transparent approval interfaces. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 5,
+            "title": "Build a test-first delivery pipeline",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B2-W5-O1",
+                "competency": "C5",
+                "text": "Produce and explain an evidence artifact for: build a test-first delivery pipeline."
+              },
+              {
+                "id": "P14-B2-W5-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, build a test-first delivery pipeline. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 6,
+            "title": "Compare deployment options and costs",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B2-W6-O1",
+                "competency": "C1",
+                "text": "Produce and explain an evidence artifact for: compare deployment options and costs."
+              },
+              {
+                "id": "P14-B2-W6-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, compare deployment options and costs. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 7,
+            "title": "Rehearse a cloud deployment design",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B2-W7-O1",
+                "competency": "C2",
+                "text": "Produce and explain an evidence artifact for: rehearse a cloud deployment design."
+              },
+              {
+                "id": "P14-B2-W7-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, rehearse a cloud deployment design. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 8,
+            "title": "Assemble a traceable project portfolio",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B2-W8-O1",
+                "competency": "C3",
+                "text": "Produce and explain an evidence artifact for: assemble a traceable project portfolio."
+              },
+              {
+                "id": "P14-B2-W8-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, assemble a traceable project portfolio. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 9,
+            "title": "Validate product and governance assumptions",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B2-W9-O1",
+                "competency": "C4",
+                "text": "Produce and explain an evidence artifact for: validate product and governance assumptions."
+              },
+              {
+                "id": "P14-B2-W9-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, validate product and governance assumptions. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          },
+          {
+            "week": 10,
+            "title": "Present the prototype and strategy defense",
+            "status": "draft activity brief; full materials pending",
+            "outcomes": [
+              {
+                "id": "P14-B2-W10-O1",
+                "competency": "C5",
+                "text": "Produce and explain an evidence artifact for: present the prototype and strategy defense."
+              },
+              {
+                "id": "P14-B2-W10-O2",
+                "competency": "C4",
+                "text": "Test a failure assumption and identify the accountable human decision."
+              }
+            ],
+            "activity": {
+              "student": "Using a fictional Academy service, present the prototype and strategy defense. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+              "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+            }
+          }
+        ],
+        "finalAssessment": "Capstone defense"
+      }
+    ],
+    "modules": [
+      {
+        "week": 1,
+        "title": "Choose a bounded applied-agent problem",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P14-B1-W1-O1",
+            "competency": "C1",
+            "text": "Produce and explain an evidence artifact for: choose a bounded applied-agent problem."
+          },
+          {
+            "id": "P14-B1-W1-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, choose a bounded applied-agent problem. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 2,
+        "title": "Model autonomy and stopping conditions",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P14-B1-W2-O1",
+            "competency": "C2",
+            "text": "Produce and explain an evidence artifact for: model autonomy and stopping conditions."
+          },
+          {
+            "id": "P14-B1-W2-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, model autonomy and stopping conditions. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 3,
+        "title": "Build a structured generation baseline",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P14-B1-W3-O1",
+            "competency": "C3",
+            "text": "Produce and explain an evidence artifact for: build a structured generation baseline."
+          },
+          {
+            "id": "P14-B1-W3-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, build a structured generation baseline. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 4,
+        "title": "Compare plans against observable evidence",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P14-B1-W4-O1",
+            "competency": "C4",
+            "text": "Produce and explain an evidence artifact for: compare plans against observable evidence."
+          },
+          {
+            "id": "P14-B1-W4-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, compare plans against observable evidence. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 5,
+        "title": "Coordinate specialist workers",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P14-B1-W5-O1",
+            "competency": "C5",
+            "text": "Produce and explain an evidence artifact for: coordinate specialist workers."
+          },
+          {
+            "id": "P14-B1-W5-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, coordinate specialist workers. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 6,
+        "title": "Connect a recoverable workflow",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P14-B1-W6-O1",
+            "competency": "C1",
+            "text": "Produce and explain an evidence artifact for: connect a recoverable workflow."
+          },
+          {
+            "id": "P14-B1-W6-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, connect a recoverable workflow. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 7,
+        "title": "Review a synthetic report with citations",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P14-B1-W7-O1",
+            "competency": "C2",
+            "text": "Produce and explain an evidence artifact for: review a synthetic report with citations."
+          },
+          {
+            "id": "P14-B1-W7-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, review a synthetic report with citations. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 8,
+        "title": "Expose a scoped database tool",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P14-B1-W8-O1",
+            "competency": "C3",
+            "text": "Produce and explain an evidence artifact for: expose a scoped database tool."
+          },
+          {
+            "id": "P14-B1-W8-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, expose a scoped database tool. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 9,
+        "title": "Test tool-protocol denial cases",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P14-B1-W9-O1",
+            "competency": "C4",
+            "text": "Produce and explain an evidence artifact for: test tool-protocol denial cases."
+          },
+          {
+            "id": "P14-B1-W9-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, test tool-protocol denial cases. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      },
+      {
+        "week": 10,
+        "title": "Defend an integrated midterm prototype",
+        "status": "draft activity brief; full materials pending",
+        "outcomes": [
+          {
+            "id": "P14-B1-W10-O1",
+            "competency": "C5",
+            "text": "Produce and explain an evidence artifact for: defend an integrated midterm prototype."
+          },
+          {
+            "id": "P14-B1-W10-O2",
+            "competency": "C4",
+            "text": "Test a failure assumption and identify the accountable human decision."
+          }
+        ],
+        "activity": {
+          "student": "Using a fictional Academy service, defend an integrated midterm prototype. Submit the artifact, assumptions, one failure example and a short limitations note. Do not use personal or customer records.",
+          "instructor": "Compare the artifact with its stated requirements; inspect evidence and failure handling, then provide feedback without replacing the learner work. Detailed solution pending."
+        }
+      }
+    ],
+    "sessions": [],
+    "competencies": [
+      {
+        "id": "C1",
+        "text": "Build a bounded multi-agent prototype from explicit requirements."
+      },
+      {
+        "id": "C2",
+        "text": "Integrate retrieval and scoped protocol tools using synthetic data."
+      },
+      {
+        "id": "C3",
+        "text": "Evaluate grounding, trace quality and operational failures."
+      },
+      {
+        "id": "C4",
+        "text": "Design transparent agent interfaces and a reproducible delivery process."
+      },
+      {
+        "id": "C5",
+        "text": "Defend a portfolio and product strategy with measured limitations."
+      }
+    ],
+    "projects": [
+      {
+        "title": "Synthetic report consistency reviewer",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      },
+      {
+        "title": "Evidence-routing assistant",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      },
+      {
+        "title": "Document retrieval workbench",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      },
+      {
+        "title": "Notes-to-actions approval workflow",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      },
+      {
+        "title": "Scoped data and ticket tool",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      },
+      {
+        "title": "Support-routing team simulation",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      },
+      {
+        "title": "Agent trace comparison dashboard",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      },
+      {
+        "title": "Product strategy and working prototype defense",
+        "status": "design brief",
+        "data": "Synthetic or licensed data only; a reviewed data card is required."
+      }
+    ],
+    "capstone": "Product strategy and working prototype defense.",
+    "rubric": [
+      {
+        "criterion": "Problem and assumptions",
+        "points": 15
+      },
+      {
+        "criterion": "Artifact and reproducibility",
+        "points": 25
+      },
+      {
+        "criterion": "Evaluation evidence",
+        "points": 25
+      },
+      {
+        "criterion": "Human oversight and risk",
+        "points": 25
+      },
+      {
+        "criterion": "Defense and communication",
+        "points": 10
+      }
+    ],
+    "audience": "Python-capable builders",
+    "prerequisites": "Programming fundamentals required; work experience preferred, not mandatory.",
+    "weeklyHours": [
+      8,
+      8
+    ],
+    "learningHours": [
+      160,
+      160
+    ],
+    "commercial": {
+      "fee": null,
+      "currency": null,
+      "startDate": null,
+      "deadline": null,
+      "timezone": null,
+      "installments": null,
+      "refundPolicy": null,
+      "advisorEmail": null,
+      "advisorPhone": null,
+      "mode": "sandbox",
+      "applicationsEnabled": false
+    },
+    "credential": {
+      "title": "Scholarion Academy Certificate of Completion",
+      "badge": "Certificate in Applied Agentic AI: Systems, Design & Impact",
+      "issuanceEnabled": false,
+      "ceu": false,
+      "perCourse": false,
+      "bundleBadge": false
+    },
+    "dependencyNotes": "Transfer and non-duplication mappings remain proposed; no automatic credit.",
+    "notes": "",
+    "publicationAllowed": false,
+    "gaps": [
+      "Complete original lessons, slide scripts and licensed readings",
+      "Executable starter and instructor notebooks with synthetic data cards",
+      "Validated quizzes, assignments and scoring policies",
+      "Confirmed tool versions and educational licenses",
+      "Faculty biography, delivery schedule and support capacity",
+      "Approved finance, completion and academic publication configuration"
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+Scholarion Academy: accounts and live classroom
+
+Open http://127.0.0.1:4180/#workspace-session
+First Super Admin setup: read private-governed/account-bootstrap.txt locally,
+enter its code in First Super Admin setup, choose a username/password, and add
+the displayed TOTP setup key to an authenticator app. Enter its six-digit code.
+The bootstrap code cannot create a second administrator. No default password.
+
+Super Admins create 24-hour one-time invitations for employees or other admins.
+Students may self-register but receive no courses automatically. Super Admins
+assign existing course codes to accounts. Employees receive instructor access
+only for assigned courses. Super Admin membership does not expose every course.
+Existing pilot tokens stop working once the first Super Admin completes 2FA.
+
+Passwords use salted scrypt. Authenticator secrets are encrypted using Fernet;
+protect the private-governed directory, including account-encryption.key.
+Sessions are random, stored as hashes, expire after eight hours, and are revoked
+on logout. Five failed login/MFA attempts trigger limits; TOTP replay is denied.
+Run using the bundled Python runtime with cryptography installed.
+
+Open http://127.0.0.1:4180/#classroom
+Instructors post real Zoom or Webex join URLs and a start time for their course.
+Enrolled students see Join Zoom / Join Webex buttons. Instructors can remove
+links. This is manual link publication, not automatic provider meeting creation.
+Meeting details and join URLs never appear in public catalog records.
+
+Verified: 267 Python tests passed; account page inspected in browser.
+The application remains loopback-only. Public HTTPS deployment, email delivery,
+password-reset and MFA-recovery workflows are not included in this release.

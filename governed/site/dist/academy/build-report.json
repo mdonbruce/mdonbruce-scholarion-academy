@@ -1,0 +1,13 @@
+{
+  "programs": 11,
+  "modules": 150,
+  "executedNotebooks": 450,
+  "python": "3.12.3",
+  "publication": "blocked",
+  "limitations": [
+    "Academic content needs independent review",
+    "Notebooks are deterministic simulations, not live framework labs",
+    "Recorded media, screenshots, Common Cartridge and LTI pending",
+    "Practice checkpoints never update grades or eligibility"
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "brief": "Healthcare operations agent on synthetic data with privacy controls and a governance review.",
+  "milestones": [
+    {
+      "name": "Scope and baseline",
+      "deliverable": "Boundary, data card, baseline and success criteria."
+    },
+    {
+      "name": "Prototype and controls",
+      "deliverable": "Runnable or visual prototype, source log and approval path."
+    },
+    {
+      "name": "Evaluation and peer review",
+      "deliverable": "Held-out cases, failures, peer critique and revisions."
+    },
+    {
+      "name": "Defense and handover",
+      "deliverable": "Five-minute evidence demo, five-minute questions, runbook and limitations."
+    }
+  ],
+  "rubric": [
+    {
+      "criterion": "Scope and assumptions",
+      "points": 15,
+      "outcome": "O1",
+      "bands": {
+        "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+        "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+        "Developing": "50% of points: partial implementation or weak justification.",
+        "Insufficient": "0 points: missing evidence or unsafe result."
+      }
+    },
+    {
+      "criterion": "Correctness and reproducibility",
+      "points": 25,
+      "outcome": "O2",
+      "bands": {
+        "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+        "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+        "Developing": "50% of points: partial implementation or weak justification.",
+        "Insufficient": "0 points: missing evidence or unsafe result."
+      }
+    },
+    {
+      "criterion": "Evaluation and failure analysis",
+      "points": 25,
+      "outcome": "O3",
+      "bands": {
+        "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+        "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+        "Developing": "50% of points: partial implementation or weak justification.",
+        "Insufficient": "0 points: missing evidence or unsafe result."
+      }
+    },
+    {
+      "criterion": "Privacy and human controls",
+      "points": 20,
+      "outcome": "O4",
+      "bands": {
+        "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+        "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+        "Developing": "50% of points: partial implementation or weak justification.",
+        "Insufficient": "0 points: missing evidence or unsafe result."
+      }
+    },
+    {
+      "criterion": "Communication and evidence",
+      "points": 15,
+      "outcome": "O5",
+      "bands": {
+        "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+        "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+        "Developing": "50% of points: partial implementation or weak justification.",
+        "Insufficient": "0 points: missing evidence or unsafe result."
+      }
+    }
+  ],
+  "exemplar": "A fictional approval queue retains missing scores, routes uncertainty to review and never executes updates. Its evidence pack records input versions, thresholds, subgroup counts, failed cases and a rollback owner. Adapt this scaffold to the program brief. This is not a finished capstone solution.",
+  "peerReview": "A peer challenges an unsupported claim and repeats one test; the author documents the response.",
+  "status": "Draft brief; finished program-specific exemplars require SME authoring."
+}

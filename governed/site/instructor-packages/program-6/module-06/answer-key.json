@@ -1,0 +1,47 @@
+[
+  {
+    "id": "P6M6Q1",
+    "prompt": "What should happen when a required field is absent?",
+    "choices": [
+      "An explicit needs-data branch",
+      "Default success",
+      "Skip review and trust the output."
+    ],
+    "correct": 0,
+    "explanation": "No-code systems still need input contracts, error paths and owners. Connect validation, branching, review and recording. Test negative paths as well as success paths.",
+    "outcomes": [
+      "O1",
+      "O4"
+    ]
+  },
+  {
+    "id": "P6M6Q2",
+    "prompt": "Your team supporting a departmental request desk cannot reproduce a result. What next?",
+    "choices": [
+      "Publish because the report looks complete.",
+      "Reproduce the inputs, versions and checks before accepting the claim.",
+      "Remove failing examples."
+    ],
+    "correct": 1,
+    "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+    "outcomes": [
+      "O3",
+      "O5"
+    ]
+  },
+  {
+    "id": "P6M6Q3",
+    "prompt": "Which artifact best demonstrates build a visual approval flow?",
+    "choices": [
+      "Configure the supplied simulator and export its decision table. Include results and limitations.",
+      "A screenshot with no inputs or explanation.",
+      "An assertion of perfect accuracy."
+    ],
+    "correct": 0,
+    "explanation": "A concrete artifact and observed evidence support review.",
+    "outcomes": [
+      "O2",
+      "O5"
+    ]
+  }
+]

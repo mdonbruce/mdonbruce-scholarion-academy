@@ -1,0 +1,23 @@
+AGENT SYSTEM BUILDER REVIEW — 2026-10-02
+Source: attachment 9cb11f4b-27f4-462e-a1b9-cd46c016165c/Pasted text.txt.
+
+IMPLEMENTED
+Reasoning/planning: fixed state machine proposed -> awaiting_approval -> approved -> completed, or rejected. No model chooses actions.
+Memory: durable SQLite run state, owner, authorized course, tool/versioned review, result reference. Reopening Service resumes approved state. No transient-only checkpoint array.
+Tools: one registered tool create_support_request, strict title/body allowlist and length constraints; arbitrary tools/code/URLs/owner overrides rejected.
+Guardrails/observability: Scholarion-only authenticated course scope; instructor approval; version checks; owner enrollment checked again at execution; max ten new proposals per user/minute; identifiers-only audit events. Ticket creation, completed checkpoint and audit event commit atomically. Retried completed actions return the original result. Saved ticket can be archived/restored through existing Help module.
+UI: #agent-runtime, navigation link, token connection, propose, review approve/reject, resume and refresh. Completed run links to existing #help records. Demo notice; no external notification.
+
+VERIFIED
+15 tests including 10 inherited pilot checks. New tests verify checkpoint recovery after Service restart, proposal/execution idempotency, student approval denial, pre-approval execution denial, strict inputs, stale review rejection and revoked enrollment blocking. JavaScript syntax passed. Not a full process-kill chaos test or browser/accessibility acceptance.
+
+REMAINING
+No live LLM loop, ReAct provider, vector database, semantic memory, dynamic planning/delegation, arbitrary MCP discovery, provider budget accounting, service-level telemetry collector or scenario/avatar editor. Existing browser Agent Builder is not connected to this runner yet. Pilot instructor authorization is not a production staff/tenant permission model. Shared local fixture architecture still requires physical isolation. No production deployment or security certification.
+Stored proposal text is necessary to create the requested support record; it is scoped to owner and course instructor. It is not copied into audit logs. Raw model prompts, hidden reasoning and sensitive tool payloads must not be logged as 'full traces'; store action decisions and redacted metadata. Production retention/encryption policy remains unconfigured. Do not enter real secrets or identity/payment documents.
+
+ACCESS
+http://127.0.0.1:4180/#agent-runtime
+POST /api/runtime/list|propose|approve|reject|resume
+Existing bearer token, tenant=scholarion, course=AIM310. Propose requires tool, args, request_key; reviews/resume require id and version. No live payments, identity changes or grade changes are supported.
+
+Course policy unchanged: all courses use ten weeks.

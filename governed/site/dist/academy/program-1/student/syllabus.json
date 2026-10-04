@@ -1,0 +1,3527 @@
+{
+  "id": 1,
+  "title": "Professional Certificate in Agentic AI Systems",
+  "track": "Builder",
+  "length": "18 weeks",
+  "coding": "Python required",
+  "summary": "Design and deploy production multi-agent systems with orchestration, memory, tool protocols, evaluation, observability, deployment, and security.",
+  "capstone": "Production multi-agent system with tool protocol integration, evaluation suite, tracing, guardrails, and deployment runbook.",
+  "format": "18 weeks, online; weekly mentored sessions plus a monthly live faculty masterclass",
+  "workload": "8–10 hours/week",
+  "credential": {
+    "type": "Certificate of Completion",
+    "issuer": "Scholarion Academy",
+    "eligible": false,
+    "requiredCourseIds": [],
+    "rule": "Every approved required course at C or better. Required-course list and final grading policy TBC.",
+    "sourceDraftRules": "Historical source additionally proposes 70% overall, all labs, capstone pass, and 80% participation/approved alternative. These are draft proposals, not activated issuance rules."
+  },
+  "support": [
+    "Program manager contact",
+    "Academic learning support",
+    "Discussion forums",
+    "Peer groups of 6–8 learners",
+    "Office hours",
+    "Scholarion AI Teaching Assistant (coaches; never completes graded work)"
+  ],
+  "structure": [
+    "Block A (Weeks 1–9): Agent foundations",
+    "Block B (Weeks 10–18): Production multi-agent systems; final exam replaced by capstone defense"
+  ],
+  "weeks": [
+    [
+      "0 (optional)",
+      "Python and tooling refresher: VS Code, Colab, Git, virtual environments, API basics"
+    ],
+    [
+      "1",
+      "Agentic systems: autonomy levels, agent loops, and when not to use agents"
+    ],
+    [
+      "2",
+      "LLM foundations for builders: tokens, context, sampling, structured output, cost and latency"
+    ],
+    [
+      "3",
+      "Instruction design for agents: system prompts and output schemas"
+    ],
+    [
+      "4",
+      "Tool use and function calling: error handling and idempotent tools"
+    ],
+    [
+      "5",
+      "Retrieval systems: embeddings, chunking, vector stores, hybrid search and reranking"
+    ],
+    [
+      "6",
+      "Agentic RAG: routing, query planning, self-correction and citation grounding"
+    ],
+    [
+      "7",
+      "Planning and reasoning patterns: reason-act loops, plan-and-execute and reflection"
+    ],
+    [
+      "8",
+      "Memory and context management: short/long-term memory, summarization and context budgets"
+    ],
+    [
+      "9",
+      "Midterm project plus Block A exam"
+    ],
+    [
+      "10",
+      "Small language models for agents: local inference and SLM/LLM routing"
+    ],
+    [
+      "11",
+      "Multi-agent architectures: orchestrator–worker, hierarchical, critic/reviewer and handoffs"
+    ],
+    [
+      "12",
+      "Frameworks lab: graph-based orchestration and role-based crews; versions verified at build time"
+    ],
+    [
+      "13",
+      "Tool and context protocols such as MCP: secure servers and clients"
+    ],
+    [
+      "14",
+      "Agentic coding: repository tasks, test-first workflows and review gates"
+    ],
+    [
+      "15",
+      "Evaluation: task success, trajectory evaluation, calibrated LLM-as-judge and regression suites"
+    ],
+    [
+      "16",
+      "Observability, security and guardrails: tracing, injection defense, permissions, sandboxing and human oversight"
+    ],
+    [
+      "17",
+      "Deployment: APIs, containers, cost controls, monitoring and rollback"
+    ],
+    [
+      "18",
+      "Capstone defense and demo day"
+    ]
+  ],
+  "projects": [
+    {
+      "name": "Dual-Source Market Insight Agent",
+      "type": "Midterm",
+      "description": "Combines structured financial data and unstructured filings/news using synthetic or public-domain sources into a cited insight report."
+    },
+    {
+      "name": "Autonomous Research Analyst Agent",
+      "type": "Applied project",
+      "description": "Multi-step research with planning, web/document tools, source grading, citations and confidence levels."
+    },
+    {
+      "name": "Loan Underwriting Assistant",
+      "type": "Capstone",
+      "description": "A multi-agent recommendation package for a human underwriter using synthetic applicants; includes audit trail, fair-lending bias testing across protected attributes, adverse-action reason codes, and an explicit human-decision step. The system never issues final credit decisions."
+    }
+  ],
+  "tools": [
+    "Python",
+    "VS Code",
+    "Google Colab",
+    "OpenAI-compatible LLM API",
+    "Claude / Claude Code",
+    "SLM runtime",
+    "Vector database",
+    "Orchestration framework",
+    "MCP SDK",
+    "Evaluation/tracing tool",
+    "Docker",
+    "GitHub"
+  ],
+  "status": "Draft — academic review required",
+  "type": "Certificate program",
+  "source": "v2 archive catalog",
+  "level": "Advanced",
+  "issuer": "Scholarion Academy",
+  "audience": "a multi-agent service desk",
+  "weeklyHours": "6–10",
+  "prerequisites": "Python functions, JSON and HTTP concepts",
+  "delivery": "Self-paced draft modules with proposed weekend workshops, peer discussion and office hours; no cohort scheduled.",
+  "outcomes": [
+    "O1: Map decision boundaries and evidence requirements for a multi-agent service desk.",
+    "O2: Construct and explain a bounded prototype for a multi-agent service desk.",
+    "O3: Evaluate ordinary, ambiguous and adversarial cases against a baseline.",
+    "O4: Demonstrate privacy minimization, human approval and recoverable failure.",
+    "O5: Defend a agent systems engineering portfolio with reproducible evidence and limitations."
+  ],
+  "rubric": [
+    {
+      "criterion": "Scope and assumptions",
+      "points": 15,
+      "outcome": "O1",
+      "bands": {
+        "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+        "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+        "Developing": "50% of points: partial implementation or weak justification.",
+        "Insufficient": "0 points: missing evidence or unsafe result."
+      }
+    },
+    {
+      "criterion": "Correctness and reproducibility",
+      "points": 25,
+      "outcome": "O2",
+      "bands": {
+        "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+        "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+        "Developing": "50% of points: partial implementation or weak justification.",
+        "Insufficient": "0 points: missing evidence or unsafe result."
+      }
+    },
+    {
+      "criterion": "Evaluation and failure analysis",
+      "points": 25,
+      "outcome": "O3",
+      "bands": {
+        "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+        "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+        "Developing": "50% of points: partial implementation or weak justification.",
+        "Insufficient": "0 points: missing evidence or unsafe result."
+      }
+    },
+    {
+      "criterion": "Privacy and human controls",
+      "points": 20,
+      "outcome": "O4",
+      "bands": {
+        "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+        "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+        "Developing": "50% of points: partial implementation or weak justification.",
+        "Insufficient": "0 points: missing evidence or unsafe result."
+      }
+    },
+    {
+      "criterion": "Communication and evidence",
+      "points": 15,
+      "outcome": "O5",
+      "bands": {
+        "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+        "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+        "Developing": "50% of points: partial implementation or weak justification.",
+        "Insufficient": "0 points: missing evidence or unsafe result."
+      }
+    }
+  ],
+  "scheduleNote": "Two 10-module blocks need pacing approval within the advertised duration; no automatic workload compression is approved.",
+  "career": {
+    "portfolio": "agent systems engineering",
+    "services": [
+      "Portfolio review",
+      "Resume evidence workshop",
+      "Interview practice"
+    ],
+    "resumePrompt": "Describe your contribution, synthetic setting, evaluation and measured results. Do not imply production deployment.",
+    "interviewPrompt": "Explain one failure, how you detected it, and why a human remained accountable.",
+    "disclaimer": "Related task skills, not a job, salary or placement guarantee."
+  },
+  "qualityGates": {
+    "structure": "automated check",
+    "syntheticData": "generated",
+    "executedSimulationNotebooks": "verified locally",
+    "SMEReview": "pending",
+    "independentInstructionalReview": "pending",
+    "originalityReview": "pending",
+    "fullAccessibilityAudit": "pending",
+    "recordedCaptionedMedia": "pending",
+    "liveProviderLabsAndLicenses": "pending",
+    "authenticatedLMSAndLTI": "pending",
+    "commonCartridgeValidation": "pending",
+    "productionPublication": "blocked"
+  },
+  "blocks": [
+    {
+      "id": "P1-B1",
+      "modules": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "status": "Draft syllabus"
+    },
+    {
+      "id": "P1-B2",
+      "modules": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "status": "Draft syllabus"
+    }
+  ],
+  "assessments": [
+    {
+      "id": "P1-B1-Assignment-1",
+      "type": "Assignment",
+      "module": 2,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Define read-only lookup and approval-gated update contracts. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Assignment-2",
+      "type": "Assignment",
+      "module": 4,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Classify five fields into context, knowledge or aggregate audit data. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Assignment-3",
+      "type": "Assignment",
+      "module": 6,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Write mock request, result and permission-error examples. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Assignment-4",
+      "type": "Assignment",
+      "module": 8,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Add a hostile snippet and show why it cannot expand the allowlist. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Assignment-5",
+      "type": "Assignment",
+      "module": 10,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Create three risk entries with owner, control and evidence. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Lab-1",
+      "type": "Lab",
+      "module": 4,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Classify five fields into context, knowledge or aggregate audit data. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Lab-2",
+      "type": "Lab",
+      "module": 7,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Write six expected outcomes, including two cases that must not trigger action. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Lab-3",
+      "type": "Lab",
+      "module": 10,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Create three risk entries with owner, control and evidence. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Project-1",
+      "type": "Project",
+      "module": 5,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Specify researcher, checker and coordinator roles. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Project-2",
+      "type": "Project",
+      "module": 10,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Create three risk entries with owner, control and evidence. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Quiz-1",
+      "type": "Quiz",
+      "module": 2,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Define read-only lookup and approval-gated update contracts. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Quiz-2",
+      "type": "Quiz",
+      "module": 3,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Draw intake, validation, review, approval and closed states. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Quiz-3",
+      "type": "Quiz",
+      "module": 4,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Classify five fields into context, knowledge or aggregate audit data. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Quiz-4",
+      "type": "Quiz",
+      "module": 5,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Specify researcher, checker and coordinator roles. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Quiz-5",
+      "type": "Quiz",
+      "module": 7,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Write six expected outcomes, including two cases that must not trigger action. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Quiz-6",
+      "type": "Quiz",
+      "module": 8,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Add a hostile snippet and show why it cannot expand the allowlist. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Quiz-7",
+      "type": "Quiz",
+      "module": 9,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Design a five-field trace and locate a failed transition. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Quiz-8",
+      "type": "Quiz",
+      "module": 10,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Create three risk entries with owner, control and evidence. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Final-defense-1",
+      "type": "Final defense",
+      "module": 10,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Create three risk entries with owner, control and evidence. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B1-Midterm-1",
+      "type": "Midterm",
+      "module": 10,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Create three risk entries with owner, control and evidence. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Assignment-1",
+      "type": "Assignment",
+      "module": 12,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Compare whole-document and sentence-level retrieval on a policy exception. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Assignment-2",
+      "type": "Assignment",
+      "module": 14,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Calculate queue-level review rates and state sampling limitations. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Assignment-3",
+      "type": "Assignment",
+      "module": 16,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Write a release checklist with a failed-evaluation rollback trigger. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Assignment-4",
+      "type": "Assignment",
+      "module": 18,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Design merge and deployment gates with rollback evidence. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Assignment-5",
+      "type": "Assignment",
+      "module": 20,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Reproduce one success and one failure; defend the boundary. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Lab-1",
+      "type": "Lab",
+      "module": 14,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Calculate queue-level review rates and state sampling limitations. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Lab-2",
+      "type": "Lab",
+      "module": 17,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Write normal, boundary and malformed-input tests. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Lab-3",
+      "type": "Lab",
+      "module": 20,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Reproduce one success and one failure; defend the boundary. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Project-1",
+      "type": "Project",
+      "module": 15,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Calculate net minutes saved at two thresholds and identify omitted costs. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Project-2",
+      "type": "Project",
+      "module": 20,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Reproduce one success and one failure; defend the boundary. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Quiz-1",
+      "type": "Quiz",
+      "module": 12,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Compare whole-document and sentence-level retrieval on a policy exception. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Quiz-2",
+      "type": "Quiz",
+      "module": 13,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Define three result fields and reject an out-of-range score. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Quiz-3",
+      "type": "Quiz",
+      "module": 14,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Calculate queue-level review rates and state sampling limitations. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Quiz-4",
+      "type": "Quiz",
+      "module": 15,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Calculate net minutes saved at two thresholds and identify omitted costs. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Quiz-5",
+      "type": "Quiz",
+      "module": 17,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Write normal, boundary and malformed-input tests. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Quiz-6",
+      "type": "Quiz",
+      "module": 18,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Design merge and deployment gates with rollback evidence. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Quiz-7",
+      "type": "Quiz",
+      "module": 19,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Remove unnecessary fields and describe remaining linkage risks. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Quiz-8",
+      "type": "Quiz",
+      "module": 20,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Reproduce one success and one failure; defend the boundary. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Final-defense-1",
+      "type": "Final defense",
+      "module": 20,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Reproduce one success and one failure; defend the boundary. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    },
+    {
+      "id": "P1-B2-Midterm-1",
+      "type": "Midterm",
+      "module": 20,
+      "outcomes": [
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "O5"
+      ],
+      "brief": "You support a multi-agent service desk. Reproduce one success and one failure; defend the boundary. Use the larger dataset; document assumptions, method, checks, output and reflection.",
+      "steps": [
+        "Define scope and boundaries",
+        "Inspect data card and dataset",
+        "Establish a baseline",
+        "Build a rule or design",
+        "Test missing and adversarial cases",
+        "Interpret results and cite sources"
+      ],
+      "rubric": [
+        {
+          "criterion": "Scope and assumptions",
+          "points": 15,
+          "outcome": "O1",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Correctness and reproducibility",
+          "points": 25,
+          "outcome": "O2",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Evaluation and failure analysis",
+          "points": 25,
+          "outcome": "O3",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Privacy and human controls",
+          "points": 20,
+          "outcome": "O4",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        },
+        {
+          "criterion": "Communication and evidence",
+          "points": 15,
+          "outcome": "O5",
+          "bands": {
+            "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+            "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+            "Developing": "50% of points: partial implementation or weak justification.",
+            "Insufficient": "0 points: missing evidence or unsafe result."
+          }
+        }
+      ],
+      "aiPolicy": "Coaching with disclosure; assessed reasoning must be your own."
+    }
+  ],
+  "capstonePackage": {
+    "brief": "Production multi-agent system with tool protocol integration, evaluation suite, tracing, guardrails, and deployment runbook.",
+    "milestones": [
+      {
+        "name": "Scope and baseline",
+        "deliverable": "Boundary, data card, baseline and success criteria."
+      },
+      {
+        "name": "Prototype and controls",
+        "deliverable": "Runnable or visual prototype, source log and approval path."
+      },
+      {
+        "name": "Evaluation and peer review",
+        "deliverable": "Held-out cases, failures, peer critique and revisions."
+      },
+      {
+        "name": "Defense and handover",
+        "deliverable": "Five-minute evidence demo, five-minute questions, runbook and limitations."
+      }
+    ],
+    "rubric": [
+      {
+        "criterion": "Scope and assumptions",
+        "points": 15,
+        "outcome": "O1",
+        "bands": {
+          "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+          "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+          "Developing": "50% of points: partial implementation or weak justification.",
+          "Insufficient": "0 points: missing evidence or unsafe result."
+        }
+      },
+      {
+        "criterion": "Correctness and reproducibility",
+        "points": 25,
+        "outcome": "O2",
+        "bands": {
+          "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+          "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+          "Developing": "50% of points: partial implementation or weak justification.",
+          "Insufficient": "0 points: missing evidence or unsafe result."
+        }
+      },
+      {
+        "criterion": "Evaluation and failure analysis",
+        "points": 25,
+        "outcome": "O3",
+        "bands": {
+          "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+          "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+          "Developing": "50% of points: partial implementation or weak justification.",
+          "Insufficient": "0 points: missing evidence or unsafe result."
+        }
+      },
+      {
+        "criterion": "Privacy and human controls",
+        "points": 20,
+        "outcome": "O4",
+        "bands": {
+          "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+          "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+          "Developing": "50% of points: partial implementation or weak justification.",
+          "Insufficient": "0 points: missing evidence or unsafe result."
+        }
+      },
+      {
+        "criterion": "Communication and evidence",
+        "points": 15,
+        "outcome": "O5",
+        "bands": {
+          "Exemplary": "Full points: reproducible evidence, justified choices, limitations addressed.",
+          "Proficient": "75% of points: core requirement met; minor evidence gaps.",
+          "Developing": "50% of points: partial implementation or weak justification.",
+          "Insufficient": "0 points: missing evidence or unsafe result."
+        }
+      }
+    ],
+    "exemplar": "A fictional approval queue retains missing scores, routes uncertainty to review and never executes updates. Its evidence pack records input versions, thresholds, subgroup counts, failed cases and a rollback owner. Adapt this scaffold to the program brief. This is not a finished capstone solution.",
+    "peerReview": "A peer challenges an unsupported claim and repeats one test; the author documents the response.",
+    "status": "Draft brief; finished program-specific exemplars require SME authoring."
+  },
+  "evaluationPlan": {
+    "pre": "Explain a bounded workflow before instruction and attempt the first practice pool.",
+    "post": "Use unseen synthetic cases and compare outcome-aligned rubric scores.",
+    "survey": [
+      "What was unclear?",
+      "Which failure changed your design?",
+      "Was the workload feasible?"
+    ],
+    "analytics": "Local practice attempts and module checkpoints, not official grades."
+  },
+  "transferPolicy": "No automatic credit. Map outcomes and assessed evidence; an educator approves equivalence and prevents duplicate credit. Dependencies #1–#14 remain TBC."
+}

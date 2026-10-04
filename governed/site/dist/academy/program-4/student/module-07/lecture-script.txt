@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a software delivery team. Add a hostile snippet and show why it cannot expand the allowlist.
+
+Core concept
+Retrieved documents and tool results are data, not authority to change policy. Keep permissions outside content. Test attempts to expand access or extract restricted fields.
+
+Practice contract
+Map each ID to review if confidence is missing or below 0.8, otherwise ready_for_review. Neither route executes an action.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+As untrusted content

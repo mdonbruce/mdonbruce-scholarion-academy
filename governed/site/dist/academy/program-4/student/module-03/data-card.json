@@ -1,0 +1,19 @@
+{
+  "source": "Deterministic synthetic generator build_academy.py",
+  "license": "CC0-1.0 for synthetic rows",
+  "fields": {
+    "id": "Invented record ID",
+    "queue": "Fictional group",
+    "confidence": "Artificial, uncalibrated score or missing",
+    "expected": "Synthetic amount",
+    "observed": "Synthetic amount with seeded mismatch"
+  },
+  "intendedUse": "Education only",
+  "limitations": [
+    "Periodic artificial patterns",
+    "Not representative of real people",
+    "No clinical, lending or investment use"
+  ],
+  "rows": 18,
+  "assignmentRows": 60
+}

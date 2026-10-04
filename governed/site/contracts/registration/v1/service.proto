@@ -1,0 +1,6 @@
+// Draft contract only. No deployed runtime. Authorization must derive from authenticated metadata.
+syntax = "proto3";
+package registration.v1;
+service EnrollmentService { rpc CreateEnrollment (CreateEnrollmentRequest) returns (CreateEnrollmentResponse); }
+message CreateEnrollmentRequest { string learner_id = 1; string section_id = 2; string idempotency_key = 3; }
+message CreateEnrollmentResponse { string enrollment_id = 1; string status = 2; }

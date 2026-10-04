@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a procurement intake process. Map an intake queue and select one measurable intervention.
+
+Core concept
+Map queues, decisions and rework rather than ideal steps only. Improving a fast step may not improve the bottleneck. Measure cycle time before choosing an intervention.
+
+Practice contract
+Map missing confidence to needs_data, below 0.8 to human_review, otherwise awaiting_approval. Never mark an action executed.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+The constrained step limiting throughput

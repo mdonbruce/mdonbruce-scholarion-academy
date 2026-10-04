@@ -1,0 +1,7 @@
+P15-S08 — Resume safely after interruption
+Faculty-review draft.
+Outcome: Persist checkpoints without bypassing human approval.
+Lab: Add approval interrupts, restart recovery and idempotent side-effect simulation.
+Assessment: Restart between approval and completion; demonstrate exactly one committed action.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

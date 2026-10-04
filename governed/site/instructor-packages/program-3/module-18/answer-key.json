@@ -1,0 +1,47 @@
+[
+  {
+    "id": "P3M18Q1",
+    "prompt": "Which field distinguishes retries?",
+    "choices": [
+      "A stable operation identifier and attempt status",
+      "A decorative display label",
+      "Skip review and trust the output."
+    ],
+    "correct": 0,
+    "explanation": "Connect requests to steps, versions, tool outcomes and human decisions without retaining unnecessary sensitive text. Distinguish attempted actions from completed actions.",
+    "outcomes": [
+      "O1",
+      "O4"
+    ]
+  },
+  {
+    "id": "P3M18Q2",
+    "prompt": "Your team supporting an operations analysis team cannot reproduce a result. What next?",
+    "choices": [
+      "Publish because the report looks complete.",
+      "Reproduce the inputs, versions and checks before accepting the claim.",
+      "Remove failing examples."
+    ],
+    "correct": 1,
+    "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+    "outcomes": [
+      "O3",
+      "O5"
+    ]
+  },
+  {
+    "id": "P3M18Q3",
+    "prompt": "Which artifact best demonstrates record useful traces?",
+    "choices": [
+      "Design a five-field trace and locate a failed transition. Include results and limitations.",
+      "A screenshot with no inputs or explanation.",
+      "An assertion of perfect accuracy."
+    ],
+    "correct": 0,
+    "explanation": "A concrete artifact and observed evidence support review.",
+    "outcomes": [
+      "O2",
+      "O5"
+    ]
+  }
+]

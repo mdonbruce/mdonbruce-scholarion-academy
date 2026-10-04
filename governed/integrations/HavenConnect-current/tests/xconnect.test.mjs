@@ -1,0 +1,14 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { connectedEntryPoint,makeIdentity,validE164 } from "../lib/xconnect-core.mjs";
+const migration=await readFile(new URL("../drizzle/0011_fair_ender_wiggin.sql",import.meta.url),"utf8");
+const service=await readFile(new URL("../app/api/v1/xconnect/_service.ts",import.meta.url),"utf8");
+test("builds tenant-scoped extension identity",()=>assert.deepEqual(makeIdentity("oak-haven","extension",2001),{canonicalId:"hcx:oak-haven:extension:2001",displayNumber:"2001"}));
+test("builds non-PSTN virtual display ID",()=>assert.deepEqual(makeIdentity("oak-haven","virtual",800000001),{canonicalId:"hcx:oak-haven:virtual:800000001",displayNumber:"XC-800-000-001"}));
+test("rejects pseudo and malformed E.164 numbers",()=>{assert.equal(validE164("+990800000001"),false);assert.equal(validE164("+2348163435375"),true)});
+test("requires both verification and provisioning before connected mapping",()=>{assert.equal(connectedEntryPoint({verificationStatus:"Verified",provisioningStatus:"Testing"}),false);assert.equal(connectedEntryPoint({verificationStatus:"Verified",provisioningStatus:"Connected"}),true)});
+test("enforces tenant-scoped canonical and display uniqueness",()=>{assert.match(migration,/communication_identities_tenant_canonical_unique/);assert.match(migration,/communication_identities_tenant_display_unique/)});
+test("enforces one active assignment and idempotency key",()=>{assert.match(migration,/identity_assignments_active_identity_unique/);assert.match(migration,/xconnect_idempotency_tenant_key_unique/)});
+test("allocation retries uniqueness conflicts instead of read-then-write",()=>{assert.match(service,/for\(let number=first/);assert.match(service,/includes\("unique"\)/);assert.doesNotMatch(service,/select first free/i)});
+test("server derives Oak Haven tenant and gates mutations",()=>{assert.match(service,/tenantId:"tenant_oak_haven"/);assert.match(service,/XConnect number-management permission is required/);assert.match(service,/HAVEN_XCONNECT_ADMIN_EMAILS/)});

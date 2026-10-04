@@ -1,0 +1,6 @@
+// Draft contract only. No deployed runtime. Authorization must derive from authenticated metadata.
+syntax = "proto3";
+package admissions.v1;
+service ApplicationService { rpc GetApplicationStatus (GetApplicationStatusRequest) returns (GetApplicationStatusResponse); }
+message GetApplicationStatusRequest { string application_id = 1; }
+message GetApplicationStatusResponse { string status = 1; }

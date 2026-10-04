@@ -1,0 +1,75 @@
+SCHOLARION PROGRAM CONSOLIDATION — DRAFT
+No program is merged, retired, published or granted credit by this report.
+Retain all existing offerings. Courses use ten-week blocks; bundled pathways require separate sequencing review.
+
+ID | Existing title | Duration | Shared module references | Decision
+1 | Professional Certificate in Agentic AI Systems | 18 weeks | commons-08, commons-09, commons-10, commons-11, commons-12, commons-13, commons-14, commons-15, commons-17, commons-18, commons-20 | Retain for review; no merge or retirement authorized
+2 | Certificate in Applied Generative & Agentic AI | 16 weeks | commons-06, commons-08, commons-09, commons-10, commons-20 | Retain for review; no merge or retirement authorized
+3 | Professional Certificate in Applied AI: Machine Learning, Generative AI & Agents | 20 weeks | commons-04, commons-05, commons-20 | Retain for review; no merge or retirement authorized
+4 | Certificate in AI Agents for Software Engineering | 14 weeks | commons-12, commons-20 | Retain for review; no merge or retirement authorized
+5 | Certificate in No-Code AI, Machine Learning & Agents | 14 weeks | commons-19, commons-20 | Retain for review; no merge or retirement authorized
+6 | Certificate in No-Code Generative AI & Agent Workflows | 12 weeks | commons-19, commons-20 | Retain for review; no merge or retirement authorized
+7 | AI-Native Professional: Workflows & Agents for Everyday Productivity | 6 weeks | commons-19, commons-20 | Retain for review; no merge or retirement authorized
+8 | Certificate in AI Agents for Business Operations | 12 weeks | commons-20 | Retain for review; no merge or retirement authorized
+9 | Certificate in Generative AI & AI Agent Strategy for Leaders | 12 weeks | commons-20, commons-21 | Retain for review; no merge or retirement authorized
+10 | Certificate in AI & Agentic AI for Finance | 10 weeks | commons-20 | Retain for review; no merge or retirement authorized
+11 | Certificate in AI & Agentic AI for Healthcare Operations | 10 weeks | commons-20 | Retain for review; no merge or retirement authorized
+12 | Certificate in Designing & Building AI Products and Services | 10 weeks | commons-20 | Retain for review; no merge or retirement authorized
+13 | Specification missing — TBC | TBC | commons-20, commons-21 | Recover specification before dependent build
+14 | Specification missing — TBC | TBC | commons-12, commons-13, commons-15, commons-19, commons-20 | Recover specification before dependent build
+15 | Advanced Certificate in Agentic AI Engineering — Weekend Intensive | 10 weekends live (60 hrs) + 5 self-paced electives | commons-01, commons-06, commons-07, commons-08, commons-09, commons-10, commons-11, commons-12, commons-13, commons-14, commons-15, commons-16, commons-17, commons-18, commons-19, commons-20 | Retain for review; no merge or retirement authorized
+16 | Certificate in Agentic AI for Developers | 5 weekends live (30 hrs) | commons-01, commons-06, commons-07, commons-08, commons-09, commons-10, commons-20 | Retain for review; no merge or retirement authorized
+17 | Generative AI Professional Pathway | ~24 weeks, stacked courses | commons-01, commons-02, commons-03, commons-04, commons-05, commons-06, commons-07, commons-08, commons-09, commons-10, commons-20, commons-22 | Retain for review; no merge or retirement authorized
+18 | Certificate in Artificial Intelligence with Python (TensorFlow & PyTorch) | 8 weeks | commons-01, commons-02, commons-03, commons-04, commons-05, commons-20, commons-22 | Retain for review; no merge or retirement authorized
+19 | Certificate in LLM Prompt Engineering & LLM Applications | 5 weeks | commons-06, commons-20, commons-22 | Retain for review; no merge or retirement authorized
+20 | Certificate in Generative AI for Business Transformation | 6 weeks, no code | commons-20, commons-21 | Retain for review; no merge or retirement authorized
+21 | Certificate in Data Science with Python | 8 weeks | commons-01, commons-02, commons-03, commons-04, commons-20 | Retain for review; no merge or retirement authorized
+22 | Advanced Certificate in Data Engineering with Generative AI | 12 weeks | commons-01, commons-03, commons-07, commons-08, commons-14, commons-17, commons-18, commons-20 | Retain for review; no merge or retirement authorized
+23 | Advanced Certificate in AI Product Management | 10 weeks | commons-15, commons-20, commons-21 | Retain for review; no merge or retirement authorized
+24 | Extended Professional Program in Generative & Agentic AI | ~32 weeks | commons-01, commons-02, commons-03, commons-04, commons-05, commons-06, commons-07, commons-08, commons-09, commons-10, commons-11, commons-12, commons-13, commons-14, commons-15, commons-16, commons-17, commons-18, commons-19, commons-20, commons-22 | Retain for review; no merge or retirement authorized
+25 | Extended Professional Certificate in Applied AI for Business Leaders | 24 weeks (#13 C1 + C2 + new Leadership Practicum) | commons-20, commons-21 | Retain for review; no merge or retirement authorized
+26 | Agentic AI Systems Design — Live Intensive | 10 weeks |  | Retain for review; no merge or retirement authorized
+27 | Proposed Certificate in MLOps and LLMOps | Proposal only; ten-week course rule applies if approved | commons-16, commons-18 | Proposal only — no build or publication approval
+
+PROPOSED RELATIONSHIPS
+#26 -> #1: proposed_recognition — Candidate source Weeks 1–8 mapping; assessed equivalence and approval required.
+#26 -> #15: proposed_recognition — Candidate Weekends 3–5 mapping; no automatic waiver.
+#16 -> #15: proposed_recognition — Modules 1–6 / weekends 1–3; requires assessed equivalence.
+#15 -> #1: mutually_exclusive_credit — Retain both formats; do not award duplicate credit.
+#20 -> #13: dependency_tbc — Short-form Course 1 recognition; program 13 missing.
+#23 -> #12: no_double_credit — Shared content requires module-level equivalence; distinct product focus.
+#21 -> #18: prerequisite_path — Data foundations before AI with Python.
+#21 -> #22: prerequisite_path — Data foundations before data engineering.
+
+COMMONS INDEX — mapping only, not full learning content
+commons-01 0.1.0-draft | Python development environment | programs [15, 16, 17, 18, 21, 22, 24]
+commons-02 0.1.0-draft | Python foundations | programs [17, 18, 21, 24]
+commons-03 0.1.0-draft | Data preparation and visualization | programs [17, 18, 21, 22, 24]
+commons-04 0.1.0-draft | Machine learning foundations | programs [3, 17, 18, 21, 24]
+commons-05 0.1.0-draft | Deep learning and language foundations | programs [3, 17, 18, 24]
+commons-06 0.1.0-draft | Language models and prompting | programs [2, 15, 16, 17, 19, 24]
+commons-07 0.1.0-draft | AI application delivery | programs [15, 16, 17, 22, 24]
+commons-08 0.1.0-draft | Embeddings and hybrid retrieval | programs [1, 2, 15, 16, 17, 22, 24]
+commons-09 0.1.0-draft | Retrieval chains and memory | programs [1, 2, 15, 16, 17, 24]
+commons-10 0.1.0-draft | Agents and typed tools | programs [1, 2, 15, 16, 17, 24]
+commons-11 0.1.0-draft | Persistent graph workflows | programs [1, 15, 24]
+commons-12 0.1.0-draft | MCP integrations | programs [1, 4, 14, 15, 24]
+commons-13 0.1.0-draft | Multi-agent orchestration | programs [1, 14, 15, 24]
+commons-14 0.1.0-draft | Agentic and graph retrieval | programs [1, 15, 22, 24]
+commons-15 0.1.0-draft | Evaluation and regression testing | programs [1, 14, 15, 23, 24]
+commons-16 0.1.0-draft | Monitoring and model adaptation | programs [15, 24]
+commons-17 0.1.0-draft | AI security and red teaming | programs [1, 15, 22, 24]
+commons-18 0.1.0-draft | Container delivery and CI/CD | programs [1, 15, 22, 24]
+commons-19 0.1.0-draft | Workflow automation | programs [5, 6, 7, 14, 15, 24]
+commons-20 0.1.0-draft | Responsible AI and governance | programs [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+commons-21 0.1.0-draft | AI strategy and organizational change | programs [9, 13, 20, 23, 25]
+commons-22 0.1.0-draft | Language representations and transformer evaluation | programs [17, 18, 19, 24]
+
+GAPS
+Programs 13 and 14 absent from catalog
+Weighted outcome equivalence unavailable; no verified >60% overlap claim
+Faculty and product-owner approval not recorded
+Canvas, Cloud Lab and Zoom integrations unavailable
+Policy Part E missing
+Tool versions, educational licensing and textbook chapter references not verified
+Catalog weeks are outlines, not evidence of full curricula. Program 15 has 10 weekend rows; its required 20 session packages, executed domain labs and approval records have not been verified. Existing generated notebooks are generic simulations. Programs 17/24/25 require bundle-duration reconciliation. Preserve all existing badges; no credential eligibility is changed.

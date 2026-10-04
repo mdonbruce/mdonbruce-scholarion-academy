@@ -1,0 +1,7 @@
+P15-S20 — Demonstrate readiness and limitations
+Faculty-review draft.
+Outcome: Support a final recommendation with reproducible evidence.
+Lab: Present the capstone, run failure demonstrations, supply runbook and retrospective.
+Assessment: Mentor scores the rubric and records the live defense outcome.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

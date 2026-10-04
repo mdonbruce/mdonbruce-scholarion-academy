@@ -1,0 +1,47 @@
+[
+  {
+    "id": "P11M5Q1",
+    "prompt": "Which task fits this course?",
+    "choices": [
+      "Synthetic scheduling support",
+      "Selecting treatment",
+      "Skip review and trust the output."
+    ],
+    "correct": 0,
+    "explanation": "Administrative scheduling and documentation can use bounded support, but ambiguous information must route to trained people. Never use real patient data or recommend diagnosis or treatment here.",
+    "outcomes": [
+      "O1",
+      "O4"
+    ]
+  },
+  {
+    "id": "P11M5Q2",
+    "prompt": "Your team supporting a synthetic scheduling office cannot reproduce a result. What next?",
+    "choices": [
+      "Publish because the report looks complete.",
+      "Reproduce the inputs, versions and checks before accepting the claim.",
+      "Remove failing examples."
+    ],
+    "correct": 1,
+    "explanation": "Keep failures visible. A claim needs reproducible evidence.",
+    "outcomes": [
+      "O3",
+      "O5"
+    ]
+  },
+  {
+    "id": "P11M5Q3",
+    "prompt": "Which artifact best demonstrates support non-clinical operations?",
+    "choices": [
+      "Route fictional administrative cases and minimize the audit trail. Include results and limitations.",
+      "A screenshot with no inputs or explanation.",
+      "An assertion of perfect accuracy."
+    ],
+    "correct": 0,
+    "explanation": "A concrete artifact and observed evidence support review.",
+    "outcomes": [
+      "O2",
+      "O5"
+    ]
+  }
+]

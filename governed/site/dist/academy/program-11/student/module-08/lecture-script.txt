@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a synthetic scheduling office. Calculate queue-level review rates and state sampling limitations.
+
+Core concept
+Overall scores can hide different error or review rates. Use fictional queues here, not real protected traits. Small synthetic samples suggest questions, not causal conclusions.
+
+Practice contract
+Calculate reviewed count, total and review rate for each fictional queue; missing confidence requires review.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+Investigate definitions and sampling first

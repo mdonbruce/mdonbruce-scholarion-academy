@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a procurement intake process. Configure the supplied simulator and export its decision table.
+
+Core concept
+No-code systems still need input contracts, error paths and owners. Connect validation, branching, review and recording. Test negative paths as well as success paths.
+
+Practice contract
+Map missing confidence to needs_data, below 0.8 to human_review, otherwise awaiting_approval. Never mark an action executed.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+An explicit needs-data branch

@@ -1,0 +1,21 @@
+MASTER SPEC REVIEW — 2026-10-02
+Source: Master Prompt Unified AI-Powered Education Management System.docx
+Brand remains Scholarion Academy. This is a local demonstration, not a production university system.
+
+IMPLEMENTED LOCAL BACKEND
+Course submissions, versioned grades and publication; personal calendar; discussions and support records; extractive authorized-source assistant; instructor draft review; curriculum structural review; enterprise request gate simulation; integration planning registry.
+NEW IN THIS UPDATE
+Integration Center: six external service planning records, persistent owner/purpose/status, student read-only access, instructor planning edits, optimistic version checking and transactional audit events. No connector can be marked connected by this UI/API. Authentication, sync and data exchange remain unavailable. History is available to pilot instructors through POST /api/integrations/history. This is not a production IT administrator permission model.
+
+PARTIAL / DEMONSTRATION
+Public catalog, programs, badges, certificates, pathways, agent builder and dashboards contain local/demo workflows. Formal credential signing, authoritative program eligibility, full curriculum quality review, AI generation, assessment delivery and analytics are not production implementations.
+
+NOT IMPLEMENTED TO MASTER-SPEC ACCEPTANCE
+Admissions and applicant identity; transactional section registration and prerequisites; SIS records; tuition and financial aid; supporter consent and scoped access; employee learning integrations; production OIDC/MFA/recovery/session/device controls; external catalog retrieval; SCORM/xAPI/LTI/OneRoster; messaging/live classrooms; retention and backup recovery; complete accessibility verification; production deployment.
+No WGU metadata was retrieved or partnership implied. No external service is connected. No claims of compliance, accreditation or all-module completion are made.
+
+VERIFICATION
+Run python -m unittest test_integration_registry test_hub test_lms_service test_curriculum from site. New registry checks cover persisted update/history, stale version rejection, student write denial and refusal of unsupported connected statuses. These are API unit checks, not full browser or accessibility acceptance.
+
+ACCESS
+Start python site/governed_service.py and open http://127.0.0.1:4180/#integration-center. Use an existing private local pilot token. Never distribute private-governed tokens or databases.

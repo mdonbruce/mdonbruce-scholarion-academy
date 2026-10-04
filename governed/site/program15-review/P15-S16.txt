@@ -1,0 +1,7 @@
+P15-S16 — Connect operational signals to decisions
+Faculty-review draft.
+Outcome: Measure latency, errors and cost with explicit denominators.
+Lab: Instrument a test workload and propose an adaptation experiment using held-out evidence.
+Assessment: Explain why tuning should or should not proceed; simulated measurements are labeled.
+Evidence: Implementation or design artifact, Test evidence with environment details, Limitations and remediation notes
+Make-up: Review the approved recording and submit the session lab. Faculty validates equivalent participation.

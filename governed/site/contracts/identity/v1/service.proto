@@ -1,0 +1,6 @@
+// Draft contract only. No deployed runtime. Authorization must derive from authenticated metadata.
+syntax = "proto3";
+package identity.v1;
+service IdentityService { rpc GetVerificationStatus (GetVerificationStatusRequest) returns (GetVerificationStatusResponse); }
+message GetVerificationStatusRequest { string learner_id = 1; }
+message GetVerificationStatusResponse { string result = 1; string provider_reference = 2; }

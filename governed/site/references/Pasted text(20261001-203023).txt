@@ -1,0 +1,278 @@
+# DESIGN PROMPT — Scholaris AI Academy
+## "Agentic AI Courses & Certifications" Catalog + Programs #15–#25 (design, build, load, publish)
+
+---
+
+## 0. ROLE & MISSION
+
+You are the **Lead Academic Architect and Catalog Designer** for Scholaris AI Academy on Scholaris Global Learning. Build:
+1. The **Agentic AI Courses & Certifications** catalog hub page (Section 3).
+2. **11 certificate programs, #15–#25** (Sections 4–6).
+3. A program website page for each one.
+4. All course shells loaded into Scholaris.
+
+All existing Academy rules apply:
+- Clean-room originality and honest claims
+- The Scholaris course standard
+- The Hands-on In-Class Activity template, with student and instructor editions
+- The design package, quality gates and shared module library
+- The program website template
+
+**Lead Faculty:** Dr. Martins Donbruce Idahosa. Other instructors and mentors are listed only once confirmed.
+
+---
+
+## 1. RULES
+
+1. **Market references are internal only.** The references are a commercial training provider's agentic AI engineering course, its AI category page and its related AI certificate courses. Never reuse their:
+   - Titles, module or topic wording, project names, FAQ text
+   - Testimonials, learner counts, ratings or review-site scores
+   - Market and salary statistics, partner logos, pricing or refund terms
+2. **Statistics.** Market, salary or adoption figures appear only from a **current, cited primary source**, verified and dated at publish time. Learner counts, ratings and testimonials come only from real Scholaris data, with consent. Otherwise omit them.
+3. **Credentials.** Scholaris AI Academy credentials only:
+   - Certificate of Completion
+   - Graded Performance Certificate (optional)
+   - Open Badges 3.0
+
+   Never use "PG", "Masters", "degree", "accredited" or "industry-recognized" wording unless a real approval exists.
+4. **No job guarantees.** Career services are described as services, never outcomes.
+5. **Tools.** Verify each tool is current and educationally licensed, pin versions in the Scholaris Cloud Lab, name tools in plain text, and include a no-affiliation disclaimer.
+6. **Sandbox.** Payments, installments and "enroll now, pay later" run in sandbox until go-live. API keys are Scholaris-issued, spend-capped and expiring.
+7. **Data.** All datasets are synthetic or licensed, each with a data card.
+8. **Textbook alignment.**
+   - Python foundations modules reference **Gaddis, *Starting Out with Python*, 6th ed.**
+   - ML/DL modules may reference **Raschka et al., *Machine Learning with PyTorch and Scikit-Learn*** and **Géron, *Hands-On Machine Learning*, 3rd ed.** as recommended readings, with chapter mapping in the instructor guide.
+
+---
+
+## 2. THE 11 PROGRAMS
+
+| # | Scholaris program (original title — refine) | Track | Length & format | Market reference (internal) | Overlap handling |
+|---|---|---|---|---|---|
+| 15 | **Advanced Certificate in Agentic AI Engineering — Weekend Intensive** | Builder | 10 weekends live (60 hrs) + 5 self-paced electives | Advanced Certification in Agentic AI Engineering | Intensive format of #1's domain; credit is mutually exclusive with #1 |
+| 16 | **Certificate in Agentic AI for Developers** | Builder | 5 weekends live (30 hrs) | Agentic AI for Developers / Agentic AI Certification Training | On-ramp; credits into #15 Weekends 1–3 |
+| 17 | **Generative AI Professional Pathway** | Builder | ~24 weeks, stacked courses | Generative AI Masters Program | Bundles #21 → #18 → #19 → new GenAI Apps course → #16 |
+| 18 | **Certificate in Artificial Intelligence with Python (TensorFlow & PyTorch)** | Builder | 8 weeks | Artificial Intelligence Certification Course | Feeds #3, #17 and #24 |
+| 19 | **Certificate in LLM Prompt Engineering & LLM Applications** | Builder-light | 5 weeks | LLM Prompt Engineering Certification | Module source for #2, #6, #17 and #24 |
+| 20 | **Certificate in Generative AI for Business Transformation** | Business | 6 weeks, no code | Generative AI for Business Transformation | Short form of #13 Course 1; credits toward #13 |
+| 21 | **Certificate in Data Science with Python** | Builder | 8 weeks | Data Science with Python Certification | Prerequisite path for #18 and #22 |
+| 22 | **Advanced Certificate in Data Engineering with Generative AI** | Builder | 12 weeks | Advanced Certification in Data Engineering with GenAI | New domain |
+| 23 | **Advanced Certificate in AI Product Management** | Product | 10 weeks | Advanced Certification in AI Product Management | PM craft; #12 = design and pitch; no double credit |
+| 24 | **Extended Professional Program in Generative & Agentic AI** | Builder | ~32 weeks | Post Graduate Program in Generative AI and Agentic AI | Flagship long pathway; never labeled "postgraduate" |
+| 25 | **Extended Professional Certificate in Applied AI for Business Leaders** | Leadership | 24 weeks (#13 C1 + C2 + new Leadership Practicum) | PG Certificate in Applied AI for Business Leaders | Built on #13 |
+
+**Optional addition:** the reference category also lists an **MLOps** certificate. Propose a #27 Certificate in MLOps & LLMOps (8 weeks) in the consolidation report. Do not build it until approved.
+
+**Catalog consolidation report (required first):** all programs #1–#26 (plus the proposed #27), showing shared modules, credit transfers, mutually exclusive pairs, and merge/retire recommendations for any program overlapping another by more than 60%.
+
+---
+
+## 3. CATALOG HUB PAGE — "Agentic AI Courses & Certifications"
+
+### 3.1 Intro copy (original; refine but keep the meaning)
+
+> **Agentic AI Courses & Certifications**
+> Learn to build AI that does more than answer — AI that plans, uses tools, and gets work done. Scholaris AI Academy programs take you from the foundations of artificial intelligence — machine learning, neural networks, and natural language processing — through training and evaluating models, to designing autonomous agents and multi-agent systems that operate safely in real organizations. You'll work hands-on with industry frameworks including TensorFlow, PyTorch, and modern agent and retrieval tooling, and finish every program with projects you can show.
+
+### 3.2 Page sections
+1. **Hero:** title, intro, CTAs ("Find your program", "Talk to an advisor").
+2. **Program finder filters:** track (Builder / No-Code / Business & Leadership / Industry / Data / Product), level (Beginner / Intermediate / Advanced), coding required (yes/no), duration, format (live weekend / live weekday / self-paced / cohort), credential type.
+3. **Program cards:** title, one-line description, duration, format, level, next cohort, fee (admin field), "View program".
+4. **Learning paths** (visual pathway diagram):
+
+   | Path | Sequence |
+   |---|---|
+   | AI Foundations → Agentic Engineer | #21 → #18 → #19 → #16 → #15 (or #1) |
+   | GenAI Builder | #19 → #2 → #17 |
+   | No-Code Professional | #7 → #6 → #5 |
+   | Data & AI Platforms | #21 → #22 → proposed #27 |
+   | Product & Strategy | #20 → #23 or #12 → #13 → #25 |
+   | Long-form | #24 (all-in-one) |
+
+5. **"Which program is right for me?" quiz:** 8–10 questions on role, coding comfort, goals and time, producing a recommendation with reasons.
+6. **Comparison table:** program, duration, hours/week, format, prerequisites, capstone, credential, fee. Fees and dates come from the Scholaris catalog.
+7. **What you'll learn across the catalog:** ML, neural networks, NLP, data training and model evaluation, GenAI and LLMs, prompting, RAG, agents, multi-agent systems, MCP, guardrails, observability, deployment, responsible AI.
+8. **Credential explainer:** certificate types, badges, verification, stackability.
+9. **For teams and organizations:** corporate training inquiry.
+10. **Career services:** resume and portfolio review, mock interviews, role mapping (services only, no guarantees).
+11. **Category FAQs** (original): agentic vs generative AI; do I need to code; TensorFlow vs PyTorch; how long to become job-ready; how programs stack; refund/deferral policy (Scholaris-written, product-owner approved).
+12. **Resources:** Scholaris blog and webinar links (when they exist).
+13. **Social proof:** only real Scholaris data and testimonials with consent; otherwise hidden.
+
+Build requirements: responsive and WCAG 2.2 AA; structured data (ItemList + Course schema); SEO metadata; all data driven from the Scholaris catalog.
+
+---
+
+## 4. SHARED MODULE LIBRARY (build once, reuse; versioned in Scholaris Blueprint/Commons)
+
+| Library module | Key content | Used by |
+|---|---|---|
+| Python & AI dev environment | venv/conda, VS Code, Jupyter, Git/GitHub, secrets, async | 15, 16, 17, 18, 21, 22, 24 |
+| Python foundations (Gaddis-aligned) | Syntax, functions, files, OOP, exceptions | 17, 18, 21, 24 |
+| Data wrangling & visualization | NumPy, pandas, plotting, EDA | 17, 18, 21, 22, 24 |
+| **ML foundations** | Supervised/unsupervised learning, feature engineering, train/validate/test, cross-validation, **model evaluation metrics**, bias–variance, scikit-learn pipelines | 3, 17, 18, 21, 24 |
+| **Neural networks & deep learning** | Perceptrons, backpropagation, optimizers, regularization; **parallel labs in PyTorch and TensorFlow/Keras**; CNNs; sequence models; transfer learning; training on GPU in the Cloud Lab | 3, 17, 18, 24 |
+| **NLP & transformers** | Text preprocessing, embeddings, attention, transformers, fine-tuning a pretrained model, evaluation | 17, 18, 19, 24 |
+| LLM fundamentals, context & prompting | — | 2, 15, 16, 17, 19, 24 |
+| AI app delivery | FastAPI, Streamlit, Gradio | 15, 16, 17, 22, 24 |
+| Embeddings, vector DBs & hybrid search | — | 1, 2, 15, 16, 17, 22, 24 |
+| Chains, memory & RAG | — | 1, 2, 15, 16, 17, 24 |
+| Agents & tool use | — | 1, 2, 15, 16, 17, 24 |
+| Graph workflows, HITL & persistence | — | 1, 15, 24 |
+| MCP | Servers & ecosystem | 1, 4, 14, 15, 24 |
+| Multi-agent orchestration | — | 1, 14, 15, 24 |
+| Agentic RAG & GraphRAG | — | 1, 15, 22, 24 |
+| Evaluation, tracing & testing | — | 1, 14, 15, 23, 24 |
+| Observability, monitoring & fine-tuning | LoRA/QLoRA | 15, 24, proposed 27 |
+| Guardrails, LLM security & red-teaming | — | 1, 15, 22, 24 |
+| Containers, CI/CD & cloud deployment | — | 1, 15, 22, 24, proposed 27 |
+| Workflow automation | n8n; Zapier/Make | 5, 6, 7, 14, 15, 24 |
+| Responsible AI & governance | — | all |
+| AI strategy, ROI & change management | — | 9, 13, 20, 23, 25 |
+
+**Framework rule:** every deep learning lab ships **both a PyTorch and a TensorFlow/Keras version** (learners choose one; the instructor solution covers both), unless the program page states a single framework.
+
+---
+
+## 5. PROGRAM #15 — AGENTIC AI ENGINEERING WEEKEND INTENSIVE (detailed spec)
+
+### 5.1 Key facts
+- **Format:** 10 weekends, live online. Saturday and Sunday, 3 hours each (60 live hours), plus ~4–6 hours/week of self-paced labs.
+- **Batches:** rolling cohorts every 4–6 weeks with time-zone-specific batches. Cohort size capped (admin-set).
+- **Prerequisites:** working Python and comfort calling APIs. No prior agent framework or Docker experience required.
+- **Pedagogy:** about 70% hands-on (demo → lab → checkpoint every session).
+- **Completion requires:**
+  - 20 live modules (attended, or recording reviewed plus lab submitted)
+  - All module assessments passed
+  - Capstone scoring at least 70/100 on the mentor rubric, with a live demo defense
+  - Final knowledge check passed (2 attempts; free remediation between attempts)
+- **Credentials:** Certificate of Completion, Graded Performance Certificate and capstone badge, all verifiable by ID.
+
+### 5.2 Weekend plan (write original titles)
+
+| Wknd | Sat | Sun |
+|---|---|---|
+| 1 | AI dev environment, secrets, Git, async LLM calls | AI app delivery: FastAPI, schemas, streaming, Streamlit/Gradio |
+| 2 | LLM mechanics, multi-provider APIs, prompting patterns, structured output, function calling, token budgets | Embeddings, vector stores, similarity metrics, chunking, hybrid search, RAG architecture |
+| 3 | Chains, parsers, memory, loaders, RAG pipelines, retriever strategies | Agent loops, ReAct vs plan-and-execute, typed custom tools, SQL agents, tool errors, streaming steps |
+| 4 | Stateful graphs: state, nodes, conditional routing, specialist routers, node testing | Cycles, self-correction, human-in-the-loop gates, checkpoint persistence, parallel fan-out, sub-graphs |
+| 5 | Tracing, eval datasets, calibrated LLM-as-judge, regression and A/B, monitoring | MCP I: architecture, primitives, transports, SDK, custom servers, permissions, validation, inspector |
+| 6 | MCP II: ecosystem servers, chaining, MCP in graphs and crews, security, deployment | Deep agents: reflection, replanning, long-term memory, consolidation, confidence, self-improvement |
+| 7 | Role-based crews: sequential and hierarchical, delegation, crew-as-node, failures, rubric scoring | Agentic RAG and GraphRAG: self-RAG, corrective RAG, reranking, HyDE, query expansion, knowledge graphs, multi-hop, RAG metrics |
+| 8 | Docker, Compose stacks, secrets, health checks, registry, cloud container deploy, CI/CD, blue/green and canary | Observability (OpenTelemetry, dashboards, drift, cost, SLOs) and fine-tuning (when to; LoRA/QLoRA vs base) |
+| 9 | Guardrails: OWASP LLM Top 10, injection, rails, validators, PII redaction, red-teaming | Workflow automation with n8n: triggers, LLM nodes, retries, scheduling, webhook bridge to agents |
+| 10 | Capstone I: architecture, tech selection, RAG/MCP/guardrails design, peer review, core build | Capstone II: containerize, CI/CD, load and cost test, security review, docs, peer code review, live demo |
+
+**Self-paced electives** (micro-badges): AI-assisted coding; no-code automation (Zapier/Make); programmatic prompting (DSPy); agent interoperability protocols (verify current status); GenAI and LLM security.
+
+**Projects** (original, synthetic data, Scholaris/Haven sandboxes):
+- P1 Guest Request Triage Agent
+- P2 Multi-Step Reasoning Assistant
+- P3 Course Catalog Semantic Search
+- P4 Policy Document Q&A Chain
+- P5 Stateful Market-Research Graph with approval gate
+- P6 Supervisor Multi-Agent Planner
+- P7 Content Operations Crew
+- P8 Deep Research Agent
+- P9 Hybrid Order-Intelligence Pipeline (MediGrid, non-clinical)
+- P10 **Capstone:** production-shaped multi-agent platform with RAG, MCP, guardrails, tracing, dashboards and CI/CD (100-point rubric)
+
+---
+
+## 6. PROGRAMS #16–#25 — REQUIREMENTS
+
+For each program, produce:
+- 5 competencies and a week-by-week outline
+- Projects and capstone, assessments and rubrics
+- Full design package, using library modules
+
+**#16 Agentic AI for Developers (5 weekends)**
+- Environment and app delivery, LLM APIs and prompting, RAG basics, tool-using agents, intro to graphs and MCP
+- **Capstone:** deployed single agent with evaluation
+
+**#17 Generative AI Professional Pathway (~24 weeks)**
+- **Courses:** #21 core → #18 core → #19 → **GenAI Applications** (new: multimodal apps, RAG apps, fine-tuning intro, image and audio generation under Haven consent and provenance rules) → #16
+- **Credentials:** a certificate per course plus the pathway credential
+- **Capstone:** GenAI product prototype
+
+**#18 Artificial Intelligence with Python — TensorFlow & PyTorch (8 weeks)**
+
+| Wk | Focus |
+|---|---|
+| 1 | AI landscape, search and problem solving, Python for AI (Gaddis-aligned refresh) |
+| 2 | ML workflow: data preparation, **data training** pipelines, feature engineering |
+| 3 | Supervised learning and **model evaluation** (metrics, cross-validation, confusion matrices, ROC/PR, calibration) |
+| 4 | Unsupervised learning: clustering, dimensionality reduction |
+| 5 | **Neural networks** from scratch → PyTorch and TensorFlow/Keras: training loops, optimizers, regularization |
+| 6 | CNNs and transfer learning for vision |
+| 7 | **NLP:** text pipelines, embeddings, sequence models, transformers, fine-tuning a small pretrained model |
+| 8 | Responsible ML (bias, explainability, model cards) plus capstone |
+
+- **Capstone:** end-to-end model (tabular, vision or NLP), trained and evaluated in both a baseline and a deep learning framework, with a model card
+
+**#19 LLM Prompt Engineering & LLM Applications (5 weeks)**
+- How LLMs process prompts; patterns and structured outputs; prompt evaluation and test sets; prompt security; RAG-backed prompting; prompt libraries; programmatic prompting intro; multimodal prompting
+- **Capstone:** evaluated prompt suite and a small LLM app for a business workflow
+
+**#20 GenAI for Business Transformation (6 weeks, no code)**
+- Condensed #13 Course 1 modules 1–5, plus a use-case portfolio sprint
+- **Capstone:** prioritized opportunity map and pilot plan
+
+**#21 Data Science with Python (8 weeks)**
+- Python for data (Gaddis-aligned), NumPy/pandas, cleaning, EDA and visualization, statistics and hypothesis testing, intro ML with scikit-learn, storytelling with data
+- **Capstone:** analysis report and dashboard on a large synthetic dataset
+
+**#22 Data Engineering with GenAI (12 weeks)**
+- SQL and data modeling; batch and streaming pipelines; orchestration; lakehouse concepts (one platform, verified); data quality and lineage; cloud data services
+- **GenAI data layer:** document ingestion, embedding pipelines at scale, vector-store operations, RAG freshness, LLM-assisted ETL/SQL with validation, PII governance
+- **Capstone:** production-style pipeline feeding a RAG app
+
+**#23 AI Product Management (10 weeks)**
+- Opportunity discovery, user research for AI, data and feasibility, AI PRDs, model/agent evals for PMs, metrics and experimentation, responsible AI in the lifecycle, AI unit economics, launch and monitoring, working with ML and agent teams
+- **Capstone:** full AI product spec with eval and launch plans
+
+**#24 Extended Professional Program in Generative & Agentic AI (~32 weeks)**
+- #21 core → #18 → #19 → #2 → #15 content (cohort-paced) → 12-week mentor-supervised industry capstone (finance, hospitality, education or healthcare-operations tracks; synthetic data) with career-services milestones
+
+**#25 Extended Professional Certificate in Applied AI for Business Leaders (24 weeks)**
+- #13 Course 1 + Course 2 + **Leadership Practicum** (8 weeks: governance setup, vendor evaluation, pilot execution, KPI review, change management, board-ready readout)
+
+---
+
+## 7. PROGRAM WEBSITE PAGES
+
+Use the Academy program template for each of #15–#25. For #15 also include:
+- **Batch selector:** dates, days and times with time zone, seats left, close date, sold-out state
+- Enroll-now/pay-later and installments (sandbox)
+- Corporate inquiry
+- Scholaris-written refund, deferral and batch-change policy (product-owner approved)
+- Certificate ID verification
+- Prerequisite self-check routing to #15, #16 or #19 + #16
+
+Every program page links back to the **catalog hub** and shows its place on the **learning-path diagram**.
+
+---
+
+## 8. BUILD ORDER & REPORTING
+
+1. Catalog consolidation report → approval
+2. Shared module library, including the dual-framework DL labs
+3. Catalog hub page (live with "coming soon" hidden; only published programs show)
+4. #15 → #16 → #19 → #21 → #18
+5. #17, #24
+6. #22, #23
+7. #20, #25
+8. Proposed #27 if approved
+
+**Per program, deliver:**
+- Catalog entry and website page
+- Outcomes map and curriculum
+- Scholaris course shells
+- In-class activities (student and instructor editions)
+- Starter TODO and EXECUTED notebooks (PyTorch and TensorFlow versions where applicable), datasets with data cards, mini labs
+- Quizzes, assignments, projects and capstone with rubrics
+- Slides and scripts, instructor guide with textbook chapter maps
+- Credential and badge definitions, brochure
+- Quality-gate results
+
+**Status report:** complete / drafted / needs SME review / blocked, with tooling, licensing and claims risks.

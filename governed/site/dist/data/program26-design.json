@@ -1,0 +1,440 @@
+{
+  "program": 26,
+  "title": "Agentic AI Systems Design \u2014 Live Intensive",
+  "brand": "Scholarion Academy",
+  "faculty": "Dr. Martins Donbruce Idahosa",
+  "state": "draft",
+  "weeks": 10,
+  "competencies": [
+    {
+      "id": "C1",
+      "text": "Implement a bounded agent with validated tools, scoped memory and termination tests."
+    },
+    {
+      "id": "C2",
+      "text": "Measure retrieval quality and trace each supported answer to evidence."
+    },
+    {
+      "id": "C3",
+      "text": "Compare coordination designs under failed tools, missing context and withheld approval."
+    },
+    {
+      "id": "C4",
+      "text": "Evaluate reliability, privacy and cost using reproducible tests and observable traces."
+    },
+    {
+      "id": "C5",
+      "text": "Deliver and defend a documented system with explicit limitations and human decision authority."
+    }
+  ],
+  "modules": [
+    {
+      "week": 1,
+      "title": "Establish a measurable agent baseline",
+      "outcomes": [
+        {
+          "id": "P26-W1-O1",
+          "competency": "C1",
+          "text": "Demonstrate establish a measurable agent baseline with reproducible evidence."
+        },
+        {
+          "id": "P26-W1-O2",
+          "competency": "C4",
+          "text": "Explain one failure, one limitation and the human approval boundary."
+        }
+      ],
+      "activity": {
+        "student": "For establish a measurable agent baseline, define a synthetic scenario; build or model a bounded solution; record outputs and failed tests. Submit a 2\u20133-page APA-style Word/PDF report with code excerpts or diagrams, evidence and references. Proposed deadline: Sunday 11:59 PM in the published cohort time zone; no cohort dates configured.",
+        "instructor": "Review establish a measurable agent baseline for reproducibility, evidence quality and safe boundaries. Check baseline comparability, withheld approval and unsupported claims. A specific worked solution and calibrated scoring guide are still required."
+      },
+      "status": "design draft"
+    },
+    {
+      "week": 2,
+      "title": "Bound tools, memory and execution",
+      "outcomes": [
+        {
+          "id": "P26-W2-O1",
+          "competency": "C2",
+          "text": "Demonstrate bound tools, memory and execution with reproducible evidence."
+        },
+        {
+          "id": "P26-W2-O2",
+          "competency": "C4",
+          "text": "Explain one failure, one limitation and the human approval boundary."
+        }
+      ],
+      "activity": {
+        "student": "For bound tools, memory and execution, define a synthetic scenario; build or model a bounded solution; record outputs and failed tests. Submit a 2\u20133-page APA-style Word/PDF report with code excerpts or diagrams, evidence and references. Proposed deadline: Sunday 11:59 PM in the published cohort time zone; no cohort dates configured.",
+        "instructor": "Review bound tools, memory and execution for reproducibility, evidence quality and safe boundaries. Check baseline comparability, withheld approval and unsupported claims. A specific worked solution and calibrated scoring guide are still required."
+      },
+      "status": "design draft"
+    },
+    {
+      "week": 3,
+      "title": "Retrieve evidence and measure grounding",
+      "outcomes": [
+        {
+          "id": "P26-W3-O1",
+          "competency": "C3",
+          "text": "Demonstrate retrieve evidence and measure grounding with reproducible evidence."
+        },
+        {
+          "id": "P26-W3-O2",
+          "competency": "C4",
+          "text": "Explain one failure, one limitation and the human approval boundary."
+        }
+      ],
+      "activity": {
+        "student": "For retrieve evidence and measure grounding, define a synthetic scenario; build or model a bounded solution; record outputs and failed tests. Submit a 2\u20133-page APA-style Word/PDF report with code excerpts or diagrams, evidence and references. Proposed deadline: Sunday 11:59 PM in the published cohort time zone; no cohort dates configured.",
+        "instructor": "Review retrieve evidence and measure grounding for reproducibility, evidence quality and safe boundaries. Check baseline comparability, withheld approval and unsupported claims. A specific worked solution and calibrated scoring guide are still required."
+      },
+      "status": "design draft"
+    },
+    {
+      "week": 4,
+      "title": "Compare search and critique strategies",
+      "outcomes": [
+        {
+          "id": "P26-W4-O1",
+          "competency": "C4",
+          "text": "Demonstrate compare search and critique strategies with reproducible evidence."
+        },
+        {
+          "id": "P26-W4-O2",
+          "competency": "C4",
+          "text": "Explain one failure, one limitation and the human approval boundary."
+        }
+      ],
+      "activity": {
+        "student": "For compare search and critique strategies, define a synthetic scenario; build or model a bounded solution; record outputs and failed tests. Submit a 2\u20133-page APA-style Word/PDF report with code excerpts or diagrams, evidence and references. Proposed deadline: Sunday 11:59 PM in the published cohort time zone; no cohort dates configured.",
+        "instructor": "Review compare search and critique strategies for reproducibility, evidence quality and safe boundaries. Check baseline comparability, withheld approval and unsupported claims. A specific worked solution and calibrated scoring guide are still required."
+      },
+      "status": "design draft"
+    },
+    {
+      "week": 5,
+      "title": "Coordinate roles and recoverable state",
+      "outcomes": [
+        {
+          "id": "P26-W5-O1",
+          "competency": "C5",
+          "text": "Demonstrate coordinate roles and recoverable state with reproducible evidence."
+        },
+        {
+          "id": "P26-W5-O2",
+          "competency": "C4",
+          "text": "Explain one failure, one limitation and the human approval boundary."
+        }
+      ],
+      "activity": {
+        "student": "For coordinate roles and recoverable state, define a synthetic scenario; build or model a bounded solution; record outputs and failed tests. Submit a 2\u20133-page APA-style Word/PDF report with code excerpts or diagrams, evidence and references. Proposed deadline: Sunday 11:59 PM in the published cohort time zone; no cohort dates configured.",
+        "instructor": "Review coordinate roles and recoverable state for reproducibility, evidence quality and safe boundaries. Check baseline comparability, withheld approval and unsupported claims. A specific worked solution and calibrated scoring guide are still required."
+      },
+      "status": "design draft"
+    },
+    {
+      "week": 6,
+      "title": "Evaluate hostile and ordinary inputs",
+      "outcomes": [
+        {
+          "id": "P26-W6-O1",
+          "competency": "C1",
+          "text": "Demonstrate evaluate hostile and ordinary inputs with reproducible evidence."
+        },
+        {
+          "id": "P26-W6-O2",
+          "competency": "C4",
+          "text": "Explain one failure, one limitation and the human approval boundary."
+        }
+      ],
+      "activity": {
+        "student": "For evaluate hostile and ordinary inputs, define a synthetic scenario; build or model a bounded solution; record outputs and failed tests. Submit a 2\u20133-page APA-style Word/PDF report with code excerpts or diagrams, evidence and references. Proposed deadline: Sunday 11:59 PM in the published cohort time zone; no cohort dates configured.",
+        "instructor": "Review evaluate hostile and ordinary inputs for reproducibility, evidence quality and safe boundaries. Check baseline comparability, withheld approval and unsupported claims. A specific worked solution and calibrated scoring guide are still required."
+      },
+      "status": "design draft"
+    },
+    {
+      "week": 7,
+      "title": "Strengthen reliability from failure evidence",
+      "outcomes": [
+        {
+          "id": "P26-W7-O1",
+          "competency": "C2",
+          "text": "Demonstrate strengthen reliability from failure evidence with reproducible evidence."
+        },
+        {
+          "id": "P26-W7-O2",
+          "competency": "C4",
+          "text": "Explain one failure, one limitation and the human approval boundary."
+        }
+      ],
+      "activity": {
+        "student": "For strengthen reliability from failure evidence, define a synthetic scenario; build or model a bounded solution; record outputs and failed tests. Submit a 2\u20133-page APA-style Word/PDF report with code excerpts or diagrams, evidence and references. Proposed deadline: Sunday 11:59 PM in the published cohort time zone; no cohort dates configured.",
+        "instructor": "Review strengthen reliability from failure evidence for reproducibility, evidence quality and safe boundaries. Check baseline comparability, withheld approval and unsupported claims. A specific worked solution and calibrated scoring guide are still required."
+      },
+      "status": "design draft"
+    },
+    {
+      "week": 8,
+      "title": "Connect research to design decisions",
+      "outcomes": [
+        {
+          "id": "P26-W8-O1",
+          "competency": "C3",
+          "text": "Demonstrate connect research to design decisions with reproducible evidence."
+        },
+        {
+          "id": "P26-W8-O2",
+          "competency": "C4",
+          "text": "Explain one failure, one limitation and the human approval boundary."
+        }
+      ],
+      "activity": {
+        "student": "For connect research to design decisions, define a synthetic scenario; build or model a bounded solution; record outputs and failed tests. Submit a 2\u20133-page APA-style Word/PDF report with code excerpts or diagrams, evidence and references. Proposed deadline: Sunday 11:59 PM in the published cohort time zone; no cohort dates configured.",
+        "instructor": "Review connect research to design decisions for reproducibility, evidence quality and safe boundaries. Check baseline comparability, withheld approval and unsupported claims. A specific worked solution and calibrated scoring guide are still required."
+      },
+      "status": "design draft"
+    },
+    {
+      "week": 9,
+      "title": "Integrate and rehearse the capstone",
+      "outcomes": [
+        {
+          "id": "P26-W9-O1",
+          "competency": "C4",
+          "text": "Demonstrate integrate and rehearse the capstone with reproducible evidence."
+        },
+        {
+          "id": "P26-W9-O2",
+          "competency": "C4",
+          "text": "Explain one failure, one limitation and the human approval boundary."
+        }
+      ],
+      "activity": {
+        "student": "For integrate and rehearse the capstone, define a synthetic scenario; build or model a bounded solution; record outputs and failed tests. Submit a 2\u20133-page APA-style Word/PDF report with code excerpts or diagrams, evidence and references. Proposed deadline: Sunday 11:59 PM in the published cohort time zone; no cohort dates configured.",
+        "instructor": "Review integrate and rehearse the capstone for reproducibility, evidence quality and safe boundaries. Check baseline comparability, withheld approval and unsupported claims. A specific worked solution and calibrated scoring guide are still required."
+      },
+      "status": "design draft"
+    },
+    {
+      "week": 10,
+      "title": "Defend the system and its limitations",
+      "outcomes": [
+        {
+          "id": "P26-W10-O1",
+          "competency": "C5",
+          "text": "Demonstrate defend the system and its limitations with reproducible evidence."
+        },
+        {
+          "id": "P26-W10-O2",
+          "competency": "C4",
+          "text": "Explain one failure, one limitation and the human approval boundary."
+        }
+      ],
+      "activity": {
+        "student": "For defend the system and its limitations, define a synthetic scenario; build or model a bounded solution; record outputs and failed tests. Submit a 2\u20133-page APA-style Word/PDF report with code excerpts or diagrams, evidence and references. Proposed deadline: Sunday 11:59 PM in the published cohort time zone; no cohort dates configured.",
+        "instructor": "Review defend the system and its limitations for reproducibility, evidence quality and safe boundaries. Check baseline comparability, withheld approval and unsupported claims. A specific worked solution and calibrated scoring guide are still required."
+      },
+      "status": "design draft"
+    }
+  ],
+  "sessions": [],
+  "labs": [
+    {
+      "id": "P26-L01",
+      "week": 1,
+      "title": "Compare structured model adapters",
+      "brief": "Validate synthetic responses against one contract; report latency and token-budget assumptions without inventing provider measurements.",
+      "minutes": 90,
+      "status": "brief drafted; executable starter and solution pending",
+      "data": "Synthetic fixture required; data card must document provenance, fields and limitations."
+    },
+    {
+      "id": "P26-L02",
+      "week": 1,
+      "title": "Baseline a tool decision",
+      "brief": "Compare a deterministic pipeline and bounded tool selection on identical synthetic requests.",
+      "minutes": 90,
+      "status": "brief drafted; executable starter and solution pending",
+      "data": "Synthetic fixture required; data card must document provenance, fields and limitations."
+    },
+    {
+      "id": "P26-L03",
+      "week": 2,
+      "title": "Enforce tool budgets",
+      "brief": "Reject invalid tool inputs; demonstrate bounded retries and a hard step limit.",
+      "minutes": 90,
+      "status": "brief drafted; executable starter and solution pending",
+      "data": "Synthetic fixture required; data card must document provenance, fields and limitations."
+    },
+    {
+      "id": "P26-L04",
+      "week": 2,
+      "title": "Measure memory tradeoffs",
+      "brief": "Compare task results with and without scoped memory; demonstrate deletion and isolation.",
+      "minutes": 90,
+      "status": "brief drafted; executable starter and solution pending",
+      "data": "Synthetic fixture required; data card must document provenance, fields and limitations."
+    },
+    {
+      "id": "P26-L05",
+      "week": 3,
+      "title": "Benchmark retrieval candidates",
+      "brief": "Compare two proposed indexes on a labeled synthetic corpus; record recall and latency when executed.",
+      "minutes": 90,
+      "status": "brief drafted; executable starter and solution pending",
+      "data": "Synthetic fixture required; data card must document provenance, fields and limitations."
+    },
+    {
+      "id": "P26-L06",
+      "week": 3,
+      "title": "Cite retrieved evidence",
+      "brief": "Route retrieval only when needed and abstain when the supplied corpus cannot support an answer.",
+      "minutes": 90,
+      "status": "brief drafted; executable starter and solution pending",
+      "data": "Synthetic fixture required; data card must document provenance, fields and limitations."
+    },
+    {
+      "id": "P26-L07",
+      "week": 4,
+      "title": "Bound a search process",
+      "brief": "Compare a limited tree search with a linear baseline using observable decisions and outcomes, not hidden model reasoning.",
+      "minutes": 90,
+      "status": "brief drafted; executable starter and solution pending",
+      "data": "Synthetic fixture required; data card must document provenance, fields and limitations."
+    },
+    {
+      "id": "P26-L08",
+      "week": 4,
+      "title": "Calibrate a critic",
+      "brief": "Use a fixed rubric to compare generator and critic outputs against human-labeled examples.",
+      "minutes": 90,
+      "status": "brief drafted; executable starter and solution pending",
+      "data": "Synthetic fixture required; data card must document provenance, fields and limitations."
+    },
+    {
+      "id": "P26-L09",
+      "week": 5,
+      "title": "Specify specialist handoffs",
+      "brief": "Give researcher, analyst and writer separate contracts and record failures at each handoff.",
+      "minutes": 90,
+      "status": "brief drafted; executable starter and solution pending",
+      "data": "Synthetic fixture required; data card must document provenance, fields and limitations."
+    },
+    {
+      "id": "P26-L10",
+      "week": 5,
+      "title": "Persist an approval checkpoint",
+      "brief": "Implement a recoverable state graph that cannot cross its action boundary without explicit approval.",
+      "minutes": 90,
+      "status": "brief drafted; executable starter and solution pending",
+      "data": "Synthetic fixture required; data card must document provenance, fields and limitations."
+    },
+    {
+      "id": "P26-L11",
+      "week": 6,
+      "title": "Build a regression evidence set",
+      "brief": "Record task outcomes, observed tool steps, costs and traces; compare to the baseline.",
+      "minutes": 90,
+      "status": "brief drafted; executable starter and solution pending",
+      "data": "Synthetic fixture required; data card must document provenance, fields and limitations."
+    },
+    {
+      "id": "P26-L12",
+      "week": 6,
+      "title": "Test hostile instructions",
+      "brief": "Inject synthetic adversarial instructions into retrieved content; compare blocked actions and task success before and after controls.",
+      "minutes": 90,
+      "status": "brief drafted; executable starter and solution pending",
+      "data": "Synthetic fixture required; data card must document provenance, fields and limitations."
+    }
+  ],
+  "stretch": [
+    {
+      "title": "Compare strict and permissive tool schemas",
+      "status": "optional design brief"
+    },
+    {
+      "title": "Test memory expiration",
+      "status": "optional design brief"
+    },
+    {
+      "title": "Measure retrieval abstention",
+      "status": "optional design brief"
+    },
+    {
+      "title": "Bound planner retries",
+      "status": "optional design brief"
+    },
+    {
+      "title": "Recover interrupted checkpoints",
+      "status": "optional design brief"
+    },
+    {
+      "title": "Estimate cost under doubled demand",
+      "status": "optional design brief"
+    }
+  ],
+  "capstone": "Choose a synthetic Academy support, research-evidence or permission-scoped code-review scenario. Build an end-to-end agent system and defend it in a ten-minute presentation. No external institution integration is authorized.",
+  "rubric": [
+    {
+      "criterion": "Architecture and boundaries",
+      "points": 20
+    },
+    {
+      "criterion": "Typed tool integrations and coordination",
+      "points": 20
+    },
+    {
+      "criterion": "Baseline and evaluation evidence",
+      "points": 25
+    },
+    {
+      "criterion": "Guardrails, observability and cost",
+      "points": 20
+    },
+    {
+      "criterion": "Limitations and defense",
+      "points": 15
+    }
+  ],
+  "requirements": {
+    "coreLabs": 12,
+    "quizCount": 6,
+    "quizMinimumPercent": 70,
+    "researchMemo": true,
+    "capstoneThreshold": null,
+    "presentationMinutes": 10,
+    "issueWithinDays": null,
+    "accessMonths": null,
+    "credit": false,
+    "transferApproved": false
+  },
+  "researchMemo": "Choose a verified public research paper. Identify its question, method and limitations, then compare one design choice in your capstone against its evidence. Include an original discussion question and complete citation. Publication is blocked until faculty verifies authors, year, venue and source.",
+  "transfer": [
+    {
+      "to": 1,
+      "mapping": "Candidate overlap with source Weeks 1\u20138",
+      "approved": false
+    },
+    {
+      "to": 15,
+      "mapping": "Candidate overlap with Weekends 3\u20135",
+      "approved": false
+    }
+  ],
+  "schedule": "Weeks 1\u20136: proposed live discussion and two 90-minute labs. Weeks 7\u201310: reliability, research, capstone clinics and defense. No dates, times, seats or recording availability have been published.",
+  "funding": "Non-credit professional training. No approval for federal student aid or military education benefits is recorded. Accepted payment methods are unconfigured.",
+  "notes": "",
+  "dependencyNotes": "Ten-week adaptation supersedes the source seven-week pacing. Transfer, late-enrollment deadline extensions, access duration and issue timing require approved policy.",
+  "publicationAllowed": false,
+  "gaps": [
+    "Executed twelve domain labs and data cards",
+    "Six quiz banks and pass/cooldown implementation",
+    "Verified research citations and maintained tool/version licenses",
+    "Live calendar, time-zone display, recordings and support contacts",
+    "Approved capstone threshold, access period, issue timing and finance policies",
+    "Academic publication and credential-signing services"
+  ]
+}

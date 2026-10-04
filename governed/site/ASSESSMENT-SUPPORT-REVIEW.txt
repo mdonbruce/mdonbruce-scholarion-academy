@@ -1,0 +1,8 @@
+ASSESSMENT SUPPORT — SPEC RECONCILIATION — 2026-10-02
+Source: supplied Proctored Assessment Setup Support Assistant specification.
+Existing: browser-local checklist and five fixed topic answers.
+Implemented: authenticated course-scoped persistent self-check, optimistic revision protection, 11 topic answers, webcam/ID/testing-area lead, accommodation referral and incident/exception boundaries, local support tickets with idempotent retries, course staff replies through existing Support module, audit events and navigation.
+Privacy: topic selections only; no question text, assessment content, ID images, ID numbers, medical details, room recordings, or camera/microphone access collected by this module. Support tickets retain the authenticated owner to enable private replies.
+Configuration gaps: authoritative Assessment Policy URL, approved institutional rollout, accessibility office/link, escalation team/channel/method and response SLA were not provided. Guidance is explicitly draft. Historical policy-change claims are not asserted. No external forwarding is claimed or performed. Staff review and real contact configuration remain required before rollout.
+Scope: checklist is self-reported, never assessment approval or scheduling. The platform system check is self-reported; no vendor hardware test is performed. Academic placement readiness_check.py remains separate.
+Validation: four focused tests cover persistence/conflicts, invalid checkbox data, course/user isolation, ticket idempotency, sensitive text exclusion, escalation boundaries and unconfigured policy. JavaScript syntax checked. No production deployment.

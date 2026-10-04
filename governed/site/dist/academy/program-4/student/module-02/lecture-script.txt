@@ -1,0 +1,16 @@
+Draft transcript; recording and synchronized captions pending.
+
+Decision to make
+You support a software delivery team. Write normal, boundary and malformed-input tests.
+
+Core concept
+Generated code needs independent correctness and security checks. Test behavior and edge cases rather than copying the implementation. Keep secrets out of prompts.
+
+Practice contract
+Keep rows with a numeric confidence between zero and one. Missing rows must not enter the accepted set.
+
+Evidence and boundary
+Show normal, missing and uncertain cases. No real data or external actions.
+
+Review and reflect
+An independently specified boundary result

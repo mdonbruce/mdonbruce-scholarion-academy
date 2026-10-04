@@ -1,0 +1,78 @@
+Scholarion Academy — reliability implementation
+2026-10-02 | Local release; not production accepted
+
+Implemented
+1. Course-scoped audit filtering before the result limit. Newly emitted retrieval,
+   draft and curriculum events carry course scope. Old unscoped events remain in
+   the immutable ledger and are excluded from course staff views.
+2. Instructor-authenticated curriculum requests up to 2 MiB; other endpoints retain
+   a 16 KB limit. Oversized requests return 413. A full standard-course fixture is
+   verified through HTTP. Nested types, exam weeks, question identifiers and
+   assessment/competency references receive additional validation.
+3. Separate published-grade pointers preserve released grades during draft edits.
+   Explicit withdrawal still hides a grade. Both coursework and dashboard use the
+   same grade projection. Existing historical draft/withdrawal ambiguity is not
+   retroactively guessed.
+4. One local pilot session with an HttpOnly, SameSite=Strict cookie, bounded to eight
+   hours or the identity's remaining lifetime. Cookies are loopback HTTP only;
+   production deployment requires HTTPS, Secure cookies and proper account/session
+   management. Existing pilot tokens remain available for development API clients.
+5. A central core-route registry for dashboard, courses, coursework, grades,
+   calendar, discussions, support and account. These use database records, the same
+   identity and an authorized-course selector. No fixed progress percentages appear
+   on the core courses page. Global navigation and titles are normalized.
+6. Shared service client for core and integrated service panels. Legacy render
+   wrappers still exist for previews; this is not a full frontend rewrite.
+7. Support replies, instructor resolution, learner reopening, resolution timestamps
+   and optimistic version checks, with UI controls and regression tests.
+8. Planner read-only tool observations can lead to another model decision. Results
+   are persisted per owner/course with a daily limit of 20 runs and at most three
+   decisions per workbench run. Write proposals remain review-required. Private
+   memory contents are excluded from hosted tool observations. This is not a fully
+   resumable planner-to-action workflow, a monetary budget controller or verified
+   live hosted inference.
+9. Standalone catalog offerings 16/18/19/20/21/22/23/26 now state ten weeks. Original
+   durations are retained as sourceLength. Bundle durations 17/24/25 are TBC pending
+   sequencing/waivers, with ten weeks per course. Detailed historical outlines still
+   need academic reconciliation; metadata changes do not constitute full curricula.
+10. Acceptance evidence is course-scoped. Historical unscoped evidence remains
+    stored but is excluded from ordinary course views.
+11. SQLite write-ahead logging allows readers to continue during writes. Connection
+    lock waits are bounded at ten seconds. The HTTP server queue supports the
+    small-pilot burst target; this is not an unrestricted production capacity claim.
+
+Validation
+- Added isolated regression tests for audit isolation, published-grade continuity,
+  malformed curriculum values/alignment, complete curriculum HTTP submission,
+  session cookies and origin restrictions, bounded planner observations, and support
+  reply/resolution/conflicts.
+- Browser checked signed-out courses/dashboard navigation and page titles.
+- Existing agent, credential, badge and coursework JS suites passed.
+- Full Python suite: 195 test executions passed after the reliability fixes.
+- Capacity settings use the user's first-term forecast of 4–15 learners. The
+  baseline runs 15 concurrent synthetic learners and the stress case runs 45.
+  The saved load report contains latency and errors. These are short local HTTP
+  checks, not a sustained production soak or provider inference load test.
+- Hosted planning permits two concurrent calls per process; excess calls return
+  a busy error. Per-instructor limits and output-token bounds are in
+  pilot_capacity.json. Monetary budget remains unconfigured.
+- A repeat load check initially failed with latency overruns and 17 stress errors.
+  That failed result is preserved in PILOT-LOAD-HISTORY.json. Following the database
+  concurrency adjustment, the 15-user run returned 60/60 successful requests (p95
+  reads 387 ms, writes 575 ms); the 45-user run returned 180/180 (p95 reads 543 ms,
+  writes 1089 ms). More sustained testing is required before production acceptance.
+
+Outstanding recommendations — do not describe these as complete
+- Production authentication, full roles/SSO/MFA, session revocation and account recovery.
+- Full educator-reviewed ten-week flagship content and independent learner acceptance.
+- Approved requirements for all programs, missing dependency specifications and waivers.
+- Published-grade change reasons/approval policy and authoritative final-course results.
+- Complete planner checkpoint/resume/action integration, monetary budgets, evaluated
+  semantic retrieval and approved remote MCP connectors.
+- Scenario authoring UX and meaningful dialogue evaluation beyond phrase matching.
+- Full release automation, backup/restore exercises, accessibility acceptance,
+  security assessment and load targets based on expected enrollment.
+- Verified external issuance, finance, identity-proofing, notifications and integrations.
+
+No real learner records were used for regression tests. No production deployment,
+external model call, payment, credential issuance or outgoing message was performed.
