@@ -34222,6 +34222,376 @@
         }
       }
     },
+    "/r/studio_profiles": {
+      "get": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "List course branding profiles",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/StudioProfiles"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Create a studio branding profile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/studio_profiles/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Get a studio branding profile",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Update a studio branding profile (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Delete (tombstone) a studio branding profile",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/studio_lab_checks": {
+      "get": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "List studio mini-lab checks",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/StudioLabChecks"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Create a studio mini-lab check",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/studio_lab_checks/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Get a studio mini-lab check",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Update a studio mini-lab check (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Delete (tombstone) a studio mini-lab check",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/r/studio_outputs": {
       "get": {
         "tags": [
@@ -59970,7 +60340,7 @@
           "Course Studio (Master Studio Generator)"
         ],
         "operationId": "studio.add_source",
-        "summary": "Add a source (pasted text, uploaded document text or a URL). Source text is data, never instructions; unreachable URLs are stored as unavailable.",
+        "summary": "Add a source (pasted text, uploaded document text or a URL). Source text is data, never instructions; unreachable URLs are stored as unavailable. If the topic already has a run, it is regenerated as a new version (autoRegenerate=false to skip).",
         "requestBody": {
           "content": {
             "application/json": {
@@ -60011,6 +60381,9 @@
                   },
                   "year": {
                     "type": "string"
+                  },
+                  "autoRegenerate": {
+                    "type": "boolean"
                   }
                 },
                 "required": [
@@ -60448,7 +60821,7 @@
           "Course Studio (Master Studio Generator)"
         ],
         "operationId": "studio.check_minilab",
-        "summary": "Server-side check of a Studio mini-lab (answers never sent to the browser).",
+        "summary": "Server-side check of a Studio mini-lab (answers never sent to the browser). reveal=true returns the worked solution after two checks (staff any time).",
         "requestBody": {
           "content": {
             "application/json": {
@@ -60461,7 +60834,10 @@
                   "labId": {
                     "type": "string"
                   },
-                  "answers": {}
+                  "answers": {},
+                  "reveal": {
+                    "type": "boolean"
+                  }
                 },
                 "required": [
                   "runId",
@@ -60485,6 +60861,191 @@
             "$ref": "#/components/responses/Error"
           },
           "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/studio.rebuild": {
+      "post": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "operationId": "studio.rebuild",
+        "summary": "Rebuild one part of the current version: cover, cover_a, cover_b, deck, chapters, readings, rubrics or minilabs. Edited files are kept; QA and manifest are refreshed.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "runId": {
+                    "type": "string"
+                  },
+                  "target": {
+                    "type": "string",
+                    "enum": [
+                      "cover",
+                      "cover_a",
+                      "cover_b",
+                      "deck",
+                      "chapters",
+                      "readings",
+                      "rubrics",
+                      "minilabs"
+                    ]
+                  }
+                },
+                "required": [
+                  "runId",
+                  "target"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/studio.lms_package": {
+      "get": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "operationId": "studio.lms_package",
+        "summary": "Export a topic as an IMS Common Cartridge 1.3 package (staff). Download at /api/campus/v1/t/{tenant}/learn/{courseId}/studio/{runId}/lms.imscc.",
+        "parameters": [
+          {
+            "name": "runId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/studio.profile_set": {
+      "post": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "operationId": "studio.profile_set",
+        "summary": "Set the course branding profile used by covers and decks (institution, motto, colours, footer cells, key topics, process). Pass profile JSON or the individual fields; lists are comma-separated.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseKey": {
+                    "type": "string"
+                  },
+                  "profile": {},
+                  "institution": {
+                    "type": "string"
+                  },
+                  "motto": {
+                    "type": "string"
+                  },
+                  "primary": {
+                    "type": "string"
+                  },
+                  "accent": {
+                    "type": "string"
+                  },
+                  "light": {
+                    "type": "string"
+                  },
+                  "format": {
+                    "type": "string"
+                  },
+                  "keyTopics": {
+                    "type": "string"
+                  },
+                  "process": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "courseKey"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/studio.profile": {
+      "get": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "operationId": "studio.profile",
+        "summary": "The course branding profile (staff).",
+        "parameters": [
+          {
+            "name": "courseKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
             "$ref": "#/components/responses/Error"
           }
         }
@@ -75169,6 +75730,73 @@
           }
         ],
         "description": "Studio generation run (tab: course-studio)"
+      },
+      "StudioProfiles": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "courseKey": {
+                "description": "Course",
+                "type": "string"
+              },
+              "profile": {
+                "description": "Branding (institution, motto, colours, footer cells, key topics, process)"
+              },
+              "updatedBy": {
+                "description": "Updated by",
+                "type": "string"
+              },
+              "updatedAt": {
+                "description": "Updated",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Studio branding profile (tab: course-studio)"
+      },
+      "StudioLabChecks": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "runId": {
+                "description": "Run",
+                "type": "string"
+              },
+              "labId": {
+                "description": "Mini-lab",
+                "type": "string"
+              },
+              "userId": {
+                "description": "Learner",
+                "type": "string"
+              },
+              "score": {
+                "description": "Score",
+                "type": "number"
+              },
+              "total": {
+                "description": "Out of",
+                "type": "number"
+              },
+              "at": {
+                "description": "At",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Studio mini-lab check (tab: course-studio)"
       },
       "StudioOutputs": {
         "allOf": [

@@ -19,7 +19,7 @@ import { brochureDoc, brochurePdf } from "../services/programs";
 import { simLabFileName, simLabHtml } from "../services/simlab";
 import { answersLocked, pinFor } from "../services/projection";
 import { gradebookCsv as gradedCsv } from "../services/graded";
-import { bundleZip, moduleStudioBundle, readOutput } from "../services/studio";
+import { bundleZip, moduleStudioBundle, readOutput, studioLmsPackage } from "../services/studio";
 import * as camp from "../services/campaigns";
 import * as designPkg from "../services/design";
 import * as cciSvc from "../services/cci";
@@ -429,7 +429,7 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
       const o = readOutput(store, a, rest[3]);
       if (o.access === "instructor" && answersLocked(store, courseId)) throw new CampusError("projection_locked", "Instructor files are hidden by the projection lock. Unlock them in the Instructor Control Panel first.", 423);
       const ext = String(o.relPath).split(".").pop()!.toLowerCase();
-      const types: Record<string, string> = { html: "text/html; charset=utf-8", md: "text/markdown; charset=utf-8", txt: "text/plain; charset=utf-8", json: "application/json; charset=utf-8", csv: "text/csv; charset=utf-8", vtt: "text/vtt; charset=utf-8", svg: "image/svg+xml", png: "image/png", mp4: "video/mp4", mp3: "audio/mpeg", pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation", yaml: "text/plain; charset=utf-8", yml: "text/plain; charset=utf-8" };
+      const types: Record<string, string> = { html: "text/html; charset=utf-8", md: "text/markdown; charset=utf-8", txt: "text/plain; charset=utf-8", json: "application/json; charset=utf-8", csv: "text/csv; charset=utf-8", vtt: "text/vtt; charset=utf-8", svg: "image/svg+xml", png: "image/png", mp4: "video/mp4", mp3: "audio/mpeg", bib: "text/x-bibtex; charset=utf-8", pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation", yaml: "text/plain; charset=utf-8", yml: "text/plain; charset=utf-8" };
       if (o.status === "awaiting_rendering" && !o.content.length) throw new CampusError("awaiting_rendering", `${o.relPath} is awaiting rendering: ${o.reason ?? "no media renderer is configured"}.`, 409);
       const body = typeof o.content === "string" ? o.content : new Uint8Array(o.content);
       const name = String(o.relPath).split("/").pop();
@@ -447,6 +447,10 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     if (rest[2] === "studio-module" && rest[3] && rest[4] === "bundle.zip") {
       const b = moduleStudioBundle(store, a, courseId, Number(rest[3]));
       return new Response(new Uint8Array(b.zip), { status: 200, headers: { "content-type": "application/zip", "content-disposition": `attachment; filename="${b.root}.zip"`, "cache-control": "no-store" } });
+    }
+    if (rest[2] === "studio" && rest[3] && rest[4] === "lms.imscc") {
+      const p = studioLmsPackage(store, a, rest[3]);
+      return new Response(new Uint8Array(p.zip), { status: 200, headers: { "content-type": "application/zip", "content-disposition": `attachment; filename="${p.name.replace(/[^A-Za-z0-9_.-]/g, "_")}"`, "cache-control": "no-store" } });
     }
     if (rest[2] === "studio" && rest[3] && rest[4] === "bundle.zip") {
       const z = bundleZip(store, a, rest[3]);

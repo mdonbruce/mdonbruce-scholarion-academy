@@ -86,6 +86,28 @@ export interface StudioInput {
   logoDataUri?: string;
   /** Restrict to these source ids; default = every source for (courseKey, module, topic). */
   sourceIds?: string[];
+  /** Course/institution branding for covers and decks (from `studio_profiles`, or supplied inline). */
+  profile?: StudioProfile;
+}
+
+/**
+ * Per-course branding profile (`studio_profiles`). Drives the 1920×1080 cover variants and the
+ * PowerPoint deck: institution wordmark, motto band, two-tone course code, module banner and the
+ * six-cell footer info bar. Variant B adds key topics, a process strip and an outcomes checklist.
+ * Every field is optional; anything missing falls back to Scholarion defaults or the course input.
+ */
+export interface StudioProfile {
+  institution?: string;
+  motto?: string;
+  primary?: string;
+  accent?: string;
+  light?: string;
+  /** Delivery format shown in the footer bar, e.g. "Live online + labs". */
+  format?: string;
+  /** Override any of the six footer cells by label (Course, Module, Level, Duration, Format, Instructor). */
+  footer?: { label: string; value: string }[];
+  keyTopics?: string[];
+  process?: string[];
 }
 
 export type Access = "learner" | "instructor";

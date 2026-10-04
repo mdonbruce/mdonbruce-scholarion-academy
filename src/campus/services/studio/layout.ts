@@ -11,7 +11,7 @@ import { canSeeInstructor, isLearnerOf } from "./sources";
  * Module export in the "Studio master prompt" layout:
  *   [COURSE_CODE]_Module_[NN]_Studio/00_Cover … 17_Requirements_Videos + manifest.json
  * Built from the topic runs of one module. Files are mapped from the generated outputs; anything
- * that needs a renderer or execution (PNG, PPTX, MP3, MP4, executed notebooks) is listed in the
+ * that needs a renderer or execution (PNG, MP3, MP4, executed notebooks) is listed in the
  * manifest as "needs render" / "needs execution" instead of being faked.
  */
 
@@ -87,18 +87,21 @@ export function moduleStudioBundle(store: TenantStore, a: Actor, courseKey: stri
       if (!o) return null;
       try {
         const r = readOutput(store, a, String(o.id));
-        return { text: typeof r.content === "string" ? r.content : r.content.toString("utf8"), refs: (o.sourceRefs as string[]) ?? [], status: String(o.status), access: String(o.access) as "learner" | "instructor", meta: o.meta as Record<string, unknown> | null };
+        return { raw: r.content, text: typeof r.content === "string" ? r.content : r.content.toString("utf8"), refs: (o.sourceRefs as string[]) ?? [], status: String(o.status), access: String(o.access) as "learner" | "instructor", meta: o.meta as Record<string, unknown> | null };
       } catch {
         return null;
       }
     };
     const put = (rel: string, to: string, type: string) => {
       const g = get(rel);
-      if (g) add(to, g.text, topic, type, g.status === "ready" ? "complete" : g.status, g.refs, g.access);
+      if (g) add(to, Buffer.isBuffer(g.raw) ? g.raw : g.text, topic, type, g.status === "ready" ? "complete" : g.status, g.refs, g.access);
       return g;
     };
     if (i === 0) {
       put("03_Lecture_Deck/cover_variant_A.html", "00_Cover/cover_slide.html", "cover_slide");
+      put("03_Lecture_Deck/cover_variant_B.html", "00_Cover/cover_slide_B.html", "cover_slide");
+      put("03_Lecture_Deck/cover_slide_A.pptx", "00_Cover/cover_slide.pptx", "cover_slide");
+      put("03_Lecture_Deck/cover_slide_B.pptx", "00_Cover/cover_slide_B.pptx", "cover_slide");
     }
     const dd = put("04_Audio/deep_dive_script.md", `01_Audio_Overview/${TT}_audio_overview_script.md`, "audio_overview");
     const words = Number(dd?.meta?.words ?? 0);
@@ -112,7 +115,7 @@ export function moduleStudioBundle(store: TenantStore, a: Actor, courseKey: stri
     todo(`03_Mind_Maps/${TT}_mindmap.svg`, topic, "mind_map", "needs render", "Render the Mermaid file (no renderer configured).");
     put("03_Lecture_Deck/lecture_deck.html", `04_Lecture_Decks/${TT}_lecture_deck.html`, "lecture_deck");
     put("03_Lecture_Deck/speaker_notes.md", `04_Lecture_Decks/${TT}_speaker_notes.md`, "speaker_notes");
-    todo(`04_Lecture_Decks/${TT}_lecture_deck.pptx`, topic, "lecture_deck", "needs render", "Export the 10-slide HTML deck to PowerPoint (no PPTX renderer configured).");
+    if (!put("03_Lecture_Deck/lecture_deck.pptx", `04_Lecture_Decks/${TT}_lecture_deck.pptx`, "lecture_deck")) todo(`04_Lecture_Decks/${TT}_lecture_deck.pptx`, topic, "lecture_deck", "needs render", "Regenerate this topic to build the PowerPoint deck.");
     put("04_Audio/audio_lecture_script.md", `05_Audio_Lectures/${TT}_audio_lecture_script.md`, "audio_lecture");
     todo(`05_Audio_Lectures/${TT}_audio_lecture.mp3`, topic, "audio_lecture", "needs render", "No text-to-speech provider is configured.");
     put("02_Overview_and_Lessons/lecture_overview.md", `06_Lecture_Overviews/${TT}_lecture_overview.md`, "lecture_overview");

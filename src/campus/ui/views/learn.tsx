@@ -1,3 +1,4 @@
+import { getProfile, REBUILD_TARGETS } from "../../services/studio";
 import crypto from "node:crypto";
 import { downloadUrl } from "../../services/files";
 import { acceptAttr, attachmentsFor, formatList, formatsFor } from "../../services/uploads";
@@ -430,6 +431,7 @@ function LectureStudio({ t }: { t: Ctx }) {
           </form>
         </section>
       )}
+      {v.staff && <BrandingProfile t={t} />}
     </>
   );
 }
@@ -462,8 +464,30 @@ function Outputs({ t }: { t: Ctx }) {
             <a className="btn btn-ghost btn-sm" href={api(slug, `learn/${v.course.id}/studio-module/1/bundle.zip`)}>
               Module folder (00_Cover … 17_Requirements_Videos + manifest)
             </a>
+            {v.staff && (
+              <a className="btn btn-ghost btn-sm" href={api(slug, `learn/${v.course.id}/studio/${runId}/lms.imscc`)}>
+                Export LMS package (.imscc)
+              </a>
+            )}
             {v.staff && <span className="small">Instructor files: {v.lock.locked ? "locked by the projection lock" : "unlocked"}</span>}
           </p>
+          {v.staff && (
+            <form method="post" action={api(slug, "a/studio.rebuild")} className="row" aria-label="Rebuild part of this package">
+              <Hidden values={{ back: `${t.here}?run=${runId}`, notice: "Rebuilt. The QA report and manifest were refreshed.", runId: String(runId) }} />
+              <label>
+                Rebuild only
+                <select name="target" defaultValue="cover_b">
+                  {Object.entries(REBUILD_TARGETS).map(([k, x]) => (
+                    <option key={k} value={k}>
+                      {x.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button className="btn btn-outline btn-sm">Rebuild</button>
+              <span className="tiny muted">Edited files are kept; released versions are never changed in place.</span>
+            </form>
+          )}
           {[...groups.entries()].map(([folder, files]) => (
             <section key={folder} className="card card-pad stack" aria-label={folder}>
               <h3 className="card-title">{folder.replace(/_/g, " ")}</h3>
@@ -1506,4 +1530,53 @@ function signedLink(store: TenantStore, actor: Actor, fileId: string) {
   } catch {
     return "#";
   }
+}
+
+function BrandingProfile({ t }: { t: Ctx }) {
+  const { v, slug, here, store } = t;
+  const p = getProfile(store, v.course.id) ?? {};
+  return (
+    <section className="card card-pad stack" aria-labelledby="ls-brand">
+      <h3 id="ls-brand" className="card-title">
+        Course branding profile
+      </h3>
+      <p className="small">Used by the 1920×1080 covers (A and B) and the PowerPoint deck: wordmark, motto band, two-tone course code, module banner and the six-cell footer bar. Cover B adds key topics, a process strip and an outcomes checklist. Leave a field blank to use the Scholarion default. Changes apply on the next generation or a targeted rebuild.</p>
+      <form method="post" action={api(slug, "a/studio.profile_set")} className="stack brand-form">
+        <Hidden values={{ back: here, notice: "Branding profile saved. Rebuild the covers to apply it.", courseKey: v.course.id }} />
+        <label>
+          Institution
+          <input name="institution" defaultValue={p.institution ?? ""} placeholder="Scholarion Academy" maxLength={80} />
+        </label>
+        <label>
+          Motto
+          <input name="motto" defaultValue={p.motto ?? ""} placeholder="Learn by building. Lead with integrity." maxLength={120} />
+        </label>
+        <label>
+          Primary colour
+          <input name="primary" defaultValue={p.primary ?? ""} placeholder="#0b1f4d" pattern="#[0-9a-fA-F]{6}" />
+        </label>
+        <label>
+          Accent colour
+          <input name="accent" defaultValue={p.accent ?? ""} placeholder="#f2c66d" pattern="#[0-9a-fA-F]{6}" />
+        </label>
+        <label>
+          Light background
+          <input name="light" defaultValue={p.light ?? ""} placeholder="#f7f5ef" pattern="#[0-9a-fA-F]{6}" />
+        </label>
+        <label>
+          Delivery format (footer)
+          <input name="format" defaultValue={p.format ?? ""} placeholder="Online lecture + labs" maxLength={60} />
+        </label>
+        <label>
+          Key topics (comma-separated, cover B)
+          <input name="keyTopics" defaultValue={(p.keyTopics ?? []).join(", ")} placeholder="From the sources when blank" />
+        </label>
+        <label>
+          Process steps (comma-separated, cover B)
+          <input name="process" defaultValue={(p.process ?? []).join(", ")} placeholder="Read, Lecture, Mini-labs, Practice quiz, Project" />
+        </label>
+        <button className="btn btn-primary btn-sm">Save profile</button>
+      </form>
+    </section>
+  );
 }

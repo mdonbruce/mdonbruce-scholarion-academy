@@ -48,7 +48,14 @@ export {
   bundleZip,
   regenerateQuiz,
   checkRunMiniLab,
+  rebuildTarget,
+  REBUILD_TARGETS,
+  studioLmsPackage,
+  addSourceAndRefresh,
+  LAB_CHECKS,
+  SOLUTION_AFTER_CHECKS,
   type PipelineOptions,
 } from "./pipeline";
 
 export { moduleStudioBundle } from "./layout";
+export { PROFILES, getProfile, setProfile, resolveProfile, coverShapes, coverHtml, coverPptx, deckPptx, twoTone } from "./brand";

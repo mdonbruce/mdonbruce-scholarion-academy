@@ -8,6 +8,7 @@ import {
   buildModel,
   buildQuiz,
   checkMiniLab,
+  solutionFor,
   contentChecksum,
   genAssessmentsRubrics,
   genLabsDemos,
@@ -24,6 +25,7 @@ import {
   type OutputView,
 } from "./generate";
 import { renderSegmentPreview, type RenderResult } from "./render";
+import { cleanProfile, getProfile } from "./brand";
 import { addSource as addSourceImpl, canGenerate, canSeeInstructor, genSources, isLearnerOf, listSources as listSourcesImpl, requireGenerate } from "./sources";
 import { DRAFT_LABEL, STEP_KEYS, type Access, type AddSourceInput, type Fetcher, type GeneratedFile, type LabCheckResult, type LabSpec, type RunStep, type StepKey, type StudioInput, type StudioSource } from "./types";
 
@@ -109,6 +111,7 @@ export function normalizeInput(raw: StudioInput): StudioInput {
     designSamples: raw.designSamples === true,
     logoDataUri: raw.logoDataUri && raw.logoDataUri.length < 2_000_000 ? raw.logoDataUri : undefined,
     sourceIds: Array.isArray(raw.sourceIds) ? raw.sourceIds.map(String).slice(0, 50) : undefined,
+    profile: cleanProfile(raw.profile),
   };
 }
 
@@ -282,6 +285,8 @@ export function listSources(store: TenantStore, actor: Actor, filter: { courseKe
 export function startRun(store: TenantStore, actor: Actor, rawInput: StudioInput, opts: PipelineOptions = {}): RunRow {
   const input = normalizeInput(rawInput);
   requireGenerate(store, actor, input.courseKey, "studio.run.start");
+  if (!input.profile) input.profile = getProfile(store, input.courseKey) ?? undefined;
+  if (!input.profile) delete input.profile;
   const sourceIds = genSources(store, input.courseKey, input.moduleNumber, input.topicTitle, input.sourceIds).map((s) => s.id);
   const run = store.tx(() => {
     const r = store.insert(
@@ -428,7 +433,11 @@ export function regenerateQuiz(store: TenantStore, actor: Actor, runId: string) 
 }
 
 /** Server-side mini-lab check for a run (learners after release, or staff). */
-export function checkRunMiniLab(store: TenantStore, actor: Actor, runId: string, labId: string, answers: Record<string, unknown>): LabCheckResult {
+export const LAB_CHECKS = "studio_lab_checks";
+/** Checks a learner must make before the worked solution unlocks. */
+export const SOLUTION_AFTER_CHECKS = 2;
+
+export function checkRunMiniLab(store: TenantStore, actor: Actor, runId: string, labId: string, answers: Record<string, unknown>, opts: { reveal?: boolean } = {}): LabCheckResult & { checks?: number; solution?: ReturnType<typeof solutionFor> } {
   const run = getRun(store, runId);
   const who = viewerFor(store, actor, run);
   const version = who === "learner" ? Number(run.releasedVersion) : run.outputsVersion;
@@ -436,7 +445,142 @@ export function checkRunMiniLab(store: TenantStore, actor: Actor, runId: string,
   const labs: LabSpec[] = keys ? (JSON.parse(String(keys.contentText)).labs as LabSpec[]) : buildLabSpecs(model(store, run));
   const spec = labs.find((l) => l.id === labId);
   if (!spec) throw new CampusError("not_found", "Mini-lab not found", 404);
-  return checkMiniLab(spec, answers && typeof answers === "object" ? answers : {});
+  const prior = store.list(LAB_CHECKS, (c) => c.runId === runId && c.labId === labId && c.userId === actor.id).length;
+  if (opts.reveal) {
+    if (who === "learner" && prior < SOLUTION_AFTER_CHECKS) throw new CampusError("not_yet", `Check your answers ${SOLUTION_AFTER_CHECKS - prior} more time${SOLUTION_AFTER_CHECKS - prior === 1 ? "" : "s"} before viewing the solution — use the hints first.`, 409);
+    audit(store, actor, "studio.minilab.solution", `${RUNS}/${runId}`, labId);
+    return { ...checkMiniLab(spec, answers && typeof answers === "object" ? answers : {}), checks: prior, solution: solutionFor(spec) };
+  }
+  const result = checkMiniLab(spec, answers && typeof answers === "object" ? answers : {});
+  store.insert(LAB_CHECKS, { runId, labId, userId: actor.id, score: result.score, total: result.total, at: nowIso() }, "slc");
+  return { ...result, checks: prior + 1 };
 }
 
 export { canGenerate };
+
+/* ---------------- Targeted rebuilds ---------------- */
+
+/**
+ * Rebuild just one part of the current version — e.g. "rebuild cover B" or "refresh readings" —
+ * without regenerating the whole set. Instructor-edited files are kept (the new text is stored
+ * as a conflict copy for review). The QA report and manifest are refreshed afterwards.
+ * A released version is never changed in place: regenerate it as a new version instead.
+ */
+export const REBUILD_TARGETS: Record<string, { label: string; step: StepKey; paths: RegExp }> = {
+  cover: { label: "Covers A and B (HTML + PowerPoint)", step: "studio_text_visual", paths: /^03_Lecture_Deck\/(cover_|lecture_deck\.pptx$)/ },
+  cover_a: { label: "Cover A", step: "studio_text_visual", paths: /^03_Lecture_Deck\/cover_(variant|slide)_A\./ },
+  cover_b: { label: "Cover B", step: "studio_text_visual", paths: /^03_Lecture_Deck\/cover_(variant|slide)_B\./ },
+  deck: { label: "Lecture deck (HTML + PowerPoint) and speaker notes", step: "studio_text_visual", paths: /^03_Lecture_Deck\/(lecture_deck\.|speaker_notes\.md$)/ },
+  chapters: { label: "Audio chapters", step: "studio_text_visual", paths: /^04_Audio\/audio_lecture_chapters\./ },
+  readings: { label: "Reading list and BibTeX", step: "lessons_readings", paths: /^01_Sources\/(reading_list\.md|sources_master\.bib)$/ },
+  rubrics: { label: "Rubrics (full, student and calibration)", step: "assessments_rubrics", paths: /^12_Assessments_and_Rubrics\/rubric_/ },
+  minilabs: { label: "Mini-labs", step: "labs_demos", paths: /^09_Student_Labs\/minilab_\d\.html$/ },
+};
+
+export function rebuildTarget(store: TenantStore, actor: Actor, runId: string, target: string) {
+  const run = getRun(store, runId);
+  requireGenerate(store, actor, run.courseKey, "studio.rebuild");
+  const t = REBUILD_TARGETS[target];
+  if (!t) throw new CampusError("invalid", `Unknown target. Use one of: ${Object.keys(REBUILD_TARGETS).join(", ")}.`, 422);
+  if (!["completed", "needs_configuration"].includes(String(run.state))) throw new CampusError("not_ready", "Finish or resume this run before rebuilding part of it.", 409);
+  if (Number(run.releasedVersion ?? 0) === run.outputsVersion) throw new CampusError("released", "This version is released to learners. Regenerate it as a new version, then rebuild.", 409);
+  const v = run.outputsVersion;
+  const rebuilt: string[] = [];
+  store.tx(() => {
+    // Covers and decks pick up the latest course branding profile.
+    if (t.step === "studio_text_visual") {
+      const profile = getProfile(store, run.courseKey);
+      if (profile) store.update(RUNS, runId, { input: { ...run.input, profile } });
+    }
+    const r = runStep(store, getRun(store, runId), t.step, {});
+    for (const f of r.files.filter((f) => t.paths.test(f.path))) {
+      persist(store, getRun(store, runId), f, v);
+      rebuilt.push(f.path);
+    }
+    for (const key of ["validate_artifacts", "save_output_set"] as StepKey[]) for (const f of runStep(store, getRun(store, runId), key, {}).files) persist(store, getRun(store, runId), f, v);
+  });
+  audit(store, actor, "studio.rebuild", `${RUNS}/${runId}`, `${target}: ${rebuilt.length} file(s)`);
+  return { runId, target, label: t.label, version: v, rebuilt };
+}
+
+/* ---------------- LMS package (Common Cartridge 1.3) ---------------- */
+
+const xe = (s: unknown) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+
+function quizQti(id: string, title: string, qs: { id: string; type: string; stem: string; options: { id: string; text: string }[]; correct: string[] }[]) {
+  const items = qs
+    .map((q) => {
+      const multi = q.type === "multiple_response";
+      const kind = multi ? "multiple_answers_question" : q.type === "true_false" ? "true_false_question" : "multiple_choice_question";
+      const cond = multi ? `<and>${q.options.map((o) => (q.correct.includes(o.id) ? `<varequal respident="r1">${xe(o.id)}</varequal>` : `<not><varequal respident="r1">${xe(o.id)}</varequal></not>`)).join("")}</and>` : `<varequal respident="r1">${xe(q.correct[0])}</varequal>`;
+      return `<item ident="${xe(q.id)}" title="${xe(q.stem.slice(0, 60))}"><itemmetadata><qtimetadata><qtimetadatafield><fieldlabel>question_type</fieldlabel><fieldentry>${kind}</fieldentry></qtimetadatafield><qtimetadatafield><fieldlabel>points_possible</fieldlabel><fieldentry>1</fieldentry></qtimetadatafield></qtimetadata></itemmetadata><presentation><material><mattext texttype="text/plain">${xe(q.stem)}</mattext></material><response_lid ident="r1" rcardinality="${multi ? "Multiple" : "Single"}"><render_choice>${q.options.map((o) => `<response_label ident="${xe(o.id)}"><material><mattext texttype="text/plain">${xe(o.text)}</mattext></material></response_label>`).join("")}</render_choice></response_lid></presentation><resprocessing><outcomes><decvar maxvalue="100" minvalue="0" varname="SCORE" vartype="Decimal"/></outcomes><respcondition continue="No"><conditionvar>${cond}</conditionvar><setvar action="Set" varname="SCORE">100</setvar></respcondition></resprocessing></item>`;
+    })
+    .join("");
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<questestinterop xmlns="http://www.imsglobal.org/xsd/ims_qtiasiv1p2"><assessment ident="${xe(id)}" title="${xe(title)}"><section ident="root_section">${items}</section></assessment></questestinterop>`;
+}
+
+/**
+ * Export a topic's current version as an IMS Common Cartridge (.imscc) for import into another
+ * LMS: every learner file as web content, organised by Studio folder, plus the practice quiz as
+ * QTI 1.2 (with its key — so the package is for staff only). Pending media are listed, not faked.
+ */
+export function studioLmsPackage(store: TenantStore, actor: Actor, runId: string): { zip: Buffer; name: string; files: number; pending: string[] } {
+  const run = getRun(store, runId);
+  if (!canSeeInstructor(store, actor, run.courseKey)) throw new CampusError("forbidden", "Only course staff can export the LMS package.", 403);
+  const rows = currentOutputs(store, runId, run.outputsVersion).filter((o) => !o.conflict);
+  const learner = rows.filter((o) => o.access === "learner");
+  const has = (o: Row) => !!(o.contentB64 || String(o.contentText ?? "").length);
+  const entries: { name: string; data: Buffer }[] = [];
+  const resources: string[] = [];
+  const folders = new Map<string, string[]>();
+  learner.filter(has).forEach((o, k) => {
+    const rel = String(o.relPath);
+    const href = `web_resources/${rel}`;
+    entries.push({ name: href, data: bytesOf(o) });
+    const id = `res_${k + 1}`;
+    resources.push(`<resource identifier="${id}" type="webcontent" href="${xe(href)}"><file href="${xe(href)}"/></resource>`);
+    const folder = rel.split("/")[0];
+    folders.set(folder, [...(folders.get(folder) ?? []), `<item identifier="it_${id}" identifierref="${id}"><title>${xe(rel.split("/").slice(1).join("/"))}</title></item>`]);
+  });
+  const quizRow = rows.find((o) => o.relPath === "08_Practice_Quizzes/practice_quiz.json");
+  if (quizRow?.contentText) {
+    try {
+      const qz = JSON.parse(String(quizRow.contentText)) as { questions: Parameters<typeof quizQti>[2] };
+      if (qz.questions?.length) {
+        entries.push({ name: "assessments/practice_quiz.xml", data: Buffer.from(quizQti(`quiz_${runId}`, `${run.topic} — practice quiz`, qz.questions)) });
+        resources.push(`<resource identifier="practice_quiz" type="imsqti_xmlv1p2/imscc_xmlv1p3/assessment" href="assessments/practice_quiz.xml"><file href="assessments/practice_quiz.xml"/></resource>`);
+        folders.set("08_Practice_Quizzes", [...(folders.get("08_Practice_Quizzes") ?? []), `<item identifier="it_practice_quiz" identifierref="practice_quiz"><title>Practice quiz (QTI)</title></item>`]);
+      }
+    } catch {
+      /* quiz JSON unreadable: export the rest */
+    }
+  }
+  const pending = learner.filter((o) => !has(o)).map((o) => `${o.relPath}: ${o.status}${o.reason ? ` — ${o.reason}` : ""}`);
+  entries.push({ name: "web_resources/README_IMPORT.txt", data: Buffer.from(`${DRAFT_LABEL}\n\n${run.topic}: Studio version ${run.outputsVersion}${run.releasedVersion ? ` (released version ${run.releasedVersion})` : " (not yet released)"}.\nImport into the target LMS as a Common Cartridge 1.3 package. Review every file before publishing to learners.\n\nNot included (not rendered yet):\n${pending.join("\n") || "- none"}\n`) });
+  const org = [...folders.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([f, items], k) => `<item identifier="fold_${k}"><title>${xe(f.replace(/^\d+_/, "").replace(/_/g, " "))}</title>${items.join("")}</item>`).join("");
+  const manifest = `<?xml version="1.0" encoding="UTF-8"?>\n<manifest identifier="studio_${xe(runId)}" xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imscp_v1p1"><metadata><schema>IMS Common Cartridge</schema><schemaversion>1.3.0</schemaversion><lomimscc:lom xmlns:lomimscc="http://ltsc.ieee.org/xsd/imsccv1p3/LOM/manifest"><lomimscc:general><lomimscc:title><lomimscc:string>${xe(`${run.input.courseCode} Module ${String(run.module).padStart(2, "0")} — ${run.topic}`)}</lomimscc:string></lomimscc:title></lomimscc:general></lomimscc:lom></metadata><organizations><organization identifier="org_1" structure="rooted-hierarchy"><item identifier="root">${org}</item></organization></organizations><resources>${resources.join("")}</resources></manifest>`;
+  entries.unshift({ name: "imsmanifest.xml", data: Buffer.from(manifest) });
+  audit(store, actor, "studio.lms_package", `${RUNS}/${runId}`, `${entries.length} files`);
+  return { zip: zip(entries), name: `${String(run.root).split("/").pop()}_v${run.outputsVersion}.imscc`, files: entries.length, pending };
+}
+
+/* ---------------- Sources added → refresh ---------------- */
+
+/**
+ * Add a source and, when the topic already has a run, regenerate it as a new version so the new
+ * source is used (instructor edits carry forward). Released versions stay as they are until the
+ * new version is reviewed and released.
+ */
+export async function addSourceAndRefresh(store: TenantStore, actor: Actor, input: AddSourceInput, opts: { fetcher?: Fetcher; timeoutMs?: number; autoRegenerate?: boolean } = {}) {
+  const source = await addSourceImpl(store, actor, input, opts);
+  if (opts.autoRegenerate === false || source.status !== "available") return { source, regenerated: null as null | { runId: string; version: number; state: string } };
+  const run = store
+    .list(RUNS, (r) => r.courseKey === input.courseKey && Number(r.module) === Number(input.module) && r.topic === input.topic)
+    .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))[0] as RunRow | undefined;
+  if (!run || !["completed", "needs_configuration"].includes(String(run.state))) return { source, regenerated: null };
+  // Include the new source: runs without an explicit selection follow every topic source.
+  if (!run.input.sourceIds) store.update(RUNS, run.id, { sourceIds: genSources(store, run.courseKey, run.module, run.topic).map((s) => s.id) });
+  const next = regenerateRun(store, actor, run.id, { render: false });
+  audit(store, actor, "studio.source_refresh", `${RUNS}/${run.id}`, `v${next.outputsVersion}`);
+  return { source, regenerated: { runId: next.id, version: next.outputsVersion, state: String(next.state) } };
+}

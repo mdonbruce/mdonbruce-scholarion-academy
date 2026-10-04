@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { fitSize, LEAD_FACULTY } from "../../../brand/faculty";
 import { facultyDataUri } from "../../../brand/faculty-assets";
+import { coverHtml, coverNotes, coverPptx, deckPptx } from "./brand";
 import {
   bestObjective,
   cloze,
@@ -215,7 +216,7 @@ function file(step: StepKey, path: string, format: string, content: string | Buf
 }
 
 /** Concept list for flows/mind maps: definition terms first, then key terms, by first appearance. */
-function concepts(m: Model, n: number): { term: string; def?: Definition }[] {
+export function concepts(m: Model, n: number): { term: string; def?: Definition }[] {
   const out: { term: string; def?: Definition }[] = [];
   const seen = new Set<string>();
   for (const d of m.defs) {
@@ -479,8 +480,26 @@ ${prompts}
   return file("lessons_readings", "07_Study_Guides_and_Flashcards/study_guide.md", "md", withLabel("md", body), "learner", allRefs(m));
 }
 
+const bibEsc = (v: string) => String(v).replace(/[\\{}]/g, "").replace(/([&%$#_])/g, "\\$1").replace(/\s+/g, " ").trim();
+
+/** BibTeX for every supplied source (only details the instructor supplied; nothing inferred). */
+export function bibtex(m: Model): string {
+  const entry = (s: GenSource) => {
+    const key = `${(s.author ?? "source").split(/[\s,]+/)[0].replace(/[^A-Za-z]/g, "") || "source"}${(s.year ?? "nd").replace(/\D/g, "") || "nd"}_${(s.ref ?? s.id).replace(/[^A-Za-z0-9]/g, "")}`;
+    const f: [string, string | null | undefined][] = [
+      ["title", s.title],
+      ["author", s.author],
+      ["year", s.year],
+      ["howpublished", s.kind === "url" && s.url ? `\\url{${String(s.url).replace(/[{}\\\s]/g, "")}}` : s.kind === "file" ? `Course document: ${s.filename ?? "upload"}` : "Instructor-supplied notes"],
+      ["note", `${s.ref ? `Cited as [${s.ref}] in the Studio outputs. ` : ""}${s.status === "available" ? "" : `Unavailable: ${s.reason ?? "not reachable"}. Not cited.`}`.trim()],
+    ];
+    return `@misc{${key},\n${f.filter(([, v]) => v).map(([k, v]) => `  ${k} = {${k === "howpublished" && s.kind === "url" ? v : bibEsc(String(v))}}`).join(",\n")}\n}`;
+  };
+  return `% ${DRAFT_LABEL}\n% ${m.input.courseCode} Module ${pad2(m.input.moduleNumber)} — ${m.input.topicTitle}: sources supplied to the Studio.\n\n${[...m.avail, ...m.unavailable].map(entry).join("\n\n")}\n`;
+}
+
 export function genLessonsReadings(m: Model): GeneratedFile[] {
-  return [readingList(m), lessons(m), lectureNotes(m), lectureOverview(m), summaryMd(m), studyGuide(m), ...flashcardFiles(m)];
+  return [readingList(m), file("lessons_readings", "01_Sources/sources_master.bib", "bib", bibtex(m), "learner", allRefs(m)), lessons(m), lectureNotes(m), lectureOverview(m), summaryMd(m), studyGuide(m), ...flashcardFiles(m)];
 }
 
 /* ======================================================================
@@ -774,9 +793,44 @@ ${rows.map((r) => `| ${r.criterion} | ${md(r.description)} | ${r.levels[0].point
 **Overall pass requirement:** ${Math.round(total * 0.7)} of ${total} points and criterion 1 at Proficient or higher ${SUPPLEMENTAL} (default threshold; instructor sets the final policy).
 `;
     const csv = [csvRow(["criterion", "description", "exemplary", "proficient", "developing", "beginning", "points", "evidence_required", "lo_alignment", "pass_requirement"]), ...rows.map((r) => csvRow([r.criterion, r.description, r.levels[0].points, r.levels[1].points, r.levels[2].points, r.levels[3].points, r.points, r.evidence, r.lo, r.pass]))].join("\n") + "\n";
+    const student = `${header(m, `What Good Looks Like — ${md(a.title)} (${total} pts)`)}
+Student version of the rubric. Use it as a checklist before you submit; your instructor grades with the full rubric.
+
+${rows.map((r, k) => `### ${k + 1}. ${r.criterion} — ${r.points} pts (${r.lo})
+- [ ] ${md(r.description)}
+- [ ] I included: ${r.evidence}.
+- **Proficient** means it meets the criterion; **Exemplary** means it meets and goes beyond it (for example, extra tests, clearer reasoning or a well-cited extension).
+`).join("\n")}
+**To pass:** about ${Math.round(total * 0.7)} of ${total} points, with “${rows[0]?.criterion ?? "criterion 1"}” at Proficient or higher (your instructor confirms the final policy).
+`;
+    const calibration = `${header(m, `Rubric Calibration Notes — ${md(a.title)}`)}
+For instructors and TAs grading the same assessment. Calibrate before grading the first batch.
+
+## Norming routine
+1. Each grader scores the same three anonymised submissions independently with \`rubric_${a.key}.md\`.
+2. Compare scores criterion by criterion. Any criterion more than one level apart is discussed until the graders agree on the reading of the descriptor.
+3. Record the agreed reading below and keep the three samples as anchors (with the learners' consent, or use instructor-written samples).
+4. Re-check agreement after the first ten submissions; repeat the routine if graders drift.
+
+## Telling the levels apart
+${rows.map((r) => `- **${r.criterion}** (${r.points} pts) — Proficient: ${md(r.description)} Exemplary adds something beyond it. Developing: part of it is missing or incorrect. Beginning: little or no evidence. Evidence to look for: ${r.evidence}.`).join("\n")}
+
+## Common scoring errors
+- Letting writing quality raise the score on correctness criteria (score each criterion on its own evidence).
+- Penalising the same mistake under several criteria.
+- Rewarding length rather than evidence.
+- Treating an AI-assisted section as misconduct without checking the course's AI-use policy for this assessment.
+
+## Agreed readings
+| Criterion | Agreed reading | Anchor sample | Date |
+|---|---|---|---|
+${rows.map((r) => `| ${r.criterion} |  |  |  |`).join("\n")}
+`;
     return [
       file("assessments_rubrics", `12_Assessments_and_Rubrics/rubric_${a.key}.md`, "md", withLabel("md", mdBody), "learner", []),
       file("assessments_rubrics", `12_Assessments_and_Rubrics/rubric_${a.key}.csv`, "csv", withLabel("csv", csv), "learner", []),
+      file("assessments_rubrics", `12_Assessments_and_Rubrics/rubric_${a.key}_student.md`, "md", withLabel("md", student), "learner", []),
+      file("assessments_rubrics", `12_Assessments_and_Rubrics/rubric_${a.key}_calibration.md`, "md", withLabel("md", calibration), "instructor", []),
     ];
   });
 }
@@ -855,6 +909,56 @@ export function buildLabSpecs(m: Model): LabSpec[] {
   ];
 }
 
+/**
+ * Three-step hint ladder per task: (1) where to look, (2) how to narrow it down, (3) a strong nudge.
+ * Hints never contain the full answer; the worked solution comes from the server (see solutionFor).
+ */
+export function hintsFor(t: LabTask): [string, string, string] {
+  switch (t.type) {
+    case "match": {
+      const words = t.answer.trim().split(/\s+/).length;
+      return [
+        `Find the sentence this description comes from in source [${t.sourceRef}] — the reading list links each source.`,
+        `The description defines one concept. Rule out options that the readings define with a different sentence.`,
+        `The concept starts with “${t.answer.trim().charAt(0).toUpperCase()}” and is ${words} word${words === 1 ? "" : "s"} long.`,
+      ];
+    }
+    case "order":
+      return [
+        "The statements follow the order the readings present them — check each statement's [S#] reference first.",
+        "Statements from the same source keep that source's sentence order; sources run S1, S2, S3 …",
+        `Start with: “${excerpt(t.items.find((i) => i.id === t.answer[0])?.text ?? "", 10)}”`,
+      ];
+    case "classify":
+      return [
+        `Open source [${t.sourceRef}] and find the sentence with the same wording.`,
+        "Compare key terms one by one — an altered statement swaps exactly one concept for another.",
+        "If every key term matches the source sentence word for word, it matches; one swapped term means it was altered.",
+      ];
+    case "config_fix":
+      return [
+        "Check each requirement against one line of the configuration — six rules, six lines to look at.",
+        "Four values are out of range or the wrong kind; two lines break a rule by what they contain (a wildcard and an inline key).",
+        "Replace the inline key line with api_key_env: SOME_VARIABLE, list tools by name, and keep numbers inside the stated ranges.",
+      ];
+  }
+}
+
+/** Worked solution, returned only by the server after the learner has checked twice (staff any time). */
+export function solutionFor(spec: LabSpec) {
+  return spec.tasks.map((t) => {
+    switch (t.type) {
+      case "match":
+      case "classify":
+        return { id: t.id, answer: t.answer, why: `See the source sentence [${t.sourceRef}].` };
+      case "order":
+        return { id: t.id, answer: t.answer.map((id, k) => `${k + 1}. ${t.items.find((i) => i.id === id)?.text ?? id}`).join("\n"), why: "The order the readings present the statements." };
+      case "config_fix":
+        return { id: t.id, answer: "max_steps: 8\ntimeout_seconds: 300\nnetwork: allowlist\ntools_allowed: [glossary_lookup, source_search]\napi_key_env: STUDIO_RUNNER_KEY\nlog_tool_calls: true", why: `One configuration that satisfies every rule: ${t.rules.map((r) => r.description).join(" ")}` };
+    }
+  });
+}
+
 /** Strip answers for learner delivery. */
 export function publicLabSpec(spec: LabSpec) {
   return {
@@ -865,13 +969,13 @@ export function publicLabSpec(spec: LabSpec) {
     tasks: spec.tasks.map((t) => {
       switch (t.type) {
         case "match":
-          return { id: t.id, type: t.type, prompt: t.prompt, sourceRef: t.sourceRef, options: t.options };
+          return { id: t.id, type: t.type, prompt: t.prompt, sourceRef: t.sourceRef, options: t.options, hints: hintsFor(t) };
         case "order":
-          return { id: t.id, type: t.type, prompt: t.prompt, items: t.items };
+          return { id: t.id, type: t.type, prompt: t.prompt, items: t.items, hints: hintsFor(t) };
         case "classify":
-          return { id: t.id, type: t.type, prompt: t.prompt, statement: t.statement, options: t.options, sourceRef: t.sourceRef };
+          return { id: t.id, type: t.type, prompt: t.prompt, statement: t.statement, options: t.options, sourceRef: t.sourceRef, hints: hintsFor(t) };
         case "config_fix":
-          return { id: t.id, type: t.type, prompt: t.prompt, broken: t.broken, requirements: t.rules.map((r) => r.description) };
+          return { id: t.id, type: t.type, prompt: t.prompt, broken: t.broken, requirements: t.rules.map((r) => r.description), hints: hintsFor(t) };
       }
     }),
   };
@@ -941,7 +1045,13 @@ function miniLabHtml(m: Model, spec: LabSpec): string {
         return `<fieldset><legend>Task ${n}: ${esc(t.prompt)}</legend><p>“${esc(t.statement)}” <span class="cite">[${esc(t.sourceRef)}]</span></p>${t.options!.map((o, k) => `<label><input type="radio" name="${t.id}" value="${esc(o)}" id="${t.id}-${k}"> ${esc(o)}</label>`).join("")}</fieldset>`;
       return `<fieldset><legend>Task ${n}: Fix the configuration</legend><p>${esc(t.prompt)}</p><ul>${t.requirements!.map((r) => `<li>${esc(r)}</li>`).join("")}</ul><label for="${t.id}">Your fixed configuration</label><textarea id="${t.id}" name="${t.id}" spellcheck="false">${esc(t.broken)}</textarea></fieldset>`;
     })
+    .map((html, k) => {
+      const t = pub.tasks[k];
+      const ladder = `<div class="ladder"><button type="button" class="secondary hint" data-task="${t.id}" aria-controls="${t.id}-hints">Show a hint (0 of 3 used)</button><ol id="${t.id}-hints" class="hints" aria-live="polite"></ol><div id="${t.id}-sol" class="sol" hidden></div></div>`;
+      return html.replace(/<\/fieldset>$/, `${ladder}</fieldset>`);
+    })
     .join("\n");
+  const hintData = Object.fromEntries(pub.tasks.map((t) => [t.id, t.hints]));
   const script = `(function(){var f=document.getElementById("lab");var out=document.getElementById("result");
 function collect(){var r={};f.querySelectorAll("select,textarea").forEach(function(e){r[e.name]=e.value});
 f.querySelectorAll("input[type=radio]:checked").forEach(function(e){r[e.name]=e.value});
@@ -952,13 +1062,20 @@ if(!ep){out.textContent="Checking is done on the course server. Your instructor 
 out.textContent="Checking…";fetch(ep,{method:"POST",headers:{"content-type":"application/json"},credentials:"same-origin",body:JSON.stringify(payload)}).then(function(r){return r.json()}).then(function(j){
 var res=j&&j.data?j.data:j;if(!res||!res.items){out.textContent="The checker did not return a result.";return}
 out.textContent="Score: "+res.score+" of "+res.total+". "+res.items.map(function(i,n){return "Task "+(n+1)+": "+i.feedback}).join(" ")}).catch(function(){out.textContent="Could not reach the checker. Download your answers instead."})});
+var H=JSON.parse(document.getElementById("hint-data").textContent||"{}");var used={};
+f.querySelectorAll("button.hint").forEach(function(b){b.addEventListener("click",function(){var id=b.getAttribute("data-task");var n=used[id]||0;var list=H[id]||[];if(n>=list.length)return;var li=document.createElement("li");li.textContent=list[n];document.getElementById(id+"-hints").appendChild(li);used[id]=n+1;b.textContent=used[id]>=list.length?"All 3 hints shown":"Show the next hint ("+used[id]+" of 3 used)";if(used[id]>=list.length)b.disabled=true})});
+document.getElementById("sol").addEventListener("click",function(){var ep=f.getAttribute("data-check-endpoint");if(!ep){out.textContent="Solutions come from the course server after you have checked your answers twice. Your instructor has not connected it yet.";return}
+fetch(ep,{method:"POST",headers:{"content-type":"application/json"},credentials:"same-origin",body:JSON.stringify({labId:f.getAttribute("data-lab-id"),responses:collect(),reveal:true})}).then(function(r){return r.json()}).then(function(j){var res=j&&j.data?j.data:j;if(!res||!res.solution){out.textContent=(j&&j.error&&j.error.message)||"Check your answers at least twice before viewing the solution.";return}
+res.solution.forEach(function(s){var d=document.getElementById(s.id+"-sol");if(!d)return;d.hidden=false;d.textContent="";var h=document.createElement("strong");h.textContent="Solution: ";d.appendChild(h);var p=document.createElement("pre");p.textContent=s.answer;d.appendChild(p);var w=document.createElement("p");w.textContent=s.why;d.appendChild(w)});out.textContent="Solutions are shown under each task."}).catch(function(){out.textContent="Could not reach the course server."})});
+document.getElementById("reset").addEventListener("click",function(){f.reset();used={};f.querySelectorAll("ol.hints").forEach(function(o){o.textContent=""});f.querySelectorAll(".sol").forEach(function(d){d.hidden=true;d.textContent=""});f.querySelectorAll("button.hint").forEach(function(b){b.disabled=false;b.textContent="Show a hint (0 of 3 used)"});out.textContent="The lab was reset. Your earlier checks still count toward unlocking the solution."});
 document.getElementById("dl").addEventListener("click",function(){var b=new Blob([JSON.stringify({labId:f.getAttribute("data-lab-id"),responses:collect(),savedAt:new Date().toISOString()},null,2)],{type:"application/json"});
 var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=f.getAttribute("data-lab-id")+"_my_answers.json";document.body.appendChild(a);a.click();a.remove();out.textContent="Your answers were downloaded."})})();`;
   const body = `<main><h1>${esc(spec.title)}</h1><p>${esc(m.input.courseCode)} ${esc(m.input.courseTitle)} · Module ${pad2(m.input.moduleNumber)}: ${esc(m.input.moduleTitle)}</p><p>${esc(spec.intro)}</p>
 <form id="lab" data-lab-id="${esc(spec.id)}" data-check-endpoint="" onsubmit="return false">${fields}
-<button type="button" id="check">Check my answers</button><button type="button" class="secondary" id="dl">Download my answers</button></form>
-<div id="result" role="status" aria-live="polite" class="panel">Your responses are checked on the course server, not in this page.</div></main>`;
-  return shell(spec.title, body, "", script);
+<button type="button" id="check">Check my answers</button><button type="button" class="secondary" id="sol">Show solution</button><button type="button" class="secondary" id="reset">Reset lab</button><button type="button" class="secondary" id="dl">Download my answers</button></form>
+<script type="application/json" id="hint-data">${scriptJson(hintData)}</script>
+<div id="result" role="status" aria-live="polite" class="panel">Your responses are checked on the course server, not in this page. Hints unlock one at a time; the solution unlocks after you have checked twice.</div></main>`;
+  return shell(spec.title, body, ".ladder{margin-top:8px}.hints{margin:6px 0 0;padding-left:1.4em}.hints li{margin:4px 0;background:var(--panel);padding:4px 8px;border-radius:6px}.sol{margin-top:8px;border-left:4px solid var(--gold);padding:4px 12px}", script);
 }
 
 /* ---------- Agentic demo ---------- */
@@ -1294,7 +1411,17 @@ function audioLecture(m: Model, slides: Slide[]) {
 ${blocks.map((b) => `[Slide ${b.slide}] **${b.title}**\n\n${md(b.text)}\n`).join("\n")}`;
   const { cues } = cueLines(blocks.map((b) => ({ text: b.text })));
   const transcript = blocks.map((b) => spoken(b.text)).join("\n\n");
-  return { scriptMd, vtt: vttFromCues(cues), transcript, words, sents: m.sentences.filter((s) => used.has(s.idx)) };
+  // Chapters: one per slide, timed on the same cue clock as the captions.
+  const chapters: { start: number; end: number; title: string }[] = [];
+  let t = 0;
+  for (const b of blocks) {
+    const r = cueLines([{ text: b.text }], t);
+    chapters.push({ start: t, end: r.end, title: `Slide ${b.slide}: ${b.title}` });
+    t = r.end;
+  }
+  const chaptersVtt = vttFromCues(chapters.map((c) => ({ start: c.start, end: c.end, text: c.title })));
+  const chaptersJson = JSON.stringify({ version: "1.2.0", label: DRAFT_LABEL, title: `${m.input.topicTitle} — audio lecture`, chapters: chapters.map((c) => ({ startTime: Math.round(c.start * 10) / 10, endTime: Math.round(c.end * 10) / 10, title: c.title })) }, null, 2);
+  return { scriptMd, vtt: vttFromCues(cues), transcript, words, sents: m.sentences.filter((s) => used.has(s.idx)), chaptersVtt, chaptersJson, chapters };
 }
 
 function deepDive(m: Model) {
@@ -1497,7 +1624,14 @@ ${cards.map((c) => `- Concept card — ${md(c.term)}: ${c.def ? `${md(excerpt(c.
 - Remember this: ${remember ? cite(remember, 26) : SUPPLEMENTAL}
 - Footer lists the sources: ${m.avail.map((s) => `[${s.ref}] ${md(s.title)}`).join("; ")}.
 `;
-  return { html: shell(`Infographic — ${m.input.topicTitle}`, body, css), alt, sents: [...cards.flatMap((c) => (c.def ? [c.def.sentence] : [])), ...(remember ? [remember] : [])] };
+  // Portrait (1080×1920) edition for phones and social posts: same content, vertical flow.
+  const vh = flow.length * 116;
+  const vsvg = `<svg role="img" aria-labelledby="vflow-t vflow-d" viewBox="0 0 920 ${vh}" width="920" height="${vh}" xmlns="http://www.w3.org/2000/svg"><title id="vflow-t">Concept flow</title><desc id="vflow-d">${esc(flow.join(" then "))}</desc>
+<defs><marker id="vah" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#0b1f4d"/></marker></defs>
+${flow.map((f, k) => `<rect x="160" y="${k * 116}" width="600" height="76" rx="14" fill="#0b1f4d"/><text x="460" y="${k * 116 + 48}" text-anchor="middle" font-size="30" fill="#ffffff" font-family="Segoe UI, sans-serif">${esc(excerpt(f, 4))}</text>${k < flow.length - 1 ? `<line x1="460" y1="${k * 116 + 78}" x2="460" y2="${k * 116 + 110}" stroke="#0b1f4d" stroke-width="6" marker-end="url(#vah)"/>` : ""}`).join("")}</svg>`;
+  const pcss = css.replace("width:1920px;height:1080px", "width:1080px;min-height:1920px").replace("padding:48px 80px", "padding:56px 64px").replace("grid-template-columns:repeat(3,1fr)", "grid-template-columns:1fr").replace("@page{size:1920px 1080px", "@page{size:1080px 1920px").replace("position:absolute;bottom:24px;left:80px;right:80px", "position:static;margin-top:20px").replace(".cards{display:grid;", ".cards{gap:14px;display:grid;").replace("gap:20px;margin-bottom:24px", "gap:14px;margin-bottom:20px");
+  const portrait = shell(`Infographic (portrait) — ${m.input.topicTitle}`, body.replace(svg, vsvg).replace('aria-labelledby="ig-title"', 'aria-labelledby="ig-title" data-orientation="portrait"'), pcss);
+  return { html: shell(`Infographic — ${m.input.topicTitle}`, body, css), portrait, alt, sents: [...cards.flatMap((c) => (c.def ? [c.def.sentence] : [])), ...(remember ? [remember] : [])] };
 }
 
 function mindMap(m: Model) {
@@ -1526,34 +1660,6 @@ function mindMap(m: Model) {
   return { mmd: mmd.join("\n") + "\n", json: JSON.stringify({ label: DRAFT_LABEL, root: tree }, null, 2), outline: `${header(m, "Mind Map — Text Outline")}\nAccessible text alternative to \`mind_map.mmd\`.\n\n${outline.join("\n")}\n` };
 }
 
-/** Cover variants A (navy, photo left) and B (light, photo right) — both with the approved faculty photograph. */
-function coverVariants(m: Model) {
-  const i = m.input;
-  const f = LEAD_FACULTY;
-  const uri = facultyDataUri(f) ?? f.photo.src;
-  const size = fitSize(f.photo, 190, 222);
-  const prov = i.designSamples ? "" : `<p class="prov">Provisional Scholarion design — cover samples not yet supplied. Upload samples in the Course Studio to replace this layout.</p>`;
-  const page = (variant: "A" | "B") => {
-    const dark = variant === "A";
-    const css = `*{box-sizing:border-box}body{margin:0;font-family:"Source Sans 3",Arial,sans-serif}.cv{width:1280px;height:720px;position:relative;overflow:hidden;padding:56px 72px;background:${dark ? "#0b1f4d" : "#f7f5ef"};color:${dark ? "#ffffff" : "#0b1f4d"}}
-.wm{font-size:26px;font-weight:700;letter-spacing:.03em}.wm .gold{color:${dark ? "#f2c66d" : "#9a6b00"}}.main{display:flex;gap:56px;align-items:center;margin-top:72px;flex-direction:${dark ? "row" : "row-reverse"};justify-content:space-between}
-.code{font-size:24px;margin:0;opacity:.9}.mod{font-size:28px;margin:8px 0 0}h1{font:700 58px/1.1 "Source Serif 4",Georgia,serif;margin:12px 0 0;max-width:820px}
-.who{text-align:center}.who img{border-radius:12px;object-fit:cover;object-position:top;border:4px solid ${dark ? "#f2c66d" : "#0b1f4d"}}.name{font-weight:700;font-size:22px;margin:10px 0 0}.role{font-size:18px;margin:2px 0 0;opacity:.9}
-.foot{position:absolute;left:72px;bottom:40px;font-size:18px;opacity:.9}.prov{position:absolute;right:72px;bottom:40px;font-size:14px;max-width:420px;text-align:right;opacity:.85}.lbl{position:absolute;right:72px;top:56px;font-size:14px;opacity:.85}`;
-    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${esc(i.courseCode)} Module ${pad2(i.moduleNumber)} — ${esc(i.topicTitle)} (cover ${variant})</title><style>${css}</style></head><body>
-<section class="cv" aria-label="Cover variant ${variant}"><p class="wm">Scholarion Academy <span class="gold">| ${esc(i.programTitle)}</span></p><p class="lbl">${esc(DRAFT_LABEL)}</p>
-<div class="main"><div><p class="code">${esc(i.courseCode)} · ${esc(i.courseTitle)}</p><p class="mod">Module ${pad2(i.moduleNumber)}: ${esc(i.moduleTitle)}</p><h1>${esc(i.topicTitle)}</h1></div>
-<figure class="who"><img src="${uri}" width="${size.width}" height="${size.height}" alt="${esc(f.photo.alt)}"><figcaption><p class="name">${esc(f.shortName)}</p><p class="role">${esc(INSTRUCTOR_ROLE)}</p></figcaption></figure></div>
-<p class="foot">${i.duration ? `Duration: ${esc(i.duration)} | ` : ""}Autonomous Agentic Lab | 2 graded attempts</p>${prov}</section></body></html>`;
-  };
-  const notes = `${header(m, "Cover Design Notes")}
-- Variant A: navy background, photograph left. Variant B: light background, photograph right.
-- Both carry Scholarion Academy, the course, module, topic, ${f.shortName} (${INSTRUCTOR_ROLE}) and the approved photograph at its original proportions (no stretching or re-generated likeness).
-- Status: ${i.designSamples ? "built from supplied cover samples." : "**provisional** — no Scholarion cover samples, video sample or logo were supplied. Upload them in the Course Studio (cover samples, video sample, logo) and regenerate."}
-`;
-  return { a: page("A"), b: page("B"), notes };
-}
-
 /** Regeneration commands for this topic (operations API and campus forms). */
 function regenerationCommands(m: Model) {
   const i = m.input;
@@ -1570,6 +1676,15 @@ Every command is an authenticated campus operation (POST /api/campus/v1/t/{tenan
 | Edit one text file | studio.edit_output | outputId=<output id>, content=<text> |
 | Release to learners (QA must pass) | studio.release | runId=<run id> |
 | Check a mini-lab answer | studio.check_minilab | runId, labId, answers |
+| Show a mini-lab solution (after two checks) | studio.check_minilab | runId, labId, reveal=true |
+| Rebuild cover B only | studio.rebuild | runId, target=cover_b |
+| Rebuild both covers + PowerPoint | studio.rebuild | runId, target=cover |
+| Refresh readings and BibTeX | studio.rebuild | runId, target=readings |
+| Rebuild deck / rubrics / mini-labs / chapters | studio.rebuild | runId, target=deck \| rubrics \| minilabs \| chapters |
+| Set course branding (motto, colours, footer) | studio.profile_set | courseKey=${i.courseKey}, motto, primary, accent, … |
+| Export LMS package (.imscc) | GET learn/${i.courseKey}/studio/<run id>/lms.imscc | staff only |
+
+Adding a source to a topic that already has a run regenerates it as a new version automatically (pass autoRegenerate=false to studio.add_source to skip).
 
 Media: set a text-to-speech provider and media renderer, then run studio.regenerate to replace files marked awaiting rendering.
 `;
@@ -1589,18 +1704,18 @@ export function genStudioTextVisual(m: Model): GeneratedFile[] {
   return [
     file(S, "03_Lecture_Deck/lecture_deck.html", "html", deck, "learner", slideRefs, "ready", { meta: { slides: slides.length, notesWords: slides.map((s) => s.notesWords), thinSlides: slides.filter((s) => s.thin).map((s) => s.n) } }),
     file(S, "03_Lecture_Deck/speaker_notes.md", "md", withLabel("md", notesMd), "instructor", slideRefs),
-    ...(() => {
-      const cv = coverVariants(m);
-      return [
-        file(S, "03_Lecture_Deck/cover_variant_A.html", "html", cv.a, "learner", [], "ready", { meta: { provisional: !m.input.designSamples } }),
-        file(S, "03_Lecture_Deck/cover_variant_B.html", "html", cv.b, "learner", [], "ready", { meta: { provisional: !m.input.designSamples } }),
-        file(S, "03_Lecture_Deck/cover_design_notes.md", "md", withLabel("md", cv.notes), "instructor", []),
-        file(S, "10_Instructor_Resources/regeneration_commands.md", "md", withLabel("md", regenerationCommands(m)), "instructor", []),
-      ];
-    })(),
+    file(S, "03_Lecture_Deck/lecture_deck.pptx", "pptx", deckPptx(m, slides), "learner", slideRefs, "ready", { meta: { slides: slides.length, width: 1920, height: 1080, speakerNotes: true } }),
+    file(S, "03_Lecture_Deck/cover_variant_A.html", "html", coverHtml(m, "A"), "learner", [], "ready", { meta: { provisional: !m.input.designSamples, width: 1920, height: 1080 } }),
+    file(S, "03_Lecture_Deck/cover_variant_B.html", "html", coverHtml(m, "B"), "learner", [], "ready", { meta: { provisional: !m.input.designSamples, width: 1920, height: 1080 } }),
+    file(S, "03_Lecture_Deck/cover_slide_A.pptx", "pptx", coverPptx(m, "A"), "learner", [], "ready", { meta: { width: 1920, height: 1080 } }),
+    file(S, "03_Lecture_Deck/cover_slide_B.pptx", "pptx", coverPptx(m, "B"), "learner", [], "ready", { meta: { width: 1920, height: 1080 } }),
+    file(S, "03_Lecture_Deck/cover_design_notes.md", "md", withLabel("md", `${header(m, "Cover Design Notes")}\n${coverNotes(m)}`), "instructor", []),
+    file(S, "10_Instructor_Resources/regeneration_commands.md", "md", withLabel("md", regenerationCommands(m)), "instructor", []),
     file(S, "04_Audio/audio_lecture_script.md", "md", withLabel("md", au.scriptMd), "learner", refsOf(m, au.sents), "ready", { meta: { words: au.words, minutes: minutes(au.words) } }),
     file(S, "04_Audio/audio_lecture.vtt", "vtt", au.vtt, "learner", refsOf(m, au.sents)),
     file(S, "04_Audio/audio_lecture_transcript.txt", "txt", withLabel("txt", au.transcript), "learner", refsOf(m, au.sents)),
+    file(S, "04_Audio/audio_lecture_chapters.vtt", "vtt", au.chaptersVtt, "learner", [], "ready", { meta: { kind: "chapters", chapters: au.chapters.length } }),
+    file(S, "04_Audio/audio_lecture_chapters.json", "json", au.chaptersJson, "learner", []),
     file(S, "04_Audio/deep_dive_script.md", "md", withLabel("md", dd.scriptMd), "learner", refsOf(m, dd.sents), "ready", { meta: { words: dd.words, minutes: minutes(dd.words) } }),
     file(S, "04_Audio/deep_dive.vtt", "vtt", dd.vtt, "learner", refsOf(m, dd.sents)),
     file(S, "04_Audio/deep_dive_transcript.txt", "txt", withLabel("txt", dd.transcript), "learner", refsOf(m, dd.sents)),
@@ -1609,6 +1724,7 @@ export function genStudioTextVisual(m: Model): GeneratedFile[] {
     file(S, "05_Video/video_overview.vtt", "vtt", vo.vtt, "learner", refsOf(m, vo.sents)),
     ...m.assessments.flatMap((a) => requirementsFiles(m, a)),
     file(S, "06_Infographics_and_Mind_Maps/infographic.html", "html", ig.html, "learner", refsOf(m, ig.sents)),
+    file(S, "06_Infographics_and_Mind_Maps/infographic_portrait.html", "html", ig.portrait, "learner", refsOf(m, ig.sents), "ready", { meta: { width: 1080, height: 1920 } }),
     file(S, "06_Infographics_and_Mind_Maps/infographic_alt_text.md", "md", withLabel("md", ig.alt), "learner", refsOf(m, ig.sents)),
     file(S, "06_Infographics_and_Mind_Maps/mind_map.mmd", "mmd", withLabel("mmd", mm.mmd), "learner", allRefs(m)),
     file(S, "06_Infographics_and_Mind_Maps/mind_map.json", "json", mm.json, "learner", allRefs(m)),

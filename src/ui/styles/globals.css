@@ -1977,3 +1977,7 @@ details.acc > div {
 .cci-heat .heat-2{background:#c9dcff}
 .cci-heat .heat-3{background:#8fb5ff;color:#0b1f4d}
 @media (prefers-color-scheme: dark){.cci-heat .heat-1{background:#1b2a4a}.cci-heat .heat-2{background:#24406e}.cci-heat .heat-3{background:#3a63a8;color:#fff}}
+
+/* Studio branding profile */
+.brand-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;align-items:end}
+.brand-form label{display:flex;flex-direction:column;gap:4px}

@@ -2928,6 +2928,33 @@ CREATE TABLE IF NOT EXISTS studio_runs (
   released boolean
 );
 
+-- Studio branding profile (tab: course-studio)
+CREATE TABLE IF NOT EXISTS studio_profiles (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  course_key text,
+  profile jsonb,
+  updated_by text
+);
+
+-- Studio mini-lab check (tab: course-studio)
+CREATE TABLE IF NOT EXISTS studio_lab_checks (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  run_id text,
+  lab_id text,
+  user_id text,
+  score numeric,
+  total numeric,
+  at timestamptz
+);
+
 -- Studio output (tab: course-studio)
 CREATE TABLE IF NOT EXISTS studio_outputs (
   id text PRIMARY KEY,

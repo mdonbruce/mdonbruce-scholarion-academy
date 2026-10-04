@@ -653,8 +653,8 @@ Source-grounded generation per topic into the Scholarion_Academy/[Program]/[Cour
 - **Depends on:** Studio sources, faculty photograph, ffmpeg for silent preview video; a TTS provider for narration (not configured).
 - **Typical failures:** Step failure (run is resumable from the failed step); unavailable URL source (stored as unavailable, never invented); narration awaiting rendering.
 - **Recovery:** Resume the run; replace the source; configure a TTS provider and regenerate media.
-- **Resources:** `studio_sources`, `studio_runs`, `studio_outputs`
-- **Operations:** `studio.add_source`, `studio.sources`, `studio.start`, `studio.resume`, `studio.regenerate`, `studio.regenerate_quiz`, `studio.release`, `studio.runs`, `studio.run`, `studio.outputs`, `studio.edit_output`, `studio.check_minilab`
+- **Resources:** `studio_sources`, `studio_runs`, `studio_outputs`, `studio_profiles`, `studio_lab_checks`
+- **Operations:** `studio.add_source`, `studio.sources`, `studio.start`, `studio.resume`, `studio.regenerate`, `studio.regenerate_quiz`, `studio.release`, `studio.runs`, `studio.run`, `studio.outputs`, `studio.edit_output`, `studio.check_minilab`, `studio.rebuild`, `studio.lms_package`, `studio.profile_set`, `studio.profile`
 - **Who sees it:** admin, designer, instructor
 
 ## 57. Free Education Resource Hub
