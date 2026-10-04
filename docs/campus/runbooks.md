@@ -498,7 +498,7 @@ Product types, cohorts with seats-left, catalog pages generated from data (filte
 - **Typical failures:** Offering won't publish (unverified claim).
 - **Recovery:** Remove the wording or record an approved claim with evidence.
 - **Resources:** `offerings`, `offering_sections`, `approved_claims`
-- **Operations:** `catalog.hub`, `catalog.recommender_questions`, `catalog.recommend`, `catalog.check_copy`
+- **Operations:** `catalog.hub`, `catalog.recommender_questions`, `catalog.recommend`, `catalog.check_copy`, `readiness.questions`, `readiness.score`
 - **Who sees it:** admin, instructor, ta, designer, student, observer, advisor, registrar, support
 
 ## 42. Pathways & Transfer
@@ -692,6 +692,54 @@ Scheduled, bounded discovery and maintenance: cron schedules in America/New_York
 - **Resources:** `eco_schedules`, `eco_jobs`, `eco_sources`, `eco_candidates`, `eco_checks`
 - **Operations:** `eco.automation`, `eco.schedule_save`, `eco.schedule_pause`, `eco.schedule_resume`, `eco.run_now`, `eco.tick`, `eco.job`, `eco.job_create`, `eco.source_add`, `eco.source_toggle`, `eco.schemas`, `eco.validate`
 - **Who sees it:** admin
+
+## 63. Governed Service Bridge
+
+The repository carries two Scholarion builds side by side: this campus and the Python governed service (governed/site) with the HavenConnect app (governed/integrations). The bridge shows the module crosswalk (shared, ported, Python-only), health probes of both services (loopback or https only, no credentials sent), the bundle checksum and the boundaries: separate sign-in realms and no learner-record sync.
+
+- **Purpose:** Know which build owns each capability and whether the companion services are up.
+- **Depends on:** governed/site (Python 3.12+), HavenConnect (Node 22), environment variables SCHOLARION_GOVERNED_URL and SCHOLARION_HAVENCONNECT_URL.
+- **Typical failures:** Service down or not configured (probe shows the reason).
+- **Recovery:** Start the service with the command shown, or set the URL, then probe again.
+- **Resources:** `bridge_probes`
+- **Operations:** `bridge.status`, `bridge.probe`
+- **Who sees it:** admin, support, designer
+
+## 64. Departments & Policy Rules
+
+Ported from the Python service: deterministic sandbox rules for finance holds (reminders, notice before enforcement, soft and hard holds, release on zero balance), refunds (published schedule in basis points, scope by payment model, automatic-approval limit, staff review), and identity-provider results (no ID images or numbers, bounded retries). Versioned policies loaded by admins or registrars; missing policy fails closed; previews on synthetic data only and never executed.
+
+- **Purpose:** Decide holds, refunds and identity outcomes from one published, versioned policy — and see the result before anything is wired to execute.
+- **Depends on:** A versioned policy loaded by an admin or registrar.
+- **Typical failures:** Policy missing (fails closed); invalid schedule (rejected on load).
+- **Recovery:** Load a corrected policy version; the previous one is superseded, never edited.
+- **Resources:** `department_policies`, `department_previews`
+- **Operations:** `departments.status`, `departments.policy_set`, `departments.preview`
+- **Who sees it:** admin, registrar, advisor, instructor
+
+## 65. Voice & Digital Human Studio
+
+Governed voice and digital-human workspace: Amara and Tunde as original fictional personas with text-only, AI-disclosed replies in Standard English, Nigerian English and Nigerian Pidgin (explicit language switch, Standard English and a human handoff for high-risk topics); Consent & Identity Center with eight required checks, separation of duties, a second reviewer, expiry and revocation impact; model registry with licences and the licence gate (non-commercial weights never route to paid plans); moderated, costed generation requests that stop at 'no served model'; immutable storyboards with pairing rules; pronunciation dictionary; provenance on exports; capability status labelled LIVE / CONNECTED / DISABLED / SIMULATED / PLANNED.
+
+- **Purpose:** Plan voice and avatar content safely before any model is served.
+- **Depends on:** Served TTS/STT/avatar models (none yet), legal review for external providers, cultural review board for Amara and Tunde.
+- **Typical failures:** Generation requested (stops at not operational); consent missing or revoked (blocked); licence gate fails (route refused).
+- **Recovery:** Serve and evaluate a licensed model, verify its licence, route it; complete or renew the consent case.
+- **Resources:** `voice_models`, `voice_routes`, `voice_consent_cases`, `voice_assets`, `voice_story_versions`, `voice_jobs`, `voice_pronunciations`
+- **Operations:** `voice.overview`, `voice.persona_reply`, `voice.route_set`, `voice.license_verify`, `voice.consent_open`, `voice.consent_evidence`, `voice.consent_approve`, `voice.consent_revoke`, `voice.voice_create`, `voice.pronunciation_add`, `voice.story_create`, `voice.stories`, `voice.story`, `voice.generate`
+- **Who sees it:** admin, designer, instructor
+
+## 66. Operational Acceptance
+
+Ported from the Python service: evidence register for ten operational-acceptance areas (functional journey, 3× peak load, resilience, RPO 15 min / RTO 4 h restore drill, security, SIS/LMS integrity, accessibility, observability, operations, compliance). Evidence is submitted unverified and verified by a different admin; sign-offs from the platform owner, security lead and academic operations come from three different people. The register never authorizes production by itself.
+
+- **Purpose:** Show, with evidence, what is and isn't ready for a go-live review.
+- **Depends on:** Restore drills (Admin Console), load tests, accessibility runs, security assessment.
+- **Typical failures:** Evidence rejected or missing (area stays blocked).
+- **Recovery:** Run the check, attach the reference, and ask a different admin to verify.
+- **Resources:** `acceptance_evidence`, `acceptance_signoffs`
+- **Operations:** `acceptance.status`, `acceptance.record`, `acceptance.verify`, `acceptance.signoff`
+- **Who sees it:** admin, support, designer, registrar
 
 ## 62. CX & Live Sessions Hub
 

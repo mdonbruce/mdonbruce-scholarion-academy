@@ -2955,6 +2955,177 @@ CREATE TABLE IF NOT EXISTS studio_lab_checks (
   at timestamptz
 );
 
+-- Service probe (tab: governed-bridge)
+CREATE TABLE IF NOT EXISTS bridge_probes (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  target text,
+  url text,
+  ok boolean,
+  status numeric,
+  ms numeric,
+  error text,
+  at timestamptz
+);
+
+-- Department policy version (tab: departments)
+CREATE TABLE IF NOT EXISTS department_policies (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  version_label text,
+  policy jsonb,
+  checksum text,
+  state text,
+  by text
+);
+
+-- Policy preview (tab: departments)
+CREATE TABLE IF NOT EXISTS department_previews (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  kind text,
+  policy_version text,
+  executed boolean,
+  summary text,
+  by text
+);
+
+-- Model registry entry (tab: voice-studio)
+CREATE TABLE IF NOT EXISTS voice_models (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  name text,
+  capability text,
+  code_license text,
+  weights_license text,
+  commercial_use boolean,
+  license_verified_by text,
+  rollout text
+);
+
+-- Model route (tab: voice-studio)
+CREATE TABLE IF NOT EXISTS voice_routes (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  plan text,
+  capability text,
+  model_id text
+);
+
+-- Consent case (tab: voice-studio)
+CREATE TABLE IF NOT EXISTS voice_consent_cases (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  subject_name text,
+  kind text,
+  purposes text,
+  expires_on text,
+  checks jsonb,
+  state text,
+  approved_by text,
+  second_reviewer_by text
+);
+
+-- Voice (tab: voice-studio)
+CREATE TABLE IF NOT EXISTS voice_assets (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  name text,
+  kind text,
+  language text,
+  consent_id text,
+  state text
+);
+
+-- Storyboard revision (tab: voice-studio)
+CREATE TABLE IF NOT EXISTS voice_story_versions (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  story_id text,
+  revision numeric,
+  payload jsonb,
+  checksum text
+);
+
+-- Generation request (tab: voice-studio)
+CREATE TABLE IF NOT EXISTS voice_jobs (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  capability text,
+  state text,
+  estimated_credits numeric,
+  charged numeric,
+  reason text
+);
+
+-- Pronunciation (tab: voice-studio)
+CREATE TABLE IF NOT EXISTS voice_pronunciations (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  term text,
+  say text,
+  language text
+);
+
+-- Acceptance evidence (tab: acceptance)
+CREATE TABLE IF NOT EXISTS acceptance_evidence (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  area text,
+  release text,
+  owner text,
+  reference text,
+  note text,
+  state text,
+  verified_by text
+);
+
+-- Acceptance sign-off (tab: acceptance)
+CREATE TABLE IF NOT EXISTS acceptance_signoffs (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  role text,
+  release text,
+  by text,
+  at timestamptz
+);
+
 -- Studio output (tab: course-studio)
 CREATE TABLE IF NOT EXISTS studio_outputs (
   id text PRIMARY KEY,

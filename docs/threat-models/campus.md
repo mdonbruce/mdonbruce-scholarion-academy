@@ -290,6 +290,30 @@ STRIDE-style notes per tab. Cross-cutting controls first.
 - SSRF → only configured trusted hosts; private and internal addresses are refused
 - Runaway agents → per-job request and runtime budgets, leases and retry limits; agents can't add credentials, enable billing or share learner data
 
+## 63. Governed Service Bridge
+
+- Server-side request forgery → probes only reach loopback (http) or https URLs set by the operator
+- Credential leakage between builds → probes send no credentials; separate sign-in realms
+- Confusing two builds → crosswalk states the owner of each capability
+
+## 64. Departments & Policy Rules
+
+- Silent financial actions → previews never execute; no processor is connected
+- Identity data over-collection → only provider references and verified name/date are accepted
+- Policy drift → every preview records the policy version used
+
+## 65. Voice & Digital Human Studio
+
+- Deepfakes and impersonation → consent case with two reviewers; moderation blocks impersonation, political persuasion, authentication use and deceptive calls
+- Licence violations → non-commercial weights can't route to paid plans; unverified licences block paid routes
+- Hidden AI → disclosure on every reply and export
+
+## 66. Operational Acceptance
+
+- Self-certification → submitter can't verify; three different sign-off people
+- False readiness claims → production stays blocked; status says what's missing
+- Evidence tampering → audit trail and outbox events for every submission and decision
+
 ## 62. CX & Live Sessions Hub
 
 - Meeting-bombing → waiting room, passcodes, authenticated join, host-only screen share, link regeneration

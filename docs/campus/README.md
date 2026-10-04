@@ -1,6 +1,6 @@
 # Scholarion Campus
 
-Multi-tenant SIS + LMS + ERP layer of Scholarion: tenant isolation, identity and policy, LMS parity (modules, assignments, quizzes, gradebook, sequential grader, discussions, calendar, inbox, blueprints…), SIS (admissions, registration, records, finance), governed AI, the Cloud Lab (LTI 1.3), catalog/pathways/sandbox commerce, Academy program pages, the Agentic AI catalog hub, the shared module library, proctored-assessment support, credentials and the control plane, the hosted learning area (Agentic Cloud Labs with saved workspaces, a bounded autonomous runner and two-attempt auto-grading to the gradebook and passbook) the Course Studio, the Free Education Resource Hub, Career Connect, the Auto-Discovery workflow, Program Marketing & Campaigns, Curriculum & Course Intelligence (tab 61) and the CX & Live Sessions Hub (tab 62) — **62 tabs**, all operational in local and staging. Every downloadable document is also available as PDF, Word and Excel (`?format=pdf|docx|xlsx`); learners upload Word, Excel, PowerPoint, PDF, notebooks, Python/R/SQL and Colab/Codelab/GitHub links for assignments, projects and mini labs; and the Course Studio writes real PowerPoint decks and 1920×1080 branded covers.
+Multi-tenant SIS + LMS + ERP layer of Scholarion: tenant isolation, identity and policy, LMS parity (modules, assignments, quizzes, gradebook, sequential grader, discussions, calendar, inbox, blueprints…), SIS (admissions, registration, records, finance), governed AI, the Cloud Lab (LTI 1.3), catalog/pathways/sandbox commerce, Academy program pages, the Agentic AI catalog hub, the shared module library, proctored-assessment support, credentials and the control plane, the hosted learning area (Agentic Cloud Labs with saved workspaces, a bounded autonomous runner and two-attempt auto-grading to the gradebook and passbook) the Course Studio, the Free Education Resource Hub, Career Connect, the Auto-Discovery workflow, Program Marketing & Campaigns, Curriculum & Course Intelligence (tab 61), the CX & Live Sessions Hub (tab 62), the Governed Service Bridge (63), Departments & Policy Rules (64), the Voice & Digital Human Studio (65) and Operational Acceptance (66) — **66 tabs**, all operational in local and staging. Every downloadable document is also available as PDF, Word and Excel (`?format=pdf|docx|xlsx`); learners upload Word, Excel, PowerPoint, PDF, notebooks, Python/R/SQL and Colab/Codelab/GitHub links for assignments, projects and mini labs; and the Course Studio writes real PowerPoint decks and 1920×1080 branded covers.
 
 > Local + staging only. All people, schools and records are fictional demonstration data. Payments are sandbox only. No accreditation or outcome claims.
 
@@ -110,10 +110,15 @@ npm run campus:docs        # regenerate schemas, OpenAPI, runbooks, threat model
 src/campus/core.ts           tenants, broker (per-tenant stores), outbox + idempotent consumers, audit, metrics
 src/campus/iam.ts            actors, sessions, TOTP, role grants, support grants, act-as
 src/campus/permissions.ts    permission matrix with account inheritance and locks
-src/campus/registry.ts       235 resources and 62 tabs (fields, permissions, runbooks, threats)
+src/campus/registry.ts       247 resources and 66 tabs (fields, permissions, runbooks, threats)
 src/campus/entity.ts         generic CRUD with authorization, validation, publish checks, tombstones
 src/campus/services/*        domain services (curriculum, assessment, grading, sis, ai, lti, academy, tutor, proctor, platform…)
 src/campus/http/*            REST router, operations registry, OpenAPI, GraphQL, gRPC
 src/campus/ui/*              server-rendered UI (shell, kit, views)
 src/campus/seed.ts           demonstration data for the three tenants
 ```
+
+
+## Two builds side by side
+
+`governed/` holds the Python governed service (`governed/site`, run `python governed_service.py`, 267 unit tests, `validate.py`) and the HavenConnect Node app (`governed/integrations/HavenConnect-current`), imported unchanged in layout from the 2026-10-04 complete-source bundle (SHA-256 `aacb2df559ef8341ba2369c06f9f33bebf74d808649d88751e36350dd3a4177b`). The Governed Service Bridge tab (63) lists which build owns each capability, probes both services, and states the boundaries: separate sign-in realms, no learner-record sync. CI runs the Python suite alongside the campus tests.

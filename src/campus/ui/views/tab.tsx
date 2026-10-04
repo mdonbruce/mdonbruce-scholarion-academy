@@ -19,6 +19,7 @@ import { ProctorPanel } from "./proctor";
 import { CampaignsPanel } from "./campaigns";
 import { DesignPanel } from "./design";
 import { AidQueuePanel } from "./market";
+import { AcceptancePanel, BridgePanel, DepartmentsPanel, VoicePanel } from "./governed";
 import { isDesignProgram } from "../../academy/design";
 import { studioOverview, programIndex } from "../../services/programs";
 import { PARITY, paritySummary, SECTION_TITLES } from "../../parity";
@@ -216,6 +217,14 @@ function Bespoke({ t, tab }: { t: T; tab: string }) {
             Work in the hub: <a href={`/campus/${t.slug}/hub/${tab === "free-resources" ? "tools" : tab === "career-connect" ? "career" : "automation"}`}>open it</a>.
           </p>
         );
+      case "governed-bridge":
+        return <BridgePanel store={t.store} actor={t.actor} slug={t.slug} here={t.here} sp={t.sp} />;
+      case "departments":
+        return <DepartmentsPanel store={t.store} actor={t.actor} slug={t.slug} here={t.here} sp={t.sp} />;
+      case "voice-studio":
+        return <VoicePanel store={t.store} actor={t.actor} slug={t.slug} here={t.here} sp={t.sp} />;
+      case "acceptance":
+        return <AcceptancePanel store={t.store} actor={t.actor} slug={t.slug} here={t.here} sp={t.sp} />;
       case "proctor-support":
         return <ProctorPanel store={t.store} actor={t.actor} slug={t.slug} sp={t.sp} here={t.here} />;
       case "catalog":

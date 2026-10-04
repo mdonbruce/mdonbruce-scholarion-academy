@@ -27,6 +27,10 @@ import { applyToProgram, programIndex, reviewProgramApplication, selfCheck } fro
 import { ProgramIndexView, ProgramPageView } from "../src/campus/ui/views/program";
 import { PublicChangelog } from "../src/campus/ui/views/ecohub";
 import { AidView, PlusView, PricingView } from "../src/campus/ui/views/market";
+import { ReadinessView } from "../src/campus/ui/views/readiness";
+import { EXAMPLE_POLICY, preview as deptPreview, setPolicy as deptSetPolicy } from "../src/campus/services/departments";
+import { createStory, requestGeneration, storyCommand } from "../src/campus/services/voice";
+import { recordEvidence } from "../src/campus/services/acceptance";
 import { kitAssets } from "../src/campus/services/campaigns";
 import { planSession, supportAnswer, tickSessions } from "../src/campus/services/comms";
 import { generateDraft } from "../src/campus/services/assess";
@@ -365,7 +369,24 @@ page("academy", "admin", "t/pathways?run=pathways.consolidation_report", "Consol
     fs.writeFileSync(path.join(OUT, `campaign-${x.path}`), body);
     index.push({ file: `campaign-${x.path}`, title: `#39 kit — ${x.title}`, who: "admin@academy" });
   }
+  {
+    // Tabs 63–66: bridge, departments, voice studio, acceptance (with a little seeded activity).
+    const reg = as("academy", "registrar");
+    deptSetPolicy(reg.store, reg.actor, { versionLabel: "synthetic-example", policy: EXAMPLE_POLICY });
+    deptPreview(reg.store, reg.actor, { kind: "refund", synthetic: true, purchase: { model: "pay_in_full", scope: "program", scope_id: "synthetic-program", paid_minor: 120000, refunded_minor: 0 }, elapsedDays: 10 });
+    const des = as("academy", "designer");
+    const st = createStory(des.store, des.actor, "Module 1 welcome");
+    storyCommand(des.store, des.actor, st.id, "scene", { revision: 1, speaker: "Host", avatar: "amara", language: "en-NG", script: "Welcome to Advanced Agentic Cloud Systems." });
+    requestGeneration(des.store, des.actor, { capability: "tts", text: "Welcome to Module 1." });
+    requestGeneration(des.store, des.actor, { capability: "tts", text: "Make it sound like Barack Obama endorsing the course" });
+    recordEvidence(des.store, des.actor, { area: "recovery", release: "campus-staging", owner: "Platform", reference: "Admin Console restore drill", note: "Drill into a validation tenant passed; awaiting verification." });
+    page("academy", "admin", "t/governed-bridge", "Governed Service Bridge (tab 63)");
+    page("academy", "registrar", "t/departments", "Departments & Policy Rules (tab 64)");
+    page("academy", "designer", "t/voice-studio?persona=amara&lang=pcm&msg=I+wan+enroll+for+program", "Voice & Digital Human Studio (tab 65)");
+    page("academy", "admin", "t/acceptance", "Operational Acceptance (tab 66)");
+  }
   const at = broker.tenant("academy")!;
+  save("academy-public-readiness.html", "Readiness self-check", "public", <PublicFrame tenant={at}><ReadinessView slug="academy" sp={{ goal: "agents", q1: "1", q2: "1", q3: "0", q4: "1", q5: "0", q6: "0", q7: "0", q8: "1", q9: "1", q10: "0" }} /></PublicFrame>);
   save("academy-public-changelog.html", "Catalog changelog", "public", <PublicFrame tenant={at}><PublicChangelog store={ca.store} /></PublicFrame>);
 }
 

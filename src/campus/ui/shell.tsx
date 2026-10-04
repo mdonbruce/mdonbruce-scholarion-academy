@@ -186,6 +186,7 @@ export function PublicFrame({ tenant, children }: { tenant: Tenant; children: Re
           <a href={`/campus/${tenant.slug}/pricing`}>Plans and pricing</a>
           <a href={`/campus/${tenant.slug}/plus`}>Scholaris Plus</a>
           <a href={`/campus/${tenant.slug}/financial-aid`}>Financial aid</a>
+          <a href={`/campus/${tenant.slug}/readiness`}>Where should I start?</a>
           <a href={`/campus/${tenant.slug}/verify`}>Verify a credential</a>
           <a href={`/campus/${tenant.slug}/changelog`}>What changed</a>
         </nav>

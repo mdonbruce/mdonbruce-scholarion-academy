@@ -49,7 +49,7 @@ import { recordView } from "../services/dashboard";
  * rate-limited). Admins may act as another user (?as_user_id=) — every request is audited.
  */
 
-const PUBLIC_OPS = new Set(["catalog.hub", "catalog.recommender_questions", "catalog.recommend", "commerce.quote", "programs.index", "programs.page", "programs.self_check_questions", "agentic.hub", "agentic.quiz_questions", "agentic.recommend", "eco.changelog", "plans.options", "plans.quote", "plans.settings_view"]);
+const PUBLIC_OPS = new Set(["catalog.hub", "catalog.recommender_questions", "catalog.recommend", "commerce.quote", "programs.index", "programs.page", "programs.self_check_questions", "agentic.hub", "agentic.quiz_questions", "agentic.recommend", "eco.changelog", "plans.options", "plans.quote", "plans.settings_view", "readiness.questions", "readiness.score"]);
 /** Commands anyone may send (same-origin forms or JSON); the signed-in user is attached when present. */
 const PUBLIC_CMDS = new Set(["programs.inquire", "programs.self_check", "campaign.subscribe"]);
 
