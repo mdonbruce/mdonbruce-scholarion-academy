@@ -1004,12 +1004,12 @@ $("data").textContent=JSON.stringify(D.cards.slice(0,6),null,2)})();`;
 <label for="max">Step budget (1–6)</label><input id="max" type="number" min="1" max="6" value="4" style="width:5em">
 <fieldset><legend>Permitted tools (simulated)</legend>${["glossary_lookup", "search_notes", "recall_memory", "compose_answer"].map((t) => `<label><input type="checkbox" name="tool" value="${t}" checked> ${t} (simulated)</label>`).join("")}</fieldset>
 <button type="button" id="run">Run the agent</button><p id="status" role="status" aria-live="polite"></p></div>
-<h2>1. Perception</h2><pre id="perception" tabindex="0" aria-label="Perception output"></pre>
-<h2>2. Reasoning &amp; Planning</h2><pre id="plan" tabindex="0" aria-label="Plan"></pre>
-<h2>3. Memory (last 5 turns)</h2><pre id="memory" tabindex="0" aria-label="Memory"></pre>
+<h2>1. Perception</h2><pre id="perception" tabindex="0" role="region" aria-label="Perception output"></pre>
+<h2>2. Reasoning &amp; Planning</h2><pre id="plan" tabindex="0" role="region" aria-label="Plan"></pre>
+<h2>3. Memory (last 5 turns)</h2><pre id="memory" tabindex="0" role="region" aria-label="Memory"></pre>
 <h2>4. Bounded tool execution</h2><table><caption class="sr-only">Tool execution trace</caption><thead><tr><th scope="col">Step</th><th scope="col">Tool</th><th scope="col">Status</th></tr></thead><tbody id="trace"></tbody></table>
 <h2>Result</h2><div id="answer" class="panel" aria-live="polite"></div>
-<h2>Synthetic dataset (first 6 records)</h2><pre id="data" tabindex="0" aria-label="Dataset sample"></pre>
+<h2>Synthetic dataset (first 6 records)</h2><pre id="data" tabindex="0" role="region" aria-label="Dataset sample"></pre>
 <p class="cite">Dataset records are short excerpts of the supplied readings with their citations; see 01_Sources/reading_list.md.</p></main>`;
   return shell(`Agentic demo — ${m.input.topicTitle}`, body, "", script);
 }

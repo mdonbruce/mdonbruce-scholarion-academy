@@ -1951,3 +1951,5 @@ details.acc > div {
 .kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 16px}.kv dt{font-weight:600}.kv dd{margin:0}
 @media (max-width:800px){.learn-layout,.learn-editor{grid-template-columns:1fr}.learn-nav ol{position:static;flex-direction:row;flex-wrap:wrap}.learn-files{columns:1}}
 @media (prefers-color-scheme:dark){.learn-ok{color:#86efac}.learn-no{color:#fdba74}}
+.campus-learn .small li{margin:0 0 6px}
+.campus-learn .small li a,.learn-editor nav a,.learn-files a{display:inline-block;min-height:24px;padding:2px 0;line-height:20px}
