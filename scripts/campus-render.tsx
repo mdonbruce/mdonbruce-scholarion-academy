@@ -287,12 +287,17 @@ page("academy", "admin", "t/module-library", "Module Library & Catalog Consolida
   page("academy", "lead", L("outputs", run ? `?run=${run.id}` : ""), "Learning area — Studio output library (instructor)");
   if (run) {
     const lead = as("academy", "lead");
-    for (const rel of ["03_Lecture_Deck/lecture_deck.html", "03_Lecture_Deck/cover_variant_A.html", "03_Lecture_Deck/cover_variant_B.html", "11_Application_Demo/agentic_demo.html", "09_Student_Labs/minilab_1.html", "06_Infographics_and_Mind_Maps/infographic.html"]) {
+    for (const rel of ["03_Lecture_Deck/lecture_deck.html", "03_Lecture_Deck/cover_variant_A.html", "03_Lecture_Deck/cover_variant_B.html", "11_Application_Demo/agentic_demo.html", "09_Student_Labs/minilab_1.html", "09_Student_Labs/minilab_2.html", "06_Infographics_and_Mind_Maps/infographic.html", "06_Infographics_and_Mind_Maps/infographic_portrait.html"]) {
       const o = studioListOutputs(lead.store, lead.actor, run.id).find((x) => x.relPath === rel);
       if (!o) continue;
       const file = `studio-ai801-${rel.split("/").pop()}`;
       fs.writeFileSync(path.join(OUT, file), String(studioReadOutput(lead.store, lead.actor, String(o.id)).content));
       index.push({ file, title: `Course Studio — AI-801 ${rel}`, who: "learner" });
+    }
+    // PowerPoint outputs (binary downloads, not screens).
+    for (const rel of ["03_Lecture_Deck/lecture_deck.pptx", "03_Lecture_Deck/cover_slide_A.pptx", "03_Lecture_Deck/cover_slide_B.pptx"]) {
+      const o = studioListOutputs(lead.store, lead.actor, run.id).find((x) => x.relPath === rel);
+      if (o) fs.writeFileSync(path.join(OUT, `studio-ai801-${rel.split("/").pop()}`), studioReadOutput(lead.store, lead.actor, String(o.id)).content as Buffer);
     }
   }
   setProjectionLock(as("academy", "lead").store, as("academy", "lead").actor, C, false);
