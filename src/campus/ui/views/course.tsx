@@ -4,7 +4,7 @@ import { Formats } from "../../../ui/components/formats";
 import { facultyByName } from "../../../brand/faculty";
 import { FacultyCard } from "../../../ui/components/faculty";
 import { CampusError, type Row, type TenantStore } from "../../core";
-import { hasAny, type Actor } from "../../iam";
+import type { Actor } from "../../iam";
 import * as entity from "../../entity";
 import { ENTITY } from "../../registry";
 import * as cur from "../../services/curriculum";

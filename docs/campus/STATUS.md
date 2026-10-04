@@ -52,7 +52,7 @@ A tab is OPERATIONAL when it has persisted resources, enforced authorization, au
 | 40 | Account & Profile | Added | OPERATIONAL | UI render test |
 | 41 | Catalog & Hub | Academy & Commerce | OPERATIONAL | platform 2/10 |
 | 42 | Pathways & Transfer | Academy & Commerce | OPERATIONAL | platform 4 |
-| 43 | Commerce (sandbox) | Academy & Commerce | OPERATIONAL | plans suite (trial disclosures and reminders, one-step cancel at period end, annual refund window, program plans, pause, financial aid with human decision) + platform commerce test |
+| 43 | Commerce (sandbox) | Academy & Commerce | OPERATIONAL | platform 3 + commerce policy test; plans suite (trial disclosures and reminders, one-step cancel at period end, annual refund window, program plans, pause, financial aid with human decision) + platform commerce test |
 | 44 | AI Tutor | Intelligence | OPERATIONAL | platform 6 |
 | 45 | Lab Key Vault | Teaching & Learning | OPERATIONAL | platform 5 |
 | 46 | Tenant Console | Platform | OPERATIONAL | platform 1/7/9 |

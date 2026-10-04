@@ -166,7 +166,6 @@ export function coverShapes(m: Model, variant: "A" | "B"): PptShape[] {
   const P = resolveProfile(m);
   const imgs = images(m);
   const dark = variant === "A";
-  const bg = dark ? P.primary : P.light;
   const ink = dark ? "#ffffff" : P.primary;
   const soft = dark ? "#d9def0" : "#3a4766";
   const accentInk = lum(P.accent) > 0.55 ? (dark ? P.accent : darken(P.accent, 0.6)) : P.accent;

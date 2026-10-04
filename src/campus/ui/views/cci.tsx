@@ -34,7 +34,6 @@ export const CCI_SECTIONS = [
 
 const programs = (t: Ctx) => programIndex(t.store).map((p) => ({ code: p.code, title: p.title }));
 const courses = (t: Ctx) => t.store.list("courses", (c) => !!c.code && t.store.list("enrollments", (e) => e.courseId === c.id && e.role === "student").length > 0).slice(0, 40);
-const GATE: Record<string, string> = { pass: "badge badge-green", needs_action: "badge badge-amber", needs_review: "badge badge-blue", fail: "badge badge-red" };
 
 export function CciWorkspace({ store, actor, slug, section, sp }: { store: TenantStore; actor: Actor; slug: string; section: string; sp: SP }) {
   if (!hasAny(actor, ["admin", "designer", "instructor", "registrar"])) return <Denied message="Curriculum Intelligence is for curriculum staff." />;
