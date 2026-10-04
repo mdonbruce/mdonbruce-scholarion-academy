@@ -259,6 +259,19 @@ STRIDE-style notes per tab. Cross-cutting controls first.
 - Agent overreach → per-tool allow/deny, per-task caps, step and tool-call budgets
 - Grade gaming → hidden test tasks in graded attempts; best-of-two posted automatically
 
+## 55. Hosted Learning Area (Agentic Cloud Labs)
+
+- Arbitrary code execution → the terminal is a simulated shell over a virtual filesystem; nothing learners type is executed on a server
+- Answer-key leaks → keys stay in frozen server-side versions, Check Answers only after grading, instructor files behind the projection lock
+- Double grading → idempotency keys on submit and on posting
+- Agent overreach → tools, filesystem, network, credentials and budgets enforced outside the model; blocked actions fail automatically
+
+## 56. Course Studio (Master Studio Generator)
+
+- Ungrounded claims → additions marked [Supplemental — verify]; QA flags unsupported statements
+- Prompt injection through sources → source text is data and never changes settings
+- Answer leaks → instructor outputs are excluded from student bundles and downloads
+
 ## 52. Module Library & Catalog Consolidation
 
 - Unapproved refund terms shown to learners → policies display only after product-owner approval

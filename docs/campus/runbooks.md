@@ -623,7 +623,7 @@ Curriculum Engine generators for every module: hands-on labs, in-class activitie
 
 ## 54. Agentic Cloud Labs
 
-Scholarion's hosted agent-building area: saved workspaces with version history, a bounded autonomous agent runner (no approval gates; step and tool-call budgets), per-tool permissions with violation tracking, evaluation traces, rubric auto-grading posted to the gradebook with a pass/no-pass mark, and two graded attempts per lab (best counts; staff can grant one more).
+Scholarion's hosted agent-building area: saved workspaces with version history, a bounded autonomous agent runner (no approval gates; step and tool-call budgets), per-tool permissions with violation tracking, an operational run log, rubric auto-grading posted to the gradebook with a pass/no-pass mark, and two graded attempts per lab (best counts; staff can grant one more).
 
 - **Purpose:** Practice and assess agent design safely and at scale.
 - **Depends on:** Courses and assignments, gradebook, sandbox scenarios.
@@ -632,6 +632,30 @@ Scholarion's hosted agent-building area: saved workspaces with version history, 
 - **Resources:** `agent_labs`, `agent_lab_runs`, `agent_lab_grants`, `agent_workspaces`
 - **Operations:** `agentlabs.mine`, `agentlabs.open`, `agentlabs.save`, `agentlabs.run`, `agentlabs.restore`, `agentlabs.reset`, `agentlabs.run_detail`, `agentlabs.roster`, `agentlabs.grant_attempt`, `agentlabs.verify`
 - **Who sees it:** admin, designer, instructor, ta, student
+
+## 55. Hosted Learning Area (Agentic Cloud Labs)
+
+Scholarion's own hosted learning area for each course: dashboard, modules and topics, sources, Lecture Studio, Agentic Cloud Labs, interactive mini-labs, in-class activities, assignments and projects, quizzes and practice, saved workspaces, application demonstrations, gradebook and passbook, instructor control panel, environment and tool permissions, and the Studio output library. Persistent workspaces (files, editor, simulated terminal, run/stop/reset/save/resume, autosave, snapshots, usage and budget); a bounded autonomous runner with policy enforced outside the model; two graded attempts with unlimited practice; frozen rubric versions; idempotent submission and grade posting with automatic retry; Check Answers after grading; competency passbook; projection lock for instructor answer keys.
+
+- **Purpose:** Learners practise and are assessed in one place; instructors run class and see progress without exposing answers.
+- **Depends on:** Courses and enrollments, gradebook, workspace templates, Course Studio outputs.
+- **Typical failures:** Grading environment unavailable (submission marked infra_failed, no attempt used); gradebook post failure (posting_failed, retried automatically); attempts exhausted (409).
+- **Recovery:** Learner resubmits after an infra failure; staff or the scheduler run graded.retry; instructor grants an extra attempt in the item settings.
+- **Resources:** `graded_items`, `graded_item_versions`, `graded_submissions`, `passbook`, `lab_workspaces`, `workspace_snapshots`, `workspace_policies`, `workspace_agent_runs`, `workspace_teams`, `projection_locks`
+- **Operations:** `learn.overview`, `learn.sections`, `graded.view`, `graded.practice`, `graded.submit`, `graded.submit_project`, `graded.review`, `graded.gradebook`, `graded.retry`, `workspace.templates`, `workspace.mine`, `workspace.launch`, `workspace.get`, `workspace.files`, `workspace.read`, `workspace.write`, `workspace.command`, `workspace.save`, `workspace.stop`, `workspace.resume`, `workspace.reset`, `workspace.snapshot`, `workspace.agent_run`, `workspace.agent_stop`, `workspace.agent_runs`, `workspace.pause`, `workspace.unpause`, `workspace.policy`, `workspace.set_policy`, `workspace.progress`, `projection.state`, `projection.lock`, `projection.unlock`
+- **Who sees it:** admin, designer, instructor, ta, student
+
+## 56. Course Studio (Master Studio Generator)
+
+Source-grounded generation per topic into the Scholarion_Academy/[Program]/[Course]/Module_[NN]/[Topic]/01_Sources … 13_Environment_Templates folder tree: 10-slide deck with notes, overview, notes, study guide, mind map, 16:9 infographic, 20+ flashcards, 10-question practice quiz, two mini-labs, lab/programming/DevOps environments, rubrics, cover variants A and B with the approved faculty photograph, video and audio scripts with honest media status, QA report, manifest, protected instructor bundle and regeneration commands. Every output is labelled AI DRAFT until an instructor releases it.
+
+- **Purpose:** Produce a complete, reviewable teaching package for any topic from the instructor's own sources.
+- **Depends on:** Studio sources, faculty photograph, ffmpeg for silent preview video; a TTS provider for narration (not configured).
+- **Typical failures:** Step failure (run is resumable from the failed step); unavailable URL source (stored as unavailable, never invented); narration awaiting rendering.
+- **Recovery:** Resume the run; replace the source; configure a TTS provider and regenerate media.
+- **Resources:** `studio_sources`, `studio_runs`, `studio_outputs`
+- **Operations:** `studio.add_source`, `studio.sources`, `studio.start`, `studio.resume`, `studio.regenerate`, `studio.regenerate_quiz`, `studio.release`, `studio.runs`, `studio.run`, `studio.outputs`, `studio.edit_output`, `studio.check_minilab`
+- **Who sees it:** admin, designer, instructor
 
 ## 52. Module Library & Catalog Consolidation
 

@@ -150,7 +150,7 @@ export interface ProgramSpec {
 }
 
 export const AI_TA = "Scholaris AI Teaching Assistant — coaches with hints and explanations from your course material; it never completes graded work";
-export const LEAD = { name: "Dr. Martins Donbruce Idahosa", role: "Lead Faculty", bio: null };
+export const LEAD = { name: "Dr. Martins Donbruce Idahosa", role: "Lead Faculty & Director of AI Innovation", bio: null };
 const TM = "Product and tool names are trademarks of their owners. Scholaris AI Academy is not affiliated with or endorsed by them.";
 export const TRADEMARK_NOTICE = TM;
 

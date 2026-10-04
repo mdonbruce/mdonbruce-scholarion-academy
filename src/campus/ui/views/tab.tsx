@@ -1313,7 +1313,7 @@ function AgenticLabsPanel({ t }: { t: T }) {
                     <th scope="col">Graded attempts</th>
                     <th scope="col">Best</th>
                     <th scope="col">Violations</th>
-                    <th scope="col">Trace</th>
+                    <th scope="col">Run log</th>
                     <th scope="col">Extra attempt</th>
                   </tr>
                 </thead>

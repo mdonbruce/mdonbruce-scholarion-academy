@@ -6,6 +6,7 @@ import { ensureProctorDefaults } from "./services/proctor";
 import { ensurePrograms } from "./services/programs";
 import { ensureConsolidationDecision } from "./services/hub";
 import { ensureAgentLabs } from "./services/agentlabs";
+import { ensureAI801 } from "./academy/ai801-seed";
 import { ensureCloudLabTool } from "./services/lti";
 import { issueCredential, rebuildIndex, recomputeSignals } from "./services/success";
 import { setGrade } from "./services/grading";
@@ -401,6 +402,7 @@ function seedAcademy(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
   ensurePrograms(store);
   ensureConsolidationDecision(store);
   ensureAgentLabs(store);
+  ensureAI801(store);
   ensureAgents(store);
   ensureProctorDefaults(store);
   ensureStandardTemplate(store);

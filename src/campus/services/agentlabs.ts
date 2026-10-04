@@ -13,7 +13,7 @@ import { audit, notify, requireTenant } from "./common";
  *   executed as code.
  * - Tool permissions: each tool is allowed or denied per lab, with per-task call caps; denied or
  *   over-cap calls are blocked and counted as violations.
- * - Evaluation traces: every decision, call, observation and violation is recorded per task.
+ * - Run logs: every routing decision, tool call, observation and violation is recorded per task (operational records, not model reasoning).
  * - Rubric grading: five criteria scored from the evaluation; graded attempts post straight to the
  *   gradebook with a pass/no-pass mark. Two graded attempts per lab; the best attempt counts.
  */

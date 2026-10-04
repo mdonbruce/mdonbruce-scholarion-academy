@@ -130,6 +130,11 @@ export function CourseView({ store, actor, slug, courseId, rest, sp }: { store: 
         <a className="btn btn-ghost btn-sm" href={`${base(c)}/tutor`}>
           AI tutor
         </a>
+        {store.list("graded_items", (i) => i.courseId === courseId).length > 0 && (
+          <a className="btn btn-primary btn-sm" href={`/campus/${slug}/learn/${courseId}/dashboard`}>
+            Learning area
+          </a>
+        )}
       </PageHead>
       {(() => {
         const fac = [...new Set(store.list("enrollments", (e) => e.courseId === courseId && e.role === "instructor" && e.state === "active").map((e) => String(store.get("users", String(e.userId))?.name ?? "")))].map((n) => facultyByName(n)).filter(Boolean);

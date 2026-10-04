@@ -50,10 +50,10 @@ describe("Approved faculty photograph", () => {
     }
     const card = renderToStaticMarkup(FacultyCard({}));
     assert.match(card, /Dr\. Martins Donbruce Idahosa/);
-    assert.match(card, /Lead Faculty, Scholarion Academy/);
+    assert.match(card, /Lead Faculty &(amp;)? Director of AI Innovation, Scholarion Academy/);
     const img = renderToStaticMarkup(FacultyPhoto({ size: 1000 }));
     assert.match(img, new RegExp(`width="${LEAD_FACULTY.photo.width}" height="${LEAD_FACULTY.photo.height}"`), "rendered at the source size, not stretched");
-    assert.match(img, /alt="Dr\. Martins Donbruce Idahosa, Lead Faculty, Scholarion Academy"/);
+    assert.match(img, /alt="Dr\. Martins Donbruce Idahosa, Lead Faculty &amp; Director of AI Innovation, Scholarion Academy"/);
   });
 
   it("appears on program pages, campus course pages and the brochure PDF", async () => {
@@ -82,7 +82,7 @@ describe("Approved faculty photograph", () => {
     for (const kind of ["slide", "title-card"] as const) {
       const html = coverHtml(store, "off_academy_15", "3", kind);
       assert.ok(html.includes(b64), "the original bytes, embedded");
-      assert.match(html, /Lead Faculty, Scholarion Academy/);
+      assert.match(html, /Lead Faculty &(amp;)? Director of AI Innovation, Scholarion Academy/);
       assert.match(html, /aspect-ratio:16\/9/);
     }
     assert.throws(() => coverHtml(store, "off_academy_15", "99", "slide"), (e: unknown) => (e as CampusError).status === 404);

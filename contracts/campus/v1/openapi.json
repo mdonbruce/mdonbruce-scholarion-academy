@@ -225,7 +225,15 @@
     },
     {
       "name": "Agentic Cloud Labs",
-      "description": "Scholarion's hosted agent-building area: saved workspaces with version history, a bounded autonomous agent runner (no approval gates; step and tool-call budgets), per-tool permissions with violation tracking, evaluation traces, rubric auto-grading posted to the gradebook with a pass/no-pass mark, and two graded attempts per lab (best counts; staff can grant one more)."
+      "description": "Scholarion's hosted agent-building area: saved workspaces with version history, a bounded autonomous agent runner (no approval gates; step and tool-call budgets), per-tool permissions with violation tracking, an operational run log, rubric auto-grading posted to the gradebook with a pass/no-pass mark, and two graded attempts per lab (best counts; staff can grant one more)."
+    },
+    {
+      "name": "Hosted Learning Area (Agentic Cloud Labs)",
+      "description": "Scholarion's own hosted learning area for each course: dashboard, modules and topics, sources, Lecture Studio, Agentic Cloud Labs, interactive mini-labs, in-class activities, assignments and projects, quizzes and practice, saved workspaces, application demonstrations, gradebook and passbook, instructor control panel, environment and tool permissions, and the Studio output library. Persistent workspaces (files, editor, simulated terminal, run/stop/reset/save/resume, autosave, snapshots, usage and budget); a bounded autonomous runner with policy enforced outside the model; two graded attempts with unlimited practice; frozen rubric versions; idempotent submission and grade posting with automatic retry; Check Answers after grading; competency passbook; projection lock for instructor answer keys."
+    },
+    {
+      "name": "Course Studio (Master Studio Generator)",
+      "description": "Source-grounded generation per topic into the Scholarion_Academy/[Program]/[Course]/Module_[NN]/[Topic]/01_Sources … 13_Environment_Templates folder tree: 10-slide deck with notes, overview, notes, study guide, mind map, 16:9 infographic, 20+ flashcards, 10-question practice quiz, two mini-labs, lab/programming/DevOps environments, rubrics, cover variants A and B with the approved faculty photograph, video and audio scripts with honest media status, QA report, manifest, protected instructor bundle and regeneration commands. Every output is labelled AI DRAFT until an instructor releases it."
     },
     {
       "name": "Module Library & Catalog Consolidation",
@@ -26420,7 +26428,7 @@
         "tags": [
           "Agentic Cloud Labs"
         ],
-        "summary": "List agent lab runs and evaluation traces",
+        "summary": "List agent lab runs and run logs",
         "parameters": [
           {
             "name": "cursor",
@@ -26892,6 +26900,2484 @@
           "Module Library & Catalog Consolidation"
         ],
         "summary": "Delete (tombstone) a catalog consolidation report",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/graded_items": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "List graded mini-labs, quizzes, worksheets and projects",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GradedItems"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Create a graded item",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "description": "Title",
+                    "type": "string"
+                  },
+                  "passMark": {
+                    "description": "Pass mark (%)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "maxAttempts": {
+                    "description": "Graded attempts",
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 5
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/graded_items/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Get a graded item",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Update a graded item (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "description": "Title",
+                    "type": "string"
+                  },
+                  "passMark": {
+                    "description": "Pass mark (%)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "maxAttempts": {
+                    "description": "Graded attempts",
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 5
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Delete (tombstone) a graded item",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/graded_items/{id}/publish": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Publish (validation runs first)",
+        "responses": {
+          "200": {
+            "description": "Published"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Unpublish",
+        "responses": {
+          "200": {
+            "description": "Unpublished"
+          }
+        }
+      }
+    },
+    "/r/graded_item_versions": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "List frozen assessment versions",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GradedItemVersions"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Create a frozen assessment version",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/graded_item_versions/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Get a frozen assessment version",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Update a frozen assessment version (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Delete (tombstone) a frozen assessment version",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/graded_submissions": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "List graded submissions",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GradedSubmissions"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Create a graded submission",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/graded_submissions/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Get a graded submission",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Update a graded submission (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Delete (tombstone) a graded submission",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/passbook": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "List competency passbook",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Passbook"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Create a passbook entry",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/passbook/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Get a passbook entry",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Update a passbook entry (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Delete (tombstone) a passbook entry",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/lab_workspaces": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "List saved cloud lab workspaces",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/LabWorkspaces"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Create a cloud lab workspace",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/lab_workspaces/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Get a cloud lab workspace",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Update a cloud lab workspace (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Delete (tombstone) a cloud lab workspace",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/workspace_teams": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "List workspace teams",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/WorkspaceTeams"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Create a workspace team",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/workspace_teams/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Get a workspace team",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Update a workspace team (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Delete (tombstone) a workspace team",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/workspace_snapshots": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "List frozen submission snapshots",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/WorkspaceSnapshots"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Create a submission snapshot",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/workspace_snapshots/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Get a submission snapshot",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Update a submission snapshot (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Delete (tombstone) a submission snapshot",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/workspace_policies": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "List environment and tool permissions",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/WorkspacePolicies"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Create a execution policy version",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/workspace_policies/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Get a execution policy version",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Update a execution policy version (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Delete (tombstone) a execution policy version",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/workspace_agent_runs": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "List bounded agent runs (run logs)",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/WorkspaceAgentRuns"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Create a bounded agent run",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/workspace_agent_runs/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Get a bounded agent run",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Update a bounded agent run (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Delete (tombstone) a bounded agent run",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/projection_locks": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "List projection locks",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProjectionLocks"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Create a projection lock",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/projection_locks/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Get a projection lock",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Update a projection lock (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "summary": "Delete (tombstone) a projection lock",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/studio_sources": {
+      "get": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "List course studio sources",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/StudioSources"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Create a studio source",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/studio_sources/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Get a studio source",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Update a studio source (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Delete (tombstone) a studio source",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/studio_runs": {
+      "get": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "List course studio runs",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/StudioRuns"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Create a studio generation run",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/studio_runs/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Get a studio generation run",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Update a studio generation run (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Delete (tombstone) a studio generation run",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/studio_outputs": {
+      "get": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "List studio output library",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/StudioOutputs"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Create a studio output",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/studio_outputs/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Get a studio output",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Update a studio output (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "summary": "Delete (tombstone) a studio output",
         "responses": {
           "200": {
             "description": "Deleted"
@@ -46657,7 +49143,7 @@
           "Agentic Cloud Labs"
         ],
         "operationId": "agentlabs.run_detail",
-        "summary": "A run's rubric breakdown and evaluation traces.",
+        "summary": "A run's rubric breakdown and run log.",
         "parameters": [
           {
             "name": "runId",
@@ -46787,6 +49273,1832 @@
             "$ref": "#/components/responses/Error"
           },
           "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/learn.overview": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "learn.overview",
+        "summary": "Everything the course's learning area shows me: modules, topics, sources, graded items with my attempts, workspaces, Studio runs, policy, projection lock and gradebook.",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/learn.sections": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "learn.sections",
+        "summary": "The 15 learning-area sections.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/graded.view": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "graded.view",
+        "summary": "Open a graded item: instructions, rubric, mandatory criteria, pass mark, attempts and my submissions (never answer keys).",
+        "parameters": [
+          {
+            "name": "itemId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/graded.practice": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "graded.practice",
+        "summary": "Practice an item: unlimited, immediate feedback with hints; never uses an attempt or posts a grade.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string"
+                  },
+                  "answers": {}
+                },
+                "required": [
+                  "itemId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/graded.submit": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "graded.submit",
+        "summary": "Submit a graded attempt (idempotent by key). Two attempts; the highest valid attempt is posted to the gradebook and passbook.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string"
+                  },
+                  "idempotencyKey": {
+                    "type": "string"
+                  },
+                  "answers": {}
+                },
+                "required": [
+                  "itemId",
+                  "idempotencyKey"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/graded.submit_project": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "graded.submit_project",
+        "summary": "Submit a workspace project: the workspace is frozen as a snapshot and that snapshot is graded. Infrastructure failures don't use an attempt.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string"
+                  },
+                  "workspaceId": {
+                    "type": "string"
+                  },
+                  "idempotencyKey": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "itemId",
+                  "workspaceId",
+                  "idempotencyKey"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/graded.review": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "graded.review",
+        "summary": "Check Answers for a graded submission (learner after grading; staff any time).",
+        "parameters": [
+          {
+            "name": "submissionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/graded.gradebook": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "graded.gradebook",
+        "summary": "Course gradebook and competency passbook (learners see their own row).",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/graded.retry": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "graded.retry",
+        "summary": "Retry failed gradebook postings (never regrades or uses attempts).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "courseId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/workspace.templates": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.templates",
+        "summary": "Workspace templates (programming, agentic, data, DevOps, cloud simulation, lecture lab).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/workspace.mine": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.mine",
+        "summary": "My saved workspaces.",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/workspace.launch": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.launch",
+        "summary": "Launch or resume my workspace for a lab (one per learner per lab).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "labKey": {
+                    "type": "string"
+                  },
+                  "templateId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "courseId",
+                  "labKey",
+                  "templateId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/workspace.get": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.get",
+        "summary": "A workspace: files, status, save status, usage and budget.",
+        "parameters": [
+          {
+            "name": "wsId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/workspace.files": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.files",
+        "summary": "File listing.",
+        "parameters": [
+          {
+            "name": "wsId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/workspace.read": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.read",
+        "summary": "Read a file.",
+        "parameters": [
+          {
+            "name": "wsId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/workspace.write": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.write",
+        "summary": "Write a file (autosaved).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "wsId": {
+                    "type": "string"
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "wsId",
+                  "path",
+                  "content"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/workspace.command": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.command",
+        "summary": "Run a command in the simulated terminal (virtual filesystem; nothing executes on a server).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "wsId": {
+                    "type": "string"
+                  },
+                  "command": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "wsId",
+                  "command"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/workspace.save": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.save",
+        "summary": "Save now.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "wsId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "wsId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/workspace.stop": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.stop",
+        "summary": "Stop (files are kept).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "wsId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "wsId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/workspace.resume": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.resume",
+        "summary": "Resume a stopped workspace.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "wsId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "wsId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/workspace.reset": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.reset",
+        "summary": "Reset to the template: first call shows what changes; confirm=true applies it.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "wsId": {
+                    "type": "string"
+                  },
+                  "confirm": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "wsId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/workspace.snapshot": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.snapshot",
+        "summary": "Freeze a read-only snapshot for an assessment.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "wsId": {
+                    "type": "string"
+                  },
+                  "assessmentKey": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "wsId",
+                  "assessmentKey"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/workspace.agent_run": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.agent_run",
+        "summary": "Run a bounded agent plan in my workspace (autonomous; blocked actions fail automatically under the lab policy).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "wsId": {
+                    "type": "string"
+                  },
+                  "plan": {}
+                },
+                "required": [
+                  "wsId",
+                  "plan"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/workspace.agent_stop": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.agent_stop",
+        "summary": "Stop a running agent run.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "runId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "runId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/workspace.agent_runs": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.agent_runs",
+        "summary": "Run logs for my workspace (actions, policy results and usage — no model reasoning).",
+        "parameters": [
+          {
+            "name": "wsId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/workspace.pause": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.pause",
+        "summary": "Instructor: pause every workspace in a lab (files kept; commands and agent runs disabled).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "labKey": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "courseId",
+                  "labKey"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/workspace.unpause": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.unpause",
+        "summary": "Instructor: resume a paused lab.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "labKey": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "courseId",
+                  "labKey"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/workspace.policy": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.policy",
+        "summary": "The lab's execution policy: tools, filesystem, network, credentials and budgets.",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "labKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/workspace.set_policy": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.set_policy",
+        "summary": "Instructor: change the policy for future runs (a new version; running and past runs keep theirs).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "labKey": {
+                    "type": "string"
+                  },
+                  "patch": {}
+                },
+                "required": [
+                  "courseId",
+                  "labKey",
+                  "patch"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/workspace.progress": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.progress",
+        "summary": "Instructor: class progress — last activity, validation labels and budget use per learner.",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "labKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/projection.state": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "projection.state",
+        "summary": "Projection lock state for a course.",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/projection.lock": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "projection.lock",
+        "summary": "Hide answer keys and instructor editions now.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "courseId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/projection.unlock": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "projection.unlock",
+        "summary": "Instructor: show answer keys for 30 minutes (then they lock again).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "courseId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/studio.add_source": {
+      "post": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "operationId": "studio.add_source",
+        "summary": "Add a source (pasted text, uploaded document text or a URL). Source text is data, never instructions; unreachable URLs are stored as unavailable.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseKey": {
+                    "type": "string"
+                  },
+                  "module": {
+                    "type": "number"
+                  },
+                  "topic": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "text",
+                      "file",
+                      "url"
+                    ]
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "filename": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "author": {
+                    "type": "string"
+                  },
+                  "year": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "courseKey",
+                  "module",
+                  "topic",
+                  "kind"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/studio.sources": {
+      "get": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "operationId": "studio.sources",
+        "summary": "Sources for a course (staff).",
+        "parameters": [
+          {
+            "name": "courseKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "module",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "in": "query"
+          },
+          {
+            "name": "topic",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/studio.start": {
+      "post": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "operationId": "studio.start",
+        "summary": "Generate the full topic package (resumable). For AI-801 pass topicKey; otherwise pass input JSON.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "topicKey": {
+                    "type": "string"
+                  },
+                  "input": {}
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/studio.resume": {
+      "post": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "operationId": "studio.resume",
+        "summary": "Resume a failed or partial run from the failed step.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "runId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "runId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/studio.regenerate": {
+      "post": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "operationId": "studio.regenerate",
+        "summary": "Regenerate as a new version (instructor-edited files are kept).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "runId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "runId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/studio.regenerate_quiz": {
+      "post": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "operationId": "studio.regenerate_quiz",
+        "summary": "A new practice-quiz set that avoids earlier stems.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "runId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "runId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/studio.release": {
+      "post": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "operationId": "studio.release",
+        "summary": "Instructor review complete: release learner files of this version (QA must pass).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "runId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "runId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/studio.runs": {
+      "get": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "operationId": "studio.runs",
+        "summary": "Runs for a course.",
+        "parameters": [
+          {
+            "name": "courseKey",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/studio.run": {
+      "get": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "operationId": "studio.run",
+        "summary": "A run's steps, state and QA.",
+        "parameters": [
+          {
+            "name": "runId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/studio.outputs": {
+      "get": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "operationId": "studio.outputs",
+        "summary": "Output files (learners: released learner files only).",
+        "parameters": [
+          {
+            "name": "runId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/studio.edit_output": {
+      "post": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "operationId": "studio.edit_output",
+        "summary": "Instructor edit of a text output (kept on regeneration).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "outputId": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "outputId",
+                  "content"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/studio.check_minilab": {
+      "post": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "operationId": "studio.check_minilab",
+        "summary": "Server-side check of a Studio mini-lab (answers never sent to the browser).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "runId": {
+                    "type": "string"
+                  },
+                  "labId": {
+                    "type": "string"
+                  },
+                  "answers": {}
+                },
+                "required": [
+                  "runId",
+                  "labId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
             "$ref": "#/components/responses/Error"
           }
         }
@@ -54559,7 +58871,7 @@
                 "type": "number"
               },
               "traces": {
-                "description": "Evaluation traces"
+                "description": "Run log (actions and policy results)"
               },
               "autonomous": {
                 "description": "Autonomous",
@@ -54643,6 +58955,630 @@
           }
         ],
         "description": "Catalog consolidation report (tab: module-library)"
+      },
+      "GradedItems": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "courseId": {
+                "description": "Course",
+                "type": "string"
+              },
+              "module": {
+                "description": "Module",
+                "type": "string"
+              },
+              "topic": {
+                "description": "Topic",
+                "type": "string"
+              },
+              "key": {
+                "description": "Key",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind",
+                "type": "string"
+              },
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "instructions": {
+                "description": "Instructions",
+                "type": "string"
+              },
+              "competencies": {
+                "description": "Competencies",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "passMark": {
+                "description": "Pass mark (%)",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "maxAttempts": {
+                "description": "Graded attempts",
+                "type": "number",
+                "minimum": 1,
+                "maximum": 5
+              },
+              "aiPolicy": {
+                "description": "AI-use policy",
+                "type": "string"
+              },
+              "points": {
+                "description": "Points",
+                "type": "number"
+              },
+              "currentVersion": {
+                "description": "Published version",
+                "type": "number"
+              },
+              "assignmentId": {
+                "description": "Gradebook column",
+                "type": "string"
+              },
+              "published": {
+                "description": "Published",
+                "type": "boolean"
+              }
+            }
+          }
+        ],
+        "description": "Graded item (tab: learning-area)"
+      },
+      "GradedItemVersions": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "itemId": {
+                "description": "Item",
+                "type": "string"
+              },
+              "version": {
+                "description": "Version",
+                "type": "number"
+              },
+              "rubric": {
+                "description": "Rubric (frozen)"
+              },
+              "evaluator": {
+                "description": "Evaluator and answer key (staff only)"
+              },
+              "passMark": {
+                "description": "Pass mark",
+                "type": "number"
+              },
+              "fingerprint": {
+                "description": "Fingerprint",
+                "type": "string"
+              },
+              "frozenAt": {
+                "description": "Frozen",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Frozen assessment version (tab: learning-area)"
+      },
+      "GradedSubmissions": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "itemId": {
+                "description": "Item",
+                "type": "string"
+              },
+              "itemVersion": {
+                "description": "Version graded",
+                "type": "number"
+              },
+              "userId": {
+                "description": "Learner",
+                "type": "string"
+              },
+              "courseId": {
+                "description": "Course",
+                "type": "string"
+              },
+              "attempt": {
+                "description": "Attempt",
+                "type": "number"
+              },
+              "idempotencyKey": {
+                "description": "Idempotency key",
+                "type": "string"
+              },
+              "snapshot": {
+                "description": "Submitted snapshot"
+              },
+              "snapshotChecksum": {
+                "description": "Snapshot checksum",
+                "type": "string"
+              },
+              "workspaceSnapshotId": {
+                "description": "Workspace snapshot",
+                "type": "string"
+              },
+              "state": {
+                "description": "State (submitted / grading / graded / posted / posting_failed / infra_failed)",
+                "type": "string"
+              },
+              "score": {
+                "description": "Score (%)",
+                "type": "number"
+              },
+              "passed": {
+                "description": "Passed",
+                "type": "boolean"
+              },
+              "criteria": {
+                "description": "Rubric results"
+              },
+              "answers": {
+                "description": "Check Answers (after grading)"
+              },
+              "postAttempts": {
+                "description": "Posting attempts",
+                "type": "number"
+              },
+              "infraReason": {
+                "description": "Infrastructure note",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Graded submission (tab: learning-area)"
+      },
+      "Passbook": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "description": "Learner",
+                "type": "string"
+              },
+              "courseId": {
+                "description": "Course",
+                "type": "string"
+              },
+              "competency": {
+                "description": "Competency",
+                "type": "string"
+              },
+              "itemId": {
+                "description": "Assessment",
+                "type": "string"
+              },
+              "itemTitle": {
+                "description": "Assessment title",
+                "type": "string"
+              },
+              "score": {
+                "description": "Score (%)",
+                "type": "number"
+              },
+              "threshold": {
+                "description": "Threshold (%)",
+                "type": "number"
+              },
+              "result": {
+                "description": "Result (pass / not_yet)",
+                "type": "string"
+              },
+              "completedAt": {
+                "description": "Completed",
+                "type": "string",
+                "format": "date-time"
+              },
+              "submissionId": {
+                "description": "Counting submission",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Passbook entry (tab: learning-area)"
+      },
+      "LabWorkspaces": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "courseId": {
+                "description": "Course",
+                "type": "string"
+              },
+              "labKey": {
+                "description": "Lab",
+                "type": "string"
+              },
+              "templateId": {
+                "description": "Template",
+                "type": "string"
+              },
+              "ownerId": {
+                "description": "Owner",
+                "type": "string"
+              },
+              "teamId": {
+                "description": "Team",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status (running / stopped / paused_by_instructor)",
+                "type": "string"
+              },
+              "saveStatus": {
+                "description": "Save status",
+                "type": "string"
+              },
+              "savedAt": {
+                "description": "Saved",
+                "type": "string",
+                "format": "date-time"
+              },
+              "revision": {
+                "description": "Revision",
+                "type": "number"
+              },
+              "usage": {
+                "description": "Usage and budget"
+              }
+            }
+          }
+        ],
+        "description": "Cloud lab workspace (tab: learning-area)"
+      },
+      "WorkspaceTeams": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "courseId": {
+                "description": "Course",
+                "type": "string"
+              },
+              "labKey": {
+                "description": "Lab",
+                "type": "string"
+              },
+              "name": {
+                "description": "Name",
+                "type": "string"
+              },
+              "memberIds": {
+                "description": "Members",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Workspace team (tab: learning-area)"
+      },
+      "WorkspaceSnapshots": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "workspaceId": {
+                "description": "Workspace",
+                "type": "string"
+              },
+              "ownerId": {
+                "description": "Owner",
+                "type": "string"
+              },
+              "submittedBy": {
+                "description": "Submitted by",
+                "type": "string"
+              },
+              "courseId": {
+                "description": "Course",
+                "type": "string"
+              },
+              "labKey": {
+                "description": "Lab",
+                "type": "string"
+              },
+              "assessmentKey": {
+                "description": "Assessment",
+                "type": "string"
+              },
+              "files": {
+                "description": "Files (read-only)"
+              },
+              "checksum": {
+                "description": "Checksum",
+                "type": "string"
+              },
+              "revision": {
+                "description": "Revision",
+                "type": "number"
+              }
+            }
+          }
+        ],
+        "description": "Submission snapshot (tab: learning-area)"
+      },
+      "WorkspacePolicies": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "courseId": {
+                "description": "Course",
+                "type": "string"
+              },
+              "labKey": {
+                "description": "Lab",
+                "type": "string"
+              },
+              "policyVersion": {
+                "description": "Version",
+                "type": "number"
+              },
+              "policy": {
+                "description": "Tools, filesystem, network, credentials and budgets"
+              },
+              "setBy": {
+                "description": "Set by",
+                "type": "string"
+              },
+              "setAt": {
+                "description": "Set",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Execution policy version (tab: learning-area)"
+      },
+      "WorkspaceAgentRuns": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "workspaceId": {
+                "description": "Workspace",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status",
+                "type": "string"
+              },
+              "steps": {
+                "description": "Run log (actions and policy results)"
+              },
+              "usage": {
+                "description": "Usage"
+              }
+            }
+          }
+        ],
+        "description": "Bounded agent run (tab: learning-area)"
+      },
+      "ProjectionLocks": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "courseId": {
+                "description": "Course",
+                "type": "string"
+              },
+              "scope": {
+                "description": "Scope",
+                "type": "string"
+              },
+              "locked": {
+                "description": "Answers hidden",
+                "type": "boolean"
+              },
+              "changedBy": {
+                "description": "Changed by",
+                "type": "string"
+              },
+              "changedAt": {
+                "description": "Changed",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Projection lock (tab: learning-area)"
+      },
+      "StudioSources": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "courseKey": {
+                "description": "Course",
+                "type": "string"
+              },
+              "module": {
+                "description": "Module",
+                "type": "number"
+              },
+              "topic": {
+                "description": "Topic",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind (text / file / url)",
+                "type": "string"
+              },
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "url": {
+                "description": "URL",
+                "type": "string"
+              },
+              "filename": {
+                "description": "File",
+                "type": "string"
+              },
+              "author": {
+                "description": "Author",
+                "type": "string"
+              },
+              "year": {
+                "description": "Year",
+                "type": "string"
+              },
+              "text": {
+                "description": "Text (data, never instructions)",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status (available / unavailable)",
+                "type": "string"
+              },
+              "reason": {
+                "description": "Why unavailable",
+                "type": "string"
+              },
+              "checksum": {
+                "description": "Checksum",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Studio source (tab: course-studio)"
+      },
+      "StudioRuns": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "courseKey": {
+                "description": "Course",
+                "type": "string"
+              },
+              "topic": {
+                "description": "Topic",
+                "type": "string"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              },
+              "outputsVersion": {
+                "description": "Version",
+                "type": "number"
+              },
+              "steps": {
+                "description": "Pipeline steps (resumable)"
+              },
+              "qa": {
+                "description": "QA report"
+              },
+              "released": {
+                "description": "Released to learners",
+                "type": "boolean"
+              }
+            }
+          }
+        ],
+        "description": "Studio generation run (tab: course-studio)"
+      },
+      "StudioOutputs": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "runId": {
+                "description": "Run",
+                "type": "string"
+              },
+              "path": {
+                "description": "Folder path",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind",
+                "type": "string"
+              },
+              "access": {
+                "description": "Access (student / instructor)",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status (ready / awaiting_rendering / preview_rendered_silent)",
+                "type": "string"
+              },
+              "bytes": {
+                "description": "Size",
+                "type": "number"
+              },
+              "checksum": {
+                "description": "Checksum",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Studio output (tab: course-studio)"
       },
       "Accounts": {
         "allOf": [

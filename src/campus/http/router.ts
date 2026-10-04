@@ -16,6 +16,9 @@ import { submit } from "../services/assessment";
 import { verifyCredential } from "../services/success";
 import { brochurePdf } from "../services/programs";
 import { simLabFileName, simLabHtml } from "../services/simlab";
+import { answersLocked } from "../services/projection";
+import { gradebookCsv as gradedCsv } from "../services/graded";
+import { bundleZip, readOutput } from "../services/studio";
 import { draftView, qtiXml } from "../services/assess";
 import { coverHtml, type CoverKind } from "../services/covers";
 import { redeemQrLogin, startMasquerade, stopMasquerade, activeGlobalAnnouncements } from "../services/admin";
@@ -337,10 +340,31 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     if (!["student", "instructor", "app"].includes(edition)) throw new CampusError("not_found", "Unknown edition", 404);
     const teaches = Object.values(a.courseRoles ?? {}).some((r) => r.includes("instructor") || r.includes("ta"));
     if (edition === "instructor" && !teaches && !hasAny(a, ["admin", "designer"])) throw new CampusError("forbidden", "The instructor edition contains answer keys and is for course staff.", 403);
+    const lockCourse = url.searchParams.get("courseId");
+    if (edition === "instructor" && lockCourse && answersLocked(store, lockCourse)) throw new CampusError("projection_locked", "Answer keys are hidden by the projection lock. Unlock them in the Instructor Control Panel first.", 423);
     const moduleNo = url.searchParams.get("module") ?? "";
     const html = simLabHtml(rest[1], edition, { module: moduleNo, program: url.searchParams.get("program") ?? undefined });
     const name = simLabFileName(rest[1], edition, moduleNo);
     return new Response(html, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "content-disposition": `${url.searchParams.get("download") ? "attachment" : "inline"}; filename="${name}"`, "cache-control": "no-store", "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'", "x-content-type-options": "nosniff" } });
+  }
+  // Hosted learning area downloads: Studio outputs, bundles and the gradebook CSV (access enforced by the services).
+  if (rest[0] === "learn" && rest[1] && method === "GET") {
+    const courseId = rest[1];
+    if (rest[2] === "gradebook.csv") return new Response(gradedCsv(store, a, courseId), { status: 200, headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="${courseId}-gradebook.csv"`, "cache-control": "no-store" } });
+    if (rest[2] === "outputs" && rest[3]) {
+      const o = readOutput(store, a, rest[3]);
+      if (o.access === "instructor" && answersLocked(store, courseId)) throw new CampusError("projection_locked", "Instructor files are hidden by the projection lock. Unlock them in the Instructor Control Panel first.", 423);
+      const ext = String(o.relPath).split(".").pop()!.toLowerCase();
+      const types: Record<string, string> = { html: "text/html; charset=utf-8", md: "text/markdown; charset=utf-8", txt: "text/plain; charset=utf-8", json: "application/json; charset=utf-8", csv: "text/csv; charset=utf-8", vtt: "text/vtt; charset=utf-8", svg: "image/svg+xml", png: "image/png", mp4: "video/mp4", mp3: "audio/mpeg", pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation", yaml: "text/plain; charset=utf-8", yml: "text/plain; charset=utf-8" };
+      if (o.status === "awaiting_rendering" && !o.content.length) throw new CampusError("awaiting_rendering", `${o.relPath} is awaiting rendering: ${o.reason ?? "no media renderer is configured"}.`, 409);
+      const body = typeof o.content === "string" ? o.content : new Uint8Array(o.content);
+      const name = String(o.relPath).split("/").pop();
+      return new Response(body, { status: 200, headers: { "content-type": types[ext] ?? "application/octet-stream", "content-disposition": `${url.searchParams.get("download") ? "attachment" : "inline"}; filename="${name}"`, "cache-control": "no-store", "x-content-type-options": "nosniff", "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data: 'self'; media-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'" } });
+    }
+    if (rest[2] === "studio" && rest[3] && rest[4] === "bundle.zip") {
+      const z = bundleZip(store, a, rest[3]);
+      return new Response(new Uint8Array(z), { status: 200, headers: { "content-type": "application/zip", "content-disposition": `attachment; filename="studio-${rest[3]}.zip"`, "cache-control": "no-store" } });
+    }
   }
   // Lecture cover slides and video title cards for any program module.
   if (rest[0] === "covers" && rest[1] && rest[2] && rest[3] && method === "GET") {

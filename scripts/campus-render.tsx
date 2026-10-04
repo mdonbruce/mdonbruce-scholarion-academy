@@ -28,6 +28,12 @@ import { generateDraft } from "../src/campus/services/assess";
 import { runLab } from "../src/campus/services/agentlabs";
 import { simLabHtml } from "../src/campus/services/simlab";
 import { coverHtml } from "../src/campus/services/covers";
+import { submit as gradedSubmit } from "../src/campus/services/graded";
+import { launchWorkspace, writeFile as wsWrite, runCommand as wsCommand, runAgent } from "../src/campus/services/workspace";
+import { listOutputs as studioListOutputs, readOutput as studioReadOutput } from "../src/campus/services/studio";
+import { setProjectionLock } from "../src/campus/services/projection";
+import { AI801_LAB_KEY, submitProject } from "../src/campus/academy/ai801-seed";
+import { AI801_MINILABS, AI801_QUIZ } from "../src/campus/academy/ai801";
 import { SIM_SCENARIOS } from "../src/campus/academy/sim-scenarios";
 
 process.env.CAMPUS_LOGS = "0";
@@ -218,7 +224,7 @@ page("academy", "admin", "t/module-library", "Module Library & Catalog Consolida
   const lab = as("academy", "admin").store.list("agent_labs", (l) => l.scenario === "haven-guest-services")[0];
   runLab(as("academy", "student4").store, as("academy", "student4").actor, lab.id, "practice");
   const g = runLab(as("academy", "student4").store, as("academy", "student4").actor, lab.id, "graded", String(lab.referenceCode));
-  page("academy", "student4", `agent-labs/${lab.id}?run=${g.runId}`, "Agentic Cloud Lab — workspace and traces");
+  page("academy", "student4", `agent-labs/${lab.id}?run=${g.runId}`, "Agentic Cloud Lab — workspace and run log");
   for (const kind of ["slide", "title-card"] as const) {
     const file = `cover-p15-weekend3-${kind}.html`;
     fs.writeFileSync(path.join(OUT, file), coverHtml(as("academy", "admin").store, "off_academy_15", "3", kind));
@@ -229,6 +235,56 @@ page("academy", "admin", "t/module-library", "Module Library & Catalog Consolida
     fs.writeFileSync(path.join(OUT, file), simLabHtml(sc.key, ed, { module: "3" }));
     index.push({ file, title: `${sc.title} — ${ed === "app" ? "Simulated Application Demo" : ed === "instructor" ? "Instructor Lab" : "Student Lab"}`, who: ed === "instructor" ? "instructor" : "public" });
   }
+}
+{
+  // Hosted learning area (AI-801): learner activity, then every section for a learner and the instructor.
+  const C = "crs_academy_ai801";
+  const st = as("academy", "student1");
+  const items = st.store.list("graded_items", (i) => i.courseId === C);
+  const byKey = (k: string) => items.find((i) => i.key === k)!;
+  const ml = byKey("m01-perception-minilab-1");
+  const tasks = AI801_MINILABS.perception[0].tasks;
+  gradedSubmit(st.store, st.actor, ml.id, Object.fromEntries(tasks.map((t) => [t.id, t.kind === "match" || t.kind === "order" ? t.key : t.key[0]])), "render-ml-1");
+  const quiz = byKey("m01-course-quiz");
+  const q1 = gradedSubmit(st.store, st.actor, quiz.id, Object.fromEntries(AI801_QUIZ.map((v, i) => [v[0].id, i < 6 ? v[0].answer : [(v[0].answer[0] + 1) % v[0].options.length]])), "render-q-1");
+  const ws = launchWorkspace(st.store, st.actor, { courseId: C, labKey: AI801_LAB_KEY, templateId: "agent-builder" });
+  wsWrite(st.store, st.actor, ws.id, "agent/spec.yaml", "name: guest-services\ngoal: Answer booking questions from data\nmax_steps: 6\ntools:\n  - FILE_READ\n  - HTTP_REQUEST\nguardrail:\n  block: [ignore previous, system prompt, grant all]\n");
+  wsWrite(st.store, st.actor, ws.id, "report.md", "# Guest services agent\n## Perception\nTyped records with provenance.\n## Memory\nShort-term context; long-term vector memory.\n## Requirements\nFinance: one refund per booking.\n## Validation\nscholarion validate: 2/2 checks passing\n");
+  wsCommand(st.store, st.actor, ws.id, "scholarion validate");
+  runAgent(st.store, st.actor, ws.id, { name: "read-schedule", onBlocked: "continue", steps: [{ tool: "FILE_READ", args: { path: "/workspace/data/schedule.csv" } }, { tool: "HTTP_REQUEST", args: { url: "sim://api.scholarion.local/v1/schedule" } }, { tool: "FILE_READ", args: { path: "/etc/passwd" } }] });
+  submitProject(st.store, st.actor, byKey("m01-activity-project").id, ws.id, "render-proj-1");
+  const run = st.store.list("studio_runs", (r) => r.courseKey === C)[0];
+  const L = (sec: string, q = "") => `learn/${C}/${sec}${q}`;
+  page("academy", "student1", L("dashboard"), "Learning area — course dashboard (learner)");
+  page("academy", "student1", L("modules"), "Learning area — modules and topics");
+  page("academy", "student1", L("sources"), "Learning area — sources and reading library");
+  page("academy", "student1", L("lecture-studio"), "Learning area — Lecture Studio (learner)");
+  page("academy", "student1", L("cloud-labs"), "Learning area — Agentic Cloud Labs with run log");
+  page("academy", "student1", L("mini-labs", `?item=${ml.id}&review=${st.store.list("graded_submissions", (x) => x.itemId === ml.id)[0].id}`), "Learning area — mini-lab with Check Answers");
+  page("academy", "student1", L("activities"), "Learning area — hands-on in-class activity");
+  page("academy", "student1", L("assignments", `?item=${byKey("m01-activity-project").id}`), "Learning area — workspace project (graded snapshot)");
+  page("academy", "student1", L("quizzes", `?item=${quiz.id}&sub=${q1.id}`), "Learning area — graded quiz, attempt 2 variants");
+  page("academy", "student1", L("workspaces", `?ws=${ws.id}`), "Learning area — saved workspace, editor and terminal");
+  page("academy", "student1", L("demos"), "Learning area — application demonstrations");
+  page("academy", "student1", L("gradebook"), "Learning area — gradebook and passbook (learner)");
+  page("academy", "student1", L("environment"), "Learning area — environment and tool permissions");
+  page("academy", "student1", L("outputs", run ? `?run=${run.id}` : ""), "Learning area — Studio output library (learner)");
+  page("academy", "lead", L("instructor"), "Learning area — Instructor Control Panel (locked)");
+  page("academy", "lead", L("gradebook"), "Learning area — class gradebook and passbook");
+  page("academy", "lead", L("lecture-studio"), "Learning area — Lecture Studio (instructor)");
+  page("academy", "lead", L("outputs", run ? `?run=${run.id}` : ""), "Learning area — Studio output library (instructor)");
+  if (run) {
+    const lead = as("academy", "lead");
+    for (const rel of ["03_Lecture_Deck/lecture_deck.html", "03_Lecture_Deck/cover_variant_A.html", "03_Lecture_Deck/cover_variant_B.html", "11_Application_Demo/agentic_demo.html", "09_Student_Labs/minilab_1.html", "06_Infographics_and_Mind_Maps/infographic.html"]) {
+      const o = studioListOutputs(lead.store, lead.actor, run.id).find((x) => x.relPath === rel);
+      if (!o) continue;
+      const file = `studio-ai801-${rel.split("/").pop()}`;
+      fs.writeFileSync(path.join(OUT, file), String(studioReadOutput(lead.store, lead.actor, String(o.id)).content));
+      index.push({ file, title: `Course Studio — AI-801 ${rel}`, who: "learner" });
+    }
+  }
+  setProjectionLock(as("academy", "lead").store, as("academy", "lead").actor, C, false);
+  page("academy", "lead", L("instructor", "?view=unlocked"), "Learning area — Instructor Control Panel (unlocked, INSTRUCTOR MODE banner)");
 }
 page("academy", "instructor", "t/agentic-cloud-labs", "Agentic Cloud Labs — instructor");
 page("academy", "student1", "agent-labs", "Agentic Cloud Labs — my labs");

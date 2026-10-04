@@ -29,7 +29,7 @@ export const LEAD_FACULTY: FacultyMember = {
   slug: "martins-idahosa",
   name: "Dr. Martins Donbruce Idahosa",
   shortName: "Dr. Martins Idahosa",
-  role: "Lead Faculty",
+  role: "Lead Faculty & Director of AI Innovation",
   org: "Scholarion Academy",
   photo: {
     src: "/brand/faculty/martins-idahosa-original.png",
@@ -37,7 +37,7 @@ export const LEAD_FACULTY: FacultyMember = {
     height: 148,
     avatar: "/brand/faculty/martins-idahosa-avatar.png",
     avatarSize: 127,
-    alt: "Dr. Martins Donbruce Idahosa, Lead Faculty, Scholarion Academy",
+    alt: "Dr. Martins Donbruce Idahosa, Lead Faculty & Director of AI Innovation, Scholarion Academy",
   },
   approval: { approvedBy: "Dr. Martins Donbruce Idahosa", approvedOn: "2026-10-04", sourceFile: "Martins (2020_11_15 17_55_30 UTC) — supplied as a 127×148 PNG", sha256: "1a9b6bbc67941a8bc11d6b4c3f072e413666123473f7ef06e7a4bb156d157945" },
 };

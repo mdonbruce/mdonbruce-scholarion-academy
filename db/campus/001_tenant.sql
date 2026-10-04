@@ -2305,6 +2305,237 @@ CREATE TABLE IF NOT EXISTS consolidation_reports (
   decision_ref text
 );
 
+-- Graded item (tab: learning-area)
+CREATE TABLE IF NOT EXISTS graded_items (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  course_id text,
+  module text,
+  topic text,
+  "key" text,
+  kind text,
+  title text NOT NULL,
+  instructions text,
+  competencies text[],
+  pass_mark numeric,
+  max_attempts numeric,
+  ai_policy text,
+  points numeric,
+  current_version numeric,
+  assignment_id text,
+  published boolean,
+  state text NOT NULL DEFAULT 'unpublished'
+);
+
+-- Frozen assessment version (tab: learning-area)
+CREATE TABLE IF NOT EXISTS graded_item_versions (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  item_id text,
+  content_version numeric,
+  rubric jsonb,
+  evaluator jsonb,
+  pass_mark numeric,
+  fingerprint text,
+  frozen_at timestamptz
+);
+
+-- Graded submission (tab: learning-area)
+CREATE TABLE IF NOT EXISTS graded_submissions (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  item_id text,
+  item_version numeric,
+  user_id text,
+  course_id text,
+  attempt numeric,
+  idempotency_key text,
+  snapshot jsonb,
+  snapshot_checksum text,
+  workspace_snapshot_id text,
+  state text,
+  score numeric,
+  passed boolean,
+  criteria jsonb,
+  answers jsonb,
+  post_attempts numeric,
+  infra_reason text
+);
+
+-- Passbook entry (tab: learning-area)
+CREATE TABLE IF NOT EXISTS passbook (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  user_id text,
+  course_id text,
+  competency text,
+  item_id text,
+  item_title text,
+  score numeric,
+  threshold numeric,
+  result text,
+  completed_at timestamptz,
+  submission_id text
+);
+
+-- Cloud lab workspace (tab: learning-area)
+CREATE TABLE IF NOT EXISTS lab_workspaces (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  course_id text,
+  lab_key text,
+  template_id text,
+  owner_id text,
+  team_id text,
+  status text,
+  save_status text,
+  saved_at timestamptz,
+  revision numeric,
+  usage jsonb
+);
+
+-- Workspace team (tab: learning-area)
+CREATE TABLE IF NOT EXISTS workspace_teams (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  course_id text,
+  lab_key text,
+  name text,
+  member_ids text[]
+);
+
+-- Submission snapshot (tab: learning-area)
+CREATE TABLE IF NOT EXISTS workspace_snapshots (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  workspace_id text,
+  owner_id text,
+  submitted_by text,
+  course_id text,
+  lab_key text,
+  assessment_key text,
+  files jsonb,
+  checksum text,
+  revision numeric
+);
+
+-- Execution policy version (tab: learning-area)
+CREATE TABLE IF NOT EXISTS workspace_policies (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  course_id text,
+  lab_key text,
+  policy_version numeric,
+  policy jsonb,
+  set_by text,
+  set_at timestamptz
+);
+
+-- Bounded agent run (tab: learning-area)
+CREATE TABLE IF NOT EXISTS workspace_agent_runs (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  workspace_id text,
+  status text,
+  steps jsonb,
+  usage jsonb
+);
+
+-- Projection lock (tab: learning-area)
+CREATE TABLE IF NOT EXISTS projection_locks (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  course_id text,
+  scope text,
+  locked boolean,
+  changed_by text,
+  changed_at timestamptz
+);
+
+-- Studio source (tab: course-studio)
+CREATE TABLE IF NOT EXISTS studio_sources (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  course_key text,
+  module numeric,
+  topic text,
+  kind text,
+  title text,
+  url text,
+  filename text,
+  author text,
+  year text,
+  text text,
+  status text,
+  reason text,
+  checksum text
+);
+
+-- Studio generation run (tab: course-studio)
+CREATE TABLE IF NOT EXISTS studio_runs (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  course_key text,
+  topic text,
+  state text,
+  outputs_version numeric,
+  steps jsonb,
+  qa jsonb,
+  released boolean
+);
+
+-- Studio output (tab: course-studio)
+CREATE TABLE IF NOT EXISTS studio_outputs (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  run_id text,
+  path text,
+  kind text,
+  access text,
+  status text,
+  bytes numeric,
+  checksum text
+);
+
 -- Account (tab: tenant-admin)
 CREATE TABLE IF NOT EXISTS accounts (
   id text PRIMARY KEY,

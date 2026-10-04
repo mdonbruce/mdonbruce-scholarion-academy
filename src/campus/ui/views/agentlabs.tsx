@@ -27,7 +27,7 @@ export function AgentLabsList({ store, actor, slug, sp }: { store: TenantStore; 
   const labs = al.myLabs(store, actor);
   return (
     <div className="stack">
-      <PageHead title="Agentic Cloud Labs" sub="Scholarion's hosted agent-building area. Your agents run autonomously inside a bounded runner with tool permissions; every run leaves an evaluation trace." />
+      <PageHead title="Agentic Cloud Labs" sub="Scholarion's hosted agent-building area. Your agents run autonomously inside a bounded runner with tool permissions; every run leaves an operational run log (actions and policy results only — never model reasoning)." />
       <Notices sp={sp} />
       {labs.length ? (
         <ul className="grid g2 campus-cards" aria-label="Labs">
@@ -42,7 +42,7 @@ export function AgentLabsList({ store, actor, slug, sp }: { store: TenantStore; 
                   Graded attempts {l.attemptsUsed} of {l.maxAttempts} · Best {l.best === null ? "—" : `${l.best}/100`} {l.best !== null && <Chip s={l.passed ? "complete" : "in_progress"} />}
                 </p>
               ) : (
-                <p className="small">Course staff view — practice runs, learner roster and traces.</p>
+                <p className="small">Course staff view — practice runs, learner roster and run logs.</p>
               )}
             </li>
           ))}
@@ -54,7 +54,7 @@ export function AgentLabsList({ store, actor, slug, sp }: { store: TenantStore; 
   );
 }
 
-/** One lab: brief, permissions, budget, rubric, workspace, runs and traces. */
+/** One lab: brief, permissions, budget, rubric, workspace, runs and run logs. */
 export function AgentLabWorkspace({ store, actor, slug, labId, sp }: { store: TenantStore; actor: Actor; slug: string; labId: string; sp: SP }) {
   let v: ReturnType<typeof al.openLab>;
   try {
@@ -255,7 +255,7 @@ export function AgentLabWorkspace({ store, actor, slug, labId, sp }: { store: Te
                     ))}
                   </ol>
                 ) : (
-                  <p className="tiny muted">Trace hidden for hidden tasks.</p>
+                  <p className="tiny muted">Run log hidden for hidden tasks.</p>
                 )}
                 {t.answer && <p className="small">Answer: {t.answer}</p>}
               </details>
