@@ -140,7 +140,9 @@ export function escalate(store: TenantStore, a: Actor, courseId: string, questio
   const staff = store.list("enrollments", (e) => e.courseId === courseId && e.state === "active" && (e.role === "instructor" || e.role === "ta")).map((e) => e.userId as string);
   if (!staff.length) throw new CampusError("no_instructor", "This course has no instructor to escalate to.", 409);
   return store.tx(() => {
-    const c = store.insert("conversations", { courseId, subject: "Question from the AI tutor", participants: [a.id, ...staff], messages: [{ id: token(6), authorId: a.id, body: `${question.slice(0, 2000)}\n\n(Escalated from the AI tutor.)`, at: nowIso() }], state: {}, authorId: a.id, escalatedFromTutor: true }, "cnv");
+    const state: Record<string, { folder: string; read: boolean }> = { [a.id]: { folder: "sent", read: true } };
+    for (const u of staff) state[u] = { folder: "inbox", read: false };
+    const c = store.insert("conversations", { courseId, subject: "Question from the AI tutor", participantIds: [a.id, ...staff], messages: [{ id: token(6), authorId: a.id, body: `${question.slice(0, 2000)}\n\n(Escalated from the AI tutor.)`, at: nowIso(), attachments: [], mediaUrl: null }], state, escalatedFromTutor: true }, "cv");
     notify(store, staff, "conversations", `Tutor escalation from ${userName(store, a.id)}`, question.slice(0, 200), `/campus/{tenant}/inbox`, courseId);
     auditAi(store, a, "ai_tutor", question, "escalation", "escalated", []);
     metrics.inc("tutor_escalations_total", {});

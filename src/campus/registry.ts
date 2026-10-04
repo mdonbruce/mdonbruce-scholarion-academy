@@ -163,7 +163,7 @@ export const ENTITIES: EntityDef[] = [
     perms: { read: ALL, create: TEACH, update: TEACH, archive: TEACH } },
   { table: "conversations", label: "Conversation", plural: "Inbox", tab: "collaboration", prefix: "cv", titleField: "subject", workflow: true, course: true,
     fields: [courseRef, sys("subject", "Subject"), sys("participantIds", "Participants", "json"), sys("messages", "Messages", "json")],
-    perms: {} },
+    perms: { read: [] } },
 
   /* 7 Files & Media */
   { table: "files", label: "File", plural: "Files", tab: "files", prefix: "fil", titleField: "name", workflow: true, owner: "ownerId", ownerOps: ["read", "archive"],
@@ -296,7 +296,7 @@ export const ENTITIES: EntityDef[] = [
     perms: { read: ALL, create: ["admin"], update: ["admin"], archive: ["admin"] } },
   { table: "survey_responses", label: "Survey response", plural: "Survey responses", tab: "evaluations", prefix: "svr", titleField: "surveyId", workflow: true,
     fields: [sys("surveyId", "Survey"), sys("respondentHash", "Respondent (one-way hash)", "string", { secret: true }), sys("answers", "Answers", "json")],
-    perms: {} },
+    perms: { read: [] } },
 
   /* 18 Credentials & ePortfolio */
   { table: "credentials", label: "Credential", plural: "Credentials", tab: "credentials", prefix: "crd", titleField: "title", workflow: true, owner: "userId", ownerOps: ["read"],

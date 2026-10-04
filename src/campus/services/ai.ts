@@ -1,7 +1,7 @@
 import { CampusError, metrics, nowIso, nowMs, registerConsumer, sha256, type Role, type Row, type TenantStore } from "../core";
 import { addPublishCheck } from "../entity";
 import { hasAny, type Actor } from "../iam";
-import { a11yCheck, renderBlocks, validateBlocks, type Block } from "./curriculum";
+import { a11yCheck, itemAccessible, renderBlocks, validateBlocks, type Block } from "./curriculum";
 import { audit, isStaff, notify, requireTenant, userName } from "./common";
 import { comment } from "./grading";
 import { validateRegistration } from "./sis";
@@ -221,6 +221,8 @@ function words(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9\s-]/g, " ").split(/\s+/).filter((w) => w.length > 2 && !STOP.has(w));
 }
 
+const LOCKABLE: Record<string, string> = { pages: "page", assignments: "assignment", discussion_topics: "discussion" };
+
 function retrieve(store: TenantStore, a: Actor, p: AgentPolicy, q: string, courseId?: string) {
   const terms = [...new Set(words(q))];
   if (!terms.length) return [];
@@ -228,6 +230,8 @@ function retrieve(store: TenantStore, a: Actor, p: AgentPolicy, q: string, cours
   return store
     .list("search_docs", (d) => p.sources.includes(d.kind as string) && (!courseId || d.courseId === courseId || !d.courseId))
     .filter((d) => docVisible(a, d))
+    // Locked module content (prerequisites, lock dates, mastery paths) isn't retrievable for students.
+    .filter((d) => !LOCKABLE[d.kind as string] || a.roles.includes("admin") || a.id === "eval-probe" || isStaff(a, d.courseId as string) || itemAccessible(store, a, LOCKABLE[d.kind as string], d.refId as string).ok)
     .map((d) => {
       const hay = `${d.title} ${d.text}`.toLowerCase();
       const hits = terms.filter((t) => hay.includes(t));

@@ -199,6 +199,14 @@ registerHooks("quizzes", {
   },
 });
 
+/** Take the publication snapshot for a quiz (used by seeds and imports that publish directly). */
+export function snapshotQuiz(store: TenantStore, quizId: string) {
+  const row = store.get("quizzes", quizId);
+  if (!row) throw new CampusError("not_found", "Quiz not found", 404);
+  const { pools, all } = poolQuestions(store, row);
+  return store.update("quizzes", row.id, { snapshot: { at: nowIso(), version: Number((row.snapshot as { version?: number } | undefined)?.version ?? 0) + 1, pools, questions: all, timeLimitMin: row.timeLimitMin, allowedAttempts: row.allowedAttempts, scoringPolicy: row.scoringPolicy ?? "highest" } });
+}
+
 /** Deterministic PRNG from a secure per-attempt seed (HMAC), so selection is reproducible. */
 function rng(seed: string) {
   let h = parseInt(seed.slice(0, 8), 16) >>> 0;
@@ -576,7 +584,12 @@ export function itemAnalysis(store: TenantStore, a: Actor, quizId: string) {
 /** Students allowed to take a quiz; whether staff see the essay queue. */
 export function manualQueue(store: TenantStore, a: Actor, courseId: string) {
   requireCourse(store, a, courseId, ["admin", "instructor", "ta"], "quizzes.manual_queue");
-  return store.list("attempts", (x) => x.courseId === courseId && x.state === "pending_review").map((x) => ({ attemptId: x.id, quiz: store.get("quizzes", x.quizId as string)?.title, student: userName(store, x.userId as string), submittedAt: x.submittedAt }));
+  return store.list("attempts", (x) => x.courseId === courseId && x.state === "pending_review").map((x) => {
+    const quiz = store.get("quizzes", x.quizId as string);
+    const snap = (quiz?.snapshot as { questions: QSnap[] } | undefined)?.questions ?? [];
+    const pending = Object.entries((x.results as Record<string, { manual: boolean; max: number }>) ?? {}).filter(([, r]) => r.manual);
+    return { attemptId: x.id, quiz: quiz?.title, student: quiz?.anonymousSurvey ? "Anonymous" : userName(store, x.userId as string), submittedAt: x.submittedAt, questions: pending.map(([qid, r]) => ({ id: qid, prompt: snap.find((q) => q.id === qid)?.prompt ?? "", max: r.max, answer: (x.answers as Record<string, unknown>)?.[qid] ?? null })) };
+  });
 }
 
 export function courseHasStudent(store: TenantStore, courseId: string, userId: string) {

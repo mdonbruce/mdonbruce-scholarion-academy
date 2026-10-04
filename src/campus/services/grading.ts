@@ -354,7 +354,7 @@ export function gradebookGrid(store: TenantStore, a: Actor, courseId: string, f:
         items.map((i) => {
           const g = store.list("grades", (x) => x.assignmentId === i.id && x.userId === u.id)[0];
           const r = t.items.find((x) => x.id === i.id);
-          return [i.id, { score: (g?.score as number) ?? null, status: r?.status ?? "none", posted: !!g?.posted, version: g?.version ?? null, gradeId: g?.id ?? null, excused: !!g?.excused }];
+          return [i.id, { score: (g?.score as number) ?? null, status: r?.status ?? "none", posted: !!g?.posted, version: g?.version ?? null, gradeId: g?.id ?? null, excused: !!g?.excused, dueAt: dueFor(store, i, u.id), assigned: effectiveDates(store, i, u.id).assigned }];
         }),
       ),
       groups: t.groups,

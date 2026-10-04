@@ -5,6 +5,7 @@ import { ensureAgents, ensureStandardTemplate } from "./services/ai";
 import { ensureCloudLabTool } from "./services/lti";
 import { issueCredential, rebuildIndex, recomputeSignals } from "./services/success";
 import { setGrade } from "./services/grading";
+import { snapshotQuiz } from "./services/assessment";
 
 /**
  * Demo/staging seed. Two tenants, physically separate stores:
@@ -191,6 +192,7 @@ function seedTenant(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
   q("essay", "In two sentences, explain what a variable is.", { points: 2 });
   const quiz1 = store.insert("quizzes", { id: `qz_${t.slug}_w1`, courseId: cid, moduleId: m1.id, title: "Week 1 quiz", bankId: bank.id, questionCount: 5, timeLimitMin: 20, allowedAttempts: 2, points: 6, groupId: groups.quiz, availableFrom: iso(-21, 0), availableUntil: iso(30, 0), kind: "graded", scoringPolicy: "highest", shuffleAnswers: true, showResponses: true, state: "published" }, "qz");
   item(m1, "quiz", quiz1.id, quiz1.title as string, "submit");
+  snapshotQuiz(store, quiz1.id);
   const loops = page(m2, "loops", "Decisions and loops", ["An if statement runs code only when a condition is true. A for loop repeats code for each item in a sequence.", "A while loop repeats while its condition stays true — make sure the condition eventually becomes false."]);
   item(m2, "page", loops.id, loops.title as string, "view");
   const lab = store.insert("lab_templates", { id: `lt_${t.slug}_sum`, title: "Sum of evens", kind: "python", instructions: "Write sum_evens(n) that returns the sum of even numbers from 0 to n inclusive.", starterCode: "def sum_evens(n):\n    # your code here\n    return 0\n", tests: [{ name: "small", code: "assert sum_evens(4) == 6", points: 5 }, { name: "zero", code: "assert sum_evens(0) == 0", points: 2 }, { name: "odd bound", code: "assert sum_evens(7) == 12", points: 3 }], maxScore: 10 }, "lt");
@@ -218,7 +220,7 @@ function seedTenant(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
   for (let i = 0; i < 4; i++) store.insert("appointment_slots", { courseId: cid, groupId: ag.id, startsAt: iso(2 + i, 13), endsAt: new Date(Date.parse(iso(2 + i, 13)) + 30 * 60_000).toISOString(), attendeeIds: [] }, "aps");
   store.insert("accommodations", { userId: s2, kind: "extra_time", multiplier: 1.5, courseId: null }, "acm");
   store.insert("accommodations", { userId: s2, kind: "deadline_extension", days: 2, courseId: cid }, "acm");
-  store.insert("conversations", { courseId: cid, subject: "Lab 1 tips", participants: [u.instructor, s1, s2, s3, s4], messages: [{ id: "m1", authorId: u.instructor, body: "Remember: range(0, n + 1, 2) gives the even numbers up to n.", at: iso(-1) }], state: {}, authorId: u.instructor }, "cnv");
+  store.insert("conversations", { courseId: cid, subject: "Lab 1 tips", participantIds: [u.instructor, s1, s2, s3, s4], messages: [{ id: "m1", authorId: u.instructor, body: "Remember: range(0, n + 1, 2) gives the even numbers up to n.", at: iso(-1), attachments: [], mediaUrl: null }], state: { [u.instructor]: { folder: "sent", read: true }, ...Object.fromEntries([s1, s2, s3, s4].map((x) => [x, { folder: "inbox", read: false }])) } }, "cv");
 
   /* Submissions & grades */
   store.insert("submissions", { assignmentId: a1.id, userId: s1, courseId: cid, mode: "text", body: "name = input('Name? ')\nprint('Hello, ' + name)\nThe first line asks for a name; the second greets the person.", attempt: 1, state: "submitted", late: false, groupId: null, groupMemberIds: [s1] }, "sub");
@@ -234,7 +236,7 @@ function seedTenant(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
   for (const k of ["transcript", "id", "statement"]) store.insert("admission_documents", { applicationId: ap.id, kind: k, verified: k !== "statement" }, "adoc");
   const app2 = store.insert("applicants", { name: "Rowan Prospect", email: `rowan@applicants.${dom}` }, "apc");
   store.insert("applications", { applicantId: app2.id, program: "BSc Data Science", termId: spring.id, state: "submitted" }, "apl");
-  store.insert("holds", { userId: s6, kind: "advising", reason: "Meet your advisor before registering for Spring.", active: true }, "hld");
+  store.insert("holds", { userId: s6, kind: "advising", reason: "Meet your advisor before registering for Spring.", active: true, blocksRegistration: true }, "hld");
   store.insert("charges", { userId: s1, description: "Fall 2026 tuition (sandbox)", amount: 900, dueAt: iso(10, 0), termId: fall.id }, "chg");
   store.insert("aid_awards", { userId: s1, kind: "grant", amount: 400, termId: fall.id, state: "offered" }, "aid");
   store.insert("charges", { userId: s3, description: "Fall 2026 tuition (sandbox)", amount: 900, dueAt: iso(-5, 0), termId: fall.id }, "chg");
@@ -268,7 +270,7 @@ function seedTenant(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
     store.insert("connector_consents", { provider: "zoom", grantedBy: u.admin, scope: "meetings, attendance reports", revokedAt: null }, "cc");
     store.insert("live_sessions", { courseId: cid, sectionId: cs101a.id, title: "Live review: loops", startsAt: iso(1, 15), minutes: 50, provider: "zoom", joinUrl: `https://live.scholarion.local/zoom/ls_seed_${t.slug}`, meetingOwnerId: u.instructor, recordingRetentionDays: 30, recordings: [] }, "ls");
     const opp = store.insert("opportunities", { title: "Junior QA intern (internal placement)", employer: "TechDev Labs (internal)", kind: "internship", location: "Hybrid" }, "opp");
-    store.insert("placement_profiles", { userId: s1, headline: "CS student, Python and testing", seeking: "internship", consent: true }, "plp");
+    store.insert("placement_profiles", { userId: s1, headline: "CS student, Python and testing", seeking: "internship", consentToShare: true, skills: ["python", "testing"] }, "plp");
     store.insert("internships", { userId: s1, opportunityId: opp.id, status: "applied" }, "int");
   }
 

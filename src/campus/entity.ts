@@ -217,6 +217,9 @@ export function read(store: TenantStore, a: Actor, table: string, id: string, op
 export function create(store: TenantStore, a: Actor, table: string, input: Record<string, unknown>) {
   const d = def(table);
   if (d.workflow) throw new CampusError("workflow_only", `${d.plural} are created through their workflow, not directly.`, 405);
+  // Authorize on the raw input first, so callers without permission learn nothing from validation errors.
+  const courseProbe = typeof input.courseId === "string" ? { courseId: input.courseId } : {};
+  assertOp(store, a, d, "create", { ...courseProbe, ...(d.owner && d.ownerOps?.includes("create") ? { [d.owner]: a.id } : {}) });
   const values = validate(store, d, input, "create");
   if (d.owner && d.ownerOps?.includes("create") && !canOp(store, a, d, "create", values)) values[d.owner] = a.id;
   const probe = { ...values, ...(d.owner && d.ownerOps?.includes("create") ? { [d.owner]: values[d.owner] ?? a.id } : {}) };
