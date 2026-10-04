@@ -23,12 +23,17 @@ export function ProgramIndexView({ tenant, store }: { tenant: Tenant; store: Ten
     <div className="stack">
       <h1 className="page-title">Programs</h1>
       <p className="muted">Certificate programs from {tenant.name}. Non-credit professional training; fees shown are sandbox prices on this staging site.</p>
+      <p>
+        <a className="btn btn-sm" href={`/campus/${tenant.slug}/agentic-ai`}>
+          Browse by type, level and skill in Agentic AI Courses &amp; Certifications
+        </a>
+      </p>
       {list.length ? (
         <ul className="grid g2 campus-cards" aria-label="Programs">
           {list.map((p) => (
             <li key={p.slug} className="card card-pad stack">
               <p className="tiny muted">
-                Program {p.code} · {p.weeks} weeks · {p.track}
+                Program {p.code} · {p.selfPaced ? `Self-paced, ${p.selfPaced}` : `${p.weeks} weeks`} · {p.track}
               </p>
               <h2 className="card-title">
                 <a href={`/campus/${tenant.slug}/programs/${p.slug}`}>{p.title}</a>
@@ -118,8 +123,13 @@ export function ProgramPageView({ tenant, store, actor, slug, sp }: { tenant: Te
         </dl>
         <div className="row">
           <a className="btn btn-primary" href="#apply">
-            Apply Now
+            {p.selfPaced ? "Enroll" : "Apply Now"}
           </a>
+          {p.selfPaced?.access.audit && (
+            <a className="btn btn-outline" href="#apply">
+              Audit for free
+            </a>
+          )}
           <a className="btn btn-outline" href={p.brochureUrl}>
             Download Brochure (PDF)
           </a>
@@ -128,6 +138,31 @@ export function ProgramPageView({ tenant, store, actor, slug, sp }: { tenant: Te
           </a>
         </div>
       </header>
+
+      <nav aria-label="Catalog" className="small">
+        <a href={p.hubUrl}>← Agentic AI Courses &amp; Certifications</a>
+      </nav>
+      {p.paths.length > 0 && (
+        <section className="card card-pad stack" aria-labelledby="pg-paths">
+          <h2 id="pg-paths" className="card-title">
+            Where this fits
+          </h2>
+          {p.paths.map((lp) => (
+            <div key={lp.title}>
+              <p className="small">
+                <strong>{lp.title}</strong>
+              </p>
+              <ol className="campus-path" aria-label={lp.title}>
+                {lp.steps.map((st) => (
+                  <li key={st.code} aria-current={st.here ? "step" : undefined} className={st.here ? "here" : undefined}>
+                    {st.here ? <strong>{st.code} (this program)</strong> : st.slug ? <a href={`/campus/${tenant.slug}/programs/${st.slug}`}>{st.code}</a> : st.code}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ))}
+        </section>
+      )}
 
       {/* 2. Overview */}
       <section className="card card-pad stack" aria-labelledby="pg-overview">
@@ -205,6 +240,38 @@ export function ProgramPageView({ tenant, store, actor, slug, sp }: { tenant: Te
                 </button>
               </div>
             </form>
+          )}
+        </section>
+      )}
+
+      {p.selfPaced && (
+        <section className="card card-pad stack" aria-labelledby="pg-incl">
+          <h2 id="pg-incl" className="card-title">
+            What&apos;s included
+          </h2>
+          <p className="small">
+            {p.selfPaced.courses.length} course{p.selfPaced.courses.length > 1 ? "s" : ""} · about {p.selfPaced.totalHours} hours · {p.selfPaced.suggestedPace}
+            {p.selfPaced.standardBlocks ? ` · maps to ${p.selfPaced.standardBlocks} ten-week Scholaris standard block${p.selfPaced.standardBlocks > 1 ? "s" : ""} for credit equivalence` : ""}
+          </p>
+          <ol>
+            {p.selfPaced.courses.map((c) => (
+              <li key={c.code}>
+                <strong>
+                  {c.code} {c.title}
+                </strong>{" "}
+                <span className="tiny muted">({c.hours} h)</span> — {c.modules.join(" · ")}. Final project: {c.finalProject}
+                {c.peerReviewed ? " (peer-reviewed, 3 reviews)" : ""}.
+              </li>
+            ))}
+          </ol>
+          {Object.keys(p.transfers).length > 0 && (
+            <p className="small">
+              <strong>Transfer credit:</strong>{" "}
+              {Object.entries(p.transfers)
+                .map(([code, wks]) => `counts toward ${code} (${wks.join(", ")})`)
+                .join("; ")}
+              .
+            </p>
           )}
         </section>
       )}
@@ -367,9 +434,16 @@ export function ProgramPageView({ tenant, store, actor, slug, sp }: { tenant: Te
         </p>
         <p>{p.ceuStatement}</p>
         <p>{s.creditStatement}</p>
-        <p className="small">
-          Verify any credential at <a href={`/campus/${tenant.slug}/verify/SAMPLE`}>the verification page</a> using its ID.
-        </p>
+        <form method="get" action={`/campus/${tenant.slug}/verify`} className="row" aria-label="Verify a certificate">
+          <label htmlFor="pg-verify" className="small">
+            Verify a certificate by ID
+          </label>
+          <input id="pg-verify" name="id" required placeholder="Credential ID" />
+          <button className="btn btn-outline btn-sm" type="submit">
+            Verify
+          </button>
+        </form>
+        {s.validity && <p className="small">{s.validity}</p>}
       </section>
 
       {/* 11. Career services */}
@@ -422,9 +496,9 @@ export function ProgramPageView({ tenant, store, actor, slug, sp }: { tenant: Te
           <table className="table">
             <thead>
               <tr>
-                <th scope="col">Cohort</th>
+                <th scope="col">{s.batches ? "Batch" : "Cohort"}</th>
                 <th scope="col">Starts</th>
-                <th scope="col">Application deadline</th>
+                <th scope="col">{s.batches ? "Registration closes" : "Application deadline"}</th>
                 <th scope="col">Early-bird deadline</th>
                 <th scope="col">Seats left</th>
               </tr>
@@ -433,14 +507,14 @@ export function ProgramPageView({ tenant, store, actor, slug, sp }: { tenant: Te
               {p.cohorts.map((c) => (
                 <tr key={c.id}>
                   <td>
-                    {c.code}
+                    {c.label ?? c.code}
                     <br />
                     <span className="tiny muted">{c.schedule}</span>
                   </td>
                   <td>{etFmt(c.startsAt)}</td>
-                  <td>{etFmt(c.applicationDeadline)}</td>
+                  <td>{etFmt(s.batches ? c.registrationClosesAt : c.applicationDeadline)}</td>
                   <td>{p.fees.earlyBird ? etFmt(p.fees.earlyBird.endsAt) : "—"}</td>
-                  <td>{c.seatsLeft}</td>
+                  <td>{c.soldOut ? <Chip s="sold_out" /> : c.seatsLeft}</td>
                 </tr>
               ))}
             </tbody>
@@ -451,17 +525,74 @@ export function ProgramPageView({ tenant, store, actor, slug, sp }: { tenant: Te
         </p>
       </section>
 
+      {!p.selfPaced && (
+        <section className="card card-pad stack" aria-labelledby="pg-policy">
+          <h2 id="pg-policy" className="card-title">
+            Refund, deferral and batch-change policy
+          </h2>
+          {p.policies.refund || p.policies.deferral || p.policies.batchChange ? (
+            <dl className="campus-dl">
+              {[p.policies.refund, p.policies.deferral, p.policies.batchChange].filter(Boolean).map((pol) => (
+                <div key={pol!.kind}>
+                  <dt>{pol!.kind === "batch_change" ? "Batch change" : pol!.kind[0].toUpperCase() + pol!.kind.slice(1)}</dt>
+                  <dd>
+                    {pol!.text} Decision and processing: {pol!.processingDays} business days{pol!.feeAmount ? `; fee ${pol!.feeAmount} ${cur}` : "; no fee"}. How to request: from your account page. Escalation: {pol!.escalationContact}.
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          ) : (
+            <p className="small">The policy is being finalized and will appear here once approved. Until then, contact the program support desk about refunds, deferrals or batch changes.</p>
+          )}
+        </section>
+      )}
+
       {/* 14. How to apply */}
       <section className="card card-pad stack" id="apply" aria-labelledby="pg-apply">
         <h2 id="pg-apply" className="card-title">
-          How to apply
+          {p.selfPaced ? "How to enroll" : "How to apply"}
         </h2>
-        <ol>
-          {p.howToApply.map((x) => (
-            <li key={x}>{x}</li>
-          ))}
-        </ol>
-        {enrolled ? (
+        {!p.selfPaced && (
+          <ol>
+            {p.howToApply.map((x) => (
+              <li key={x}>{x}</li>
+            ))}
+          </ol>
+        )}
+        {p.selfPaced && !enrolled ? (
+          !actor ? (
+            <p>
+              <a className="btn btn-primary" href={`/campus/${tenant.slug}/signin?next=${encodeURIComponent(`${here}#apply`)}`}>
+                Sign in to enroll
+              </a>
+            </p>
+          ) : (
+            <div className="row">
+              <form method="post" action={api(tenant.slug, "a/commerce.checkout")}>
+                <Hidden values={{ back: `${here}#apply`, offeringId: p.offeringId, sandboxCard: "tok_sandbox_visa", notice: "Enrolled (sandbox purchase). Start from your dashboard." }} />
+                <button className="btn btn-primary" type="submit">
+                  Buy for {money(p.fees.price, cur)} (sandbox)
+                </button>
+              </form>
+              {p.selfPaced.access.subscription && (
+                <form method="post" action={api(tenant.slug, "a/commerce.enroll_with_subscription")}>
+                  <Hidden values={{ back: `${here}#apply`, offeringId: p.offeringId, notice: "Enrolled with your subscription." }} />
+                  <button className="btn btn-outline" type="submit">
+                    Use my Scholaris Plus subscription
+                  </button>
+                </form>
+              )}
+              {p.selfPaced.access.audit && (
+                <form method="post" action={api(tenant.slug, "a/commerce.audit")}>
+                  <Hidden values={{ back: `${here}#apply`, offeringId: p.offeringId, notice: "Auditing: content is open; graded work unlocks when you buy or subscribe." }} />
+                  <button className="btn btn-outline" type="submit">
+                    Audit for free
+                  </button>
+                </form>
+              )}
+            </div>
+          )
+        ) : enrolled ? (
           <p className="notice notice-ok">
             You&apos;re enrolled. <a href={`/campus/${tenant.slug}/dashboard`}>Go to your dashboard</a> for orientation.
           </p>
@@ -474,7 +605,15 @@ export function ProgramPageView({ tenant, store, actor, slug, sp }: { tenant: Te
         ) : myApp?.state === "admitted" ? (
           <form method="post" action={api(tenant.slug, "a/commerce.checkout")} className="stack card card-pad">
             <p className="notice notice-ok">You&apos;ve been admitted. Reserve your seat (sandbox payment).</p>
-            <Hidden values={{ back: `${here}#apply`, offeringId: p.offeringId, sectionId: p.nextCohort?.id, sandboxCard: "tok_sandbox_visa", notice: "Seat reserved (sandbox). Orientation is in your course." }} />
+            <Hidden values={{ back: `${here}#apply`, offeringId: p.offeringId, sandboxCard: "tok_sandbox_visa", notice: "Seat reserved (sandbox). Orientation is in your course." }} />
+            <fieldset>
+              <legend className="small">{s.batches ? "Choose your batch" : "Cohort"}</legend>
+              {p.cohorts.filter((c) => c.registrationClosesAt >= new Date().toISOString()).map((c, i) => (
+                <label key={c.id} className="check">
+                  <input type="radio" name="sectionId" value={c.id} defaultChecked={i === 0 && !c.soldOut} disabled={c.soldOut} /> {c.label ?? c.code} — {c.schedule} · starts {etFmt(c.startsAt)} · {c.soldOut ? "sold out" : `${c.seatsLeft} seats left`}
+                </label>
+              ))}
+            </fieldset>
             <fieldset>
               <legend className="small">Payment plan</legend>
               <label className="check">
@@ -483,6 +622,11 @@ export function ProgramPageView({ tenant, store, actor, slug, sp }: { tenant: Te
               <label className="check">
                 <input type="radio" name="plan" value="installments" /> {p.fees.installments.terms}
               </label>
+              {p.payLater && (
+                <label className="check">
+                  <input type="radio" name="plan" value="pay_later" /> Enroll now, pay later — nothing due today; the full fee is due 3 days before your batch starts (sandbox)
+                </label>
+              )}
               <input type="hidden" name="installments" value={String(p.fees.installments.count)} />
             </fieldset>
             <div>

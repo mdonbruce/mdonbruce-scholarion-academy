@@ -4,7 +4,7 @@ Generated 2026-10-04 by `scripts/campus-docs.ts`. Environment: local + staging o
 
 **Capabilities:** 28 LIVE · 0 CONNECTED · 3 SIMULATED · 8 DISABLED · 2 PLANNED
 
-## Tabs (51)
+## Tabs (52)
 
 A tab is OPERATIONAL when it has persisted resources, enforced authorization, audited writes, an API surface (REST + operations + GraphQL), a working screen, and a passing test. Tabs that depend on outside services report the connector state honestly.
 
@@ -60,6 +60,7 @@ A tab is OPERATIONAL when it has persisted resources, enforced authorization, au
 | 48 | Capability Status | Platform | OPERATIONAL | status board test |
 | 49 | Proctored Assessment Support | Student Success | OPERATIONAL | proctor suite (10 tests) |
 | 50 | Program Studio | Academy & Commerce | OPERATIONAL | programs suite (Tab 50) |
+| 52 | Module Library & Catalog Consolidation | Academy & Commerce | OPERATIONAL | agentic suite (Tab 52: hub, library, policies, consolidation) |
 | 51 | LMS Parity Status | Platform | OPERATIONAL | programs suite (Tab 51) |
 
 ## Capabilities

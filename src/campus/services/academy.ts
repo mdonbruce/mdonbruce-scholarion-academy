@@ -6,7 +6,7 @@ import { copyCheck } from "./claims";
 import { computeTotals } from "./grading";
 import { moduleStates } from "./curriculum";
 import { issueCredential } from "./success";
-import { onProgramEnrollment, passNoPassChecks, programCheckoutGuard } from "./programs";
+import { afterProgramCompletion, onProgramEnrollment, passNoPassChecks, programCheckoutGuard } from "./programs";
 
 /**
  * Academy engine (Tabs 41–43): catalog hub generated from data, recommender quiz,
@@ -244,7 +244,7 @@ function couponFor(store: TenantStore, code: string | undefined, offeringId: str
   return c;
 }
 
-export function quote(store: TenantStore, input: { offeringId: string; coupon?: string; plan?: "full" | "installments"; installments?: number }) {
+export function quote(store: TenantStore, input: { offeringId: string; coupon?: string; plan?: "full" | "installments" | "pay_later"; installments?: number; sectionId?: string }) {
   const o = store.get("offerings", input.offeringId);
   if (!o || o.state !== "published") throw new CampusError("not_found", "Offering not found", 404);
   const p = priceNow(o);
@@ -253,13 +253,20 @@ export function quote(store: TenantStore, input: { offeringId: string; coupon?: 
   const net = Math.round((p.price - discount) * 100) / 100;
   const tax = Math.round(net * (TAX_RATES[p.currency] ?? 0) * 100) / 100;
   const total = Math.round((net + tax) * 100) / 100;
+  if (input.plan === "pay_later") {
+    if (!o.payLaterAllowed) throw new CampusError("pay_later_unavailable", "Enroll now, pay later isn't offered for this program.", 422);
+    // Pay later: nothing due today; the full amount is due 3 days before the batch starts (sandbox).
+    const sec = input.sectionId ? store.get("offering_sections", input.sectionId) : undefined;
+    const dueMs = sec ? new Date(String(sec.startsAt)).getTime() - 3 * 86400_000 : nowMs() + 14 * 86400_000;
+    return { offeringId: o.id, currency: p.currency, listPrice: p.listPrice, price: p.price, earlyBird: p.earlyBird, discount, coupon: c?.code ?? null, tax, taxNote: "Simulated tax for the sandbox", total, plan: "pay_later", schedule: [{ due: new Date(Math.max(dueMs, nowMs())).toISOString().slice(0, 10), amount: total }], sandbox: true };
+  }
   const n = input.plan === "installments" ? Math.min(Math.max(input.installments ?? 3, 2), 6) : 1;
   const schedule = Array.from({ length: n }, (_, i) => ({ due: new Date(nowMs() + i * 30 * 86400_000).toISOString().slice(0, 10), amount: Math.round((total / n + (i === n - 1 ? total - Math.round((total / n) * 100) / 100 * n : 0)) * 100) / 100 }));
   return { offeringId: o.id, currency: p.currency, listPrice: p.listPrice, price: p.price, earlyBird: p.earlyBird, discount, coupon: c?.code ?? null, tax, taxNote: "Simulated tax for the sandbox", total, plan: n > 1 ? "installments" : "full", schedule, sandbox: true };
 }
 
 /** Sandbox checkout → order, program enrollment, LMS enrollment, pathway waivers. */
-export function checkout(store: TenantStore, a: Actor, input: { offeringId: string; sectionId?: string; coupon?: string; plan?: "full" | "installments"; installments?: number; funding?: "self" | "federal_aid" | "employer"; idempotencyKey?: string; sandboxCard?: string }) {
+export function checkout(store: TenantStore, a: Actor, input: { offeringId: string; sectionId?: string; coupon?: string; plan?: "full" | "installments" | "pay_later"; installments?: number; funding?: "self" | "federal_aid" | "employer"; idempotencyKey?: string; sandboxCard?: string }) {
   if (a.masqueradedBy) throw new CampusError("forbidden", "Purchases aren't allowed while acting as someone else.", 403);
   if (input.sandboxCard && !/^tok_sandbox_/.test(input.sandboxCard)) throw new CampusError("sandbox_only", "This is a sandbox. Use a sandbox token like tok_sandbox_visa — never a real card.", 422);
   const key = input.idempotencyKey ?? null;
@@ -272,7 +279,7 @@ export function checkout(store: TenantStore, a: Actor, input: { offeringId: stri
   if (input.funding === "federal_aid" && !(o.aidEligible && o.aidApprovalRef)) throw new CampusError("aid_ineligible", "This non-credit offering isn't eligible for federal aid.", 422);
   const path = evaluatePathway(store, a.id, o.id);
   if (!path.allowed) throw new CampusError("pathway_blocked", path.blockers.join(" "), 409, { blockers: path.blockers });
-  if (store.list("offering_enrollments", (e) => e.userId === a.id && e.offeringId === o.id && e.state === "active").length) throw new CampusError("already_enrolled", "You're already enrolled.", 409);
+  if (store.list("offering_enrollments", (e) => e.userId === a.id && e.offeringId === o.id && e.state === "active" && e.source !== "audit").length) throw new CampusError("already_enrolled", "You're already enrolled.", 409);
   programCheckoutGuard(store, a.id, o, input.sectionId ?? null);
   const q = quote(store, input);
   return store.tx(() => {
@@ -285,7 +292,7 @@ export function checkout(store: TenantStore, a: Actor, input: { offeringId: stri
       if (seatsLeft(store, sec) <= 0) state = "waitlisted";
       else store.update("offering_sections", sec.id, { seatsTaken: Number(sec.seatsTaken ?? 0) + 1 });
     }
-    const order = store.insert("orders", { userId: a.id, offeringId: o.id, sectionId: sec?.id ?? null, plan: q.plan, subtotal: q.price, discount: q.discount, tax: q.tax, total: q.total, currency: q.currency, state: state === "waitlisted" ? "waitlist_hold" : "paid_sandbox", sandboxRef: `sbx_${token(10)}`, couponCode: q.coupon, installments: q.schedule, funding: input.funding ?? "self", idempotencyKey: key }, "ord");
+    const order = store.insert("orders", { userId: a.id, offeringId: o.id, sectionId: sec?.id ?? null, plan: q.plan, subtotal: q.price, discount: q.discount, tax: q.tax, total: q.total, currency: q.currency, state: state === "waitlisted" ? "waitlist_hold" : q.plan === "pay_later" ? "pay_later_sandbox" : "paid_sandbox", sandboxRef: `sbx_${token(10)}`, couponCode: q.coupon, installments: q.schedule, funding: input.funding ?? "self", idempotencyKey: key }, "ord");
     if (q.coupon) {
       const c = store.list("coupons", (x) => x.code === q.coupon)[0];
       store.update("coupons", c.id, { redemptions: Number(c.redemptions ?? 0) + 1 });
@@ -299,6 +306,8 @@ export function checkout(store: TenantStore, a: Actor, input: { offeringId: stri
 }
 
 function enrollInOffering(store: TenantStore, userId: string, o: Row, opts: { sectionId: string | null; source: string; state: string; orderId?: string; waived: PathwayResult["waivedModules"] }) {
+  // Upgrading from a free audit: the audit enrollment is closed and graded work unlocks.
+  if (opts.state === "active") for (const x of store.list("offering_enrollments", (e) => e.userId === userId && e.offeringId === o.id && e.source === "audit" && e.state === "active")) store.update("offering_enrollments", x.id, { state: "upgraded" });
   const enr = store.insert("offering_enrollments", { userId, offeringId: o.id, sectionId: opts.sectionId, source: opts.source, state: opts.state, orderId: opts.orderId ?? null, waivedModules: opts.waived, completedAt: null, credentialId: null }, "oen");
   if (opts.state === "active" && o.courseId) {
     if (!store.list("enrollments", (e) => e.userId === userId && e.courseId === o.courseId && e.role === "student" && e.state === "active").length) store.insert("enrollments", { userId, courseId: o.courseId, role: "student", state: "active", source: opts.source, offeringEnrollmentId: enr.id }, "enr");
@@ -474,7 +483,8 @@ export function evaluateCompletion(store: TenantStore, a: Actor | null, userId: 
     }
     const cred = issueCredential(store, null, { userId, courseId: o.courseId as string, title: `${o.code} ${o.title}`, kind: o.productType === "guided_project" || o.productType === "short_course" ? "badge" : "certificate", templateId: tpl?.id, achievementType: o.productType === "short_course" ? "Badge" : "Certificate", evidence: [{ name: pnp ? "Pass (all pass/no-pass requirements met)" : `Final grade ${totals.finalPct}%` }] });
     store.update("offering_enrollments", enr.id, { credentialId: cred.id });
-    return { completed: true, checks, credential: cred, pendingApproval: false };
+    const graded = afterProgramCompletion(store, userId, o);
+    return { completed: true, checks, credential: cred, gradedPerformance: graded, pendingApproval: false };
   });
 }
 

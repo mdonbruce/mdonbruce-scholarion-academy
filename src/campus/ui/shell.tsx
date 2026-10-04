@@ -164,6 +164,7 @@ export function PublicFrame({ tenant, children }: { tenant: Tenant; children: Re
         <nav aria-label="Public" className="row">
           <a href={`/campus/${tenant.slug}/catalog`}>Catalog</a>
           <a href={`/campus/${tenant.slug}/programs`}>Programs</a>
+          <a href={`/campus/${tenant.slug}/agentic-ai`}>Agentic AI</a>
           <a href={`/campus/${tenant.slug}/signin`} className="btn btn-primary btn-sm">
             Sign in
           </a>

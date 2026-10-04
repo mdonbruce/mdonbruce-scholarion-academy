@@ -1836,3 +1836,10 @@ details.acc > div {
 .campus-calday { list-style: none; padding: 0; margin: 2px 0 0; font-size: 0.78rem; }
 .campus-calday li { margin-bottom: 2px; }
 .campus-program .eyebrow { color: var(--text-2, #334155); }
+.campus-path { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0; }
+.campus-path li { border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px; font-size: 0.85rem; }
+.campus-path li + li::before { content: "→"; margin-right: 8px; color: var(--text-3); }
+.campus-path li.here { border-color: var(--primary, #0b1f4d); border-width: 2px; }
+.campus-hub-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.campus-hub-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; align-items: end; }
+.campus-rail { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; list-style: none; padding: 0; }

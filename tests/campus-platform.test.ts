@@ -13,6 +13,7 @@ import * as cur from "../src/campus/services/curriculum";
 import * as success from "../src/campus/services/success";
 import * as admin from "../src/campus/services/admin";
 import * as entity from "../src/campus/entity";
+import * as prog from "../src/campus/services/programs";
 
 /**
  * Scholarion platform prompt — §6 end-to-end acceptance scenario (steps 1–11).
@@ -64,7 +65,7 @@ describe("Platform acceptance scenario", () => {
 
   it("2 · Academy publishes #32 (Short Course) and #15 (Live Intensive); catalog pages come from data", () => {
     const { store } = as("academy", "designer");
-    const hub = academy.catalogHub(store, { compare: ["off_academy_32", "off_academy_15"] });
+    const hub = academy.catalogHub(store, { compare: ["off_academy_37_2", "off_academy_15"] });
     const codes = hub.items.map((i) => i.code);
     assert.ok(codes.includes("#32") && codes.includes("#15"));
     assert.equal(hub.items.find((i) => i.code === "#32")!.typeLabel, "Short Course");
@@ -76,27 +77,28 @@ describe("Platform acceptance scenario", () => {
     assert.ok(hub.items.find((i) => i.code === "#15")!.nextCohort!.seatsLeft > 0);
   });
 
-  it("3 · recommender routes a learner to #32; sandbox purchase; completion with an autograded lab; verifiable badge", () => {
+  it("3 · recommender routes a learner to #37.2; sandbox purchase; completion with an autograded lab; verifiable badge", () => {
     const { store, actor } = as("academy", "student1", false);
     const rec = academy.recommend(store, { goal: "start", experience: "intermediate", interest: "ml", format: "self", hours: "6" });
-    assert.equal(rec.top!.offering.code, "#32");
+    assert.equal(rec.top!.offering.code, "#37.2");
     assert.ok(rec.top!.why.length > 0);
     // Real card data is refused; sandbox token accepted.
-    denied(() => academy.checkout(store, actor, { offeringId: "off_academy_32", sandboxCard: "4242424242424242" }), 422);
-    const co = academy.checkout(store, actor, { offeringId: "off_academy_32", coupon: "WELCOME10", sandboxCard: "tok_sandbox_visa", idempotencyKey: "k1" });
+    denied(() => academy.checkout(store, actor, { offeringId: "off_academy_37_2", sandboxCard: "4242424242424242" }), 422);
+    const co = academy.checkout(store, actor, { offeringId: "off_academy_37_2", coupon: "WELCOME10", sandboxCard: "tok_sandbox_visa", idempotencyKey: "k1" });
     assert.equal(co.order.state, "paid_sandbox");
-    assert.equal(co.order.total, 116.1);
-    const again = academy.checkout(store, actor, { offeringId: "off_academy_32", idempotencyKey: "k1" });
+    const listPrice = Number(store.get("offerings", "off_academy_37_2")!.price);
+    assert.equal(co.order.total, Math.round(listPrice * 0.9 * 100) / 100, "WELCOME10 takes 10% off");
+    const again = academy.checkout(store, actor, { offeringId: "off_academy_37_2", idempotencyKey: "k1" });
     assert.equal(again.order.id, co.order.id, "idempotent checkout");
     relay(store);
 
     // Module 1: view the page.
     let s = as("academy", "student1", false);
-    const m1 = cur.moduleStates(s.store, s.actor, "crs_academy_p32")[0];
+    const m1 = cur.moduleStates(s.store, s.actor, "crs_academy_p37_2")[0];
     cur.openItem(s.store, s.actor, m1.items[0].item.id);
     // Module 2: view page, then Cloud Lab via LTI 1.3.
     s = as("academy", "student1", false);
-    const m2 = cur.moduleStates(s.store, s.actor, "crs_academy_p32")[1];
+    const m2 = cur.moduleStates(s.store, s.actor, "crs_academy_p37_2")[1];
     assert.equal(m2.locked, false);
     cur.openItem(s.store, s.actor, m2.items[0].item.id);
     const l = lti.launch(s.store, s.actor, "asg_academy_p32_lab");
@@ -116,7 +118,7 @@ describe("Platform acceptance scenario", () => {
     grading.setGrade(inst.store, inst.actor, { assignmentId: "asg_academy_p32_capstone", userId: actor.id, score: 18 });
     grading.postGrades(inst.store, inst.actor, "asg_academy_p32_lab");
     relay(inst.store);
-    const enr = inst.store.list("offering_enrollments", (e) => e.userId === actor.id && e.offeringId === "off_academy_32")[0];
+    const enr = inst.store.list("offering_enrollments", (e) => e.userId === actor.id && e.offeringId === "off_academy_37_2")[0];
     assert.ok(enr.completedAt, "completion evaluated on grade posting");
     assert.ok(enr.credentialId);
     credentialId = enr.credentialId as string;
@@ -126,22 +128,28 @@ describe("Platform acceptance scenario", () => {
     assert.ok((cred.vc as { type: string[] }).type.includes("OpenBadgeCredential"));
   });
 
-  it("4 · completing #32 waives the mapped module in #15 at enrollment (rule fires, audited)", () => {
+  it("4 · completing #37.2 waives the mapped module in #18 at enrollment (rule fires, audited)", () => {
     const { store, actor } = as("academy", "student1", false);
-    const path = academy.evaluatePathway(store, actor.id, "off_academy_15");
-    assert.deepEqual(path.waivedModules.map((w) => w.moduleKey), ["dl-m1"]);
-    academy.checkout(store, actor, { offeringId: "off_academy_15", sectionId: store.list("offering_sections", (s) => s.code === "DL-OCT")[0].id, sandboxCard: "tok_sandbox_visa" });
-    relay(store);
+    const path = academy.evaluatePathway(store, actor.id, "off_academy_18");
+    assert.deepEqual(path.waivedModules.map((w) => w.moduleKey), ["p18-w5"]);
+    const sec = store.list("offering_sections", (s) => s.code === "DL-OCT")[0];
+    denied(() => academy.checkout(store, actor, { offeringId: "off_academy_18", sectionId: sec.id, sandboxCard: "tok_sandbox_visa" }), 409); // admission first
+    const app = prog.applyToProgram(as("academy", "student1", false).store, actor, { offeringId: "off_academy_18", sectionId: sec.id, statement: "I finished the supervised learning course and want deep learning in both frameworks." });
+    const reg = as("academy", "registrar");
+    prog.reviewProgramApplication(reg.store, reg.actor, app.application.id, "admit");
+    academy.checkout(as("academy", "student1", false).store, actor, { offeringId: "off_academy_18", sectionId: sec.id, sandboxCard: "tok_sandbox_visa" });
+    relay(storeOf("academy"));
     const s = as("academy", "student1", false);
-    const mods = cur.moduleStates(s.store, s.actor, "crs_academy_p15");
-    assert.equal(mods[0].waived, true);
-    assert.equal(mods[0].complete, true);
-    assert.equal(mods[1].locked, false, "module 2 opens because module 1 is waived");
+    const mods = cur.moduleStates(s.store, s.actor, "crs_academy_p18");
+    const w5 = mods.find((m) => m.module.moduleKey === "p18-w5")!;
+    assert.equal(w5.waived, true);
+    assert.equal(w5.complete, true);
+    assert.equal(mods.find((m) => m.module.moduleKey === "p18-w6")!.waived, false);
     assert.ok(s.store.auditLog(500).some((r) => r.action === "pathway.waive"));
     assert.ok(s.store.outbox().some((e) => e.type === "pathway.rule_fired"));
   });
 
-  it("5 · #15 PyTorch lab: LTI launch, learner-scoped API key, autograder posts an unposted score, instructor posts it", () => {
+  it("5 · #18 PyTorch lab (adopted Week 5–6 content): LTI launch, learner-scoped API key, autograder posts an unposted score, instructor posts it", () => {
     const s = as("academy", "student1", false);
     const key = tutor.issueLabKey(s.store, s.actor, "asg_academy_p15_lab");
     assert.match(key.key, /^sk-sch-/);
@@ -164,23 +172,23 @@ describe("Platform acceptance scenario", () => {
 
   it("6 · AI Tutor (Amara avatar mode) answers with citations, then refuses graded work and offers hints", () => {
     const s = as("academy", "student1", false);
-    const a = tutor.tutor(s.store, s.actor, { courseId: "crs_academy_p32", mode: "explain", question: "What is overfitting and how do I reduce it?", avatar: "amara" });
+    const a = tutor.tutor(s.store, s.actor, { courseId: "crs_academy_p37_2", mode: "explain", question: "What is overfitting and how do I reduce it?", avatar: "amara" });
     assert.equal(a.decision, "answered");
     assert.ok(a.citations.length >= 1);
     assert.match(a.text, /overfitting/i);
     assert.ok(a.avatar && a.avatar.captionsVtt.startsWith("WEBVTT") && a.avatar.transcript.length > 0);
     assert.match(a.disclosure, /AI tutor/);
-    const r = tutor.tutor(as("academy", "student1", false).store, s.actor, { courseId: "crs_academy_p32", mode: "explain", question: "write my capstone report for the assignment" });
+    const r = tutor.tutor(as("academy", "student1", false).store, s.actor, { courseId: "crs_academy_p37_2", mode: "explain", question: "write my capstone report for the assignment" });
     assert.equal(r.decision, "refused_with_hints");
     assert.match(r.text, /hints/i);
-    const pcm = tutor.tutor(as("academy", "student1", false).store, s.actor, { courseId: "crs_academy_p32", mode: "explain", question: "evaluation metrics accuracy", language: "pcm" });
+    const pcm = tutor.tutor(as("academy", "student1", false).store, s.actor, { courseId: "crs_academy_p37_2", mode: "explain", question: "evaluation metrics accuracy", language: "pcm" });
     assert.match(pcm.text, /See wetin/);
     denied(() => tutor.tutor(as("demo", "student1", false).store, as("demo", "student1", false).actor, { courseId: "crs_demo_cs101", mode: "explain", question: "variables", language: "pcm" }), 423);
   });
 
-  it("7 · the corporate tenant licenses #32; content syncs via blueprint copy; no learner data crosses tenants", () => {
+  it("7 · the corporate tenant licenses #37.2; content syncs via blueprint copy; no learner data crosses tenants", () => {
     const ops = as("techdev", "ops").actor;
-    const lic = platform.createLicense(ops, { sourceTenantId: "tn_academy", sourceCourseId: "crs_academy_p32", targetTenantId: `tn_${corpSlug}` });
+    const lic = platform.createLicense(ops, { sourceTenantId: "tn_academy", sourceCourseId: "crs_academy_p37_2", targetTenantId: `tn_${corpSlug}` });
     const first = platform.syncLicense(ops, lic.id);
     assert.ok(first.created > 0);
     const second = platform.syncLicense(ops, lic.id);
@@ -208,10 +216,10 @@ describe("Platform acceptance scenario", () => {
 
   it("9 · program funnel and mastery dashboards for the director; the operator sees de-identified metrics only", () => {
     const d = as("academy", "admin");
-    const prog = academy.programAnalytics(d.store, d.actor);
-    const p32 = prog.find((p) => p.offering.startsWith("#32"))!;
+    const programs = academy.programAnalytics(d.store, d.actor);
+    const p32 = programs.find((p) => p.offering.startsWith("#37.2"))!;
     assert.ok(p32.funnel.orders >= 1 && p32.funnel.completed >= 1 && p32.funnel.credentialed >= 1);
-    const mastery = grading.masteryGradebook(d.store, d.actor, "crs_academy_p32");
+    const mastery = grading.masteryGradebook(d.store, d.actor, "crs_academy_p37_2");
     assert.ok(mastery);
     const ops = as("techdev", "ops").actor;
     const m = platform.platformMetrics(ops);
@@ -259,7 +267,7 @@ describe("Platform acceptance scenario", () => {
   it("commerce policy: deferral/refund explanations, seats, aid eligibility", () => {
     const s = as("academy", "student2", false);
     denied(() => academy.checkout(s.store, s.actor, { offeringId: "off_academy_15", funding: "federal_aid" }), 422);
-    denied(() => academy.checkout(s.store, s.actor, { offeringId: "off_academy_20" }), 409); // prerequisite #1-R
+    denied(() => academy.checkout(s.store, s.actor, { offeringId: "off_academy_22" }), 409); // prerequisite #21
     const co = academy.checkout(s.store, s.actor, { offeringId: "off_academy_1r", sandboxCard: "tok_sandbox_visa" });
     const rf = academy.requestRefund(as("academy", "student2", false).store, s.actor, String(co.order.id), "refund", "Changed plans");
     assert.equal(rf.decision, "approved");

@@ -522,7 +522,7 @@ Quotes, coupons and referrals, early-bird, installments, subscriptions, corporat
 - **Typical failures:** Checkout refused (sold out, aid ineligible, coupon expired).
 - **Recovery:** Join the waitlist / choose another cohort; check coupon window.
 - **Resources:** `coupons`, `orders`, `subscriptions`, `seat_licenses`, `invoices`, `refund_requests`, `offering_enrollments`
-- **Operations:** `commerce.quote`, `commerce.checkout`, `commerce.subscribe`, `commerce.cancel_subscription`, `commerce.enroll_with_subscription`, `commerce.assign_seat`, `commerce.invoice_seats`, `commerce.refund`, `commerce.reset_deadlines`, `analytics.commerce`
+- **Operations:** `commerce.quote`, `commerce.checkout`, `commerce.subscribe`, `commerce.cancel_subscription`, `commerce.enroll_with_subscription`, `commerce.assign_seat`, `commerce.invoice_seats`, `commerce.refund`, `commerce.reset_deadlines`, `analytics.commerce`, `commerce.batch_change`, `commerce.audit`
 - **Who sees it:** admin, student
 
 ## 44. AI Tutor
@@ -606,8 +606,20 @@ Academy program designs (#1, #12, #13, #14, #26): website pages generated from c
 - **Typical failures:** Program page won't publish (copy check, missing fee or unconfirmed faculty).
 - **Recovery:** Fix the flagged wording or field and publish again; the page reads fees and dates from the catalog.
 - **Resources:** `program_pages`, `program_testimonials`, `program_inquiries`, `selfcheck_attempts`
-- **Operations:** `programs.index`, `programs.page`, `programs.self_check_questions`, `programs.self_check`, `programs.inquire`, `programs.apply`, `programs.review`, `programs.quality_gate`, `programs.publish_shells`, `programs.status`, `programs.progress`
+- **Operations:** `agentic.hub`, `agentic.quiz_questions`, `agentic.recommend`, `programs.index`, `programs.page`, `programs.self_check_questions`, `programs.self_check`, `programs.inquire`, `programs.apply`, `programs.review`, `programs.quality_gate`, `programs.publish_shells`, `programs.status`, `programs.progress`
 - **Who sees it:** admin, designer, registrar, advisor, instructor
+
+## 52. Module Library & Catalog Consolidation
+
+The versioned shared module library (blueprint course), the catalog consolidation report for programs #1–#38 (shared modules, credit transfers, mutually exclusive pairs, merge/retire recommendations, proposed #27) with product-owner approval, and the refund, deferral and batch-change policies that only display once approved.
+
+- **Purpose:** Build once, reuse everywhere; keep the catalog coherent.
+- **Depends on:** Offerings, pathway graph, blueprint courses.
+- **Typical failures:** Overlap above 60% flagged; policy not displayed (not approved).
+- **Recovery:** Merge or retire per the approved report; product owner approves the policy.
+- **Resources:** `library_modules`, `catalog_policies`, `consolidation_reports`
+- **Operations:** `catalog.consolidation`, `catalog.consolidation_submit`, `catalog.consolidation_decide`, `policies.approve`
+- **Who sees it:** admin, designer, registrar
 
 ## 51. LMS Parity Status
 

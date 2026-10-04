@@ -25,6 +25,7 @@ export function submit(store: TenantStore, a: Actor, assignmentId: string, input
   if (!hasAny(a, ["student"], courseId)) throw new CampusError("forbidden", "Only students in this course can submit.", 403);
   const crs = store.get("courses", courseId);
   if (crs?.concludedAt && String(crs.concludedAt) <= nowIso()) throw new CampusError("concluded", "This course has concluded and is read-only.", 423);
+  if (store.list("enrollments", (e) => e.userId === a.id && e.courseId === courseId && e.state === "active" && !!e.audit).length) throw new CampusError("audit_only", "You're auditing this course. Buy it or use your subscription to submit graded work.", 402);
   assertAccessible(store, a, "assignment", asg.id);
   const dates = effectiveDates(store, asg, a.id);
   if (!dates.assigned) throw new CampusError("not_assigned", "This assignment isn't assigned to you.", 403);
@@ -301,6 +302,7 @@ export function startAttempt(store: TenantStore, a: Actor, quizId: string, opts:
   const mine = store.list("attempts", (x) => x.quizId === quizId && x.userId === a.id);
   const open = mine.find((x) => x.state === "in_progress");
   if (open) return attemptView(store, a, open.id);
+  if (store.list("enrollments", (e) => e.userId === a.id && e.courseId === courseId && e.state === "active" && !!e.audit).length) throw new CampusError("audit_only", "You're auditing this course. Buy it or use your subscription to take graded quizzes.", 402);
   // Proctored assessments: the student confirms the pre-test checklist first (Tab 49).
   if (quiz.proctored && !store.list("proctor_readiness", (r) => r.quizId === quizId && r.userId === a.id && !!r.complete).length) throw new CampusError("pretest_checklist", "Before you start, complete the pre-test checklist for this proctored assessment.", 428);
   const acc = accommodation(store, a.id, courseId);

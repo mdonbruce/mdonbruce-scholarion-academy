@@ -17,6 +17,45 @@ export interface WeekSpec {
   kind?: "midterm" | "capstone" | "exam";
   /** Program #26: the two guided labs for the week. */
   labs?: [string, string];
+  /** Weekend programs: Saturday and Sunday live sessions. */
+  sessions?: [string, string];
+  /** Shared module library keys this week is built on. */
+  lib?: string[];
+  /** Deep-learning week: labs ship in PyTorch and TensorFlow/Keras versions. */
+  dual?: boolean;
+  /** Pathways: the course this week belongs to (code of an included program, or a new course key). */
+  course?: string;
+}
+export interface LabSpec {
+  title: string;
+  instructions: string;
+  starterCode: string;
+  tests: { name: string; code: string; points: number }[];
+}
+export interface QuizItem {
+  kind: "multiple_choice" | "true_false";
+  prompt: string;
+  choices?: string[];
+  answer: string;
+  explanation?: string;
+}
+export interface SPModule {
+  title: string;
+  focus: string;
+  lib?: string[];
+  videos?: string[];
+  lab?: LabSpec;
+  quiz?: QuizItem[];
+}
+export interface SPCourse {
+  code: string;
+  title: string;
+  hours: number;
+  modules: SPModule[];
+  finalProject: string;
+  peerReviewed?: boolean;
+  /** Reuse an existing course shell for this course (legacy content folded into the new catalog). */
+  courseId?: string;
 }
 export interface ProjectSpec {
   key: string;
@@ -48,7 +87,7 @@ export interface ProgramSpec {
   code: string;
   slug: string;
   title: string;
-  productType: "professional_certificate" | "cohort_program" | "bundle" | "live_intensive" | "short_course";
+  productType: "professional_certificate" | "cohort_program" | "bundle" | "live_intensive" | "short_course" | "pathway" | "specialization" | "guided_project";
   track: string;
   valueStatement: string;
   overview: string[];
@@ -87,22 +126,43 @@ export interface ProgramSpec {
   parts?: { code: string; title: string; summary: string; weeks: string; price: number }[];
   /** Module keys other programs can waive, by week. */
   waives?: { toCode: string; weeks: string[]; note: string }[];
+  /** Catalog hub facets. */
+  catalogTrack?: "Builder" | "No-Code" | "Business & Leadership" | "Industry" | "Data" | "Product";
+  codingRequired?: boolean;
+  formatKind?: "live_weekend" | "live_weekday" | "self_paced" | "cohort";
+  /** Self-paced line (#28–#38). */
+  selfPaced?: { type: "guided_project" | "short_course" | "specialization" | "professional_certificate"; suggestedPace: string; audit: boolean; inPlus: boolean; standardBlocks: number; courses: SPCourse[] };
+  /** Assembled pathways (#17, #24, #25): included program codes, in order. */
+  pathway?: { includes: string[]; missing?: string[]; note: string };
+  /** Rolling batches (#15). */
+  batches?: { code: string; label: string; startInDays: number; timeZone: string; satStart: string; sunStart: string; capacity: number }[];
+  completion?: "weekend_intensive";
+  gradedPerformance?: boolean;
+  validity?: string;
+  mutuallyExclusive?: string[];
+  prerequisiteFor?: string[];
+  feeds?: string[];
+  textbooks?: string[];
+  /** Adopt an existing course shell for a block (legacy demo content). */
+  adoptCourse?: { courseId: string; weeks: Record<string, string> };
+  /** Self-check routing bands (#15). */
+  selfCheckBands?: { min: number; route: string[]; message: string }[];
 }
 
-const AI_TA = "Scholaris AI Teaching Assistant — coaches with hints and explanations from your course material; it never completes graded work";
-const LEAD = { name: "Dr. Martins Donbruce Idahosa", role: "Lead Faculty", bio: null };
+export const AI_TA = "Scholaris AI Teaching Assistant — coaches with hints and explanations from your course material; it never completes graded work";
+export const LEAD = { name: "Dr. Martins Donbruce Idahosa", role: "Lead Faculty", bio: null };
 const TM = "Product and tool names are trademarks of their owners. Scholaris AI Academy is not affiliated with or endorsed by them.";
 export const TRADEMARK_NOTICE = TM;
 
-const COMMON_FAQ = (s: { weeks: number; hours: string; refund: string; tech: string }) => [
+export const COMMON_FAQ = (s: { weeks: number; hours: string; refund: string; tech: string }) => [
   { q: "How much time does it take?", a: `${s.weeks} weeks at ${s.hours}. Live sessions are recorded with chapters and transcripts.` },
   { q: "Are there taxes on the fee?", a: "Any tax is calculated at checkout from your billing location and shown before you confirm. This staging site uses simulated tax and sandbox payments only." },
   { q: "What is the refund and withdrawal policy?", a: s.refund },
   { q: "What are the technical requirements?", a: s.tech },
   { q: "How is the certificate verified?", a: "Each certificate and badge has a verification ID. Anyone can check it on the Scholaris verification page, which shows the issuer, the achievement and whether it is current." },
 ];
-const REFUND = "Full refund within 14 days of the cohort start if you have completed less than 20% of the work. You can defer once to the next cohort if you ask at least 7 days before the start. Requests go through your account page.";
-const TECH = "A laptop or desktop with a current browser, a stable internet connection, and a webcam and microphone for live sessions. Labs run in the Scholaris Cloud Lab, so you don't need a powerful computer.";
+export const REFUND = "Full refund within 14 days of the cohort start if you have completed less than 20% of the work. You can defer once to the next cohort if you ask at least 7 days before the start. Requests go through your account page.";
+export const TECH = "A laptop or desktop with a current browser, a stable internet connection, and a webcam and microphone for live sessions. Labs run in the Scholaris Cloud Lab, so you don't need a powerful computer.";
 
 export const PROGRAMS: ProgramSpec[] = [
   /* ------------------------------------------------------------------ #1 */
@@ -537,7 +597,7 @@ export const PROGRAMS: ProgramSpec[] = [
     },
     waives: [
       { toCode: "#1", weeks: ["1", "2", "3", "4", "5", "6", "7", "8"], note: "Completion of #26 waives Program #1 Weeks 1–8." },
-      { toCode: "#15", weeks: ["W3", "W4", "W5"], note: "Completion of #26 waives Program #15 Weekends 3–5." },
+      { toCode: "#15", weeks: ["3", "4", "5"], note: "Completion of #26 waives Program #15 Weekends 3–5." },
     ],
     dataCards: [
       { key: "agent_tasks", name: "Synthetic multi-turn task set", purpose: "Weeks 1–2 agent and memory labs", rows: 400, fields: ["task_id", "turns", "expected_tool_calls", "gold_answer"], source: "Written by Scholaris.", caveats: "Simplified tasks for measurement." },

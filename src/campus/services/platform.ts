@@ -296,6 +296,8 @@ export function capabilityBoard(store: TenantStore): Capability[] {
     live("SIS", "Admissions, registration → enrollment projection, reconciliation, holds, transcript", "master acceptance"),
     live("Catalog", "Product types, catalog hub, recommender, Catalog Copy Checker", "platform acceptance 2–3, 10"),
     live("Catalog", "Academy program pages (#1, #12, #13, #14, #26) generated from catalog data, brochure PDF, apply → admission → sandbox seat, inquiries, prerequisite self-check, pass/no-pass completion", "programs suite"),
+    live("Catalog", "Agentic AI hub (tabs, filters, rails from real data, learning paths, 9-question quiz, comparison, credential explainer, ItemList JSON-LD); programs #15–#25 and self-paced #28–#38 with batches, pay-later, audit access, autograded Cloud Lab notebooks, stacking certificates", "agentic suite"),
+    live("Catalog", "Shared module library, policy approval gate (refund / deferral / batch change) and catalog consolidation report with product-owner decision", "agentic suite (Tab 52)"),
     live("Pathways", "Prerequisite / stacks / waives / mutually-exclusive rules, transfer credit, consolidation report", "platform acceptance 4"),
     { area: "Commerce", capability: "Checkout, coupons, installments, subscriptions, seats, invoices, refunds", status: "SIMULATED", evidence: "Sandbox only; policy engine tested", blockers: "Payment provider and go-live decision." },
     live("Credentials", "Open Badges 3.0 / VC signing, verification portal, revocation, reissue, CLR, honesty guard", "credential tests"),

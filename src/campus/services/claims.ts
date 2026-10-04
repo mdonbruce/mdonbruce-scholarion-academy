@@ -24,7 +24,11 @@ export interface CopyFlag {
   match: string;
 }
 
-export function copyCheck(store: TenantStore, text: string): CopyFlag[] {
+/** Names of public standards that look like claims but aren't (e.g. the OWASP Top 10 for LLM applications). */
+const NOT_CLAIMS = [/\bOWASP (?:LLM )?Top 10\b/gi];
+
+export function copyCheck(store: TenantStore, raw: string): CopyFlag[] {
+  const text = NOT_CLAIMS.reduce((t, re) => t.replace(re, "OWASP list"), raw);
   const approved = store.list("approved_claims", (c) => !c.expiresAt || String(c.expiresAt) >= nowIso().slice(0, 10)).map((c) => String(c.phrase).toLowerCase());
   const flags: CopyFlag[] = [];
   for (const r of RULES) {

@@ -16,7 +16,8 @@ import { ensureCampusSeed } from "../src/campus/seed";
 import { TABS } from "../src/campus/registry";
 import { CampusShell, PublicFrame } from "../src/campus/ui/shell";
 import { CampusPage } from "../src/campus/ui/views/dispatch";
-import { CatalogView, SigninView, TenantHome, TenantPicker, VerifyView } from "../src/campus/ui/views/public";
+import { CatalogView, SigninView, TenantHome, TenantPicker, VerifyLookupView, VerifyView } from "../src/campus/ui/views/public";
+import { AgenticHubView } from "../src/campus/ui/views/hub";
 import { startAttempt } from "../src/campus/services/assessment";
 import { checkout } from "../src/campus/services/academy";
 import { openItem, moduleStates } from "../src/campus/services/curriculum";
@@ -84,12 +85,12 @@ for (const slug of ["demo", "academy", "techdev"]) {
   const store = broker.connect({ tenantId: t.id, slug, via: "path", traceId: "render" });
   save(`${slug}-public-home.html`, `${t.name}`, "public", <PublicFrame tenant={t}><TenantHome tenant={t} store={store} /></PublicFrame>);
   save(`${slug}-public-signin.html`, "Sign in", "public", <PublicFrame tenant={t}><SigninView tenant={t} sp={{}} /></PublicFrame>);
-  save(`${slug}-public-catalog.html`, "Catalog", "public", <PublicFrame tenant={t}><CatalogView tenant={t} store={store} actor={null} sp={{ r_goal: "start", r_experience: "intermediate", r_interest: "ml", r_format: "self", r_hours: "6", compare: "off_academy_32,off_academy_15" }} /></PublicFrame>);
+  save(`${slug}-public-catalog.html`, "Catalog", "public", <PublicFrame tenant={t}><CatalogView tenant={t} store={store} actor={null} sp={{ r_goal: "start", r_experience: "intermediate", r_interest: "ml", r_format: "self", r_hours: "6", compare: "off_academy_37_2,off_academy_18" }} /></PublicFrame>);
 }
 {
   const t = broker.tenant("academy")!;
   const s = as("academy", "student2");
-  save("academy-public-offering.html", "#32 Applied Machine Learning", "student2@academy", <PublicFrame tenant={t}><CatalogView tenant={t} store={s.store} actor={s.actor} sp={{ offering: "off_academy_32", coupon: "WELCOME10" }} /></PublicFrame>);
+  save("academy-public-offering.html", "#37.2 Supervised and Unsupervised Learning", "student2@academy", <PublicFrame tenant={t}><CatalogView tenant={t} store={s.store} actor={s.actor} sp={{ offering: "off_academy_37_2", coupon: "WELCOME10" }} /></PublicFrame>);
   const demo = broker.tenant("demo")!;
   const ds = as("demo", "admin");
   const cred = ds.store.list("credentials")[0];
@@ -166,10 +167,10 @@ page("demo", "admin", "t/tenant-admin?accountId=acc_demo_computing", "Permission
 // Academy: commerce + tutor in Pidgin
 {
   const s = as("academy", "student1");
-  checkout(s.store, s.actor, { offeringId: "off_academy_32", sandboxCard: "tok_sandbox_visa" });
+  checkout(s.store, s.actor, { offeringId: "off_academy_37_2", sandboxCard: "tok_sandbox_visa" });
 }
 page("academy", "student1", "dashboard", "Academy dashboard");
-page("academy", "student1", "courses/crs_academy_p32/tutor?ask=1&mode=explain&q=what+is+overfitting&lang=pcm", "Tutor (Pidgin)");
+page("academy", "student1", "courses/crs_academy_p37_2/tutor?ask=1&mode=explain&q=what+is+overfitting&lang=pcm", "Tutor (Pidgin)");
 page("academy", "admin", "t/commerce", "Commerce");
 page("academy", "admin", "t/program-studio", "Program Studio");
 page("demo", "student1", "calendar?view=month", "Calendar — month");
@@ -189,6 +190,17 @@ page("demo", "student1", "calendar?view=week", "Calendar — week");
   const fail = selfCheck(s6.store, s6.actor, "off_academy_26", { py1: "6" });
   save("academy-program-26-selfcheck-routed.html", "#26 — self-check routes elsewhere", "student6@academy", <PublicFrame tenant={t}><ProgramPageView tenant={t} store={s6.store} actor={s6.actor} slug="agentic-systems-live-intensive" sp={{ selfcheck: fail.id }} /></PublicFrame>);
 }
+{
+  const t = broker.tenant("academy")!;
+  const pub = broker.connect({ tenantId: t.id, slug: "academy", via: "path", traceId: "render" });
+  save("academy-agentic-hub.html", "Agentic AI Courses & Certifications", "public", <PublicFrame tenant={t}><AgenticHubView tenant={t} store={pub} sp={{}} /></PublicFrame>);
+  save("academy-agentic-hub-filtered.html", "Agentic AI hub — no-coding filter + comparison", "public", <PublicFrame tenant={t}><AgenticHubView tenant={t} store={pub} sp={{ coding: "no", compare: ["off_academy_20", "off_academy_34"] }} /></PublicFrame>);
+  save("academy-agentic-hub-quiz.html", "Agentic AI hub — quiz recommendation", "public", <PublicFrame tenant={t}><AgenticHubView tenant={t} store={pub} sp={{ tab: "short_course", ans_role: "developer", ans_coding: "strong", ans_goal: "build-agents", ans_time: "5", ans_format: "self_paced", ans_length: "short" }} /></PublicFrame>);
+  save("academy-verify-lookup.html", "Verify a credential", "public", <PublicFrame tenant={t}><VerifyLookupView tenant={t} /></PublicFrame>);
+}
+page("academy", "admin", "t/module-library", "Module Library & Catalog Consolidation");
+page("academy", "instructor", "courses/crs_academy_p15/modules", "#15 course shell (weekends)");
+page("academy", "instructor", "courses/crs_academy_p32/modules", "#32 self-paced course (modules)");
 page("academy", "instructor", "courses/crs_academy_p26/modules", "#26 course shell (modules)");
 page("academy", "admin", "t/pathways?run=pathways.consolidation_report", "Consolidation report");
 

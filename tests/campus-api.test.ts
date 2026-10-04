@@ -194,16 +194,16 @@ describe("Campus HTTP API", () => {
     const tok = await call("v1/t/academy/oauth2/token", { json: { grant_type: "client_credentials", client_assertion: assertion, scope: `${lti.SCOPES.score} ${lti.SCOPES.nrps}` } });
     assert.ok(tok.data.access_token, JSON.stringify(tok.data));
     const st = as("academy", "student4", false);
-    // enroll student4 in #32 via sandbox checkout so AGS can score them
+    // enroll student4 in #37.2 via sandbox checkout so AGS can score them
     const { checkout } = await import("../src/campus/services/academy");
-    checkout(st.store, st.actor, { offeringId: "off_academy_32", sandboxCard: "tok_sandbox_visa" });
+    checkout(st.store, st.actor, { offeringId: "off_academy_37_2", sandboxCard: "tok_sandbox_visa" });
     const { pseudonym } = await import("../src/campus/services/success");
     const score = await call("v1/t/academy/lti/lineitems/asg_academy_p32_lab/scores", { bearer: tok.data.access_token, json: { userId: pseudonym("tn_academy", "usr_academy_student4"), scoreGiven: 7, scoreMaximum: 10, activityProgress: "Completed", gradingProgress: "FullyGraded", timestamp: new Date().toISOString() } });
     assert.equal(score.res.status, 200, JSON.stringify(score.data));
     const g = storeOf("academy").list("grades", (x) => x.assignmentId === "asg_academy_p32_lab" && x.userId === "usr_academy_student4")[0];
     assert.equal(g.score, 7);
     assert.equal(g.posted, false);
-    const nrps = await call("v1/t/academy/lti/courses/crs_academy_p32/memberships", { bearer: tok.data.access_token });
+    const nrps = await call("v1/t/academy/lti/courses/crs_academy_p37_2/memberships", { bearer: tok.data.access_token });
     assert.ok(nrps.data.members.length >= 2);
     assert.ok(!JSON.stringify(nrps.data).includes("usr_academy"), "pseudonymous ids only");
   });

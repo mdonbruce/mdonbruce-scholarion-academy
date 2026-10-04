@@ -1762,6 +1762,11 @@ CREATE TABLE IF NOT EXISTS offerings (
   format text CHECK (format IN ('online', 'live', 'blended')),
   state text,
   copy_flags jsonb,
+  audit_available boolean,
+  pay_later_allowed boolean,
+  pathway_includes jsonb,
+  library_keys jsonb,
+  standard_blocks numeric,
   requires_application boolean,
   self_check_required boolean,
   block_course_ids jsonb,
@@ -1786,6 +1791,7 @@ CREATE TABLE IF NOT EXISTS offering_sections (
   registration_closes_at timestamptz NOT NULL,
   schedule text,
   seats_taken numeric,
+  label text,
   application_deadline timestamptz
 );
 CREATE INDEX IF NOT EXISTS offering_sections_offering_id ON offering_sections (offering_id) WHERE deleted_at IS NULL;
@@ -2148,6 +2154,57 @@ CREATE TABLE IF NOT EXISTS selfcheck_attempts (
   of numeric,
   passed boolean,
   route_to jsonb
+);
+
+-- Library module (tab: module-library)
+CREATE TABLE IF NOT EXISTS library_modules (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  "key" text,
+  title text,
+  content_version text,
+  content text,
+  used_by jsonb,
+  dual_framework boolean,
+  textbook text,
+  module_id text,
+  blueprint_course_id text
+);
+
+-- Catalog policy (tab: module-library)
+CREATE TABLE IF NOT EXISTS catalog_policies (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  kind text NOT NULL CHECK (kind IN ('refund', 'deferral', 'batch_change')),
+  text text NOT NULL,
+  window_days numeric,
+  fee_amount numeric,
+  processing_days numeric,
+  escalation_contact text,
+  approved_by text,
+  approved_at timestamptz,
+  state text
+);
+
+-- Catalog consolidation report (tab: module-library)
+CREATE TABLE IF NOT EXISTS consolidation_reports (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  report jsonb,
+  state text,
+  submitted_by text,
+  decided_by text,
+  decided_at timestamptz,
+  decision_note text
 );
 
 -- Account (tab: tenant-admin)

@@ -220,6 +220,10 @@
       "description": "Academy program designs (#1, #12, #13, #14, #26): website pages generated from catalog data, course shells, credentials, apply → admission → sandbox seat → orientation, brochures, team and advisor inquiries, prerequisite self-checks, consented testimonials and the design-package status report."
     },
     {
+      "name": "Module Library & Catalog Consolidation",
+      "description": "The versioned shared module library (blueprint course), the catalog consolidation report for programs #1–#38 (shared modules, credit transfers, mutually exclusive pairs, merge/retire recommendations, proposed #27) with product-owner approval, and the refund, deferral and batch-change policies that only display once approved."
+    },
+    {
       "name": "LMS Parity Status",
       "description": "Every feature in the LMS feature-parity specification marked DONE / PARTIAL / NOT STARTED with evidence and the gap, plus the 15 acceptance tests and their test files."
     }
@@ -20871,6 +20875,14 @@
                       "blended"
                     ]
                   },
+                  "auditAvailable": {
+                    "description": "Free audit (content visible, graded items locked)",
+                    "type": "boolean"
+                  },
+                  "payLaterAllowed": {
+                    "description": "Enroll now, pay later (sandbox)",
+                    "type": "boolean"
+                  },
                   "requiresApplication": {
                     "description": "Apply → admission review before seat reservation",
                     "type": "boolean"
@@ -21074,6 +21086,14 @@
                       "live",
                       "blended"
                     ]
+                  },
+                  "auditAvailable": {
+                    "description": "Free audit (content visible, graded items locked)",
+                    "type": "boolean"
+                  },
+                  "payLaterAllowed": {
+                    "description": "Enroll now, pay later (sandbox)",
+                    "type": "boolean"
                   },
                   "requiresApplication": {
                     "description": "Apply → admission review before seat reservation",
@@ -21290,6 +21310,10 @@
                     "description": "Schedule",
                     "type": "string"
                   },
+                  "label": {
+                    "description": "Batch label",
+                    "type": "string"
+                  },
                   "applicationDeadline": {
                     "description": "Application deadline",
                     "type": "string",
@@ -21402,6 +21426,10 @@
                   },
                   "schedule": {
                     "description": "Schedule",
+                    "type": "string"
+                  },
+                  "label": {
+                    "description": "Batch label",
                     "type": "string"
                   },
                   "applicationDeadline": {
@@ -25395,6 +25423,537 @@
           "Program Studio"
         ],
         "summary": "Delete (tombstone) a prerequisite self-check",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/library_modules": {
+      "get": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "summary": "List shared module library",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/LibraryModules"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/library_modules/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "summary": "Get a library module",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "summary": "Delete (tombstone) a library module",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/catalog_policies": {
+      "get": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "summary": "List refund, deferral and batch-change policies",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CatalogPolicies"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "summary": "Create a catalog policy",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "description": "Policy",
+                    "type": "string",
+                    "enum": [
+                      "refund",
+                      "deferral",
+                      "batch_change"
+                    ]
+                  },
+                  "text": {
+                    "description": "Policy text (Scholaris-written)",
+                    "type": "string"
+                  },
+                  "windowDays": {
+                    "description": "Request window (days)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 365
+                  },
+                  "feeAmount": {
+                    "description": "Fee (sandbox)",
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "processingDays": {
+                    "description": "Decision and processing time (business days)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 60
+                  },
+                  "escalationContact": {
+                    "description": "Escalation contact",
+                    "type": "string",
+                    "format": "email"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "text"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/catalog_policies/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "summary": "Get a catalog policy",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "summary": "Update a catalog policy (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "description": "Policy",
+                    "type": "string",
+                    "enum": [
+                      "refund",
+                      "deferral",
+                      "batch_change"
+                    ]
+                  },
+                  "text": {
+                    "description": "Policy text (Scholaris-written)",
+                    "type": "string"
+                  },
+                  "windowDays": {
+                    "description": "Request window (days)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 365
+                  },
+                  "feeAmount": {
+                    "description": "Fee (sandbox)",
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "processingDays": {
+                    "description": "Decision and processing time (business days)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 60
+                  },
+                  "escalationContact": {
+                    "description": "Escalation contact",
+                    "type": "string",
+                    "format": "email"
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "summary": "Delete (tombstone) a catalog policy",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/catalog_policies/{id}/publish": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "summary": "Publish (validation runs first)",
+        "responses": {
+          "200": {
+            "description": "Published"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "summary": "Unpublish",
+        "responses": {
+          "200": {
+            "description": "Unpublished"
+          }
+        }
+      }
+    },
+    "/r/consolidation_reports": {
+      "get": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "summary": "List catalog consolidation reports",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ConsolidationReports"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/consolidation_reports/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "summary": "Get a catalog consolidation report",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "summary": "Delete (tombstone) a catalog consolidation report",
         "responses": {
           "200": {
             "description": "Deleted"
@@ -42762,7 +43321,8 @@
                     "type": "string",
                     "enum": [
                       "full",
-                      "installments"
+                      "installments",
+                      "pay_later"
                     ]
                   },
                   "installments": {
@@ -44385,6 +44945,417 @@
             "$ref": "#/components/responses/Error"
           },
           "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/agentic.hub": {
+      "get": {
+        "tags": [
+          "Program Studio"
+        ],
+        "operationId": "agentic.hub",
+        "summary": "Agentic AI Courses & Certifications hub (filters, rails, paths, comparison).",
+        "parameters": [
+          {
+            "name": "tab",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "track",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "level",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "coding",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "yes",
+                "no"
+              ]
+            },
+            "in": "query"
+          },
+          {
+            "name": "duration",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "format",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "credential",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "skill",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "access",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "q",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "compare",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/agentic.quiz_questions": {
+      "get": {
+        "tags": [
+          "Program Studio"
+        ],
+        "operationId": "agentic.quiz_questions",
+        "summary": "“Which program is right for me?” questions.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/agentic.recommend": {
+      "get": {
+        "tags": [
+          "Program Studio"
+        ],
+        "operationId": "agentic.recommend",
+        "summary": "Recommend programs from quiz answers, with reasons.",
+        "parameters": [
+          {
+            "name": "answers",
+            "required": true,
+            "schema": {},
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/catalog.consolidation": {
+      "get": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "operationId": "catalog.consolidation",
+        "summary": "Catalog consolidation report for programs #1–#38 (and proposed #27).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/catalog.consolidation_submit": {
+      "post": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "operationId": "catalog.consolidation_submit",
+        "summary": "Submit the consolidation report for product-owner approval.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/catalog.consolidation_decide": {
+      "post": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "operationId": "catalog.consolidation_decide",
+        "summary": "Product owner: approve or request changes to a consolidation report.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reportId": {
+                    "type": "string"
+                  },
+                  "decision": {
+                    "type": "string",
+                    "enum": [
+                      "approved",
+                      "changes_requested"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "reportId",
+                  "decision"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/policies.approve": {
+      "post": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "operationId": "policies.approve",
+        "summary": "Product owner: approve a refund, deferral or batch-change policy so it displays.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "policyId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "policyId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/commerce.batch_change": {
+      "post": {
+        "tags": [
+          "Commerce (sandbox)"
+        ],
+        "operationId": "commerce.batch_change",
+        "summary": "Move my seat to another batch (approved batch-change policy).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderId": {
+                    "type": "string"
+                  },
+                  "sectionId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "orderId",
+                  "sectionId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/commerce.audit": {
+      "post": {
+        "tags": [
+          "Commerce (sandbox)"
+        ],
+        "operationId": "commerce.audit",
+        "summary": "Audit a self-paced offering for free (graded items locked).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "offeringId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "offeringId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
             "$ref": "#/components/responses/Error"
           }
         }
@@ -50492,6 +51463,24 @@
               "copyFlags": {
                 "description": "Copy check flags"
               },
+              "auditAvailable": {
+                "description": "Free audit (content visible, graded items locked)",
+                "type": "boolean"
+              },
+              "payLaterAllowed": {
+                "description": "Enroll now, pay later (sandbox)",
+                "type": "boolean"
+              },
+              "pathwayIncludes": {
+                "description": "Pathway includes"
+              },
+              "libraryKeys": {
+                "description": "Library modules"
+              },
+              "standardBlocks": {
+                "description": "10-week standard block equivalents",
+                "type": "number"
+              },
               "requiresApplication": {
                 "description": "Apply → admission review before seat reservation",
                 "type": "boolean"
@@ -50563,6 +51552,10 @@
               "seatsTaken": {
                 "description": "Seats taken",
                 "type": "number"
+              },
+              "label": {
+                "description": "Batch label",
+                "type": "string"
               },
               "applicationDeadline": {
                 "description": "Application deadline",
@@ -51503,6 +52496,152 @@
           }
         ],
         "description": "Prerequisite self-check (tab: program-studio)"
+      },
+      "LibraryModules": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "key": {
+                "description": "Key",
+                "type": "string"
+              },
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "version": {
+                "description": "Version",
+                "type": "string"
+              },
+              "content": {
+                "description": "Key content",
+                "type": "string"
+              },
+              "usedBy": {
+                "description": "Used by programs"
+              },
+              "dualFramework": {
+                "description": "PyTorch + TensorFlow labs",
+                "type": "boolean"
+              },
+              "textbook": {
+                "description": "Textbook alignment",
+                "type": "string"
+              },
+              "moduleId": {
+                "description": "Blueprint module",
+                "type": "string"
+              },
+              "blueprintCourseId": {
+                "description": "Blueprint course",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Library module (tab: module-library)"
+      },
+      "CatalogPolicies": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "description": "Policy",
+                "type": "string",
+                "enum": [
+                  "refund",
+                  "deferral",
+                  "batch_change"
+                ]
+              },
+              "text": {
+                "description": "Policy text (Scholaris-written)",
+                "type": "string"
+              },
+              "windowDays": {
+                "description": "Request window (days)",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 365
+              },
+              "feeAmount": {
+                "description": "Fee (sandbox)",
+                "type": "number",
+                "minimum": 0
+              },
+              "processingDays": {
+                "description": "Decision and processing time (business days)",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 60
+              },
+              "escalationContact": {
+                "description": "Escalation contact",
+                "type": "string",
+                "format": "email"
+              },
+              "approvedBy": {
+                "description": "Approved by (product owner)",
+                "type": "string"
+              },
+              "approvedAt": {
+                "description": "Approved",
+                "type": "string",
+                "format": "date-time"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Catalog policy (tab: module-library)"
+      },
+      "ConsolidationReports": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "report": {
+                "description": "Report"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              },
+              "submittedBy": {
+                "description": "Submitted by",
+                "type": "string"
+              },
+              "decidedBy": {
+                "description": "Product-owner decision by",
+                "type": "string"
+              },
+              "decidedAt": {
+                "description": "Decided",
+                "type": "string",
+                "format": "date-time"
+              },
+              "decisionNote": {
+                "description": "Decision note",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Catalog consolidation report (tab: module-library)"
       },
       "Accounts": {
         "allOf": [

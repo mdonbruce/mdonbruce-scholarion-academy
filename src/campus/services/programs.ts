@@ -2,7 +2,8 @@ import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { broker, CampusError, metrics, nowIso, nowMs, registerConsumer, type Row, type TenantStore } from "../core";
 import { addPublishCheck } from "../entity";
 import { createUser, hasAny, type Actor } from "../iam";
-import { PROGRAMS, P26_QUIZ, TRADEMARK_NOTICE, type ProgramSpec, type WeekSpec } from "../academy/programs-data";
+import { PROGRAMS, P26_QUIZ, TRADEMARK_NOTICE, type ProgramSpec, type QuizItem, type WeekSpec } from "../academy/programs-data";
+import { LEARNING_PATHS, LIBRARY, P15_CHECKS, PROGRAMS_2, type LibraryModule } from "../academy/programs-data-2";
 import { audit, notify, requireTenant } from "./common";
 import { copyCheck } from "./claims";
 import { renderBlocks, validateBlocks, type Block } from "./curriculum";
@@ -124,55 +125,67 @@ const ACTIVITY_BODY = (w: WeekSpec) => [
   "Status: shell loaded from the program design; the student and instructor editions are pending SME authoring.",
 ];
 
-/** Load one program (idempotent): courses per block, modules per week, items, offering, cohort, page, credentials. */
-function loadProgram(store: TenantStore, slug: string, spec: ProgramSpec, root: Row | undefined, instructorIds: string[]) {
-  const offeringId = offeringIdFor(slug, spec.code);
+type Ctx = { store: TenantStore; slug: string; root: Row | undefined; staff: string[]; pos: number };
+
+function getOrCreateCourse(x: Ctx, id: string, data: Record<string, unknown>) {
+  const ex = x.store.get("courses", id);
+  if (ex) return { course: x.store.update("courses", id, { code: data.code, title: data.title, description: data.description }), created: false };
+  const c = x.store.insert("courses", { id, credits: 0, state: "unpublished", accountId: x.root?.id ?? null, homeType: "modules", latePolicy: { latePctPerDay: 0, floorPct: 0, missingScorePct: 0 }, timeZone: ET, visibility: "course", ...data }, "crs");
+  for (const uid of x.staff) x.store.insert("enrollments", { userId: uid, courseId: c.id, role: "instructor", state: "active", source: "manual" }, "enr");
+  return { course: c, created: true };
+}
+function itemOf(x: Ctx, c: Row, m: Row, kind: string, refId: string, title: string, requirement: string | null, extra: Record<string, unknown> = {}) {
+  return x.store.insert("module_items", { courseId: c.id, moduleId: m.id, kind, refId, title, position: ++x.pos, indent: 0, requirement, state: "published", ...extra }, "mi");
+}
+function pageOf(x: Ctx, c: Row, m: Row | null, title: string, paras: string[]) {
+  const bl = blocks(paras, title);
+  return x.store.insert("pages", { courseId: c.id, moduleId: m?.id ?? null, title, blocks: bl, html: renderBlocks(x.store, bl, c.id), position: 1, state: "published" }, "pg");
+}
+function libraryNote(keys: string[] | undefined) {
+  const mods = (keys ?? []).map((k) => LIBRARY.find((l) => l.key === k)).filter(Boolean) as LibraryModule[];
+  if (!mods.length) return [];
+  return [`Built on shared library module${mods.length > 1 ? "s" : ""}: ${mods.map((m) => `${m.title} v${m.version}`).join("; ")}.`, ...mods.filter((m) => m.textbook).map((m) => `Reading: ${m.textbook}.`)];
+}
+function quizFrom(x: Ctx, c: Row, m: Row, title: string, items: QuizItem[], opts: { tag: string; groupId?: string; attempts?: number; cooling?: number; availableFrom?: string; availableUntil?: string; bank?: Row }) {
+  const bank = opts.bank ?? x.store.insert("question_banks", { courseId: c.id, title: `${title} bank` }, "qb");
+  for (const q of items) x.store.insert("questions", { courseId: c.id, bankId: bank.id, kind: q.kind, prompt: q.prompt, choices: q.choices, answer: q.answer, explanation: q.explanation ?? null, points: 1, tags: [opts.tag], version: 1 }, "qn");
+  const qz = x.store.insert("quizzes", { courseId: c.id, moduleId: m.id, title, bankId: bank.id, pools: [{ bankId: bank.id, tag: opts.tag, pick: items.length }], questionCount: items.length, timeLimitMin: 20, allowedAttempts: opts.attempts ?? 3, coolingMinutes: opts.cooling ?? 0, points: items.length, groupId: opts.groupId ?? null, availableFrom: opts.availableFrom ?? null, availableUntil: opts.availableUntil ?? null, kind: "graded", scoringPolicy: "highest", shuffleAnswers: true, showResponses: true, showCorrectAnswers: true, state: "published" }, "qz");
+  snapshotQuiz(x.store, qz.id);
+  return { quiz: qz, bank };
+}
+
+/** Load one live/cohort program or pathway (idempotent): courses per block, modules per week, items, offering, cohorts, page, credentials. */
+function loadProgram(x: Ctx, spec: ProgramSpec) {
+  const { store, slug } = x;
   if (store.get("program_pages", `ppg_${slug}_${num(spec.code)}`)) return;
-  const lead = leadFaculty(store, slug);
-  const start = cohortMonday(spec.cohort.startInDays);
+  if (spec.selfPaced) return loadSelfPaced(x, spec);
+  const offeringId = offeringIdFor(slug, spec.code);
+  const start = cohortMonday(spec.batches?.[0]?.startInDays ?? spec.cohort.startInDays);
   const single = spec.blocks.length === 1;
   const courseByBlock: Record<string, Row> = {};
-  let pos = 0;
+  x.pos = 0;
 
-  for (const b of spec.blocks) {
-    const c = store.insert("courses", {
-      id: courseIdFor(slug, spec.code, b.key, single),
-      code: single ? spec.code : `${spec.code}-${b.key}`,
-      title: single ? spec.title : `${spec.title} — ${b.title}`,
-      description: spec.valueStatement,
-      credits: 0,
-      state: "unpublished",
-      accountId: root?.id ?? null,
-      homeType: "modules",
-      format: spec.format,
-      latePolicy: { latePctPerDay: 0, floorPct: 0, missingScorePct: 0 },
-      startAt: dayOf(start, 0, 0, 0),
-      endAt: dayOf(start, spec.weeks * 7, 23, 59),
-      timeZone: ET,
-      visibility: "course",
-    }, "crs");
-    courseByBlock[b.key] = c;
-    for (const uid of [lead.id, ...instructorIds]) store.insert("enrollments", { userId: uid, courseId: c.id, role: "instructor", state: "active", source: "manual" }, "enr");
-  }
+  spec.blocks.forEach((b, bi) => {
+    const id = bi === 0 && spec.adoptCourse ? spec.adoptCourse.courseId : courseIdFor(slug, spec.code, b.key, single);
+    const titleFor = spec.pathway ? `${spec.title} — ${b.title}` : single ? spec.title : `${spec.title} — ${b.title}`;
+    courseByBlock[b.key] = getOrCreateCourse(x, id, { code: single && !spec.pathway ? spec.code : `${spec.code}-${b.key}`, title: titleFor, description: spec.valueStatement, format: spec.format, startAt: dayOf(start, 0, 0, 0), endAt: dayOf(start, spec.weeks * 7, 23, 59) }).course;
+  });
   const groups: Record<string, Record<string, Row>> = {};
   for (const [k, c] of Object.entries(courseByBlock)) {
+    const pnp = spec.grading === "pass_no_pass" || spec.completion === "weekend_intensive";
     groups[k] = {
-      act: store.insert("assignment_groups", { courseId: c.id, name: "In-class activities", weight: spec.grading === "pass_no_pass" ? 10 : 20 }, "ag"),
-      lab: store.insert("assignment_groups", { courseId: c.id, name: "Labs", weight: spec.grading === "pass_no_pass" ? 40 : 20 }, "ag"),
-      quiz: store.insert("assignment_groups", { courseId: c.id, name: "Quizzes and exams", weight: 20 }, "ag"),
-      proj: store.insert("assignment_groups", { courseId: c.id, name: "Projects and capstone", weight: spec.grading === "pass_no_pass" ? 30 : 40 }, "ag"),
+      act: store.insert("assignment_groups", { courseId: c.id, name: "In-class activities", weight: pnp ? 10 : 20 }, "ag"),
+      lab: store.insert("assignment_groups", { courseId: c.id, name: "Labs", weight: pnp ? 40 : 20 }, "ag"),
+      quiz: store.insert("assignment_groups", { courseId: c.id, name: "Quizzes and checks", weight: 20 }, "ag"),
+      proj: store.insert("assignment_groups", { courseId: c.id, name: "Projects and capstone", weight: pnp ? 30 : 40 }, "ag"),
     };
   }
-  const item = (c: Row, m: Row, kind: string, refId: string, title: string, requirement: string | null) => store.insert("module_items", { courseId: c.id, moduleId: m.id, kind, refId, title, position: ++pos, indent: 0, requirement, state: "published" }, "mi");
-  const page = (c: Row, m: Row | null, title: string, paras: string[], extra: Block[] = []) => {
-    const bl = blocks(paras, title, extra);
-    return store.insert("pages", { courseId: c.id, moduleId: m?.id ?? null, title, blocks: bl, html: renderBlocks(store, bl, c.id), position: 1, state: "published" }, "pg");
-  };
-
   const firstBlock = spec.blocks[0].key;
   let prevModule: Row | null = null;
   let prevBlock = "";
   let bank: Row | null = null;
+  let checksBank: Row | null = null;
+  const unit = spec.curriculum.some((w) => w.sessions) ? "Weekend" : "Week";
   for (const w of spec.curriculum) {
     const bk = w.block ?? firstBlock;
     const c = courseByBlock[bk];
@@ -180,78 +193,93 @@ function loadProgram(store: TenantStore, slug: string, spec: ProgramSpec, root: 
     prevBlock = bk;
     const wk = weekNo(w.week);
     const weekStart = Math.max(0, wk - 1) * 7;
-    const m: Row = store.insert("modules", {
-      courseId: c.id,
-      title: `${w.optional ? "Optional — " : ""}Week ${w.week}: ${w.title}`,
-      position: wk + 1,
-      moduleKey: moduleKeyFor(spec.code, w.week),
-      state: "published",
-      requireAll: true,
-      sequential: spec.code === "#26",
-      prerequisiteModuleIds: spec.code === "#26" && prevModule ? [prevModule.id] : [],
-    }, "mod");
+    const adoptId = bk === firstBlock ? spec.adoptCourse?.weeks[w.week] : undefined;
+    const modData = { courseId: c.id, title: `${w.optional ? "Optional — " : ""}${unit} ${w.week}: ${w.title}`, position: wk + 1, moduleKey: moduleKeyFor(spec.code, w.week), state: "published", requireAll: true, sequential: spec.code === "#26", prerequisiteModuleIds: spec.code === "#26" && prevModule ? [prevModule.id] : [] };
+    const m: Row = adoptId && store.get("modules", adoptId) ? store.update("modules", adoptId, { title: modData.title, position: modData.position, moduleKey: modData.moduleKey }) : store.insert("modules", modData, "mod");
     if (!w.optional) prevModule = m;
-    if (pos === 0 || (wk <= 1 && bk === firstBlock && !store.list("pages", (p) => p.courseId === c.id && /Orientation/.test(String(p.title))).length)) {
-      const o = page(c, m, "Orientation and getting started", [`Welcome to ${spec.title}. ${spec.formatText}.`, `How the program works: ${spec.learningExperience.join("; ")}.`, `Grading: ${spec.grading === "pass_no_pass" ? `pass/no-pass — ${(spec.passRules ?? []).join("; ")}` : "graded against each assignment's rubric"}.`, "Need help? Use the AI Teaching Assistant for hints from your course material, the program support desk for anything else, and the accessibility support contact for accommodations."]);
-      item(c, m, "page", o.id, o.title as string, "view");
+    if (x.pos === 0 || (wk <= 1 && bk === firstBlock && !store.list("pages", (p) => p.courseId === c.id && /Orientation/.test(String(p.title))).length)) {
+      const o = pageOf(x, c, m, "Orientation and getting started", [`Welcome to ${spec.title}. ${spec.formatText}.`, `How the program works: ${spec.learningExperience.join("; ")}.`, `Grading: ${spec.grading === "pass_no_pass" ? `pass/no-pass — ${(spec.passRules ?? []).join("; ")}` : spec.completion === "weekend_intensive" ? `completion requires — ${(spec.passRules ?? []).join("; ")}` : "graded against each assignment's rubric"}.`, ...(spec.textbooks?.length ? [`Textbooks: ${spec.textbooks.join("; ")}.`] : []), "Need help? Use the AI Teaching Assistant for hints from your course material, the program support desk for anything else, and the accessibility support contact for accommodations."]);
+      itemOf(x, c, m, "page", o.id, o.title as string, "view");
     }
     const research = (spec.research ?? []).filter((r) => r.week === wk);
-    const ov = page(c, m, `Week ${w.week} overview`, [w.focus, ...(w.labs ? [`Lab A: ${w.labs[0]}.`, `Lab B: ${w.labs[1]}.`] : []), ...research.map((r) => `Research case study: ${r.authors} (${r.year}). ${r.title}. ${r.venue}.`)]);
-    item(c, m, "page", ov.id, ov.title as string, "view");
+    const ov = pageOf(x, c, m, `${unit} ${w.week} overview`, [w.focus, ...(w.sessions ? [`Saturday session (3 hours): ${w.sessions[0]}.`, `Sunday session (3 hours): ${w.sessions[1]}.`, "Each session is a guided build: demo → lab → checkpoint."] : []), ...(w.labs ? [`Lab A: ${w.labs[0]}.`, `Lab B: ${w.labs[1]}.`] : []), ...(w.dual ? ["Deep learning labs ship in PyTorch and TensorFlow/Keras versions; choose one. The instructor solution covers both."] : []), ...libraryNote(w.lib), ...research.map((r) => `Research case study: ${r.authors} (${r.year}). ${r.title}. ${r.venue}.`)]);
+    itemOf(x, c, m, "page", ov.id, ov.title as string, "view");
     const due = dayOf(start, weekStart + 6, 23, 59);
     if (w.kind !== "capstone" && w.kind !== "midterm") {
-      const act = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `In-Class Activity — Week ${w.week}: ${w.title}`, instructions: ACTIVITY_BODY(w).join("\n\n"), points: 10, groupId: groups[bk].act.id, dueAt: due, submissionTypes: ["file"], allowedExtensions: ["docx", "pdf"], state: "published", gradingType: "points" }, "asg");
-      item(c, m, "assignment", act.id, act.title as string, w.optional ? null : "submit");
+      const act = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `In-Class Activity — ${unit} ${w.week}: ${w.title}`, instructions: ACTIVITY_BODY(w).join("\n\n"), points: 10, groupId: groups[bk].act.id, dueAt: due, submissionTypes: ["file"], allowedExtensions: ["docx", "pdf"], state: "published", gradingType: "points" }, "asg");
+      itemOf(x, c, m, "assignment", act.id, act.title as string, w.optional ? null : "submit");
+    }
+    if (w.sessions) {
+      w.sessions.forEach((title, i) => {
+        const a = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `Session lab ${wk}${i === 0 ? "A" : "B"}: ${title.split(":")[0]}`, instructions: `${title}.\n\nComplete the session checkpoint in the Cloud Lab and submit your notebook. If you missed the live session, review the recording first — a submitted lab counts as attendance.`, points: 10, groupId: groups[bk].lab.id, dueAt: dayOf(start, weekStart + 5 + i, 23, 59), submissionTypes: ["file", "url"], allowedExtensions: ["ipynb", "py", "pdf"], state: "published", gradingType: "points", tags: ["session_lab"] }, "asg");
+        itemOf(x, c, m, "assignment", a.id, a.title as string, "submit");
+      });
+    }
+    if (w.dual) {
+      const a = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `Lab ${w.week}: ${w.title} (PyTorch or TensorFlow/Keras)`, instructions: "Choose the PyTorch or TensorFlow/Keras starter notebook, complete the TODOs and submit. Both versions are graded on the same rubric.", points: 10, groupId: groups[bk].lab.id, dueAt: due, submissionTypes: ["file", "url"], allowedExtensions: ["ipynb", "py"], state: "published", gradingType: "points", tags: ["lab", "dual_framework"] }, "asg");
+      itemOf(x, c, m, "assignment", a.id, a.title as string, "submit");
     }
     if (w.labs) {
       w.labs.forEach((lab, i) => {
         const day = i === 0 ? 3 : 4;
         const a = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `Lab ${wk}${i === 0 ? "A" : "B"}: ${lab}`, instructions: `Guided 90-minute lab (${i === 0 ? "Thursday" : "Friday"}). Open the Student Starter notebook with TODOs in the Cloud Lab, complete the checkpoints and submit the notebook. Checkpoints are met at 7/10 or above.`, points: 10, groupId: groups[bk].lab.id, dueAt: dayOf(start, weekStart + day + 2, 23, 59), submissionTypes: ["file", "url"], allowedExtensions: ["ipynb", "py", "pdf"], state: "published", gradingType: "points", tags: ["lab"] }, "asg");
-        item(c, m, "assignment", a.id, a.title as string, "submit");
+        itemOf(x, c, m, "assignment", a.id, a.title as string, "submit");
       });
     }
     if (spec.code === "#26" && P26_QUIZ[wk]) {
       bank ??= store.insert("question_banks", { courseId: c.id, title: `${spec.code} weekly quiz bank` }, "qb");
-      for (const q of P26_QUIZ[wk]) store.insert("questions", { courseId: c.id, bankId: bank.id, kind: q.kind, prompt: q.prompt, choices: q.choices, answer: q.answer, points: 1, tags: [`week${wk}`], version: 1 }, "qn");
-      const qz = store.insert("quizzes", { courseId: c.id, moduleId: m.id, title: `Week ${wk} quiz`, bankId: bank.id, pools: [{ bankId: bank.id, tag: `week${wk}`, pick: 3 }], questionCount: 3, timeLimitMin: 20, allowedAttempts: 3, points: 3, groupId: groups[bk].quiz.id, availableFrom: dayOf(start, weekStart, 0, 0), availableUntil: due, kind: "graded", scoringPolicy: "highest", shuffleAnswers: true, showResponses: true, state: "published" }, "qz");
-      snapshotQuiz(store, qz.id);
-      item(c, m, "quiz", qz.id, qz.title as string, "submit");
+      const r = quizFrom(x, c, m, `Week ${wk} quiz`, P26_QUIZ[wk], { tag: `week${wk}`, groupId: groups[bk].quiz.id, availableFrom: dayOf(start, weekStart, 0, 0), availableUntil: due, bank });
+      itemOf(x, c, m, "quiz", r.quiz.id, r.quiz.title as string, "submit");
     }
-    if (w.kind === "exam") {
-      const ex = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `Block exam (Week ${w.week})`, instructions: "Exam items pending SME authoring.", points: 20, groupId: groups[bk].quiz.id, dueAt: due, submissionTypes: ["on_paper"], state: "unpublished", gradingType: "points" }, "asg");
-      item(c, m, "assignment", ex.id, ex.title as string, null);
+    if (spec.completion === "weekend_intensive" && P15_CHECKS[wk]) {
+      checksBank ??= store.insert("question_banks", { courseId: c.id, title: `${spec.code} weekend checks bank` }, "qb");
+      const r = quizFrom(x, c, m, `Weekend ${wk} check`, P15_CHECKS[wk], { tag: `weekend${wk}`, groupId: groups[bk].quiz.id, bank: checksBank });
+      itemOf(x, c, m, "quiz", r.quiz.id, r.quiz.title as string, "min_score", { minScore: 70 });
     }
     if (spec.code === "#1" && w.kind === "midterm") {
       const ex = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: "Block A exam", instructions: "Exam items pending SME authoring.", points: 20, groupId: groups[bk].quiz.id, dueAt: due, submissionTypes: ["on_paper"], state: "unpublished", gradingType: "points" }, "asg");
-      item(c, m, "assignment", ex.id, ex.title as string, null);
+      itemOf(x, c, m, "assignment", ex.id, ex.title as string, null);
     }
-    for (const p of spec.projects.filter((x) => weekNo(x.week) === wk && (x.week === w.week || !spec.curriculum.some((y) => y.week === x.week)))) {
+    for (const p of spec.projects.filter((pp) => weekNo(pp.week) === wk && (pp.week === w.week || !spec.curriculum.some((y) => y.week === pp.week)))) {
       const rb = p.requirements ? rubricFor(store, c.id, `${p.name} rubric`, p.requirements) : null;
       const a = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: `${p.kind === "capstone" ? "Capstone" : p.kind === "midterm" ? "Midterm project" : "Project"}: ${p.name}`, instructions: `${p.description}\n\nSkills practiced: ${p.skills.join(", ")}.${p.requirements ? `\n\nRequired: ${p.requirements.join("; ")}.` : ""}\n\nUse the synthetic datasets in Program resources; never real personal or financial data.`, points: rb ? p.requirements!.length * 5 : 20, groupId: groups[bk].proj.id, dueAt: due, submissionTypes: ["file", "url"], rubricId: rb?.id ?? null, state: "published", gradingType: "points", tags: [p.kind] }, "asg");
-      item(c, m, "assignment", a.id, a.title as string, "submit");
+      itemOf(x, c, m, "assignment", a.id, a.title as string, "submit");
     }
     if (spec.code === "#26" && wk === 5) {
       const ms = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: "Capstone milestone check-in", instructions: "Share your chosen brief, architecture sketch and evaluation plan for feedback.", points: 5, groupId: groups[bk].proj.id, dueAt: due, submissionTypes: ["text", "file"], state: "published", gradingType: "points" }, "asg");
-      item(c, m, "assignment", ms.id, ms.title as string, "submit");
+      itemOf(x, c, m, "assignment", ms.id, ms.title as string, "submit");
     }
     if (spec.code === "#26" && wk === 7) {
       const pr = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: "Final presentation (10 minutes)", instructions: "Demo, architecture, evaluation results and limitations. Marked delivered by faculty.", points: 1, groupId: groups[bk].proj.id, dueAt: dayOf(start, 6 * 7 + 4, 23, 59), submissionTypes: ["on_paper"], state: "published", gradingType: "points", tags: ["presentation"] }, "asg");
-      item(c, m, "assignment", pr.id, pr.title as string, null);
+      itemOf(x, c, m, "assignment", pr.id, pr.title as string, null);
+    }
+    if (spec.completion === "weekend_intensive" && w.kind === "capstone") {
+      const d = store.insert("assignments", { courseId: c.id, moduleId: m.id, title: "Capstone live demo defense", instructions: "Live demo with the monitoring dashboard, followed by questions from mentors. Marked delivered by faculty.", points: 1, groupId: groups[bk].proj.id, dueAt: due, submissionTypes: ["on_paper"], state: "published", gradingType: "points", tags: ["presentation"] }, "asg");
+      itemOf(x, c, m, "assignment", d.id, d.title as string, null);
+      if (checksBank) {
+        const fq = store.insert("quizzes", { courseId: c.id, moduleId: m.id, title: "Final knowledge check", bankId: checksBank.id, pools: Object.keys(P15_CHECKS).map((k) => ({ bankId: checksBank!.id, tag: `weekend${k}`, pick: 1 })), questionCount: 10, timeLimitMin: 30, allowedAttempts: 2, points: 10, groupId: groups[bk].quiz.id, kind: "graded", scoringPolicy: "highest", shuffleAnswers: true, showResponses: true, state: "published" }, "qz");
+        snapshotQuiz(store, fq.id);
+        itemOf(x, c, m, "quiz", fq.id, "Final knowledge check (2 attempts; free remediation between attempts)", null);
+      }
     }
   }
-  // Program resources: data cards (synthetic datasets).
-  for (const [k, c] of Object.entries(courseByBlock)) {
-    if (k !== firstBlock) continue;
-    const res = store.insert("modules", { courseId: c.id, title: "Program resources: datasets and data cards", position: 99, moduleKey: moduleKeyFor(spec.code, "res"), state: "published", requireAll: false }, "mod");
+  // Program resources: data cards, tools, library modules, electives.
+  {
+    const c = courseByBlock[firstBlock];
+    const res = store.insert("modules", { courseId: c.id, title: "Program resources: datasets, tools and electives", position: 99, moduleKey: moduleKeyFor(spec.code, "res"), state: "published", requireAll: false }, "mod");
     for (const d of spec.dataCards) {
-      const p = page(c, res, `Data card: ${d.name}`, [`Purpose: ${d.purpose}.`, `Rows: about ${d.rows}. Fields: ${d.fields.join(", ")}.`, `Source: ${d.source}`, `Caveats: ${d.caveats}`]);
-      item(c, res, "page", p.id, p.title as string, null);
+      const pg = pageOf(x, c, res, `Data card: ${d.name}`, [`Purpose: ${d.purpose}.`, `Rows: about ${d.rows}. Fields: ${d.fields.join(", ")}.`, `Source: ${d.source}`, `Caveats: ${d.caveats}`]);
+      itemOf(x, c, res, "page", pg.id, pg.title as string, null);
     }
-    const t = page(c, res, "Tools and versions", [...spec.tools.map((g) => `${g.family}: ${g.items.join(", ")}.`), "Versions are pinned in the Cloud Lab after verification at cohort start.", TRADEMARK_NOTICE]);
-    item(c, res, "page", t.id, t.title as string, null);
+    const t = pageOf(x, c, res, "Tools and versions", [...spec.tools.map((g) => `${g.family}: ${g.items.join(", ")}.`), "Versions are pinned in the Cloud Lab after verification at cohort start.", TRADEMARK_NOTICE]);
+    itemOf(x, c, res, "page", t.id, t.title as string, null);
+    if (spec.electives?.length) {
+      const el = pageOf(x, c, res, "Self-paced electives (optional, micro-badges)", [...spec.electives.map((e) => `${e}.`), "Electives are optional and don't count toward completion. Each runs 2–4 weeks of access and earns a micro-badge."]);
+      itemOf(x, c, res, "page", el.id, el.title as string, null);
+    }
   }
 
-  // Live schedule (#26): faculty session Wednesday, Lab A Thursday, Lab B Friday, 90 minutes, 12:00 ET.
+  // Live calendars: #26 weekday sessions; weekend programs from the first batch.
   if (spec.code === "#26") {
     const c = courseByBlock[firstBlock];
     for (const w of spec.curriculum) {
@@ -260,46 +288,70 @@ function loadProgram(store: TenantStore, slug: string, spec: ProgramSpec, root: 
       const sessions: [number, string][] = w.kind === "capstone" ? [[3, "Capstone build clinic and peer design review"], [4, "Final presentations"]] : [[2, `Live session: ${w.title}`], [3, `Lab A: ${w.labs?.[0] ?? ""}`], [4, `Lab B: ${w.labs?.[1] ?? ""}`]];
       for (const [d, title] of sessions) store.insert("calendar_events", { courseId: c.id, title: `Week ${wk} · ${title}`, startsAt: dayOf(start, base + d, 12, 0), endsAt: dayOf(start, base + d, 13, 30), location: "Live online (link on the course home)", recurrence: "none" }, "ce");
     }
+  } else if (spec.curriculum.some((w) => w.sessions)) {
+    const c = courseByBlock[firstBlock];
+    const b = spec.batches?.[0];
+    const [sh, sm] = (b?.satStart ?? "10:00").split(":").map(Number);
+    for (const w of spec.curriculum) {
+      const wk = weekNo(w.week);
+      const base = (wk - 1) * 7;
+      w.sessions?.forEach((title, i) => store.insert("calendar_events", { courseId: c.id, title: `Weekend ${wk} · ${i === 0 ? "Sat" : "Sun"}: ${title.split(":")[0]}`, startsAt: dayOf(start, base + 5 + i, sh, sm), endsAt: dayOf(start, base + 5 + i, sh + 3, sm), location: `Live online${b ? ` (${b.label})` : ""}`, recurrence: "none" }, "ce"));
+    }
   }
 
   // Credentials.
-  const cert = store.insert("credential_templates", { name: spec.credential.certificate, kind: spec.productType === "professional_certificate" ? "professional_certificate" : "completion", wording: `${spec.credential.description} ${spec.creditStatement}`, gradeThreshold: 70, requiresCapstone: spec.grading !== "pass_no_pass", approvalRequired: false, state: "published" }, "ctpl");
+  const cert = store.insert("credential_templates", { name: spec.credential.certificate, kind: spec.productType === "professional_certificate" ? "professional_certificate" : "completion", wording: `${spec.credential.description} ${spec.creditStatement}`, gradeThreshold: 70, requiresCapstone: spec.grading !== "pass_no_pass" && spec.completion !== "weekend_intensive", approvalRequired: false, state: "published" }, "ctpl");
   store.insert("credential_templates", { name: spec.credential.badge, kind: "skill_badge", wording: spec.credential.badge, gradeThreshold: 70, requiresCapstone: true, approvalRequired: false, state: "published" }, "ctpl");
+  if (spec.gradedPerformance) store.insert("credential_templates", { name: `Scholaris AI Academy Graded Performance Certificate — ${spec.title}`, kind: "graded_performance", wording: `Shows the final grade earned in ${spec.title}. ${spec.creditStatement}`, gradeThreshold: 70, requiresCapstone: true, approvalRequired: false, state: "published" }, "ctpl");
 
   // Catalog.
-  const blockIds = Object.values(courseByBlock).map((c) => c.id);
-  const o = store.insert("offerings", {
-    id: offeringId,
+  const included = (spec.pathway?.includes ?? []).map((code) => store.list("offerings", (o) => o.code === code)[0]).filter(Boolean) as Row[];
+  const includedCourses = included.flatMap((o) => [o.courseId as string, ...((o.blockCourseIds as string[] | undefined) ?? [])]).filter(Boolean);
+  const blockIds = [...Object.values(courseByBlock).map((c) => c.id), ...includedCourses];
+  const offeringData = {
     code: spec.code,
     title: spec.title,
     productType: spec.productType,
     courseId: blockIds[0],
     blockCourseIds: blockIds.slice(1),
+    pathwayIncludes: included.map((o) => o.id),
     summary: spec.valueStatement,
     level: spec.level,
     hours: spec.hoursPerWeek ? Math.round(((spec.hoursPerWeek[0] + spec.hoursPerWeek[1]) / 2) * spec.weeks) : null,
-    skills: [...new Set(spec.projects.flatMap((p) => p.skills))].slice(0, 8),
+    skills: [...new Set(spec.projects.flatMap((pp) => pp.skills))].slice(0, 8),
+    libraryKeys: [...new Set(spec.curriculum.flatMap((w) => w.lib ?? []))],
     moduleKeys: spec.curriculum.map((w) => moduleKeyFor(spec.code, w.week)),
     price: spec.fees.price,
     earlyBirdPrice: spec.fees.earlyBirdPrice,
     earlyBirdEndsAt: dayOf(cohortMonday(spec.cohort.earlyBirdInDays - 7 > 0 ? spec.cohort.earlyBirdInDays - 7 : 0), 6, 23, 59),
     currency: "USD",
-    format: spec.format,
+    format: spec.format === "online" && spec.formatKind?.startsWith("live") ? "live" : spec.format,
     selfPaced: false,
     inPlus: false,
     aidEligible: false,
     credentialTemplateId: cert.id,
     requiresApplication: true,
     selfCheckRequired: !!spec.selfCheck,
+    payLaterAllowed: !!spec.batches,
     lateEnrollmentDays: spec.lateEnrollmentDays,
     state: "published",
-  }, "off");
-  store.insert("offering_sections", { offeringId: o.id, code: spec.cohort.code, startsAt: dayOf(start, 0, 9, 0), endsAt: dayOf(start, spec.weeks * 7 - 1, 23, 59), timeZone: spec.cohort.timeZone, capacity: spec.cohort.capacity, registrationClosesAt: dayOf(start, spec.lateEnrollmentDays, 23, 59), applicationDeadline: dayOf(start, spec.cohort.applicationDeadlineInDays - spec.cohort.startInDays, 23, 59), schedule: spec.cohort.schedule, seatsTaken: 0 }, "osec");
+  };
+  const o = store.get("offerings", offeringId) ? store.update("offerings", offeringId, offeringData) : store.insert("offerings", { id: offeringId, ...offeringData }, "off");
+  if (spec.batches?.length) {
+    for (const b of spec.batches) {
+      const bs = cohortMonday(b.startInDays);
+      const [sh, sm] = b.satStart.split(":").map(Number);
+      store.insert("offering_sections", { offeringId: o.id, code: b.code, label: b.label, startsAt: atZone(bs.y, bs.mo, bs.d + 5, sh, sm, b.timeZone).toISOString(), endsAt: dayOf(bs, spec.weeks * 7 - 1, 23, 59), timeZone: b.timeZone, capacity: b.capacity, registrationClosesAt: dayOf(bs, 2, 23, 59), applicationDeadline: dayOf(bs, -3, 23, 59), schedule: `Sat ${b.satStart}–${String(sh + 3).padStart(2, "0")}:${String(sm).padStart(2, "0")} and Sun ${b.sunStart}–${String(Number(b.sunStart.split(":")[0]) + 3).padStart(2, "0")}:${b.sunStart.split(":")[1]} (${b.timeZone})`, seatsTaken: 0 }, "osec");
+    }
+  } else {
+    store.insert("offering_sections", { offeringId: o.id, code: spec.cohort.code, startsAt: dayOf(start, 0, 9, 0), endsAt: dayOf(start, spec.weeks * 7 - 1, 23, 59), timeZone: spec.cohort.timeZone, capacity: spec.cohort.capacity, registrationClosesAt: dayOf(start, spec.lateEnrollmentDays, 23, 59), applicationDeadline: dayOf(start, spec.cohort.applicationDeadlineInDays - spec.cohort.startInDays, 23, 59), schedule: spec.cohort.schedule, seatsTaken: 0 }, "osec");
+  }
+  for (const inc of included) if (!store.list("pathway_edges", (e) => e.fromId === inc.id && e.toId === o.id && e.kind === "stacks_into").length) store.insert("pathway_edges", { fromId: inc.id, toId: o.id, kind: "stacks_into", moduleKey: null, note: `Included in the ${spec.code} pathway; issues its own certificate.` }, "pe");
 
   // Parts sold separately (#13).
   for (const part of spec.parts ?? []) {
     const blockKey = part.code.endsWith(".1") ? "C1" : "C2";
-    const po = store.insert("offerings", { id: offeringIdFor(slug, part.code), code: part.code, title: part.title, productType: "short_course", courseId: courseByBlock[blockKey].id, summary: part.summary, level: spec.level, price: part.price, currency: "USD", format: spec.format, selfPaced: false, inPlus: false, aidEligible: false, requiresApplication: true, credentialTemplateId: store.insert("credential_templates", { name: `Scholaris AI Academy Certificate of Completion — ${part.title}`, kind: "completion", wording: `Completed ${part.title}. ${spec.creditStatement}`, gradeThreshold: 70, requiresCapstone: true, approvalRequired: false, state: "published" }, "ctpl").id, moduleKeys: spec.curriculum.filter((w) => (w.block ?? firstBlock) === blockKey).map((w) => moduleKeyFor(spec.code, w.week)), state: "published" }, "off");
+    const po = store.insert("offerings", { id: offeringIdFor(slug, part.code), code: part.code, title: part.title, productType: "short_course", courseId: courseByBlock[blockKey].id, summary: part.summary, level: spec.level, price: part.price, currency: "USD", format: spec.format, selfPaced: false, inPlus: false, aidEligible: false, requiresApplication: true, credentialTemplateId: store.insert("credential_templates", { name: `Scholaris AI Academy Certificate of Completion — ${part.title}`, kind: "completion", wording: `Completed ${part.title}. ${spec.creditStatement}`, gradeThreshold: 70, requiresCapstone: true, approvalRequired: false, state: "published" }, "ctpl").id, moduleKeys: spec.curriculum.filter((w) => (w.block ?? firstBlock) === blockKey).map((w) => moduleKeyFor(spec.code, w.week)), libraryKeys: [...new Set(spec.curriculum.filter((w) => (w.block ?? firstBlock) === blockKey).flatMap((w) => w.lib ?? []))], state: "published" }, "off");
     store.insert("offering_sections", { offeringId: po.id, code: `${spec.cohort.code}-${blockKey}`, startsAt: dayOf(start, blockKey === "C1" ? 0 : 56, 9, 0), endsAt: dayOf(start, blockKey === "C1" ? 55 : 111, 23, 59), timeZone: spec.cohort.timeZone, capacity: spec.cohort.capacity, registrationClosesAt: dayOf(start, (blockKey === "C1" ? 0 : 56) + spec.lateEnrollmentDays, 23, 59), schedule: spec.cohort.schedule, seatsTaken: 0 }, "osec");
     store.insert("pathway_edges", { fromId: po.id, toId: o.id, kind: "stacks_into", moduleKey: null, note: "Completing both courses earns the bundle badge." }, "pe");
   }
@@ -307,22 +359,124 @@ function loadProgram(store: TenantStore, slug: string, spec: ProgramSpec, root: 
   store.insert("program_pages", { id: `ppg_${slug}_${num(spec.code)}`, offeringId: o.id, slug: spec.slug, spec, advisorEmail: `advisors@${slug}.scholarion.test`, advisorPhone: null, brochureNote: "Fees and dates are read from the catalog when the brochure is generated.", packageStatus: null, copyFlags: [], state: "published" }, "ppg");
 }
 
+/** Self-paced products (#28–#38): one course per short course, autograded labs, quizzes, final projects. */
+function loadSelfPaced(x: Ctx, spec: ProgramSpec) {
+  const { store, slug } = x;
+  const sp = spec.selfPaced!;
+  const courseRows: Row[] = [];
+  const partOfferings: Row[] = [];
+  const perCoursePrice = sp.courses.length > 1 ? Math.max(29, Math.round((spec.fees.price / sp.courses.length) * 1.25)) : spec.fees.price;
+  for (const c of sp.courses) {
+    const id = c.courseId ?? `crs_${slug}_p${num(c.code)}`;
+    const { course, created } = getOrCreateCourse(x, id, { code: c.code, title: c.title, description: `${spec.title}: ${c.title}`, format: "online", selfPacedCourse: true });
+    courseRows.push(course);
+    if (created) {
+      x.pos = 0;
+      let complete = true;
+      const grp = store.insert("assignment_groups", { courseId: course.id, name: "Graded work", weight: 100 }, "ag");
+      c.modules.forEach((m, mi) => {
+        const mod = store.insert("modules", { courseId: course.id, title: `Module ${mi + 1}: ${m.title}`, position: mi + 1, moduleKey: `${moduleKeyFor(c.code, String(mi + 1))}`, state: "published", requireAll: true, sequential: false }, "mod");
+        const ov = pageOf(x, course, mod, `Module ${mi + 1} overview: ${m.title}`, [m.focus, `Videos (6–10 minutes each, captioned, with transcripts and chapters): ${(m.videos ?? [m.title, "Worked example", "Common pitfalls", "Recap"]).join("; ")}.${m.videos ? "" : " Scripts are pending SME authoring."}`, "Readings: original Scholaris notes plus cited public papers and documentation.", "Discussion prompt: share one thing that surprised you and one question you still have.", ...libraryNote(m.lib)]);
+        itemOf(x, course, mod, "page", ov.id, ov.title as string, "view");
+        if (m.lab) {
+          const tpl = store.insert("lab_templates", { title: m.lab.title, kind: "python", image: "scholarion/lab-python:3.12-slim (pinned)", instructions: m.lab.instructions, starterCode: m.lab.starterCode, tests: m.lab.tests, maxScore: m.lab.tests.reduce((s, t) => s + t.points, 0), notebookStarter: { cells: [{ type: "code", source: m.lab.starterCode }] }, notebookExecuted: { cells: [{ type: "code", source: (m.lab as { solution?: string }).solution ?? "" }] }, releaseExecutedAfterSubmit: true }, "lt");
+          const a = store.insert("assignments", { courseId: course.id, moduleId: mod.id, title: `Programming assignment: ${m.lab.title}`, instructions: `${m.lab.instructions}\n\nAutograded in the Scholaris Cloud Lab; your score passes back via LTI. The Instructor EXECUTED notebook unlocks after you submit.`, points: 10, groupId: grp.id, submissionTypes: ["lti"], labTemplateId: tpl.id, state: "published", gradingType: "points", tags: ["lab", "autograded"] }, "asg");
+          itemOf(x, course, mod, "assignment", a.id, a.title as string, "submit");
+        } else {
+          complete = false;
+          const a = store.insert("assignments", { courseId: course.id, moduleId: mod.id, title: `Ungraded lab: ${m.title}`, instructions: "Open the Student Starter notebook with TODOs. Notebook pending SME authoring after tool verification.", points: 0, groupId: grp.id, submissionTypes: ["file", "url"], allowedExtensions: ["ipynb", "py"], state: "unpublished", gradingType: "not_graded", tags: ["lab"] }, "asg");
+          void a;
+        }
+        if (m.quiz?.length) {
+          const r = quizFrom(x, course, mod, `Module ${mi + 1} quiz`, m.quiz, { tag: `m${mi + 1}`, groupId: grp.id, attempts: 5, cooling: 60 });
+          itemOf(x, course, mod, "quiz", r.quiz.id, `${r.quiz.title} (80% to pass)`, "min_score", { minScore: 80 });
+        } else {
+          complete = false;
+          store.insert("quizzes", { courseId: course.id, moduleId: mod.id, title: `Module ${mi + 1} quiz (items pending SME authoring)`, questionCount: 5, timeLimitMin: 20, allowedAttempts: 5, coolingMinutes: 60, points: 5, kind: "graded", state: "unpublished" }, "qz");
+        }
+        if (mi === c.modules.length - 1) {
+          const fp = store.insert("assignments", { courseId: course.id, moduleId: mod.id, title: `Final project: ${c.finalProject}`, instructions: `${c.finalProject}.${c.peerReviewed ? " Peer-reviewed: you review three classmates' projects with the rubric, and three review yours." : " Autograded or instructor-reviewed against the rubric."}`, points: 20, groupId: grp.id, submissionTypes: ["file", "url"], peerReviews: c.peerReviewed ? 3 : 0, rubricId: rubricFor(store, course.id, `${c.title} final project rubric`, ["Meets the brief", "Correct and working", "Clearly explained", "Evaluated or tested"]).id, state: "published", gradingType: "points", tags: ["final_project"] }, "asg");
+          itemOf(x, course, mod, "assignment", fp.id, fp.title as string, "submit");
+        }
+      });
+      if (complete) store.update("courses", course.id, { state: "published", publishedAt: nowIso() });
+    }
+    if (sp.courses.length > 1) {
+      const pid = offeringIdFor(slug, c.code);
+      const pdata = { code: c.code, title: c.title, productType: "short_course", courseId: course.id, summary: `Course in ${spec.title}: ${c.title}.`, level: spec.level, hours: c.hours, price: perCoursePrice, currency: "USD", format: "online", selfPaced: true, inPlus: sp.inPlus, auditAvailable: sp.audit, aidEligible: false, requiresApplication: false, libraryKeys: [...new Set(c.modules.flatMap((m) => m.lib ?? []))], moduleKeys: c.modules.map((_, mi) => moduleKeyFor(c.code, String(mi + 1))), state: "published" };
+      const existing = store.get("offerings", pid);
+      const courseCert = () => store.insert("credential_templates", { name: `Scholaris AI Academy Course Certificate — ${c.title}`, kind: "course_certificate", wording: `Completed ${c.title}. ${spec.creditStatement}`, gradeThreshold: 80, requiresCapstone: false, approvalRequired: false, state: "published" }, "ctpl").id;
+      // An adopted legacy offering keeps its id and history but issues this line's Course Certificate.
+      const keepTpl = existing?.credentialTemplateId && store.get("credential_templates", String(existing.credentialTemplateId))?.kind === "course_certificate";
+      const po = existing ? store.update("offerings", pid, { ...pdata, ...(keepTpl ? {} : { credentialTemplateId: courseCert() }) }) : store.insert("offerings", { id: pid, ...pdata, credentialTemplateId: courseCert() }, "off");
+      partOfferings.push(po);
+      if (!store.list("offering_sections", (s) => s.offeringId === po.id).length) store.insert("offering_sections", { offeringId: po.id, code: `${c.code.replace("#", "SP")}-OPEN`, startsAt: nowIso(), endsAt: new Date(nowMs() + 400 * DAY).toISOString(), timeZone: "UTC", capacity: 100000, registrationClosesAt: new Date(nowMs() + 365 * DAY).toISOString(), schedule: "Start any time", seatsTaken: 0 }, "osec");
+    }
+  }
+  const kind = sp.type === "specialization" ? "specialization_certificate" : sp.type === "professional_certificate" ? "professional_certificate" : sp.type === "short_course" ? "course_certificate" : "skill_badge";
+  const cert = store.insert("credential_templates", { name: spec.credential.certificate, kind, wording: `${spec.credential.description} ${spec.creditStatement}`, gradeThreshold: 80, requiresCapstone: false, approvalRequired: false, state: "published" }, "ctpl");
+  store.insert("credential_templates", { name: spec.credential.badge, kind: "skill_badge", wording: spec.credential.badge, gradeThreshold: 80, requiresCapstone: false, approvalRequired: false, state: "published" }, "ctpl");
+  const offeringId = offeringIdFor(slug, spec.code);
+  const hours = sp.courses.reduce((s, c) => s + c.hours, 0);
+  const data = { code: spec.code, title: spec.title, productType: sp.type, courseId: courseRows[0].id, blockCourseIds: courseRows.slice(1).map((c) => c.id), summary: spec.valueStatement, level: spec.level, hours, skills: [...new Set(spec.projects.flatMap((pp) => pp.skills))].slice(0, 8), libraryKeys: [...new Set(sp.courses.flatMap((c) => c.modules.flatMap((m) => m.lib ?? [])))], moduleKeys: sp.courses.flatMap((c) => c.modules.map((_, mi) => moduleKeyFor(c.code, String(mi + 1)))), price: spec.fees.price, currency: "USD", format: "online", selfPaced: true, inPlus: sp.inPlus, auditAvailable: sp.audit, aidEligible: false, credentialTemplateId: cert.id, requiresApplication: false, standardBlocks: sp.standardBlocks, state: "published" };
+  const o = store.get("offerings", offeringId) ? store.update("offerings", offeringId, data) : store.insert("offerings", { id: offeringId, ...data }, "off");
+  if (!store.list("offering_sections", (s) => s.offeringId === o.id).length) store.insert("offering_sections", { offeringId: o.id, code: `${spec.code.replace("#", "SP")}-OPEN`, startsAt: nowIso(), endsAt: new Date(nowMs() + 400 * DAY).toISOString(), timeZone: "UTC", capacity: 100000, registrationClosesAt: new Date(nowMs() + 365 * DAY).toISOString(), schedule: "Start any time", seatsTaken: 0 }, "osec");
+  for (const po of partOfferings) if (!store.list("pathway_edges", (e) => e.fromId === po.id && e.toId === o.id).length) store.insert("pathway_edges", { fromId: po.id, toId: o.id, kind: "stacks_into", moduleKey: null, note: `Course in ${spec.code}; issues its own Course Certificate.` }, "pe");
+  store.insert("program_pages", { id: `ppg_${slug}_${num(spec.code)}`, offeringId: o.id, slug: spec.slug, spec, advisorEmail: `advisors@${slug}.scholarion.test`, advisorPhone: null, brochureNote: "Prices and access models are read from the catalog when the brochure is generated.", packageStatus: null, copyFlags: [], state: "published" }, "ppg");
+}
+
+/** The shared module library: versioned rows plus a blueprint course holding one module per library entry. */
+export function ensureLibrary(store: TenantStore) {
+  const t = broker.tenant(store.tenantId)!;
+  const x: Ctx = { store, slug: t.slug, root: store.list("accounts", (a) => !a.parentId)[0], staff: [leadFaculty(store, t.slug).id], pos: 0 };
+  const { course, created } = getOrCreateCourse(x, `crs_${t.slug}_library`, { code: "LIB", title: "Scholaris Module Library (blueprint)", description: "Versioned shared modules that programs pull from. Programs add their own framing, projects and assessments.", isBlueprint: true, format: "online" });
+  LIBRARY.forEach((l, i) => {
+    if (store.list("library_modules", (r) => r.key === l.key).length) return;
+    let moduleId: string | null = null;
+    if (created) {
+      const m = store.insert("modules", { courseId: course.id, title: `${l.title} v${l.version}`, position: i + 1, moduleKey: `lib-${l.key}`, state: "published", requireAll: false }, "mod");
+      const pg = pageOf(x, course, m, `${l.title} (v${l.version})`, [`Key content: ${l.content}.`, `Used by: ${l.usedBy.join(", ")}.`, ...(l.dualFramework ? ["Framework rule: every lab ships in PyTorch and TensorFlow/Keras versions; learners choose one and the instructor solution covers both."] : []), ...(l.textbook ? [`Textbook alignment: ${l.textbook}.`] : [])]);
+      itemOf(x, course, m, "page", pg.id, pg.title as string, null);
+      moduleId = m.id;
+    }
+    store.insert("library_modules", { key: l.key, title: l.title, version: l.version, content: l.content, usedBy: l.usedBy, dualFramework: !!l.dualFramework, textbook: l.textbook ?? null, moduleId, blueprintCourseId: course.id }, "lib");
+  });
+}
+
 /** Load every program design into a tenant (idempotent) and connect pathways. */
 export function ensurePrograms(store: TenantStore) {
   const t = broker.tenant(store.tenantId)!;
   const root = store.list("accounts", (a) => !a.parentId)[0];
+  const lead = leadFaculty(store, t.slug);
   const instructors = store.list("users", (u) => u.id === `usr_${t.slug}_instructor`).map((u) => u.id);
-  for (const spec of PROGRAMS) loadProgram(store, t.slug, spec, root, instructors);
-  // Waivers recorded in the consolidation table (#26 → #1 Weeks 1–8, #15 Weekends 3–5).
-  for (const spec of PROGRAMS) {
+  ensureLibrary(store);
+  ensurePolicies(store);
+  const x: Ctx = { store, slug: t.slug, root, staff: [lead.id, ...instructors], pos: 0 };
+  const all = [...PROGRAMS, ...PROGRAMS_2];
+  for (const spec of all) loadProgram(x, spec);
+  // Waivers and transfer rules recorded in the consolidation table.
+  for (const spec of all) {
+    const from = store.get("offerings", offeringIdFor(t.slug, spec.code));
+    if (!from) continue;
     for (const w of spec.waives ?? []) {
       const to = store.list("offerings", (o) => o.code === w.toCode)[0];
-      const from = store.get("offerings", offeringIdFor(t.slug, spec.code));
-      if (!to || !from) continue;
+      if (!to) continue;
       for (const wk of w.weeks) {
-        const key = w.toCode === "#15" ? `dl-${wk.toLowerCase()}` : moduleKeyFor(w.toCode, wk);
+        const key = moduleKeyFor(w.toCode.split(".")[0], wk);
         if (!store.list("pathway_edges", (e) => e.fromId === from.id && e.toId === to.id && e.moduleKey === key).length) store.insert("pathway_edges", { fromId: from.id, toId: to.id, kind: "waives", moduleKey: key, note: w.note }, "pe");
       }
+    }
+    for (const code of spec.mutuallyExclusive ?? []) {
+      const other = store.list("offerings", (o) => o.code === code)[0];
+      if (other && !store.list("pathway_edges", (e) => e.kind === "mutually_exclusive" && ((e.fromId === from.id && e.toId === other.id) || (e.toId === from.id && e.fromId === other.id))).length) store.insert("pathway_edges", { fromId: from.id, toId: other.id, kind: "mutually_exclusive", moduleKey: null, note: `Credit for ${spec.code} and ${code} is mutually exclusive.` }, "pe");
+    }
+    for (const code of spec.prerequisiteFor ?? []) {
+      const to = store.list("offerings", (o) => o.code === code)[0];
+      if (to && !store.list("pathway_edges", (e) => e.kind === "prerequisite" && e.fromId === from.id && e.toId === to.id).length) store.insert("pathway_edges", { fromId: from.id, toId: to.id, kind: "prerequisite", moduleKey: null, note: `${spec.code} (or advisor-confirmed equivalent) before ${code}.` }, "pe");
+    }
+    for (const code of spec.feeds ?? []) {
+      const to = store.list("offerings", (o) => o.code === code)[0];
+      if (to && !store.list("pathway_edges", (e) => e.kind === "stacks_into" && e.fromId === from.id && e.toId === to.id).length) store.insert("pathway_edges", { fromId: from.id, toId: to.id, kind: "stacks_into", moduleKey: null, note: `Recommended path: ${spec.code} → ${code}.` }, "pe");
     }
   }
 }
@@ -342,7 +496,7 @@ export function programPage(store: TenantStore, a: Actor | null, slugOrCode: str
   const spec = row.spec as ProgramSpec;
   const o = store.get("offerings", row.offeringId as string)!;
   const now = nowIso();
-  const cohorts = store.list("offering_sections", (s) => s.offeringId === o.id).sort((x, y) => String(x.startsAt).localeCompare(String(y.startsAt))).map((s) => ({ id: s.id, code: String(s.code), startsAt: String(s.startsAt), endsAt: String(s.endsAt ?? ""), applicationDeadline: String(s.applicationDeadline ?? s.registrationClosesAt), registrationClosesAt: String(s.registrationClosesAt), timeZone: String(s.timeZone), schedule: String(s.schedule ?? ""), seatsLeft: Math.max(0, Number(s.capacity) - Number(s.seatsTaken ?? 0)) }));
+  const cohorts = store.list("offering_sections", (s) => s.offeringId === o.id).sort((x, y) => String(x.startsAt).localeCompare(String(y.startsAt))).map((s) => ({ id: s.id, code: String(s.code), startsAt: String(s.startsAt), endsAt: String(s.endsAt ?? ""), applicationDeadline: String(s.applicationDeadline ?? s.registrationClosesAt), registrationClosesAt: String(s.registrationClosesAt), timeZone: String(s.timeZone), schedule: String(s.schedule ?? ""), seatsLeft: Math.max(0, Number(s.capacity) - Number(s.seatsTaken ?? 0)), soldOut: Number(s.capacity) - Number(s.seatsTaken ?? 0) <= 0, label: (s.label as string) ?? null }));
   const next = cohorts.find((c) => c.registrationClosesAt >= now) ?? cohorts[0] ?? null;
   const earlyBird = o.earlyBirdPrice && o.earlyBirdEndsAt && String(o.earlyBirdEndsAt) >= now ? { price: Number(o.earlyBirdPrice), endsAt: String(o.earlyBirdEndsAt) } : null;
   const price = Number(o.price);
@@ -405,6 +559,26 @@ export function programPage(store: TenantStore, a: Actor | null, slugOrCode: str
     howToApply: ["Submit your application", "Admission review (usually within 3 business days)", "Reserve your seat — pay in full or start your installment plan (sandbox)", "Orientation, then the cohort starts"],
     jsonLd,
     brochureUrl: `/api/campus/v1/t/${tenant.slug}/programs/${spec.slug}/brochure.pdf`,
+    hubUrl: `/campus/${tenant.slug}/agentic-ai`,
+    payLater: !!o.payLaterAllowed,
+    policies: { refund: approvedPolicy(store, "refund"), deferral: approvedPolicy(store, "deferral"), batchChange: approvedPolicy(store, "batch_change") },
+    paths: LEARNING_PATHS.filter((lp) => lp.steps.includes(spec.code)).map((lp) => ({ title: lp.title, steps: lp.steps.map((code) => ({ code, here: code === spec.code, slug: (store.list("program_pages", (pp) => (pp.spec as ProgramSpec)?.code === code && pp.state === "published")[0]?.slug as string) ?? null })).filter((st) => st.slug || st.here) })),
+    transfers: store.list("pathway_edges", (e) => e.fromId === o.id && e.kind === "waives").reduce<Record<string, string[]>>((m, e) => {
+      const to = String(store.get("offerings", String(e.toId))?.code ?? "");
+      (m[to] ??= []).push(String(e.moduleKey).replace(/^p[\d_]+-w/, "Week "));
+      return m;
+    }, {}),
+    selfPaced: spec.selfPaced
+      ? {
+          type: spec.selfPaced.type,
+          suggestedPace: spec.selfPaced.suggestedPace,
+          totalHours: spec.selfPaced.courses.reduce((t, c) => t + c.hours, 0),
+          courses: spec.selfPaced.courses.map((c) => ({ code: c.code, title: c.title, hours: c.hours, modules: c.modules.map((m) => m.title), finalProject: c.finalProject, peerReviewed: !!c.peerReviewed, offeringId: store.get("offerings", offeringIdFor(tenant.slug, c.code))?.id ?? null })),
+          access: { audit: !!o.auditAvailable, paid: true, subscription: !!o.inPlus },
+          standardBlocks: spec.selfPaced.standardBlocks,
+          related: store.list("pathway_edges", (e) => (e.fromId === o.id || e.toId === o.id) && e.kind !== "waives").map((e) => store.get("offerings", String(e.fromId === o.id ? e.toId : e.fromId))).filter((r) => r && !/^#\d+\.\d+$/.test(String(r.code))).map((r) => ({ code: String(r!.code), title: String(r!.title), slug: (store.list("program_pages", (pp) => pp.offeringId === r!.id)[0]?.slug as string) ?? null })),
+        }
+      : null,
   };
 }
 
@@ -412,7 +586,7 @@ export function programIndex(store: TenantStore) {
   return store.list("program_pages", (p) => p.state === "published").map((p) => {
     const spec = p.spec as ProgramSpec;
     const o = store.get("offerings", p.offeringId as string);
-    return { slug: spec.slug, code: spec.code, title: spec.title, valueStatement: spec.valueStatement, weeks: spec.weeks, format: spec.formatText, track: spec.track, price: Number(o?.price ?? 0), currency: String(o?.currency ?? "USD") };
+    return { slug: spec.slug, code: spec.code, title: spec.title, valueStatement: spec.valueStatement, weeks: spec.weeks, format: spec.formatText, track: spec.track, selfPaced: spec.selfPaced ? spec.selfPaced.suggestedPace : null, price: Number(o?.price ?? 0), currency: String(o?.currency ?? "USD") };
   }).sort((x, y) => Number(x.code.replace(/\D/g, "")) - Number(y.code.replace(/\D/g, "")));
 }
 
@@ -510,8 +684,9 @@ export async function brochurePdf(store: TenantStore, slugOrCode: string): Promi
 const INQUIRY_WINDOW = new Map<string, number[]>();
 
 export function submitInquiry(store: TenantStore, a: Actor | null, input: { offeringId: string; kind: "team" | "advisor"; name: string; email: string; organization?: string; seats?: number; preferredTime?: string; timeZone?: string; message?: string }) {
-  const o = store.get("offerings", input.offeringId);
-  if (!o || o.state !== "published") throw new CampusError("not_found", "Program not found", 404);
+  // "catalog" = a corporate-training inquiry from the catalog hub, not tied to one program.
+  const o = input.offeringId === "catalog" ? ({ id: "catalog", code: "Catalog" } as unknown as Row) : store.get("offerings", input.offeringId);
+  if (!o || (o.id !== "catalog" && o.state !== "published")) throw new CampusError("not_found", "Program not found", 404);
   const email = String(input.email ?? "").trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new CampusError("invalid", "Enter a valid email address.", 422, { field: "email" });
   const name = String(input.name ?? "").trim();
@@ -544,14 +719,18 @@ export function selfCheck(store: TenantStore, a: Actor | null, offeringId: strin
   if (!spec.selfCheck) throw new CampusError("not_found", "This program has no prerequisite self-check.", 404);
   const sc = spec.selfCheck;
   const score = sc.questions.filter((q) => String(answers[q.id] ?? "") === q.answer).length;
-  const passed = score >= sc.passMin;
-  const available = sc.routeTo.map((code) => store.list("offerings", (o) => o.code === code && o.state === "published")[0]).filter(Boolean) as Row[];
-  const route = passed ? [] : available.map((o) => ({ code: String(o.code), title: String(o.title), offeringId: o.id }));
-  const message = passed
-    ? `You're ready for ${spec.code}. You scored ${score}/${sc.questions.length}.`
-    : `You scored ${score}/${sc.questions.length}; ${sc.passMin} is needed. We recommend starting with ${sc.routeTo.join(" or ")}${available.length < sc.routeTo.length ? " — an advisor will help you choose, since not every recommended program is open in this catalog yet" : ""}.`;
-  const row2 = store.tx(() => store.insert("selfcheck_attempts", { offeringId: row.offeringId, userId: a?.id ?? null, score, of: sc.questions.length, passed, routeTo: sc.routeTo }, "psc"));
-  return { id: row2.id, score, of: sc.questions.length, passed, routeTo: sc.routeTo, available: route, message };
+  const band = spec.selfCheckBands?.find((b) => score >= b.min);
+  const passed = band ? band.route.includes(spec.code) : score >= sc.passMin;
+  const routeTo = band ? band.route.filter((c) => c !== spec.code) : passed ? [] : sc.routeTo;
+  const available = routeTo.map((code) => store.list("offerings", (o) => o.code === code && o.state === "published")[0]).filter(Boolean) as Row[];
+  const route = available.map((o) => ({ code: String(o.code), title: String(o.title), offeringId: o.id, slug: (store.list("program_pages", (p) => p.offeringId === o.id)[0]?.slug as string) ?? null }));
+  const message = band
+    ? `You scored ${score}/${sc.questions.length}. ${band.message}`
+    : passed
+      ? `You're ready for ${spec.code}. You scored ${score}/${sc.questions.length}.`
+      : `You scored ${score}/${sc.questions.length}; ${sc.passMin} is needed. We recommend starting with ${routeTo.join(" or ")}${available.length < routeTo.length ? " — an advisor will help you choose, since not every recommended program is open in this catalog yet" : ""}.`;
+  const row2 = store.tx(() => store.insert("selfcheck_attempts", { offeringId: row.offeringId, userId: a?.id ?? null, score, of: sc.questions.length, passed, routeTo, message }, "psc"));
+  return { id: row2.id, score, of: sc.questions.length, passed, routeTo, available: route, message };
 }
 
 export function applyToProgram(store: TenantStore, a: Actor, input: { offeringId: string; sectionId?: string; statement: string; experience?: string }) {
@@ -605,8 +784,13 @@ const toMs = (s: string) => new Date(s).getTime();
 
 /** After enrollment: extra blocks, and automatic Week 1 lab extensions for late joiners. */
 export function onProgramEnrollment(store: TenantStore, userId: string, o: Row, sectionId: string | null) {
+  clearAudit(store, userId, o);
   for (const cid of (o.blockCourseIds as string[] | undefined) ?? []) {
     if (!store.list("enrollments", (e) => e.userId === userId && e.courseId === cid && e.role === "student" && e.state === "active").length) store.insert("enrollments", { userId, courseId: cid, role: "student", state: "active", source: "purchase" }, "enr");
+  }
+  // Pathways: enroll in each included program too, so each issues its own certificate on completion.
+  for (const incId of (o.pathwayIncludes as string[] | undefined) ?? []) {
+    if (!store.list("offering_enrollments", (e) => e.userId === userId && e.offeringId === incId && ["active", "completed"].includes(String(e.state))).length) store.insert("offering_enrollments", { userId, offeringId: incId, sectionId: null, source: "pathway", state: "active", orderId: null, waivedModules: [], completedAt: null, credentialId: null, viaOfferingId: o.id }, "oen");
   }
   const sec = sectionId ? store.get("offering_sections", sectionId) : null;
   if (!sec || !o.courseId) return;
@@ -624,6 +808,7 @@ export function onProgramEnrollment(store: TenantStore, userId: string, o: Row, 
 export function passNoPassChecks(store: TenantStore, userId: string, o: Row) {
   const page = store.list("program_pages", (p) => p.offeringId === o.id)[0];
   const spec = page?.spec as ProgramSpec | undefined;
+  if (spec?.completion === "weekend_intensive") return weekendChecks(store, userId, o);
   if (!spec || spec.grading !== "pass_no_pass") return null;
   const courseIds = [o.courseId as string, ...((o.blockCourseIds as string[] | undefined) ?? [])];
   const grade = (asgId: string) => store.list("grades", (g) => g.assignmentId === asgId && g.userId === userId && !!g.posted)[0];
@@ -649,6 +834,113 @@ export function passNoPassChecks(store: TenantStore, userId: string, o: Row) {
   ];
 }
 
+/** #15 completion: 20 session labs (attended, or recording reviewed with the lab submitted), weekend checks ≥ 70%, capstone ≥ 70/100 with a live defense, final knowledge check passed. */
+function weekendChecks(store: TenantStore, userId: string, o: Row) {
+  const courseIds = [o.courseId as string, ...((o.blockCourseIds as string[] | undefined) ?? [])];
+  const grade = (asgId: string) => store.list("grades", (g) => g.assignmentId === asgId && g.userId === userId && !!g.posted)[0];
+  const labs = store.list("assignments", (x) => courseIds.includes(x.courseId as string) && /^Session lab /.test(String(x.title)));
+  const attended = labs.filter((l) => store.list("submissions", (sub) => sub.assignmentId === l.id && sub.userId === userId).length || store.list("attendance", (at) => at.userId === userId && at.refId === l.id).length).length;
+  const best = (q: Row) => store.list("attempts", (x) => x.quizId === q.id && x.userId === userId && x.state === "graded").reduce((m, x) => Math.max(m, Number(x.score ?? 0)), -1);
+  const checks = store.list("quizzes", (q) => courseIds.includes(q.courseId as string) && q.state === "published" && /^Weekend \d+ check/.test(String(q.title)));
+  const checksMet = checks.filter((q) => best(q) >= 0.7 * Number(q.points ?? 0)).length;
+  const cap = store.list("assignments", (x) => courseIds.includes(x.courseId as string) && /^Capstone:/.test(String(x.title)))[0];
+  const capG = cap ? grade(cap.id) : undefined;
+  const def = store.list("assignments", (x) => courseIds.includes(x.courseId as string) && /^Capstone live demo defense/.test(String(x.title)))[0];
+  const defG = def ? grade(def.id) : undefined;
+  const fin = store.list("quizzes", (q) => courseIds.includes(q.courseId as string) && q.title === "Final knowledge check")[0];
+  const finBest = fin ? best(fin) : -1;
+  return [
+    { requirement: `All ${labs.length} live modules attended (or recording reviewed with the lab submitted)`, ok: labs.length > 0 && attended === labs.length, detail: `${attended}/${labs.length}` },
+    { requirement: "All module assessments passed (70%)", ok: checks.length > 0 && checksMet === checks.length, detail: `${checksMet}/${checks.length}` },
+    { requirement: "Capstone at least 70/100 on the mentor rubric", ok: !!capG && Number(capG.score) >= 70, detail: capG ? `${capG.score}/100` : "not graded" },
+    { requirement: "Live demo defense delivered", ok: !!defG && Number(defG.score) > 0, detail: defG ? "delivered" : "not yet" },
+    { requirement: "Final knowledge check passed (2 attempts)", ok: !!fin && finBest >= 0.7 * Number(fin.points ?? 10), detail: finBest >= 0 ? `${finBest}/${fin?.points}` : "not taken" },
+  ];
+}
+
+/** After completion: the Graded Performance Certificate (shows the final grade) where the program offers one. */
+export function afterProgramCompletion(store: TenantStore, userId: string, o: Row) {
+  const spec = store.list("program_pages", (p) => p.offeringId === o.id)[0]?.spec as ProgramSpec | undefined;
+  if (!spec?.gradedPerformance) return null;
+  const courseIds = [o.courseId as string, ...((o.blockCourseIds as string[] | undefined) ?? [])];
+  const pct = courseIds.map((c) => computeTotals(store, c, userId).finalPct).filter((p): p is number => p !== null);
+  const final = pct.length ? Math.round((pct.reduce((s, p) => s + p, 0) / pct.length) * 10) / 10 : null;
+  const tpl = store.list("credential_templates", (t) => t.kind === "graded_performance" && String(t.name).endsWith(spec.title))[0];
+  return issueCredential(store, null, { userId, courseId: o.courseId as string, title: `Graded Performance Certificate — ${spec.title}`, kind: "certificate", templateId: tpl?.id, achievementType: "Certificate", evidence: [{ name: final === null ? "Final grade recorded by faculty" : `Final grade ${final}%` }] });
+}
+
+/* ---------------- audit access, policies, batch changes ---------------- */
+
+/** Free audit of a self-paced offering: content visible, graded items locked. */
+export function enrollAudit(store: TenantStore, a: Actor, offeringId: string) {
+  const o = store.get("offerings", offeringId);
+  if (!o || o.state !== "published" || !o.auditAvailable) throw new CampusError("audit_unavailable", "Free audit isn't offered for this product.", 409);
+  return store.tx(() => {
+    const ids = [o.courseId as string, ...((o.blockCourseIds as string[] | undefined) ?? [])].filter(Boolean);
+    for (const cid of ids) if (!store.list("enrollments", (e) => e.userId === a.id && e.courseId === cid && e.role === "student" && e.state === "active").length) store.insert("enrollments", { userId: a.id, courseId: cid, role: "student", state: "active", source: "audit", audit: true }, "enr");
+    const enr = store.insert("offering_enrollments", { userId: a.id, offeringId: o.id, sectionId: null, source: "audit", state: "active", orderId: null, waivedModules: [], completedAt: null, credentialId: null }, "oen");
+    audit(store, a, "commerce.audit", `offerings/${o.id}`);
+    return { enrollment: enr, note: "Auditing: content is open; graded quizzes, assignments and the credential unlock when you buy or subscribe (sandbox)." };
+  });
+}
+
+/** Upgrading from audit (purchase or subscription) unlocks graded work. */
+export function clearAudit(store: TenantStore, userId: string, o: Row) {
+  for (const cid of [o.courseId as string, ...((o.blockCourseIds as string[] | undefined) ?? [])].filter(Boolean)) for (const e of store.list("enrollments", (x) => x.userId === userId && x.courseId === cid && !!x.audit)) store.update("enrollments", e.id, { audit: false, source: "purchase" });
+}
+
+export const DEFAULT_POLICIES = [
+  { kind: "refund", text: "Full refund if you ask within 14 days of your cohort or batch start and have completed less than 20% of the graded work. Self-paced products: full refund within 14 days of purchase if you haven't earned the credential. Refunds return to the original sandbox payment method.", windowDays: 14, feeAmount: 0, processingDays: 5 },
+  { kind: "deferral", text: "You can defer once to a later cohort or batch if you ask at least 7 days before your start date. Deferral is free; your payment carries over.", windowDays: 7, feeAmount: 0, processingDays: 3 },
+  { kind: "batch_change", text: "You can move to another batch of the same program once, up to 3 days before your current batch starts, if the new batch has seats. Later changes are reviewed case by case.", windowDays: 3, feeAmount: 0, processingDays: 2 },
+];
+
+export function ensurePolicies(store: TenantStore) {
+  const t = broker.tenant(store.tenantId)!;
+  for (const p of DEFAULT_POLICIES) if (!store.list("catalog_policies", (x) => x.kind === p.kind).length) store.insert("catalog_policies", { ...p, escalationContact: `support@${t.slug}.scholarion.test`, approvedBy: null, approvedAt: null, state: "draft" }, "cpol");
+}
+
+/** Policies show to learners only after the product owner (an admin) approves them. */
+export function approvedPolicy(store: TenantStore, kind: "refund" | "deferral" | "batch_change") {
+  const p = store.list("catalog_policies", (x) => x.kind === kind && x.state === "published" && !!x.approvedAt)[0];
+  return p ? { kind, text: String(p.text), windowDays: Number(p.windowDays ?? 0), feeAmount: Number(p.feeAmount ?? 0), processingDays: Number(p.processingDays ?? 0), escalationContact: String(p.escalationContact ?? ""), approvedAt: String(p.approvedAt) } : null;
+}
+
+export function approvePolicy(store: TenantStore, a: Actor, policyId: string) {
+  requireTenant(store, a, ["admin"], "policies.approve");
+  const p = store.get("catalog_policies", policyId);
+  if (!p) throw new CampusError("not_found", "Policy not found", 404);
+  const issues = copyCheck(store, String(p.text));
+  if (issues.length) throw new CampusError("copy_check", `Copy check: ${issues.map((i) => i.label).join(", ")}.`, 422);
+  return store.tx(() => {
+    const row = store.update("catalog_policies", policyId, { approvedBy: a.id, approvedAt: nowIso(), state: "published" });
+    audit(store, a, "policies.approve", `catalog_policies/${policyId}`, String(p.kind));
+    return row;
+  });
+}
+
+/** Move a seat to another batch of the same program under the approved batch-change policy. */
+export function requestBatchChange(store: TenantStore, a: Actor, orderId: string, newSectionId: string) {
+  const policy = approvedPolicy(store, "batch_change");
+  if (!policy) throw new CampusError("policy_pending", "Batch changes open once the batch-change policy is approved. Contact support in the meantime.", 409);
+  const order = store.get("orders", orderId);
+  if (!order || order.userId !== a.id) throw new CampusError("not_found", "Order not found", 404);
+  const from = order.sectionId ? store.get("offering_sections", String(order.sectionId)) : undefined;
+  const to = store.get("offering_sections", newSectionId);
+  if (!from || !to || to.offeringId !== order.offeringId || to.id === from.id) throw new CampusError("invalid", "Choose another batch of the same program.", 422);
+  if (new Date(String(from.startsAt)).getTime() - nowMs() < policy.windowDays * DAY) throw new CampusError("window_closed", `Batch changes close ${policy.windowDays} days before your batch starts. Contact ${policy.escalationContact}.`, 423);
+  if (Number(to.capacity) - Number(to.seatsTaken ?? 0) <= 0) throw new CampusError("sold_out", "That batch is sold out.", 409);
+  if (store.list("orders", (x) => x.userId === a.id && x.offeringId === order.offeringId && !!x.batchChangedFrom).length) throw new CampusError("limit", "You've already changed batch once for this program.", 409);
+  return store.tx(() => {
+    store.update("offering_sections", from.id, { seatsTaken: Math.max(0, Number(from.seatsTaken ?? 0) - 1) });
+    store.update("offering_sections", to.id, { seatsTaken: Number(to.seatsTaken ?? 0) + 1 });
+    const row = store.update("orders", orderId, { sectionId: to.id, batchChangedFrom: from.id });
+    for (const e of store.list("offering_enrollments", (x) => x.orderId === orderId)) store.update("offering_enrollments", e.id, { sectionId: to.id });
+    audit(store, a, "commerce.batch_change", `orders/${orderId}`, `${from.code} → ${to.code}`);
+    return { order: row, from: from.code, to: to.code, processingDays: policy.processingDays, fee: policy.feeAmount };
+  });
+}
+
 /* ---------------- bundle badge (#13) ---------------- */
 
 registerConsumer({
@@ -657,15 +949,22 @@ registerConsumer({
   handle(store, e) {
     const userId = String(e.data.userId);
     const o = store.get("offerings", String(e.data.offeringId));
-    if (!o || !/^#\d+\.\d$/.test(String(o.code))) return;
-    const bundleCode = String(o.code).split(".")[0];
-    const parts = store.list("offerings", (x) => String(x.code).startsWith(`${bundleCode}.`));
-    const done = parts.every((p) => store.list("offering_enrollments", (x) => x.offeringId === p.id && x.userId === userId && x.state === "completed").length);
-    if (!done) return;
-    const bundle = store.list("offerings", (x) => x.code === bundleCode)[0];
-    const spec = bundle ? (store.list("program_pages", (p) => p.offeringId === bundle.id)[0]?.spec as ProgramSpec | undefined) : undefined;
-    if (!spec || store.list("credentials", (c) => c.userId === userId && c.title === spec.credential.badge).length) return;
-    issueCredential(store, null, { userId, courseId: o.courseId as string, title: spec.credential.badge, kind: "badge", achievementType: "Badge", evidence: parts.map((p) => ({ name: `Completed ${p.code} ${p.title}` })) });
+    if (!o) return;
+    // Parents this offering stacks into: bundles (#13), specializations and professional certificates.
+    const parents = store.list("pathway_edges", (x) => x.kind === "stacks_into" && x.fromId === o.id).map((x) => store.get("offerings", String(x.toId))).filter((p) => p && ["bundle", "specialization", "professional_certificate"].includes(String(p.productType))) as Row[];
+    for (const parent of parents) {
+      const parts = store.list("pathway_edges", (x) => x.kind === "stacks_into" && x.toId === parent.id).map((x) => String(x.fromId));
+      const done = parts.every((pid) => store.list("offering_enrollments", (x) => x.offeringId === pid && x.userId === userId && x.state === "completed").length);
+      if (!done) continue;
+      const spec = store.list("program_pages", (p) => p.offeringId === parent.id)[0]?.spec as ProgramSpec | undefined;
+      if (!spec) continue;
+      const titles = parent.productType === "bundle" ? [spec.credential.badge] : [spec.credential.certificate, spec.credential.badge];
+      for (const title of titles) {
+        if (store.list("credentials", (c) => c.userId === userId && c.title === title).length) continue;
+        issueCredential(store, null, { userId, courseId: o.courseId as string, title, kind: /badge/i.test(title) ? "badge" : "certificate", achievementType: /badge/i.test(title) ? "Badge" : "Certificate", evidence: parts.map((pid) => ({ name: `Completed ${store.get("offerings", pid)?.code} ${store.get("offerings", pid)?.title}` })) });
+      }
+      for (const pe of store.list("offering_enrollments", (x) => x.offeringId === parent.id && x.userId === userId && x.state === "active")) store.update("offering_enrollments", pe.id, { state: "completed", completedAt: nowIso() });
+    }
   },
 });
 
@@ -676,19 +975,42 @@ export function qualityGate(store: TenantStore, offeringId: string) {
   const spec = row.spec as ProgramSpec;
   const o = store.get("offerings", row.offeringId as string)!;
   const courseIds = [o.courseId as string, ...((o.blockCourseIds as string[] | undefined) ?? [])];
-  const mods = store.list("modules", (m) => courseIds.includes(m.courseId as string) && !String(m.moduleKey).endsWith("-wres"));
-  const missingWeeks = spec.curriculum.filter((w) => !mods.some((m) => m.moduleKey === moduleKeyFor(spec.code, w.week))).map((w) => w.week);
-  const caps = spec.projects.filter((p) => p.kind === "capstone");
-  const capsWithRubric = caps.filter((p) => store.list("assignments", (x) => courseIds.includes(x.courseId as string) && String(x.title).endsWith(p.name) && !!x.rubricId).length);
   const pages = store.list("pages", (p) => courseIds.includes(p.courseId as string));
   const copy = copyCheck(store, programCopy(spec));
-  return [
-    { gate: "Every week has a module, overview page and activity", ok: missingWeeks.length === 0, detail: missingWeeks.length ? `Missing weeks: ${missingWeeks.join(", ")}` : `${spec.curriculum.length} weeks` },
-    { gate: "Capstone has a rubric", ok: capsWithRubric.length === caps.length, detail: `${capsWithRubric.length}/${caps.length}` },
+  const common = [
     { gate: "Outcomes are 5–6 measurable competencies", ok: spec.outcomes.length >= 5 && spec.outcomes.length <= 6, detail: `${spec.outcomes.length}` },
     { gate: "Honest-claims copy check", ok: copy.length === 0, detail: copy.map((c) => c.label).join(", ") || "clean" },
     { gate: "Datasets are synthetic with data cards", ok: spec.dataCards.length > 0 && spec.dataCards.every((d) => /scholaris|fictional|synthetic/i.test(`${d.source} ${d.name}`)), detail: `${spec.dataCards.length} data cards` },
     { gate: "Pages pass the accessibility structure check (headings first)", ok: pages.every((p) => ((p.blocks as Block[]) ?? [])[0]?.type === "heading"), detail: `${pages.length} pages` },
+  ];
+  if (spec.selfPaced) {
+    const sp = spec.selfPaced;
+    const missing: string[] = [];
+    let finals = 0;
+    for (const c of sp.courses) {
+      const cid = c.courseId ?? courseIdFor(broker.tenant(store.tenantId)!.slug, c.code, "A", true);
+      if (c.courseId) {
+        finals++; // adopted legacy course: its own structure is kept
+        continue;
+      }
+      const mods = store.list("modules", (m) => m.courseId === cid);
+      if (mods.length < c.modules.length) missing.push(`${c.code} (${mods.length}/${c.modules.length} modules)`);
+      if (store.list("assignments", (a) => a.courseId === cid && /^Final project:/.test(String(a.title)) && !!a.rubricId).length) finals++;
+    }
+    return [
+      { gate: "Every course has its modules (overview, lab, quiz)", ok: missing.length === 0, detail: missing.length ? missing.join("; ") : `${sp.courses.length} courses` },
+      { gate: "Every course has a final project with a rubric", ok: finals === sp.courses.length, detail: `${finals}/${sp.courses.length}` },
+      ...common,
+    ];
+  }
+  const mods = store.list("modules", (m) => courseIds.includes(m.courseId as string) && !String(m.moduleKey).endsWith("-wres"));
+  const missingWeeks = spec.curriculum.filter((w) => !mods.some((m) => m.moduleKey === moduleKeyFor(spec.code, w.week))).map((w) => w.week);
+  const caps = spec.projects.filter((p) => p.kind === "capstone");
+  const capsWithRubric = caps.filter((p) => store.list("assignments", (x) => courseIds.includes(x.courseId as string) && String(x.title).endsWith(p.name) && !!x.rubricId).length);
+  return [
+    { gate: "Every week has a module, overview page and activity", ok: missingWeeks.length === 0, detail: missingWeeks.length ? `Missing weeks: ${missingWeeks.join(", ")}` : `${spec.curriculum.length} ${spec.curriculum.some((w) => w.sessions) ? "weekends" : "weeks"}` },
+    { gate: "Capstone has a rubric", ok: capsWithRubric.length === caps.length, detail: `${capsWithRubric.length}/${caps.length}` },
+    ...common,
   ];
 }
 
@@ -717,26 +1039,35 @@ export function programStatus(store: TenantStore, offeringId: string) {
   const asg = store.list("assignments", (x) => ids.includes(x.courseId as string));
   const quizzes = store.list("quizzes", (q) => ids.includes(q.courseId as string) && q.state === "published");
   const gate = qualityGate(store, row.offeringId as string);
+  const sp = spec.selfPaced;
+  const allModulesBuilt = !!sp && sp.courses.every((c) => !!c.courseId || c.modules.every((m) => m.lab && m.quiz?.length));
+  const weekendChecks = spec.completion === "weekend_intensive" && quizzes.length >= 10;
   const items: { deliverable: string; status: Status; note: string }[] = [
-    { deliverable: "Catalog entry and website page", status: o.state === "published" && row.state === "published" ? "complete" : "drafted", note: "Fees and dates read from the catalog." },
-    { deliverable: "Outcomes map and week-by-week curriculum", status: "needs SME review", note: `${spec.outcomes.length} outcomes, ${spec.curriculum.length} weeks; outcome-to-week alignment needs SME confirmation.` },
-    { deliverable: "Course shells in Scholaris", status: gate.every((g) => g.ok) ? "complete" : "drafted", note: `${ids.length} course block(s) loaded unpublished; publish after the quality gate.` },
-    { deliverable: "In-class activities (student and instructor editions)", status: "drafted", note: `${asg.filter((x) => /In-Class Activity/.test(String(x.title))).length} activity shells in the Academy template; editions pending authoring.` },
-    { deliverable: "Starter TODO and EXECUTED notebooks", status: "blocked", note: "Built after tool versions are verified and pinned in the Cloud Lab." },
-    { deliverable: "Synthetic datasets with data cards", status: "drafted", note: `${spec.dataCards.length} data cards written; datasets generated at build.` },
-    { deliverable: "Mini labs, quizzes, assignments, projects and capstone with rubrics", status: spec.code === "#26" && quizzes.length >= 6 ? "needs SME review" : "drafted", note: `${asg.filter((x) => /^(Project|Midterm project|Capstone)/.test(String(x.title))).length} projects, ${quizzes.length} published quizzes, capstone rubric ${gate[1].ok ? "attached" : "missing"}.` },
-    { deliverable: "Slides, scripts and instructor guide", status: "not started", note: "Authored after SME review of the curriculum." },
-    { deliverable: "Credential and badge definitions", status: store.get("credential_templates", o.credentialTemplateId as string) ? "complete" : "drafted", note: `${spec.credential.certificate}; ${spec.credential.badge}.` },
+    { deliverable: "Catalog entry and website page", status: o.state === "published" && row.state === "published" ? "complete" : "drafted", note: "Fees, dates and seats read from the catalog." },
+    { deliverable: "Outcomes map and week-by-week curriculum", status: "needs SME review", note: `${spec.outcomes.length} outcomes, ${spec.curriculum.length} ${sp ? "modules" : spec.curriculum.some((w) => w.sessions) ? "weekends" : "weeks"}; outcome-to-module alignment needs SME confirmation.` },
+    { deliverable: "Course shells in Scholaris", status: gate.every((g) => g.ok) ? "complete" : "drafted", note: `${ids.length} course(s) loaded${sp && allModulesBuilt ? " and published" : " unpublished; publish after the quality gate"}.` },
+    { deliverable: "In-class activities (student and instructor editions)", status: "drafted", note: sp ? "Licensed-cohort activity editions follow the Academy template; the self-paced edition uses autograded deliverables." : `${asg.filter((x) => /In-Class Activity/.test(String(x.title))).length} activity shells in the Academy template; editions pending authoring.` },
+    { deliverable: "Starter TODO and EXECUTED notebooks", status: allModulesBuilt ? "needs SME review" : "blocked", note: allModulesBuilt ? "Starter code and executed solutions exist for every lab; autograder tests verified (solutions pass, starters fail)." : "Built after tool versions are verified and pinned in the Cloud Lab (PyTorch and TensorFlow versions where applicable)." },
+    { deliverable: "Synthetic datasets with data cards", status: "drafted", note: `${spec.dataCards.length} data card(s) written; datasets generated at build.` },
+    { deliverable: "Quizzes, assignments, projects and capstone with rubrics", status: allModulesBuilt || weekendChecks || (spec.code === "#26" && quizzes.length >= 6) ? "needs SME review" : "drafted", note: `${quizzes.length} published quiz(zes); ${asg.filter((x) => /^(Project|Midterm project|Capstone|Final project)/.test(String(x.title))).length} projects/final projects with rubrics.` },
+    { deliverable: "Slides, video scripts and instructor guide (with textbook chapter maps)", status: "not started", note: spec.textbooks?.length ? `Chapter maps due for: ${spec.textbooks.join("; ")}.` : "Authored after SME review of the curriculum." },
+    { deliverable: "Credential and badge definitions", status: store.get("credential_templates", o.credentialTemplateId as string) ? "complete" : "drafted", note: `${spec.credential.certificate}; ${spec.credential.badge}${spec.gradedPerformance ? "; Graded Performance Certificate" : ""}.` },
     { deliverable: "Brochure", status: "complete", note: "Generated as PDF from the same content." },
+    { deliverable: "Quality-gate results", status: gate.every((g) => g.ok) ? "complete" : "blocked", note: gate.filter((g) => !g.ok).map((g) => g.gate).join("; ") || "All gates pass." },
   ];
   const risks = [
     "Tool list must be verified current and education-licensed, then version-pinned, before labs are built.",
+    ...(spec.pathway?.missing ?? []).map((c) => `Pathway step ${c} isn't in the catalog yet; the pathway runs without it until it exists.`),
+    ...(spec.adoptCourse ? ["Built on the Academy's earlier Deep Learning course shell (Weeks 5–6 reuse its modules and PyTorch lab)."] : []),
+    ...(sp?.courses.some((c) => c.courseId) ? ["Course 2 reuses the earlier Applied ML course content; align it with the spec's module list during SME review."] : []),
+    ...(spec.electives?.some((e) => /protocol/i.test(e)) ? ["Agent interoperability protocol status must be verified at build time."] : []),
+    ...(spec.batches ? ["Refund, deferral and batch-change policy text is shown only after product-owner approval."] : []),
     ...(spec.faculty.some((f) => !f.bio) ? ["Lead faculty bio not yet supplied; additional faculty listed only once confirmed."] : []),
     ...(spec.research?.length ? ["Research citations entered from the publication record; SME to confirm before publishing the reading list."] : []),
     ...(spec.selfCheck ? spec.selfCheck.routeTo.filter((c) => !store.list("offerings", (x) => x.code === c).length).map((c) => `Self-check routes to ${c}, which isn't in this catalog yet.`) : []),
     ...(spec.decisions ?? []).filter((d) => d.status !== "recorded").map((d) => `Decision pending: ${d.topic} — ${d.decision}`),
-    ...(spec.waives ?? []).filter((w) => w.toCode === "#15").map(() => "Program #15's course shell has no Weekend 3–5 modules keyed yet, so that waiver applies once they exist."),
     ...(spec.hoursPerWeek ? [] : ["Weekly hours not yet set; learning hours can't be stated until they are."]),
+    ...(spec.waives ?? []).filter((w) => !store.list("offerings", (x) => x.code === w.toCode).length).map((w) => `Transfer rule into ${w.toCode} is recorded but that program isn't in the catalog yet.`),
   ];
   const overall: Status = items.some((i) => i.status === "blocked") ? "blocked" : items.every((i) => i.status === "complete") ? "complete" : "drafted";
   return { code: spec.code, title: spec.title, overall, items, risks, gate };

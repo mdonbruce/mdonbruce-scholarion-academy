@@ -114,7 +114,7 @@ describe("Academy programs #1, #12, #13, #14, #26 (Tab 50)", () => {
     const fail = prog.selfCheck(as("academy", "student4", false).store, s.actor, P26, { py1: "6" });
     assert.equal(fail.passed, false);
     assert.deepEqual(fail.routeTo, ["#16", "#19"]);
-    assert.match(fail.message, /advisor/);
+    assert.match(fail.message, /#16|#19/);
     assert.equal(prog.selfCheck(as("academy", "student4", false).store, s.actor, P26, SELF_OK).passed, true);
     const app = prog.applyToProgram(as("academy", "student4", false).store, s.actor, { offeringId: P26, statement: "I build backend services and want reliable multi-agent systems." });
     assert.equal(app.application.state, "submitted");

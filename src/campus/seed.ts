@@ -342,8 +342,8 @@ function seedAcademy(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
   const scheme = store.insert("grading_schemes", { name: "Pass mark", kind: "letter", bands: [{ label: "Distinction", min: 85 }, { label: "Pass", min: 70 }, { label: "Not yet", min: 0 }] }, "gsc");
 
   const mkCourse = (key: string, code: string, title: string, desc: string, extra: Record<string, unknown> = {}) => store.insert("courses", { id: `crs_${t.slug}_${key}`, code, title, description: desc, credits: 0, state: "published", publishedAt: iso(-60), accountId: root.id, homeType: "modules", gradingSchemeId: scheme.id, latePolicy: { latePctPerDay: 0, floorPct: 0, missingScorePct: 0 }, visibility: "course", format: "online", language: "en", ...extra }, "crs");
-  const c32 = mkCourse("p32", "#32", "Applied Machine Learning with Python", "Build, evaluate and explain supervised learning models in Python.");
-  const c15 = mkCourse("p15", "#15", "Deep Learning Live Intensive", "Neural networks and PyTorch in a live cohort.", { format: "live" });
+  const c32 = mkCourse("p37_2", "#37.2", "Supervised and Unsupervised Learning", "Build, evaluate and explain supervised learning models in Python (Course 2 of #37).");
+  const c15 = mkCourse("p18", "#18", "Certificate in Artificial Intelligence with Python (TensorFlow & PyTorch)", "Classical ML to deep learning and NLP, in both frameworks.", { format: "live" });
   const c1 = mkCourse("p01", "#1-R", "Python & Tooling Refresher", "Python, data structures, notebooks and Git for AI work (the optional Week 0 of Program #1, also sold on its own).");
   for (const [c, inst] of [[c32, u.instructor], [c15, u.instructor2], [c1, u.instructor]] as const) store.insert("enrollments", { userId: inst, courseId: c.id, role: "instructor", state: "active", source: "manual" }, "enr");
   store.insert("enrollments", { userId: u.ta, courseId: c32.id, role: "ta", state: "active", source: "manual" }, "enr");
@@ -384,16 +384,14 @@ function seedAcademy(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
   store.insert("posting_policies", { courseId: c32.id, mode: "automatic" }, "pp");
 
   // Offerings (sandbox prices; no outcome or accreditation claims)
-  const off = (code: string, title: string, productType: string, extra: Record<string, unknown>) => store.insert("offerings", { id: `off_${t.slug}_${code.replace("#", "")}`, code, title, productType, currency: "USD", aidEligible: false, state: "published", format: "online", ...extra }, "off");
+  const off = (code: string, title: string, productType: string, extra: Record<string, unknown>) => store.insert("offerings", { id: `off_${t.slug}_${code.replace("#", "").replace(".", "_")}`, code, title, productType, currency: "USD", aidEligible: false, state: "published", format: "online", ...extra }, "off");
   const o1 = store.insert("offerings", { id: `off_${t.slug}_1r`, code: "#1-R", title: "Python & Tooling Refresher", productType: "short_course", currency: "USD", aidEligible: false, state: "published", format: "online", courseId: c1.id, summary: "Python basics, data structures, notebooks and Git for AI work — the optional Week 0 of Program #1, also available on its own.", level: "beginner", hours: 15, skills: ["python", "notebooks"], price: 49, inPlus: true, selfPaced: true }, "off");
-  const o32 = off("#32", "Applied Machine Learning with Python", "short_course", { courseId: c32.id, summary: "Train and evaluate supervised models, and explain their limits in a capstone report.", level: "intermediate", hours: 20, skills: ["python", "ml", "evaluation"], moduleKeys: ["ml-m1", "ml-m2", "ml-m3"], price: 129, inPlus: true, selfPaced: true, credentialTemplateId: tpl.id });
-  const o15 = off("#15", "Deep Learning Live Intensive", "live_intensive", { courseId: c15.id, summary: "Neural networks and PyTorch with live sessions and graded labs.", level: "intermediate", hours: 30, skills: ["deep-learning", "pytorch", "ml"], moduleKeys: ["dl-m1", "dl-m2"], price: 399, earlyBirdPrice: 349, earlyBirdEndsAt: iso(14), format: "live" });
-  const o20 = off("#20", "AI Agents Specialization", "specialization", { summary: "Design, evaluate and deploy tool-using AI agents responsibly.", level: "advanced", hours: 60, skills: ["agents", "evaluation", "python"], price: 499 });
-  const o38 = off("#38", "Machine Learning Professional Certificate", "professional_certificate", { summary: "A stack of short courses and a capstone across the ML workflow.", level: "intermediate", hours: 120, skills: ["python", "ml", "deep-learning", "evaluation"], price: 899 });
+  const o32 = off("#37.2", "Supervised and Unsupervised Learning", "short_course", { courseId: c32.id, summary: "Train and evaluate supervised models, and explain their limits in a capstone report.", level: "intermediate", hours: 20, skills: ["python", "ml", "evaluation"], moduleKeys: ["ml-m1", "ml-m2", "ml-m3"], price: 129, inPlus: true, selfPaced: true, credentialTemplateId: tpl.id });
+  const o15 = off("#18", "Certificate in Artificial Intelligence with Python (TensorFlow & PyTorch)", "cohort_program", { courseId: c15.id, summary: "Neural networks and PyTorch with live sessions and graded labs.", level: "intermediate", hours: 30, skills: ["deep-learning", "pytorch", "ml"], moduleKeys: ["dl-m1", "dl-m2"], price: 399, earlyBirdPrice: 349, earlyBirdEndsAt: iso(14), format: "live" });
   off("#5", "Prompting and Evaluation Guided Project", "guided_project", { summary: "A two-hour project: write prompts and measure their quality.", level: "beginner", hours: 2, skills: ["agents", "evaluation"], price: 19, inPlus: true, selfPaced: true });
   store.insert("offering_sections", { offeringId: o15.id, code: "DL-OCT", startsAt: iso(10, 15), endsAt: iso(52, 15), timeZone: "Africa/Lagos", capacity: 20, registrationClosesAt: iso(8, 23), schedule: "Tue/Thu 16:00–18:00 WAT", seatsTaken: 0 }, "osec");
   store.insert("offering_sections", { offeringId: o15.id, code: "DL-JAN", startsAt: iso(95, 15), endsAt: iso(137, 15), timeZone: "Africa/Lagos", capacity: 2, registrationClosesAt: iso(90, 23), schedule: "Sat 10:00–14:00 WAT", seatsTaken: 0 }, "osec");
-  for (const [from, to, kind, moduleKey] of [[o32, o15, "waives", "dl-m1"], [o1, o20, "prerequisite", null], [o1, o38, "stacks_into", null], [o32, o38, "stacks_into", null], [o15, o38, "stacks_into", null]] as const) store.insert("pathway_edges", { fromId: from.id, toId: to.id, kind, moduleKey }, "pe");
+  for (const [from, to, kind, moduleKey] of [[o32, o15, "waives", "p18-w5"]] as const) store.insert("pathway_edges", { fromId: from.id, toId: to.id, kind, moduleKey }, "pe");
   store.insert("transfer_rules", { externalCode: "CS-101", source: "Scholarion Demo University (demo)", offeringId: o1.id, moduleKey: null, note: "Equivalent introductory programming." }, "tr");
   store.insert("coupons", { code: "WELCOME10", percentOff: 10, maxRedemptions: 1000, redemptions: 0, expiresAt: iso(120) }, "cpn");
   store.insert("seat_licenses", { orgName: "Demo Corp (fictional)", offeringId: o32.id, seats: 3, managerId: u.admin, assigned: [] }, "seat");
@@ -408,7 +406,6 @@ function seedAcademy(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
   rebuildIndex(store, actorFor(store, u.admin, true));
   relay(store);
   broker.persist(t.id);
-  void o20;
   return u;
 }
 

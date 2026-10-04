@@ -16,6 +16,8 @@ import { labNotebook } from "../../services/tutor";
 import { ProctorPanel } from "./proctor";
 import { studioOverview, programIndex } from "../../services/programs";
 import { PARITY, paritySummary, SECTION_TITLES } from "../../parity";
+import { consolidationReport } from "../../services/hub";
+import { LIBRARY } from "../../academy/programs-data-2";
 import { api, Chip, Denied, Empty, EntityForm, EntityTable, fmt, Hidden, OpForm, PageHead, Result } from "../kit";
 
 type SP = Record<string, string | undefined>;
@@ -174,6 +176,8 @@ function Bespoke({ t, tab }: { t: T; tab: string }) {
         return <ProgramStudio t={t} />;
       case "parity-status":
         return <ParityStatus t={t} />;
+      case "module-library":
+        return <ModuleLibrary t={t} />;
       case "proctor-support":
         return <ProctorPanel store={t.store} actor={t.actor} slug={t.slug} sp={t.sp} here={t.here} />;
       case "catalog":
@@ -764,6 +768,192 @@ function ProgramStudio({ t }: { t: T }) {
           )}
         </section>
       )}
+    </>
+  );
+}
+
+function ModuleLibrary({ t }: { t: T }) {
+  const rep = consolidationReport(t.store, t.actor);
+  const isOwner = hasAny(t.actor, ["admin"]);
+  const policies = t.store.list("catalog_policies", () => true);
+  const reports = t.store.list("consolidation_reports", () => true).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  const libRows = t.store.list("library_modules", () => true);
+  const libCount = (key: string) => libRows.find((r) => r.key === key);
+  return (
+    <>
+      <section className="card card-pad stack" aria-labelledby="ml-pol">
+        <h2 id="ml-pol" className="card-title">
+          Refund, deferral and batch-change policies
+        </h2>
+        <p className="small">Learner pages show a policy only after the product owner approves it. Until then they say the policy is being finalized.</p>
+        <ul className="item-list">
+          {policies.map((p) => (
+            <li key={String(p.id)} className="stack">
+              <p>
+                <strong>{String(p.kind).replace("_", " ")}</strong> <Chip s={p.approvedAt ? "published" : "draft"} />
+              </p>
+              <p className="small">{String(p.text)}</p>
+              <p className="tiny muted">
+                Window {String(p.windowDays)} days · processing {String(p.processingDays)} business days · escalation {String(p.escalationContact)}
+                {p.approvedAt ? ` · approved ${fmt(p.approvedAt)}` : ""}
+              </p>
+              {isOwner && !p.approvedAt && (
+                <form method="post" action={api(t.slug, "a/policies.approve")}>
+                  <Hidden values={{ back: t.here, policyId: String(p.id), notice: "Policy approved — it now shows on program pages." }} />
+                  <button className="btn btn-primary btn-sm" type="submit">
+                    Approve {String(p.kind).replace("_", " ")} policy
+                  </button>
+                </form>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="card card-pad stack" aria-labelledby="ml-lib">
+        <h2 id="ml-lib" className="card-title">
+          Shared module library ({LIBRARY.length})
+        </h2>
+        <div className="table-wrap" tabIndex={0} role="region" aria-label="Library modules">
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">Module</th>
+                <th scope="col">Version</th>
+                <th scope="col">Used by</th>
+                <th scope="col">Frameworks</th>
+                <th scope="col">Loaded</th>
+              </tr>
+            </thead>
+            <tbody>
+              {LIBRARY.map((l) => (
+                <tr key={l.key}>
+                  <td>{l.title}</td>
+                  <td>{l.version}</td>
+                  <td className="small">{l.usedBy.join(", ")}</td>
+                  <td className="small">{l.dualFramework ? "PyTorch + TensorFlow" : "—"}</td>
+                  <td>{libCount(l.key) ? "yes" : "no"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="card card-pad stack" aria-labelledby="ml-rep">
+        <h2 id="ml-rep" className="card-title">
+          Catalog consolidation report
+        </h2>
+        <p className="small">
+          {rep.scope}. {rep.programs.length} programs, {rep.overlaps.length} overlaps of 40% or more, {rep.mergeOrRetire.length} merge-or-retire candidates.
+        </p>
+        <form method="post" action={api(t.slug, "a/catalog.consolidation_submit")}>
+          <Hidden values={{ back: t.here, notice: "Report submitted for product-owner approval." }} />
+          <button className="btn btn-primary btn-sm" type="submit">
+            Submit report for approval
+          </button>
+        </form>
+        {reports.length > 0 && (
+          <ul className="item-list" aria-label="Submitted reports">
+            {reports.map((r) => (
+              <li key={String(r.id)} className="stack">
+                <p>
+                  Report {String(r.id)} <Chip s={String(r.state)} /> <span className="tiny muted">{fmt(r.createdAt)}</span>
+                  {r.decisionNote ? <span className="small"> — {String(r.decisionNote)}</span> : null}
+                </p>
+                {isOwner && r.state === "submitted" && (
+                  <form method="post" action={api(t.slug, "a/catalog.consolidation_decide")} className="row">
+                    <Hidden values={{ back: t.here, reportId: String(r.id), notice: "Decision recorded." }} />
+                    <label className="small">
+                      Decision{" "}
+                      <select name="decision">
+                        <option value="approved">Approve</option>
+                        <option value="changes_requested">Request changes</option>
+                      </select>
+                    </label>
+                    <label className="small">
+                      Note <input name="note" maxLength={500} />
+                    </label>
+                    <button className="btn btn-sm" type="submit">
+                      Record decision
+                    </button>
+                  </form>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+        <h3 className="small">Overlaps</h3>
+        <div className="table-wrap" tabIndex={0} role="region" aria-label="Program overlaps">
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">Program A</th>
+                <th scope="col">Program B</th>
+                <th scope="col">Overlap</th>
+                <th scope="col">Recorded relation</th>
+                <th scope="col">Recommendation</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rep.overlaps.map((o) => (
+                <tr key={o.a + o.b}>
+                  <td className="small">{o.a}</td>
+                  <td className="small">{o.b}</td>
+                  <td>{o.overlapPct}%</td>
+                  <td className="small">{o.relation}</td>
+                  <td className="small">{o.recommendation}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <h3 className="small">Programs</h3>
+        <div className="table-wrap" tabIndex={0} role="region" aria-label="Programs in scope">
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">Code</th>
+                <th scope="col">Title</th>
+                <th scope="col">Type</th>
+                <th scope="col">Status</th>
+                <th scope="col">Transfers out</th>
+                <th scope="col">Stacks into</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rep.programs.map((p) => (
+                <tr key={p.code}>
+                  <td>{p.code}</td>
+                  <td className="small">{p.title}</td>
+                  <td className="small">{p.type}</td>
+                  <td className="small">{p.status}</td>
+                  <td className="small">{p.transfersOut.join("; ") || "—"}</td>
+                  <td className="small">{p.stacksInto.join(", ") || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="small">
+          <strong>Referenced but not in the catalog:</strong> {rep.referencedNotInCatalog.join(", ") || "none"}
+        </p>
+        <p className="small">
+          <strong>Proposed:</strong> {rep.proposed.map((p) => `${p.code} ${p.title} (${p.status})`).join("; ")}
+        </p>
+        <h3 className="small">Legacy changes</h3>
+        <ul className="small">
+          {rep.legacyChanges.map((c) => (
+            <li key={c}>{c}</li>
+          ))}
+        </ul>
+        <h3 className="small">Decisions pending</h3>
+        <ul className="small">
+          {rep.decisionsPending.map((c) => (
+            <li key={c}>{c}</li>
+          ))}
+        </ul>
+      </section>
     </>
   );
 }

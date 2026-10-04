@@ -474,3 +474,22 @@ export function VerifyView({ tenant, store, id }: { tenant: Tenant; store: Tenan
     </section>
   );
 }
+
+export function VerifyLookupView({ tenant }: { tenant: Tenant }) {
+  return (
+    <section className="card card-pad stack" aria-labelledby="verl-h">
+      <h1 id="verl-h" className="page-title">
+        Verify a credential
+      </h1>
+      <p className="small">Enter the credential ID printed on the certificate or badge issued by {tenant.name}.</p>
+      <form method="get" action={`/campus/${tenant.slug}/verify`} className="row">
+        <label className="small">
+          Credential ID <input name="id" required maxLength={120} />
+        </label>
+        <button className="btn btn-primary btn-sm" type="submit">
+          Verify
+        </button>
+      </form>
+    </section>
+  );
+}
