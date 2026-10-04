@@ -184,6 +184,14 @@ export function CatalogView({ tenant, store, actor, sp }: { tenant: Tenant; stor
                     <a href={`${here}?offering=${o.id}`}>{o.title}</a>
                   </h2>
                   <p className="small">{o.summary}</p>
+                  {(() => {
+                    const pp = store.list("program_pages", (x) => x.offeringId === o.id && x.state === "published")[0];
+                    return pp ? (
+                      <p className="small">
+                        <a href={`/campus/${tenant.slug}/programs/${String(pp.slug)}`}>Program page, schedule and how to apply</a>
+                      </p>
+                    ) : null;
+                  })()}
                   <p className="small">
                     <strong>
                       {o.currency} {o.price}

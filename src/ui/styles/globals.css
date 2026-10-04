@@ -1810,3 +1810,28 @@ details.acc > div {
 .campus-tabnav summary { color: var(--text-2); }
 .campus .crumbs a, .campus-public .crumbs a { text-decoration: underline; text-underline-offset: 2px; }
 .campus .prose a, .campus-main p a, .campus-public-main p a, .notice a { text-decoration: underline; }
+
+/* Academy program pages (Tab 50) */
+.campus-program .lead { font-size: 1.15rem; color: var(--text-2, inherit); margin: 0; }
+.campus-program-hero { border-top: 4px solid var(--primary, #0b1f4d); }
+.campus-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px 20px; margin: 4px 0; }
+.campus-facts dt { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); }
+.campus-facts dd { margin: 2px 0 0; font-weight: 600; }
+.campus-acc { border-bottom: 1px solid var(--border); padding: 8px 0; }
+.campus-acc summary { cursor: pointer; font-weight: 600; }
+.campus-acc[open] summary { margin-bottom: 6px; }
+.campus-cert-sample { border: 2px dashed var(--border); border-radius: 10px; padding: 16px 20px; margin: 0; text-align: center; max-width: 520px; }
+.campus-cert-name { font-size: 1.3rem; font-weight: 700; margin: 4px 0; }
+.campus-program blockquote { border-left: 3px solid var(--accent, #1f56e0); margin: 0; padding: 4px 12px; }
+.campus-parity td, .campus-parity th { vertical-align: top; }
+
+/* Personal accessibility settings (campus profile) */
+.campus.a11y-contrast { --text: #000; --text-2: #111; --text-3: #1f2937; --border: #111; --surface: #fff; --bg: #fff; }
+.campus.a11y-contrast a { color: #0033a0; }
+.campus.a11y-contrast .badge { border: 1px solid #000; }
+.campus.a11y-dyslexia, .campus.a11y-dyslexia * { font-family: "Atkinson Hyperlegible", "Comic Sans MS", Verdana, sans-serif !important; letter-spacing: 0.03em; word-spacing: 0.08em; line-height: 1.6; }
+.campus.a11y-underline a { text-decoration: underline !important; }
+.campus.a11y-reduce-motion *, .campus.a11y-reduce-motion *::before, .campus.a11y-reduce-motion *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+.campus-calgrid td { min-width: 110px; height: 84px; vertical-align: top; }
+.campus-calday { list-style: none; padding: 0; margin: 2px 0 0; font-size: 0.78rem; }
+.campus-calday li { margin-bottom: 2px; }

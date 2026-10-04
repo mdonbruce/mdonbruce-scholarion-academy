@@ -2,9 +2,9 @@
 
 Generated 2026-10-04 by `scripts/campus-docs.ts`. Environment: local + staging only (demonstration data, sandbox payments).
 
-**Capabilities:** 27 LIVE · 0 CONNECTED · 3 SIMULATED · 8 DISABLED · 2 PLANNED
+**Capabilities:** 28 LIVE · 0 CONNECTED · 3 SIMULATED · 8 DISABLED · 2 PLANNED
 
-## Tabs (49)
+## Tabs (51)
 
 A tab is OPERATIONAL when it has persisted resources, enforced authorization, audited writes, an API surface (REST + operations + GraphQL), a working screen, and a passing test. Tabs that depend on outside services report the connector state honestly.
 
@@ -59,6 +59,8 @@ A tab is OPERATIONAL when it has persisted resources, enforced authorization, au
 | 47 | Connectors | Platform | OPERATIONAL | status board test |
 | 48 | Capability Status | Platform | OPERATIONAL | status board test |
 | 49 | Proctored Assessment Support | Student Success | OPERATIONAL | proctor suite (10 tests) |
+| 50 | Program Studio | Academy & Commerce | OPERATIONAL | programs suite (Tab 50) |
+| 51 | LMS Parity Status | Platform | OPERATIONAL | programs suite (Tab 51) |
 
 ## Capabilities
 
@@ -82,6 +84,7 @@ A tab is OPERATIONAL when it has persisted resources, enforced authorization, au
 | LMS | Blueprints, copy with date shift, package import/export (CC + QTI) | LIVE | content tests (tests/campus-*.test.ts) | — |
 | SIS | Admissions, registration → enrollment projection, reconciliation, holds, transcript | LIVE | master acceptance (tests/campus-*.test.ts) | — |
 | Catalog | Product types, catalog hub, recommender, Catalog Copy Checker | LIVE | platform acceptance 2–3, 10 (tests/campus-*.test.ts) | — |
+| Catalog | Academy program pages (#1, #12, #13, #14, #26) generated from catalog data, brochure PDF, apply → admission → sandbox seat, inquiries, prerequisite self-check, pass/no-pass completion | LIVE | programs suite (tests/campus-*.test.ts) | — |
 | Pathways | Prerequisite / stacks / waives / mutually-exclusive rules, transfer credit, consolidation report | LIVE | platform acceptance 4 (tests/campus-*.test.ts) | — |
 | Commerce | Checkout, coupons, installments, subscriptions, seats, invoices, refunds | SIMULATED | Sandbox only; policy engine tested | Payment provider and go-live decision. |
 | Credentials | Open Badges 3.0 / VC signing, verification portal, revocation, reissue, CLR, honesty guard | LIVE | credential tests (tests/campus-*.test.ts) | — |

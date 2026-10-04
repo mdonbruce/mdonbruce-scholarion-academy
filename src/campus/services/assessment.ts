@@ -23,6 +23,8 @@ export function submit(store: TenantStore, a: Actor, assignmentId: string, input
   if (!asg || asg.state !== "published") throw new CampusError("not_found", "Assignment not found", 404);
   const courseId = asg.courseId as string;
   if (!hasAny(a, ["student"], courseId)) throw new CampusError("forbidden", "Only students in this course can submit.", 403);
+  const crs = store.get("courses", courseId);
+  if (crs?.concludedAt && String(crs.concludedAt) <= nowIso()) throw new CampusError("concluded", "This course has concluded and is read-only.", 423);
   assertAccessible(store, a, "assignment", asg.id);
   const dates = effectiveDates(store, asg, a.id);
   if (!dates.assigned) throw new CampusError("not_assigned", "This assignment isn't assigned to you.", 403);
@@ -61,6 +63,11 @@ export function submit(store: TenantStore, a: Actor, assignmentId: string, input
   const due = dueFor(store, asg, a.id);
   return store.tx(() => {
     const s = store.insert("submissions", { assignmentId, userId: a.id, courseId, mode: input.mode, body: input.mode === "text" ? input.body : null, url: input.url ?? input.mediaUrl ?? null, fileId: input.mode === "annotation" ? asg.annotationFileId : (input.fileId ?? null), attempt: prior.length + 1, state: "submitted", late: !!due && now > due, groupId, groupMemberIds: members, offline: !!input.offline }, "sub");
+    // Plagiarism review hook: queue a similarity request for the configured LTI tool.
+    if (asg.plagiarismToolId) {
+      store.update("submissions", s.id, { similarity: { toolId: asg.plagiarismToolId, status: "requested", requestedAt: nowIso() } });
+      store.emit("submissions.similarity_requested", `submissions/${s.id}`, { submissionId: s.id, toolId: asg.plagiarismToolId, courseId });
+    }
     store.emit("submissions.created", `submissions/${s.id}`, { submissionId: s.id, assignmentId, courseId, userId: a.id, late: s.late, attempt: s.attempt });
     audit(store, a, "submissions.create", `submissions/${s.id}`);
     return s;

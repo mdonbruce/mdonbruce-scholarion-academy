@@ -270,7 +270,11 @@ export function markAnnouncementRead(store: TenantStore, a: Actor, annId: string
 /** Podcast/RSS feed for announcements or a discussion with podcast enabled. */
 export function podcastFeed(store: TenantStore, courseId: string): string {
   const c = course(store, courseId);
-  const items = store.list("announcements", (x) => x.courseId === courseId && x.state === "published" && !!x.podcast);
+  const anns = store.list("announcements", (x) => x.courseId === courseId && x.state === "published" && !!x.podcast);
+  // Discussions with the podcast option contribute their (non-deleted, non-anonymous) posts.
+  const topics = store.list("discussion_topics", (t) => t.courseId === courseId && t.state === "published" && !!t.podcast && !t.anonymous);
+  const posts = topics.flatMap((t) => store.list("posts", (p) => p.topicId === t.id && !p.deletedAt).map((p) => ({ id: p.id, title: `${t.title}: reply`, body: p.body, createdAt: p.createdAt })));
+  const items = [...anns, ...posts].sort((x, y) => String(y.createdAt).localeCompare(String(x.createdAt)));
   const esc = (s: unknown) => String(s ?? "").replace(/[<>&]/g, (ch) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" })[ch]!);
   return `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>${esc(c.title)} announcements</title>${items.map((i) => `<item><title>${esc(i.title)}</title><description>${esc(i.body)}</description><pubDate>${new Date(String(i.createdAt)).toUTCString()}</pubDate><guid>${esc(i.id)}</guid></item>`).join("")}</channel></rss>`;
 }

@@ -1,6 +1,6 @@
 # Scholarion Campus
 
-Multi-tenant SIS + LMS + ERP layer of Scholarion: tenant isolation, identity and policy, LMS parity (modules, assignments, quizzes, gradebook, sequential grader, discussions, calendar, inbox, blueprints…), SIS (admissions, registration, records, finance), governed AI, the Cloud Lab (LTI 1.3), catalog/pathways/sandbox commerce, proctored-assessment support, credentials and the control plane — **49 tabs**, all operational in local and staging.
+Multi-tenant SIS + LMS + ERP layer of Scholarion: tenant isolation, identity and policy, LMS parity (modules, assignments, quizzes, gradebook, sequential grader, discussions, calendar, inbox, blueprints…), SIS (admissions, registration, records, finance), governed AI, the Cloud Lab (LTI 1.3), catalog/pathways/sandbox commerce, Academy program pages, proctored-assessment support, credentials and the control plane — **51 tabs**, all operational in local and staging.
 
 > Local + staging only. All people, schools and records are fictional demonstration data. Payments are sandbox only. No accreditation or outcome claims.
 
@@ -39,6 +39,36 @@ npm run dev                # http://localhost:3000/campus
 | LTI 1.3 | JWKS, OIDC configuration, OAuth2 client credentials, AGS, NRPS, deep linking, dynamic registration |
 | Feeds | iCal (`/api/campus/ical/…`), podcasts, Prometheus metrics (`/api/campus/metrics`) |
 
+## Academy programs and Program Studio (Tab 50)
+
+The program designs for #1, #12, #13 (a bundle, plus its two courses sold separately as #13.1 and #13.2), #14 and #26 are in `src/campus/academy/programs-data.ts`. `ensurePrograms` loads them into the Academy tenant and is safe to run more than once.
+
+Each program gets:
+- a catalog offering
+- a cohort
+- course shells: one course per block, a module per week, with overview pages, in-class activities in the Academy template, projects, and capstones with rubrics. #26 also gets 12 labs, 6 published weekly quizzes and a live-session calendar in ET.
+- credential and badge templates
+- a public website page at `/campus/academy/programs/<slug>`
+
+The website page has the 18 template sections and Course JSON-LD. Fees and dates are read from the catalog. A brochure PDF is generated from the same content (`/api/campus/v1/t/academy/programs/<slug>/brochure.pdf`).
+
+**Apply flow:** apply → admission review → sandbox seat reservation → orientation.
+- #26 also needs the prerequisite self-check, which routes learners who aren't ready to #16 or #19.
+- Late joiners up to 7 days after the start get automatic Week 1 lab extensions.
+- Completion for #26 is pass/no-pass.
+
+**Quality gate:** course shells load unpublished, and an admin publishes them once the gate passes.
+
+**Status report:** Program Studio shows the status of each program's design package, computed from what is actually loaded, along with the risks:
+- tool verification
+- missing #16 and #19
+- the pending decision on #9
+- the faculty bio
+
+## LMS Parity Status (Tab 51)
+
+`src/campus/parity.ts` lists every feature in the parity specification as DONE, PARTIAL or NOT STARTED, with evidence and the gap. The 15 acceptance tests are listed alongside it.
+
 ## Proctored Assessment Support (Tab 49)
 
 A setup assistant for students preparing for online proctored assessments. It answers with **approved talking points only** (published rows in `proctor_talking_points`; `{{INSTITUTION}}`, `{{ESCALATION_TEAM}}` and the other placeholders come from `proctor_settings`) and leads setup questions with the three focus areas: webcam view, valid ID, testing area.
@@ -64,6 +94,7 @@ npm run campus:docs        # regenerate schemas, OpenAPI, runbooks, threat model
 - `tests/campus-platform.test.ts` — platform scenario 1–11
 - `tests/campus-security.test.ts` — authorization matrix and negative cross-tenant suite
 - `tests/campus-api.test.ts` — REST, GraphQL, gRPC, OAuth2, LTI, webhooks, OneRoster
+- `tests/campus-programs.test.ts` — Academy programs (catalog, pages, apply flow, late enrollment, pass/no-pass, bundle badge, brochure, inquiries) and the parity gap closures
 - `tests/campus-proctor.test.ts` — Tab 49 proctored-assessment support (approved answers, focus areas, accommodations routing, escalation, boundaries, redaction, checklist gate, staff workflow)
 - `tests/campus-ui.test.ts`, `tests/campus-naming.test.ts`, `tests/campus-contracts.test.ts`
 
@@ -79,7 +110,7 @@ npm run campus:docs        # regenerate schemas, OpenAPI, runbooks, threat model
 src/campus/core.ts           tenants, broker (per-tenant stores), outbox + idempotent consumers, audit, metrics
 src/campus/iam.ts            actors, sessions, TOTP, role grants, support grants, act-as
 src/campus/permissions.ts    permission matrix with account inheritance and locks
-src/campus/registry.ts       158 resources and 49 tabs (fields, permissions, runbooks, threats)
+src/campus/registry.ts       162 resources and 51 tabs (fields, permissions, runbooks, threats)
 src/campus/entity.ts         generic CRUD with authorization, validation, publish checks, tombstones
 src/campus/services/*        domain services (curriculum, assessment, grading, sis, ai, lti, academy, tutor, proctor, platform…)
 src/campus/http/*            REST router, operations registry, OpenAPI, GraphQL, gRPC

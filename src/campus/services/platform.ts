@@ -295,6 +295,7 @@ export function capabilityBoard(store: TenantStore): Capability[] {
     live("LMS", "Blueprints, copy with date shift, package import/export (CC + QTI)", "content tests"),
     live("SIS", "Admissions, registration → enrollment projection, reconciliation, holds, transcript", "master acceptance"),
     live("Catalog", "Product types, catalog hub, recommender, Catalog Copy Checker", "platform acceptance 2–3, 10"),
+    live("Catalog", "Academy program pages (#1, #12, #13, #14, #26) generated from catalog data, brochure PDF, apply → admission → sandbox seat, inquiries, prerequisite self-check, pass/no-pass completion", "programs suite"),
     live("Pathways", "Prerequisite / stacks / waives / mutually-exclusive rules, transfer credit, consolidation report", "platform acceptance 4"),
     { area: "Commerce", capability: "Checkout, coupons, installments, subscriptions, seats, invoices, refunds", status: "SIMULATED", evidence: "Sandbox only; policy engine tested", blockers: "Payment provider and go-live decision." },
     live("Credentials", "Open Badges 3.0 / VC signing, verification portal, revocation, reissue, CLR, honesty guard", "credential tests"),

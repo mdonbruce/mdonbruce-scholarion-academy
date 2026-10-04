@@ -17,7 +17,9 @@ export const REQUIRED_DOCS = ["transcript", "id", "statement"];
 
 export function applicationChecklist(store: TenantStore, applicationId: string) {
   const docs = store.list("admission_documents", (d) => d.applicationId === applicationId);
-  return REQUIRED_DOCS.map((kind) => {
+  // Program applications (Academy) list their own required documents (e.g. a statement only).
+  const required = (store.get("applications", applicationId)?.requiredDocs as string[] | undefined) ?? REQUIRED_DOCS;
+  return required.map((kind) => {
     const d = docs.find((x) => x.kind === kind);
     return { kind, received: !!d?.received, verified: !!d?.verified };
   });

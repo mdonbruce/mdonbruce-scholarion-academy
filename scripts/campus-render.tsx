@@ -21,6 +21,8 @@ import { startAttempt } from "../src/campus/services/assessment";
 import { checkout } from "../src/campus/services/academy";
 import { openItem, moduleStates } from "../src/campus/services/curriculum";
 import { proctorAsk, saveReadiness } from "../src/campus/services/proctor";
+import { applyToProgram, programIndex, reviewProgramApplication, selfCheck } from "../src/campus/services/programs";
+import { ProgramIndexView, ProgramPageView } from "../src/campus/ui/views/program";
 
 process.env.CAMPUS_LOGS = "0";
 process.env.CLOUDLAB_LOCAL_RUNNER ??= "1";
@@ -169,6 +171,25 @@ page("demo", "admin", "t/tenant-admin?accountId=acc_demo_computing", "Permission
 page("academy", "student1", "dashboard", "Academy dashboard");
 page("academy", "student1", "courses/crs_academy_p32/tutor?ask=1&mode=explain&q=what+is+overfitting&lang=pcm", "Tutor (Pidgin)");
 page("academy", "admin", "t/commerce", "Commerce");
+page("academy", "admin", "t/program-studio", "Program Studio");
+page("demo", "student1", "calendar?view=month", "Calendar — month");
+page("demo", "student1", "calendar?view=week", "Calendar — week");
+{
+  const t = broker.tenant("academy")!;
+  const pub = broker.connect({ tenantId: t.id, slug: "academy", via: "path", traceId: "render" });
+  save("academy-programs-index.html", "Programs", "public", <PublicFrame tenant={t}><ProgramIndexView tenant={t} store={pub} /></PublicFrame>);
+  for (const p of programIndex(pub)) save(`academy-program-${p.slug}.html`, `${p.code} ${p.title}`, "public", <PublicFrame tenant={t}><ProgramPageView tenant={t} store={pub} actor={null} slug={p.slug} sp={{}} /></PublicFrame>);
+  // #26 as a signed-in learner: self-check passed, applied, admitted → seat reservation step.
+  const s5 = as("academy", "student5");
+  const sc = selfCheck(s5.store, s5.actor, "off_academy_26", { py1: "[0, 2, 4]", py2: "dict", ds1: "queue", py3: "1 2", llm1: "the number of tokens it can consider at once", llm2: "code must parse the model's answer reliably" });
+  const app = applyToProgram(as("academy", "student5").store, s5.actor, { offeringId: "off_academy_26", statement: "I build backend services and want to design reliable multi-agent systems with proper evaluation." });
+  reviewProgramApplication(as("academy", "registrar").store, as("academy", "registrar").actor, app.application.id, "admit");
+  save("academy-program-26-admitted.html", "#26 — admitted, reserve seat", "student5@academy", <PublicFrame tenant={t}><ProgramPageView tenant={t} store={as("academy", "student5").store} actor={as("academy", "student5").actor} slug="agentic-systems-live-intensive" sp={{ selfcheck: sc.id }} /></PublicFrame>);
+  const s6 = as("academy", "student6");
+  const fail = selfCheck(s6.store, s6.actor, "off_academy_26", { py1: "6" });
+  save("academy-program-26-selfcheck-routed.html", "#26 — self-check routes elsewhere", "student6@academy", <PublicFrame tenant={t}><ProgramPageView tenant={t} store={s6.store} actor={s6.actor} slug="agentic-systems-live-intensive" sp={{ selfcheck: fail.id }} /></PublicFrame>);
+}
+page("academy", "instructor", "courses/crs_academy_p26/modules", "#26 course shell (modules)");
 page("academy", "admin", "t/pathways?run=pathways.consolidation_report", "Consolidation report");
 
 const list = index.map((i) => `<li><a href="${i.file}">${i.title}</a> <small>(${i.who})</small></li>`).join("");

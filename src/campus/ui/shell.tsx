@@ -27,8 +27,11 @@ export function CampusShell({ tenant, store, actor, current, children }: { tenan
   const initials = actor.name.split(/\s+/).map((p) => p[0]).slice(0, 2).join("").toUpperCase();
   const theme = { "--primary": tenant.theme.primary, "--accent": tenant.theme.accent } as never;
   const here = `/campus/${slug}/${current}`;
+  // Personal accessibility settings (Account → Profile) apply to every campus screen.
+  const prof = store.list("profiles", (p) => p.userId === actor.id)[0];
+  const a11y = [prof?.highContrast && "a11y-contrast", prof?.dyslexiaFont && "a11y-dyslexia", prof?.underlineLinks && "a11y-underline", prof?.reducedMotion && "a11y-reduce-motion"].filter(Boolean).join(" ");
   return (
-    <div className="app campus" style={theme} data-tenant={slug}>
+    <div className={`app campus ${a11y}`.trim()} style={theme} data-tenant={slug} lang={String(prof?.language ?? "en")}>
       <a className="skip-link" href="#main">
         Skip to content
       </a>
@@ -160,6 +163,7 @@ export function PublicFrame({ tenant, children }: { tenant: Tenant; children: Re
         </a>
         <nav aria-label="Public" className="row">
           <a href={`/campus/${tenant.slug}/catalog`}>Catalog</a>
+          <a href={`/campus/${tenant.slug}/programs`}>Programs</a>
           <a href={`/campus/${tenant.slug}/signin`} className="btn btn-primary btn-sm">
             Sign in
           </a>

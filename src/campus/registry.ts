@@ -206,7 +206,7 @@ export const ENTITIES: EntityDef[] = [
     fields: [req("name", "Name"), req("email", "Email", "email"), f("program", "Program of interest"), f("userId", "Linked user", "ref", { ref: "users" })],
     perms: { read: SIS, create: SIS, update: SIS, archive: SIS } },
   { table: "applications", label: "Application", plural: "Applications", tab: "admissions", prefix: "app", titleField: "program", owner: "userId", ownerOps: ["read"],
-    fields: [req("applicantId", "Applicant", "ref", { ref: "applicants" }), f("userId", "Applicant user", "ref", { ref: "users" }), req("program", "Program"), req("termId", "Entry term", "ref", { ref: "terms" }), f("statement", "Statement", "text"), sys("checklist", "Document checklist", "json"), sys("state", "State"), sys("reviewerId", "Reviewer")],
+    fields: [req("applicantId", "Applicant", "ref", { ref: "applicants" }), f("userId", "Applicant user", "ref", { ref: "users" }), req("program", "Program"), f("termId", "Entry term", "ref", { ref: "terms" }), f("statement", "Statement", "text"), sys("checklist", "Document checklist", "json"), sys("state", "State"), sys("reviewerId", "Reviewer")],
     perms: { read: SIS, create: SIS, update: SIS, archive: SIS } },
   { table: "admission_documents", label: "Application document", plural: "Application documents", tab: "admissions", prefix: "doc", titleField: "kind",
     fields: [req("applicationId", "Application", "ref", { ref: "applications" }), req("kind", "Kind", "enum", { options: ["transcript", "id", "statement", "recommendation", "resume"] }), f("fileId", "File", "ref", { ref: "files" }), f("received", "Received", "boolean"), f("verified", "Verified", "boolean")],
@@ -441,7 +441,7 @@ export const ENTITIES: EntityDef[] = [
     perms: { read: ["admin"], create: ["admin"], update: ["admin"], archive: ["admin"] } },
 ];
 
-/* ---------------- Canvas-parity additions ---------------- */
+/* ---------------- LMS-parity additions ---------------- */
 
 function extend(table: string, fields: FieldDef[]) {
   const e = ENTITIES.find((x) => x.table === table);
@@ -483,7 +483,7 @@ extend("discussion_topics", [
   f("checkpoints", "Checkpoints", "json", { help: '{"replyToTopic":{"dueAt":"…","points":5},"replies":{"count":2,"dueAt":"…","points":5}}' }), sys("assignmentId", "Grading assignment"),
 ]);
 extend("posts", [sys("likes", "Likes", "json"), sys("edits", "Edit history", "json"), sys("mentions", "Mentions", "json"), sys("reports", "Reports", "json")]);
-extend("announcements", [f("allowReplies", "Allow replies", "boolean"), f("allowLikes", "Allow likes", "boolean"), f("lockReplies", "Lock replies", "boolean"), f("podcast", "Podcast feed", "boolean"), f("attachments", "Attachments (file ids)", "tags"), sys("readBy", "Read by", "json")]);
+extend("announcements", [f("allowReplies", "Allow replies", "boolean"), f("allowLikes", "Allow likes", "boolean"), f("lockReplies", "Lock replies", "boolean"), f("podcast", "Podcast feed", "boolean"), f("attachments", "Attachments (file ids)", "tags"), sys("readBy", "Read by", "json"), sys("replies", "Replies", "json"), sys("likes", "Likes", "json")]);
 extend("files", [f("folderId", "Folder", "ref", { ref: "folders" }), f("usageRights", "Usage rights", "enum", { options: ["own_copyright", "public_domain", "permission", "fair_use", "creative_commons"] }), f("license", "License"), f("availableFrom", "Available from", "datetime"), f("availableUntil", "Available until", "datetime"), f("hiddenLinkable", "Hidden but linkable", "boolean"), sys("published", "Published", "boolean")]);
 ENTITIES.push({
   table: "folders", label: "Folder", plural: "Folders", tab: "files", prefix: "fld", titleField: "name", course: true,
@@ -565,7 +565,22 @@ ENTITIES.push(
   { table: "proctor_questions", label: "Logged question", plural: "Question log (redacted, no personal data)", tab: "proctor-support", prefix: "pq", titleField: "intent", workflow: true,
     fields: [sys("question", "Question (redacted)", "text"), sys("intent", "Intent"), sys("decision", "Decision"), sys("talkingPointKey", "Talking point"), sys("ticketId", "Escalation ticket"), sys("promotedTo", "Promoted to talking point"), sys("reply", "Reply given", "text"), sys("askerHash", "Asker (one-way hash)", "string", { secret: true })],
     perms: { read: ["admin", "support"] } },
+  { table: "program_pages", label: "Program page", plural: "Program website pages", tab: "program-studio", prefix: "ppg", titleField: "slug", publishable: true,
+    fields: [req("offeringId", "Offering", "ref", { ref: "offerings" }), req("slug", "URL slug"), req("spec", "Program design (outcomes, curriculum, projects, tools, FAQs…)", "json"), f("advisorEmail", "Program advisor email", "email"), f("advisorPhone", "Program advisor phone"), f("brochureNote", "Brochure footnote", "text"), sys("packageStatus", "Design package status", "json"), sys("copyFlags", "Copy check flags", "json"), sys("state", "State")],
+    perms: { read: ALL, create: ["admin", "designer"], update: ["admin", "designer"], archive: ["admin"], publish: ["admin"] } },
+  { table: "program_testimonials", label: "Learner testimonial", plural: "Learner testimonials (consented)", tab: "program-studio", prefix: "pts", titleField: "learnerName", publishable: true,
+    fields: [req("offeringId", "Offering", "ref", { ref: "offerings" }), req("learnerName", "Learner name as they consented"), req("quote", "Quote", "text"), req("consentRef", "Written consent reference"), req("consentAt", "Consent date", "date"), sys("state", "State")],
+    perms: { read: ALL, create: ["admin"], update: ["admin"], archive: ["admin"], publish: ["admin"] } },
+  { table: "program_inquiries", label: "Program inquiry", plural: "Team and advisor inquiries", tab: "program-studio", prefix: "pin", titleField: "kind", workflow: true,
+    fields: [sys("offeringId", "Offering"), sys("kind", "Kind"), sys("name", "Name"), sys("email", "Email"), sys("organization", "Organization"), sys("seats", "Seats", "number"), sys("preferredTime", "Preferred time"), sys("timeZone", "Time zone"), sys("message", "Message", "text"), sys("state", "State")],
+    perms: { read: ["admin", "advisor", "registrar"] } },
+  { table: "selfcheck_attempts", label: "Prerequisite self-check", plural: "Prerequisite self-checks", tab: "program-studio", prefix: "psc", titleField: "offeringId", workflow: true, owner: "userId", ownerOps: ["read"],
+    fields: [sys("offeringId", "Offering"), sys("userId", "Learner"), sys("score", "Score", "number"), sys("of", "Out of", "number"), sys("passed", "Passed", "boolean"), sys("routeTo", "Recommended instead", "json")],
+    perms: { read: ["admin", "advisor"] } },
 );
+extend("offering_sections", [f("applicationDeadline", "Application deadline", "datetime")]);
+extend("offerings", [f("requiresApplication", "Apply → admission review before seat reservation", "boolean"), f("selfCheckRequired", "Prerequisite self-check required", "boolean"), f("blockCourseIds", "Additional course blocks", "json"), f("lateEnrollmentDays", "Late enrollment allowed (days after start)", "number", { min: 0, max: 60 })]);
+extend("applications", [sys("offeringId", "Program offering"), sys("sectionId", "Cohort"), sys("requiredDocs", "Required documents", "json")]);
 extend("quizzes", [f("proctored", "Proctored (students complete the pre-test checklist first)", "boolean")]);
 extend("lab_templates", [f("image", "Pinned image", "string", { help: "e.g. scholarion/lab-pytorch:2.4.1@sha256:…" }), f("gpu", "Needs GPU", "boolean"), f("egressAllowlist", "Network egress allowlist", "tags"), f("cpuSeconds", "CPU limit (s)", "number", { min: 1, max: 3600 }), f("memoryMb", "Memory (MB)", "number", { min: 64, max: 65536 }), f("idleMinutes", "Idle shutdown (min)", "number", { min: 5, max: 480 }), f("notebookStarter", "Starter notebook (TODO)", "json"), f("notebookExecuted", "Instructor executed notebook", "json", { secret: true }), f("releaseExecutedAt", "Release executed notebook at", "datetime")]);
 extend("credentials", [sys("templateId", "Template"), sys("legalName", "Legal name"), sys("expiresAt", "Expires", "datetime"), sys("reissuedFrom", "Reissued from"), sys("reasonCode", "Reason code")]);
@@ -862,6 +877,11 @@ export const TABS: TabDef[] = [
     actions: [{ label: "Ask the setup assistant", href: "proctor-support#ask", roles: ALL }],
     runbook: { purpose: "Consistent, supportive answers about proctored-assessment setup.", deps: "Approved talking points (published), settings, Help Desk for escalations, governed agent policy.", failure: "Assistant escalates a question it has no approved answer for.", recovery: "Support reviews the question log, drafts a talking point, an admin reviews and publishes it." },
     threats: ["Unapproved or punitive wording → only published talking points; publish blocked by the tone and promise check", "Collecting ID photos or medical details → never requested; uploads refused; question log redacts numbers and emails", "Policy decisions by the assistant → exceptions, accommodations and incidents always escalate to people"] },
+  { n: 50, slug: "program-studio", title: "Program Studio", group: "Academy & Commerce", phase: 2, summary: "Academy program designs (#1, #12, #13, #14, #26): website pages generated from catalog data, course shells, credentials, apply → admission → sandbox seat → orientation, brochures, team and advisor inquiries, prerequisite self-checks, consented testimonials and the design-package status report.", entities: ["program_pages", "program_testimonials", "program_inquiries", "selfcheck_attempts"], nav: ["admin", "designer", "registrar", "advisor", "instructor"],
+    runbook: { purpose: "Program design packages and their public pages.", deps: "Catalog offerings and cohorts, Admissions, Commerce (sandbox), Curriculum, Credentials.", failure: "Program page won't publish (copy check, missing fee or unconfirmed faculty).", recovery: "Fix the flagged wording or field and publish again; the page reads fees and dates from the catalog." },
+    threats: ["Borrowed statistics or prestige claims → copy check on every page; social proof only from consented testimonials", "Price tampering → fees always read from the catalog; checkout quotes server-side", "Inquiry spam → per-email rate limit; same-origin forms"] },
+  { n: 51, slug: "parity-status", title: "LMS Parity Status", group: "Platform", phase: 0, summary: "Every feature in the LMS feature-parity specification marked DONE / PARTIAL / NOT STARTED with evidence and the gap, plus the 15 acceptance tests and their test files.", entities: [], nav: ["admin", "designer", "instructor", "registrar"],
+    runbook: { purpose: "Honest parity reporting after each build stage.", deps: "Parity audit list (src/campus/parity.ts), tests.", failure: "—", recovery: "—" }, threats: [] },
 ];
 
 export const ENTITY = Object.fromEntries(ENTITIES.map((e) => [e.table, e])) as Record<string, EntityDef>;

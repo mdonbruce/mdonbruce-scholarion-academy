@@ -12,6 +12,7 @@ import { tutor, tutorMemory, type TutorLanguage, type TutorMode } from "../../se
 import { courseAnalytics, studentAnalytics } from "../../services/success";
 import { isGrader, isStaff } from "../../services/common";
 import { OPERATIONS } from "../../http/ops";
+import { courseStatistics, displayGrade } from "../../services/lmsplus";
 import { PretestChecklist } from "./proctor";
 import { api, Chip, Denied, Empty, EntityForm, EntityTable, fmt, Hidden, OpForm, PageHead, Result } from "../kit";
 
@@ -29,45 +30,64 @@ const base = (c: C) => `/campus/${c.slug}/courses/${c.course.id}`;
 
 export function CoursesList({ store, actor, slug }: { store: TenantStore; actor: Actor; slug: string }) {
   const mine = entity.list(store, actor, "courses", { limit: 200 }).items.filter((c) => (actor.courseRoles[String(c.id)] ?? []).length || actor.roles.includes("admin") || actor.roles.includes("designer"));
+  const favorites = new Set(((store.list("dashboard_prefs", (p) => p.userId === actor.id)[0]?.favorites as string[]) ?? []).map(String));
+  const now = new Date().toISOString();
+  // Current / future / past from the course's term (or its own dates); concluded courses are past.
+  const period = (c: Record<string, unknown>) => {
+    const term = c.termId ? store.get("terms", String(c.termId)) : undefined;
+    const start = String(c.startAt ?? term?.startsAt ?? "");
+    const end = String(c.endAt ?? term?.endsAt ?? "");
+    if (c.concludedAt || (end && end < now)) return "past";
+    if (start && start > now) return "future";
+    return "current";
+  };
+  const groups: [string, string][] = [["current", "Current enrollments"], ["future", "Future enrollments"], ["past", "Past enrollments"]];
   return (
     <>
-      <PageHead title="Courses" sub="Courses you teach, take, design or administer." />
+      <PageHead title="All courses" sub="Courses you teach, take, design or administer. Starred courses appear on your dashboard." />
       {mine.length ? (
-        <div className="table-wrap" tabIndex={0} role="region" aria-label="Scrollable table">
-          <table className="table">
-            <thead>
-              <tr>
-                <th scope="col">Course</th>
-                <th scope="col">Code</th>
-                <th scope="col">Your role</th>
-                <th scope="col">State</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mine.map((c) => (
-                <tr key={String(c.id)}>
-                  <td>
-                    <a href={`/campus/${slug}/courses/${c.id}`}>{String(c.title)}</a>
-                  </td>
-                  <td>{String(c.code)}</td>
-                  <td>{(actor.courseRoles[String(c.id)] ?? actor.roles).join(", ")}</td>
-                  <td>
-                    <Chip s={String(c.state)} />
-                    {c.isBlueprint ? <span className="badge badge-blue"> blueprint</span> : null}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        groups.map(([key, label]) => {
+          const rows = mine.filter((c) => period(c) === key);
+          if (!rows.length) return null;
+          return (
+            <section key={key} className="stack" aria-labelledby={`cl-${key}`}>
+              <h2 id={`cl-${key}`} className="card-title">
+                {label}
+              </h2>
+              <div className="table-wrap" tabIndex={0} role="region" aria-label={label}>
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Favorite</th>
+                      <th scope="col">Course</th>
+                      <th scope="col">Code</th>
+                      <th scope="col">Your role</th>
+                      <th scope="col">State</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((c) => (
+                      <tr key={String(c.id)}>
+                        <td>{favorites.has(String(c.id)) ? <span aria-label="Favorite">★</span> : <span className="muted" aria-label="Not a favorite">☆</span>}</td>
+                        <td>
+                          <a href={`/campus/${slug}/courses/${c.id}`}>{String(c.title)}</a>
+                        </td>
+                        <td>{String(c.code)}</td>
+                        <td>{(actor.courseRoles[String(c.id)] ?? actor.roles).join(", ")}</td>
+                        <td>
+                          <Chip s={String(c.state)} />
+                          {c.isBlueprint ? <span className="badge badge-blue"> blueprint</span> : null}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          );
+        })
       ) : (
-        <Empty title="No courses." />
-      )}
-      {hasAny(actor, ["admin", "designer"]) && (
-        <section className="card card-pad">
-          <h2 className="card-title">Create a course</h2>
-          <EntityForm slug={slug} table="courses" back={`/campus/${slug}/courses`} />
-        </section>
+        <Empty title="No courses yet." />
       )}
     </>
   );
@@ -689,6 +709,7 @@ function StudentGrades({ c }: { c: C }) {
   const whatIf = Object.fromEntries(Object.entries(c.sp).filter(([k, v]) => k.startsWith("wi_") && v !== "").map(([k, v]) => [k.slice(3), Number(v)]));
   if (c.course.hideTotals) return <p>Your instructor has hidden course totals.</p>;
   const t = grading.computeTotals(c.store, String(c.course.id), c.actor.id, Object.keys(whatIf).length ? { whatIf } : {});
+  const scheme = c.course.gradingSchemeId ? c.store.get("grading_schemes", String(c.course.gradingSchemeId)) : undefined;
   return (
     <form method="get" className="stack">
       <p>
@@ -714,7 +735,7 @@ function StudentGrades({ c }: { c: C }) {
                 </td>
                 <td>{fmt(i.dueAt, true)}</td>
                 <td>{i.hidden ? "hidden" : <Chip s={i.status} />}</td>
-                <td>{i.hidden ? "—" : i.score === null ? "—" : `${i.score} / ${i.points}`}</td>
+                <td>{i.hidden ? "—" : i.score === null ? "—" : displayGrade(i.score, Number(i.points), String(c.store.get("assignments", String(i.id))?.displayGradeAs ?? "points"), (scheme?.bands as never) ?? undefined)}</td>
                 <td>
                   <label className="sr-only" htmlFor={`wi-${i.id}`}>
                     What-If score for {i.title}
@@ -1052,6 +1073,26 @@ function Settings({ c }: { c: C }) {
       <section className="card card-pad">
         <h2 className="card-title">Feature options</h2>
         <OpForm slug={c.slug} op={OPERATIONS["features.set"]} back={here} values={{ courseId: String(c.course.id) }} hide={["courseId", "accountId", "locked"]} />
+      </section>
+      <section className="card card-pad stack">
+        <h2 className="card-title">Course actions</h2>
+        <p className="small">
+          <a href={api(c.slug, `courses/${c.course.id}/export`)}>Export course content (Common Cartridge + QTI)</a>
+        </p>
+        <h3 className="small">Course statistics</h3>
+        <Result value={courseStatistics(c.store, c.actor, String(c.course.id))} />
+        <details>
+          <summary>{c.course.concludedAt ? "Reopen course" : "Conclude course"}</summary>
+          <OpForm slug={c.slug} op={OPERATIONS["course.conclude"]} back={here} values={{ courseId: String(c.course.id), reopen: c.course.concludedAt ? "true" : "" }} hide={["courseId", "reopen"]} uid="concl" label={c.course.concludedAt ? "Reopen course" : "Conclude course"} />
+        </details>
+        <details>
+          <summary>Reset course content</summary>
+          <OpForm slug={c.slug} op={OPERATIONS["course.reset"]} back={here} values={{ courseId: String(c.course.id) }} hide={["courseId"]} uid="reset" />
+        </details>
+        <details>
+          <summary>Bulk edit dates</summary>
+          <OpForm slug={c.slug} op={OPERATIONS["assignments.bulk_dates"]} back={here} values={{ courseId: String(c.course.id) }} hide={["courseId"]} uid="bulk" />
+        </details>
       </section>
     </div>
   );

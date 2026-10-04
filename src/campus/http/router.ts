@@ -1,5 +1,5 @@
 import "../index";
-import { broker, CampusError, log, metrics, nowIso, relay, resolveTenant, token, type TenantContext, type TenantStore } from "../core";
+import { broker, CampusError, log, metrics, nowIso, relay, resolveTenant, token, type Row, type TenantContext, type TenantStore } from "../core";
 import { actorFor, cookieName, effectiveRoles, resolveSession, sessionRow, signIn, signOut, type Actor } from "../iam";
 import { actorHas } from "../permissions";
 import * as entity from "../entity";
@@ -10,9 +10,11 @@ import { openApi } from "./openapi";
 import { executeGraphql } from "./graphql";
 import { feedOwner, ics, projection } from "../services/calendar";
 import { podcastFeed } from "../services/collaboration";
-import { readObject, receiveUpload, requestUpload, scanFile, verifySignature, canDownload } from "../services/files";
+import { readObject, receiveUpload, requestUpload, scanFile, verifySignature, canDownload, zipFiles } from "../services/files";
+import { exportCourse } from "../services/content";
 import { submit } from "../services/assessment";
 import { verifyCredential } from "../services/success";
+import { brochurePdf } from "../services/programs";
 import { redeemQrLogin, startMasquerade, stopMasquerade, activeGlobalAnnouncements } from "../services/admin";
 import { resolveApiToken, rateLimit, refreshToken, exchangeCode, scopeAllows } from "../services/integration";
 import * as lti from "../services/lti";
@@ -34,7 +36,9 @@ import { recordView } from "../services/dashboard";
  * rate-limited). Admins may act as another user (?as_user_id=) — every request is audited.
  */
 
-const PUBLIC_OPS = new Set(["catalog.hub", "catalog.recommender_questions", "catalog.recommend", "commerce.quote"]);
+const PUBLIC_OPS = new Set(["catalog.hub", "catalog.recommender_questions", "catalog.recommend", "commerce.quote", "programs.index", "programs.page", "programs.self_check_questions"]);
+/** Commands anyone may send (same-origin forms or JSON); the signed-in user is attached when present. */
+const PUBLIC_CMDS = new Set(["programs.inquire", "programs.self_check"]);
 
 type Body = Record<string, unknown>;
 
@@ -207,6 +211,28 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     return json({ data: await op.run({ store, actor: null as unknown as Actor, args: new Args(Object.fromEntries(url.searchParams)), tenant }) });
   }
 
+  if (rest[0] === "programs" && rest[2] === "brochure.pdf" && method === "GET") {
+    const pdf = await brochurePdf(store, decodeURIComponent(rest[1] ?? ""));
+    return new Response(Buffer.from(pdf), { status: 200, headers: { "content-type": "application/pdf", "content-disposition": `inline; filename="${(rest[1] ?? "program").replace(/[^a-z0-9-]/gi, "")}-brochure.pdf"`, "cache-control": "no-store" } });
+  }
+  if (rest[0] === "a" && PUBLIC_CMDS.has(rest[1] ?? "") && method === "POST" && !bearer) {
+    if (!sameOrigin(req)) throw new CampusError("bad_origin", "Cross-site request blocked.", 403);
+    const secret = readCookie(req, cookieName(tenant.tenantId));
+    let who: Actor | null = null;
+    try {
+      who = secret ? resolveSession(store, secret) : null;
+    } catch {
+      who = null;
+    }
+    c.actor = who;
+    const raw: Record<string, unknown> = { ...body };
+    const ans = Object.entries(raw).filter(([k]) => k.startsWith("ans__"));
+    if (ans.length && raw.answers === undefined) raw.answers = Object.fromEntries(ans.map(([k, v]) => [k.slice(5), v]));
+    const op = OPERATIONS[rest[1]];
+    const result = await op.run({ store, actor: who as Actor, args: new Args(raw), tenant });
+    return ok(c, result, 200, {}, `${op.summary.split(/[.(]/)[0]}: done.`);
+  }
+
   // Authenticate.
   if (bearer) {
     const t = resolveApiToken(store, bearer);
@@ -284,6 +310,8 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     if ((op.kind === "query") !== (method === "GET") && !(op.kind === "query" && method === "POST")) throw new CampusError("method_not_allowed", `${op.name} is a ${op.kind}.`, 405);
     if (c.scopes && !(c.scopes.includes("write") || (op.kind === "query" && c.scopes.includes("read")))) throw new CampusError("insufficient_scope", "This token's scopes don't allow that.", 403);
     const raw: Record<string, unknown> = method === "GET" ? Object.fromEntries(url.searchParams) : { ...Object.fromEntries(url.searchParams), ...body };
+    // The client address comes from the proxy, never from the request body (IP-filtered quizzes).
+    raw.__clientIp = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || req.headers.get("x-real-ip") || "";
     // HTML forms: ans__<questionId> fields become `answers`; rating__<criterion> become a rubric assessment.
     const ans = Object.entries(raw).filter(([k]) => k.startsWith("ans__"));
     if (ans.length && raw.answers === undefined) raw.answers = Object.fromEntries(ans.map(([k, v]) => [k.slice(5), v]));
@@ -292,6 +320,17 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     const result = await op.run({ store, actor: a, args: new Args(raw), tenant, sessionSecret: c.sessionSecret });
     if (method === "GET" && (raw.format === "csv" || op.name.endsWith("export_csv")) && typeof result === "string") return text(result, "text/csv; charset=utf-8", 200, { "content-disposition": `attachment; filename="${op.name}.csv"` });
     return ok(c, result, 200, {}, `${op.summary.split(/[.(]/)[0]}: done.`);
+  }
+
+  // Downloads: selected files as a zip; course export package (Common Cartridge + QTI).
+  if (route === "files/zip" && method === "GET") {
+    const ids = [...url.searchParams.getAll("ids[]"), ...(url.searchParams.get("ids")?.split(",") ?? [])].filter(Boolean).slice(0, 200);
+    if (!ids.length) throw new CampusError("invalid", "Choose files to download.", 422);
+    return new Response(new Uint8Array(zipFiles(store, a, ids)), { status: 200, headers: { "content-type": "application/zip", "content-disposition": 'attachment; filename="files.zip"', "cache-control": "no-store" } });
+  }
+  if (rest[0] === "courses" && rest[2] === "export" && method === "GET") {
+    const bytes = exportCourse(store, a, rest[1]);
+    return new Response(new Uint8Array(bytes), { status: 200, headers: { "content-type": "application/zip", "content-disposition": `attachment; filename="${rest[1].replace(/[^a-z0-9_-]/gi, "")}-export.imscc"`, "cache-control": "no-store" } });
   }
 
   // Generic resources: /r/:table[/:id[/publish|restore]]
@@ -304,9 +343,9 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     const clean = Object.fromEntries(Object.entries(body).filter(([k, v]) => !["back", "_method", "notice", "ifVersion", "show_result"].includes(k) && typeof v !== "object" || Array.isArray(v)));
     if (!id) {
       if (method === "GET") {
-        const where = Object.fromEntries([...url.searchParams].filter(([k]) => !["cursor", "limit", "q", "courseId", "includeDeleted", "as_user_id", "sort"].includes(k)));
+        const where = Object.fromEntries([...url.searchParams].filter(([k]) => !["cursor", "limit", "q", "courseId", "includeDeleted", "as_user_id", "sort", "include[]", "exclude[]", "include", "exclude"].includes(k)));
         const r = entity.list(store, a, table, { courseId: url.searchParams.get("courseId") ?? undefined, where, search: url.searchParams.get("q") ?? undefined, cursor: url.searchParams.get("cursor") ?? undefined, limit: url.searchParams.get("limit") ? Number(url.searchParams.get("limit")) : undefined, includeDeleted: url.searchParams.get("includeDeleted") === "1" });
-        return ok(c, r.items, 200, { ...linkHeader(c, r.next), "x-total-count": String(r.total) });
+        return ok(c, r.items.map((row) => shape(store, a, table, row as Row, url)), 200, { ...linkHeader(c, r.next), "x-total-count": String(r.total) });
       }
       if (method === "POST") return ok(c, entity.create(store, a, table, clean), 201, {}, `${ENTITY[table].label} created.`);
     } else {
@@ -314,7 +353,7 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
       if (rest[3] === "restore" && method === "POST") return ok(c, entity.restore(store, a, table, id), 200, {}, "Restored.");
       if (method === "GET") {
         const row = entity.read(store, a, table, id, { includeDeleted: url.searchParams.get("includeDeleted") === "1" });
-        return ok(c, row, 200, { etag: `"${row.version}"` });
+        return ok(c, shape(store, a, table, row as Row, url), 200, { etag: `"${row.version}"` });
       }
       if (method === "PATCH" || method === "PUT") return ok(c, entity.update(store, a, table, id, clean, ifVersion), 200, {}, `${ENTITY[table].label} saved.`);
       if (method === "DELETE") return ok(c, entity.archive(store, a, table, id, ifVersion), 200, {}, `${ENTITY[table].label} deleted.`);
@@ -327,6 +366,29 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
   if (route === "lti/register" && method === "POST") return json(lti.dynamicRegister(store, a, body as never), 201);
   void back;
   throw new CampusError("not_found", "Not found", 404);
+}
+
+/**
+ * REST include/exclude: `exclude[]=field` drops fields; `include[]=course` embeds the row a
+ * reference field points to (courseId → course), read with the caller's own permissions.
+ */
+function shape(store: TenantStore, a: Actor, table: string, row: Row, url: URL): Row {
+  const list = (k: string) => [...url.searchParams.getAll(`${k}[]`), ...(url.searchParams.get(k)?.split(",") ?? [])].map((x) => x.trim()).filter(Boolean);
+  const exclude = list("exclude");
+  const include = list("include");
+  if (!exclude.length && !include.length) return row;
+  const out: Row = { ...row };
+  for (const f of exclude) if (!["id", "version"].includes(f)) delete out[f];
+  for (const name of include) {
+    const field = ENTITY[table].fields.find((f) => f.type === "ref" && (f.name === `${name}Id` || f.name === name));
+    if (!field?.ref || !row[field.name]) continue;
+    try {
+      out[name] = entity.read(store, a, field.ref, String(row[field.name]));
+    } catch {
+      out[name] = null;
+    }
+  }
+  return out;
 }
 
 /** Tabs a person can open: role nav, tenant kind, flags and platform-only rules. */

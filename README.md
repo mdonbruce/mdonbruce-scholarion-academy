@@ -53,7 +53,7 @@ State persists to `.data/db.json` when `SCHOLARION_PERSIST=1`. Run `npm run db:r
 
 ## Scholarion Campus (multi-tenant SIS + LMS)
 
-`/campus` hosts the multi-tenant layer: three demonstration tenants (Scholarion Demo University, Scholaris AI Academy, TechDev Institution), 49 operational tabs, REST + GraphQL + gRPC APIs, LTI 1.3 Cloud Lab, governed AI, catalog and sandbox commerce. See [docs/campus/README.md](docs/campus/README.md) and the [status board](docs/campus/STATUS.md).
+`/campus` hosts the multi-tenant layer: three demonstration tenants (Scholarion Demo University, Scholaris AI Academy, TechDev Institution), 51 operational tabs, REST + GraphQL + gRPC APIs, LTI 1.3 Cloud Lab, governed AI, catalog and sandbox commerce. See [docs/campus/README.md](docs/campus/README.md) and the [status board](docs/campus/STATUS.md).
 
 ## Architecture
 

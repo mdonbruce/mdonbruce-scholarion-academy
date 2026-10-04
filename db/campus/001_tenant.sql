@@ -557,7 +557,9 @@ CREATE TABLE IF NOT EXISTS announcements (
   lock_replies boolean,
   podcast boolean,
   attachments text[],
-  read_by jsonb
+  read_by jsonb,
+  replies jsonb,
+  likes jsonb
 );
 CREATE INDEX IF NOT EXISTS announcements_course_id ON announcements (course_id) WHERE deleted_at IS NULL;
 CREATE INDEX IF NOT EXISTS announcements_section_id ON announcements (section_id) WHERE deleted_at IS NULL;
@@ -773,11 +775,14 @@ CREATE TABLE IF NOT EXISTS applications (
   applicant_id text NOT NULL,
   user_id text,
   program text NOT NULL,
-  term_id text NOT NULL,
+  term_id text,
   statement text,
   checklist jsonb,
   state text,
-  reviewer_id text
+  reviewer_id text,
+  offering_id text,
+  section_id text,
+  required_docs jsonb
 );
 CREATE INDEX IF NOT EXISTS applications_applicant_id ON applications (applicant_id) WHERE deleted_at IS NULL;
 CREATE INDEX IF NOT EXISTS applications_user_id ON applications (user_id) WHERE deleted_at IS NULL;
@@ -1756,7 +1761,11 @@ CREATE TABLE IF NOT EXISTS offerings (
   credential_template_id text,
   format text CHECK (format IN ('online', 'live', 'blended')),
   state text,
-  copy_flags jsonb
+  copy_flags jsonb,
+  requires_application boolean,
+  self_check_required boolean,
+  block_course_ids jsonb,
+  late_enrollment_days numeric
 );
 CREATE INDEX IF NOT EXISTS offerings_course_id ON offerings (course_id) WHERE deleted_at IS NULL;
 CREATE INDEX IF NOT EXISTS offerings_credential_template_id ON offerings (credential_template_id) WHERE deleted_at IS NULL;
@@ -1776,7 +1785,8 @@ CREATE TABLE IF NOT EXISTS offering_sections (
   capacity numeric NOT NULL,
   registration_closes_at timestamptz NOT NULL,
   schedule text,
-  seats_taken numeric
+  seats_taken numeric,
+  application_deadline timestamptz
 );
 CREATE INDEX IF NOT EXISTS offering_sections_offering_id ON offering_sections (offering_id) WHERE deleted_at IS NULL;
 
@@ -2069,6 +2079,75 @@ CREATE TABLE IF NOT EXISTS proctor_questions (
   promoted_to text,
   reply text,
   asker_hash text
+);
+
+-- Program page (tab: program-studio)
+CREATE TABLE IF NOT EXISTS program_pages (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  offering_id text NOT NULL,
+  slug text NOT NULL,
+  spec jsonb NOT NULL,
+  advisor_email text,
+  advisor_phone text,
+  brochure_note text,
+  package_status jsonb,
+  copy_flags jsonb,
+  state text
+);
+CREATE INDEX IF NOT EXISTS program_pages_offering_id ON program_pages (offering_id) WHERE deleted_at IS NULL;
+
+-- Learner testimonial (tab: program-studio)
+CREATE TABLE IF NOT EXISTS program_testimonials (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  offering_id text NOT NULL,
+  learner_name text NOT NULL,
+  quote text NOT NULL,
+  consent_ref text NOT NULL,
+  consent_at date NOT NULL,
+  state text
+);
+CREATE INDEX IF NOT EXISTS program_testimonials_offering_id ON program_testimonials (offering_id) WHERE deleted_at IS NULL;
+
+-- Program inquiry (tab: program-studio)
+CREATE TABLE IF NOT EXISTS program_inquiries (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  offering_id text,
+  kind text,
+  name text,
+  email text,
+  organization text,
+  seats numeric,
+  preferred_time text,
+  time_zone text,
+  message text,
+  state text
+);
+
+-- Prerequisite self-check (tab: program-studio)
+CREATE TABLE IF NOT EXISTS selfcheck_attempts (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  offering_id text,
+  user_id text,
+  score numeric,
+  of numeric,
+  passed boolean,
+  route_to jsonb
 );
 
 -- Account (tab: tenant-admin)

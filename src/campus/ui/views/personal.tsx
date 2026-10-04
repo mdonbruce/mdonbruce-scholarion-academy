@@ -207,9 +207,13 @@ function PlannerList({ store, actor, slug, back }: { store: TenantStore; actor: 
 }
 
 export function CalendarView({ store, actor, slug, sp }: { store: TenantStore; actor: Actor; slug: string; sp: SP }) {
-  const start = sp.from ? new Date(sp.from) : new Date(Date.now() - 3 * 86400_000);
+  const view = sp.view === "month" || sp.view === "week" ? sp.view : "agenda";
+  const base = sp.from ? new Date(sp.from) : new Date(Date.now() - (view === "agenda" ? 3 * 86400_000 : 0));
+  // Month: from the Monday on/before the 1st; week: from the Monday of this week.
+  const monday = (d: Date) => new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - ((d.getUTCDay() + 6) % 7)));
+  const start = view === "month" ? monday(new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), 1))) : view === "week" ? monday(base) : base;
   const from = start.toISOString();
-  const to = new Date(start.getTime() + 35 * 86400_000).toISOString();
+  const to = new Date(start.getTime() + (view === "week" ? 7 : view === "month" ? 42 : 35) * 86400_000).toISOString();
   const { items, undated } = projection(store, actor, from, to);
   const days = new Map<string, typeof items>();
   for (const i of items) {
@@ -217,19 +221,64 @@ export function CalendarView({ store, actor, slug, sp }: { store: TenantStore; a
     days.set(k, [...(days.get(k) ?? []), i]);
   }
   const here = `/campus/${slug}/calendar`;
-  const prev = new Date(start.getTime() - 28 * 86400_000).toISOString().slice(0, 10);
-  const next = new Date(start.getTime() + 28 * 86400_000).toISOString().slice(0, 10);
+  const step = view === "week" ? 7 : view === "month" ? 31 : 28;
+  const anchor = view === "month" ? new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), 15)) : start;
+  const prev = new Date(anchor.getTime() - step * 86400_000).toISOString().slice(0, 10);
+  const next = new Date(anchor.getTime() + step * 86400_000).toISOString().slice(0, 10);
+  const grid = view === "agenda" ? [] : Array.from({ length: view === "week" ? 7 : 42 }, (_, i) => new Date(start.getTime() + i * 86400_000).toISOString().slice(0, 10));
   return (
     <>
       <PageHead title="Calendar" sub="Assignments, quizzes, class meetings, live sessions, office hours and your to-dos.">
-        <a className="btn btn-ghost btn-sm" href={`${here}?from=${prev}`}>
+        <nav aria-label="Calendar view" className="row">
+          {(["month", "week", "agenda"] as const).map((v) => (
+            <a key={v} className="btn btn-ghost btn-sm" aria-current={view === v ? "page" : undefined} href={`${here}?view=${v}`}>
+              {v[0].toUpperCase() + v.slice(1)}
+            </a>
+          ))}
+        </nav>
+        <a className="btn btn-ghost btn-sm" href={`${here}?view=${view}&from=${prev}`}>
           ← Earlier
         </a>
-        <a className="btn btn-ghost btn-sm" href={`${here}?from=${next}`}>
+        <a className="btn btn-ghost btn-sm" href={`${here}?view=${view}&from=${next}`}>
           Later →
         </a>
       </PageHead>
       <div className="with-aside">
+        {view !== "agenda" ? (
+          <section aria-label={`${view === "month" ? "Month" : "Week"} grid`}>
+            <div className="table-wrap" tabIndex={0} role="region" aria-label="Calendar grid">
+              <table className="table campus-calgrid">
+                <thead>
+                  <tr>
+                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
+                      <th key={d} scope="col">
+                        {d}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.from({ length: grid.length / 7 }, (_, w) => (
+                    <tr key={w}>
+                      {grid.slice(w * 7, w * 7 + 7).map((day) => (
+                        <td key={day} className={view === "month" && Number(day.slice(5, 7)) !== anchor.getUTCMonth() + 1 ? "muted" : undefined}>
+                          <div className="tiny">{Number(day.slice(8, 10))}</div>
+                          <ul className="campus-calday">
+                            {(days.get(day) ?? []).map((i) => (
+                              <li key={`${i.kind}:${i.id}:${i.start}`}>
+                                <span className="dot" style={{ background: i.color ?? "var(--primary)" }} aria-hidden="true" /> {i.href ? <a href={t(i.href, slug)}>{i.title}</a> : i.title}
+                              </li>
+                            ))}
+                          </ul>
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ) : (
         <section aria-label="Agenda">
           {[...days.entries()].length ? (
             <ol className="campus-agenda">
@@ -260,6 +309,7 @@ export function CalendarView({ store, actor, slug, sp }: { store: TenantStore; a
             </section>
           )}
         </section>
+        )}
         <aside className="stack">
           <section className="card card-pad">
             <h2 className="card-title">Add an event</h2>

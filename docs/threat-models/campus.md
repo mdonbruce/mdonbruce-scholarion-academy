@@ -241,3 +241,9 @@ STRIDE-style notes per tab. Cross-cutting controls first.
 - Unapproved or punitive wording → only published talking points; publish blocked by the tone and promise check
 - Collecting ID photos or medical details → never requested; uploads refused; question log redacts numbers and emails
 - Policy decisions by the assistant → exceptions, accommodations and incidents always escalate to people
+
+## 50. Program Studio
+
+- Borrowed statistics or prestige claims → copy check on every page; social proof only from consented testimonials
+- Price tampering → fees always read from the catalog; checkout quotes server-side
+- Inquiry spam → per-email rate limit; same-origin forms

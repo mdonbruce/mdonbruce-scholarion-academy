@@ -3,6 +3,7 @@ import { actorFor, createUser, type Actor } from "./iam";
 import { renderBlocks, validateBlocks, type Block } from "./services/curriculum";
 import { ensureAgents, ensureStandardTemplate } from "./services/ai";
 import { ensureProctorDefaults } from "./services/proctor";
+import { ensurePrograms } from "./services/programs";
 import { ensureCloudLabTool } from "./services/lti";
 import { issueCredential, rebuildIndex, recomputeSignals } from "./services/success";
 import { setGrade } from "./services/grading";
@@ -343,7 +344,7 @@ function seedAcademy(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
   const mkCourse = (key: string, code: string, title: string, desc: string, extra: Record<string, unknown> = {}) => store.insert("courses", { id: `crs_${t.slug}_${key}`, code, title, description: desc, credits: 0, state: "published", publishedAt: iso(-60), accountId: root.id, homeType: "modules", gradingSchemeId: scheme.id, latePolicy: { latePctPerDay: 0, floorPct: 0, missingScorePct: 0 }, visibility: "course", format: "online", language: "en", ...extra }, "crs");
   const c32 = mkCourse("p32", "#32", "Applied Machine Learning with Python", "Build, evaluate and explain supervised learning models in Python.");
   const c15 = mkCourse("p15", "#15", "Deep Learning Live Intensive", "Neural networks and PyTorch in a live cohort.", { format: "live" });
-  const c1 = mkCourse("p01", "#1", "Python for AI Foundations", "Python, data structures and notebooks for AI work.");
+  const c1 = mkCourse("p01", "#1-R", "Python & Tooling Refresher", "Python, data structures, notebooks and Git for AI work (the optional Week 0 of Program #1, also sold on its own).");
   for (const [c, inst] of [[c32, u.instructor], [c15, u.instructor2], [c1, u.instructor]] as const) store.insert("enrollments", { userId: inst, courseId: c.id, role: "instructor", state: "active", source: "manual" }, "enr");
   store.insert("enrollments", { userId: u.ta, courseId: c32.id, role: "ta", state: "active", source: "manual" }, "enr");
 
@@ -384,7 +385,7 @@ function seedAcademy(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
 
   // Offerings (sandbox prices; no outcome or accreditation claims)
   const off = (code: string, title: string, productType: string, extra: Record<string, unknown>) => store.insert("offerings", { id: `off_${t.slug}_${code.replace("#", "")}`, code, title, productType, currency: "USD", aidEligible: false, state: "published", format: "online", ...extra }, "off");
-  const o1 = off("#1", "Python for AI Foundations", "short_course", { courseId: c1.id, summary: "Python basics, data structures and notebooks for AI work.", level: "beginner", hours: 15, skills: ["python", "notebooks"], price: 49, inPlus: true, selfPaced: true });
+  const o1 = store.insert("offerings", { id: `off_${t.slug}_1r`, code: "#1-R", title: "Python & Tooling Refresher", productType: "short_course", currency: "USD", aidEligible: false, state: "published", format: "online", courseId: c1.id, summary: "Python basics, data structures, notebooks and Git for AI work — the optional Week 0 of Program #1, also available on its own.", level: "beginner", hours: 15, skills: ["python", "notebooks"], price: 49, inPlus: true, selfPaced: true }, "off");
   const o32 = off("#32", "Applied Machine Learning with Python", "short_course", { courseId: c32.id, summary: "Train and evaluate supervised models, and explain their limits in a capstone report.", level: "intermediate", hours: 20, skills: ["python", "ml", "evaluation"], moduleKeys: ["ml-m1", "ml-m2", "ml-m3"], price: 129, inPlus: true, selfPaced: true, credentialTemplateId: tpl.id });
   const o15 = off("#15", "Deep Learning Live Intensive", "live_intensive", { courseId: c15.id, summary: "Neural networks and PyTorch with live sessions and graded labs.", level: "intermediate", hours: 30, skills: ["deep-learning", "pytorch", "ml"], moduleKeys: ["dl-m1", "dl-m2"], price: 399, earlyBirdPrice: 349, earlyBirdEndsAt: iso(14), format: "live" });
   const o20 = off("#20", "AI Agents Specialization", "specialization", { summary: "Design, evaluate and deploy tool-using AI agents responsibly.", level: "advanced", hours: 60, skills: ["agents", "evaluation", "python"], price: 499 });
@@ -398,6 +399,7 @@ function seedAcademy(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
   store.insert("seat_licenses", { orgName: "Demo Corp (fictional)", offeringId: o32.id, seats: 3, managerId: u.admin, assigned: [] }, "seat");
   for (const [title, body] of [["How sandbox checkout works", "This staging site never takes real payments. Use the sandbox token tok_sandbox_visa at checkout."], ["Using the AI tutor", "The tutor answers from your course pages with citations. It won't do graded work, but it gives hints and can pass your question to your instructor."]]) store.insert("kb_articles", { title, body, tags: ["help"], state: "published" }, "kb");
   store.insert("global_announcements", { title: "Staging environment", body: "Demonstration site with fictional data. Payments are sandbox only.", roles: [], startsAt: iso(-30), endsAt: iso(365), dismissedBy: [] }, "gan");
+  ensurePrograms(store);
   ensureAgents(store);
   ensureProctorDefaults(store);
   ensureStandardTemplate(store);

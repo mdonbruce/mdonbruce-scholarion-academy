@@ -6,6 +6,7 @@ import { copyCheck } from "./claims";
 import { computeTotals } from "./grading";
 import { moduleStates } from "./curriculum";
 import { issueCredential } from "./success";
+import { onProgramEnrollment, passNoPassChecks, programCheckoutGuard } from "./programs";
 
 /**
  * Academy engine (Tabs 41–43): catalog hub generated from data, recommender quiz,
@@ -272,6 +273,7 @@ export function checkout(store: TenantStore, a: Actor, input: { offeringId: stri
   const path = evaluatePathway(store, a.id, o.id);
   if (!path.allowed) throw new CampusError("pathway_blocked", path.blockers.join(" "), 409, { blockers: path.blockers });
   if (store.list("offering_enrollments", (e) => e.userId === a.id && e.offeringId === o.id && e.state === "active").length) throw new CampusError("already_enrolled", "You're already enrolled.", 409);
+  programCheckoutGuard(store, a.id, o, input.sectionId ?? null);
   const q = quote(store, input);
   return store.tx(() => {
     let sec: Row | undefined;
@@ -300,6 +302,7 @@ function enrollInOffering(store: TenantStore, userId: string, o: Row, opts: { se
   const enr = store.insert("offering_enrollments", { userId, offeringId: o.id, sectionId: opts.sectionId, source: opts.source, state: opts.state, orderId: opts.orderId ?? null, waivedModules: opts.waived, completedAt: null, credentialId: null }, "oen");
   if (opts.state === "active" && o.courseId) {
     if (!store.list("enrollments", (e) => e.userId === userId && e.courseId === o.courseId && e.role === "student" && e.state === "active").length) store.insert("enrollments", { userId, courseId: o.courseId, role: "student", state: "active", source: opts.source, offeringEnrollmentId: enr.id }, "enr");
+    onProgramEnrollment(store, userId, o, opts.sectionId);
     applyWaivers(store, userId, o, opts.waived);
     if (o.selfPaced) suggestDeadlines(store, userId, o);
   }
@@ -445,17 +448,20 @@ export function evaluateCompletion(store: TenantStore, a: Actor | null, userId: 
   const enr = store.list("offering_enrollments", (e) => e.userId === userId && e.offeringId === o.id && e.state === "active")[0];
   if (!enr) throw new CampusError("not_found", "Not enrolled", 404);
   const tpl = o.credentialTemplateId ? store.get("credential_templates", o.credentialTemplateId as string) : undefined;
-  const learner = { id: userId, tenantId: store.tenantId, name: "", email: "", roles: [], courseRoles: { [o.courseId as string]: ["student" as const] }, platformOperator: false, mfa: false, customRoles: [] };
-  const mods = moduleStates(store, learner, o.courseId as string);
+  const courseIds = [o.courseId as string, ...((o.blockCourseIds as string[] | undefined) ?? [])];
+  const learner = { id: userId, tenantId: store.tenantId, name: "", email: "", roles: [], courseRoles: Object.fromEntries(courseIds.map((c) => [c, ["student" as const]])), platformOperator: false, mfa: false, customRoles: [] };
+  const mods = courseIds.flatMap((cid) => moduleStates(store, learner, cid).filter((m) => !/^Optional/.test(String(m.module.title)) && !/Program resources/.test(String(m.module.title))));
   const totals = computeTotals(store, o.courseId as string, userId);
-  const capstone = store.list("assignments", (x) => x.courseId === o.courseId && /capstone/i.test(String(x.title)))[0];
+  const blockTotals = courseIds.map((cid) => computeTotals(store, cid, userId).finalPct);
+  const capstone = store.list("assignments", (x) => courseIds.includes(x.courseId as string) && /capstone/i.test(String(x.title)) && !/milestone/i.test(String(x.title)))[0];
   const capPct = capstone ? (() => {
     const g = store.list("grades", (x) => x.assignmentId === capstone.id && x.userId === userId && !!x.posted)[0];
     return g && capstone.points ? (Number(g.score) / Number(capstone.points)) * 100 : null;
   })() : null;
-  const checks = [
+  const pnp = passNoPassChecks(store, userId, o);
+  const checks = pnp ?? [
     { requirement: "All modules complete (waivers count)", ok: mods.length > 0 && mods.every((m) => m.complete) },
-    { requirement: `Final grade ≥ ${tpl?.gradeThreshold ?? 70}%`, ok: totals.finalPct !== null && totals.finalPct >= Number(tpl?.gradeThreshold ?? 70) },
+    { requirement: `Final grade ≥ ${tpl?.gradeThreshold ?? 70}%${courseIds.length > 1 ? " in every block" : ""}`, ok: blockTotals.every((p) => p !== null && p >= Number(tpl?.gradeThreshold ?? 70)) },
     ...(tpl?.requiresCapstone ? [{ requirement: "Capstone passed (≥ 70%)", ok: capPct !== null && capPct >= 70 }] : []),
   ];
   if (!checks.every((c) => c.ok)) return { completed: false, checks };
@@ -466,7 +472,7 @@ export function evaluateCompletion(store: TenantStore, a: Actor | null, userId: 
       store.insert("review_queue", { agentKey: "credential_issuance", summary: `Approve credential: ${o.code} ${o.title} for ${userId}`, draft: { userId, offeringId: o.id }, targetType: "offering_enrollments", targetId: enr.id, courseId: o.courseId, requestedBy: "pathway-engine", state: "pending", reviewerId: null }, "rq");
       return { completed: true, checks, credential: null, pendingApproval: true };
     }
-    const cred = issueCredential(store, null, { userId, courseId: o.courseId as string, title: `${o.code} ${o.title}`, kind: o.productType === "guided_project" || o.productType === "short_course" ? "badge" : "certificate", templateId: tpl?.id, achievementType: o.productType === "short_course" ? "Badge" : "Certificate", evidence: [{ name: `Final grade ${totals.finalPct}%` }] });
+    const cred = issueCredential(store, null, { userId, courseId: o.courseId as string, title: `${o.code} ${o.title}`, kind: o.productType === "guided_project" || o.productType === "short_course" ? "badge" : "certificate", templateId: tpl?.id, achievementType: o.productType === "short_course" ? "Badge" : "Certificate", evidence: [{ name: pnp ? "Pass (all pass/no-pass requirements met)" : `Final grade ${totals.finalPct}%` }] });
     store.update("offering_enrollments", enr.id, { credentialId: cred.id });
     return { completed: true, checks, credential: cred, pendingApproval: false };
   });

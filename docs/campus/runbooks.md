@@ -5,7 +5,7 @@ Generated from the tab registry (`src/campus/registry.ts`). One section per tab.
 Common tools for every tab:
 
 - **Audit log:** Admin Console → Recent audit, or `GET /q/audit.log`. Every denial is recorded with the reason; act-as records carry the real admin.
-- **Outbox:** `GET /q/outbox.status?status=dead`; replay with `POST /a/outbox.replay`. Consumers: file-scanner, media-transcoder, lms-enrollment-projection, observer-alerts, analytics-events, notifications, search-indexer, ai-support-triage, webhook-fanout, completion-evaluator.
+- **Outbox:** `GET /q/outbox.status?status=dead`; replay with `POST /a/outbox.replay`. Consumers: file-scanner, media-transcoder, lms-enrollment-projection, observer-alerts, analytics-events, notifications, search-indexer, ai-support-triage, webhook-fanout, bundle-badge, completion-evaluator.
 - **Metrics:** `/api/campus/metrics` (Prometheus text). Health: `/api/campus/health`.
 - **Jobs:** `POST /a/ops.run_jobs` (announcements, missing work, overdue holds, retention, digests, outbox relay, webhooks).
 
@@ -30,7 +30,7 @@ Courses, sections, modules and accessible block pages with publish validation, p
 - **Typical failures:** Publish blocked by validation; blueprint conflicts.
 - **Recovery:** Read the validation report; fix references/alt text/captions; re-run the blueprint push (idempotent).
 - **Resources:** `courses`, `sections`, `modules`, `module_items`, `pages`, `page_revisions`, `module_progress`
-- **Operations:** `course.modules`, `course.nav`, `course.syllabus`, `course.checklist`, `course.progress`, `module.open_item`, `module.mark_done`, `module.duplicate`, `module.move_item`, `page.restore_revision`, `page.a11y`, `course.student_view`, `page.save_text`
+- **Operations:** `course.modules`, `course.nav`, `course.syllabus`, `course.checklist`, `course.progress`, `module.open_item`, `module.mark_done`, `module.duplicate`, `module.move_item`, `page.restore_revision`, `page.a11y`, `course.student_view`, `page.save_text`, `course.statistics`, `course.conclude`, `course.reset`, `page.word_count`
 - **Who sees it:** admin, instructor, ta, designer, student, observer, advisor, registrar, support
 
 ## 3. Enrollment
@@ -54,7 +54,7 @@ Assignments, quizzes with snapshots and seeded randomization, question banks, at
 - **Typical failures:** Attempt start refused; submission blocked by scan.
 - **Recovery:** Check availability, attempt count, accommodations; re-scan file; idempotent resubmit.
 - **Resources:** `assignments`, `quizzes`, `question_banks`, `questions`, `attempts`, `submissions`
-- **Operations:** `submission.create`, `submission.mine`, `peer.assign`, `peer.complete`, `peer.mine`, `quiz.start`, `quiz.attempt`, `quiz.autosave`, `quiz.finish`, `quiz.submit`, `quiz.grade_question`, `quiz.moderate`, `quiz.regrade`, `quiz.item_analysis`, `quiz.manual_queue`
+- **Operations:** `submission.create`, `submission.mine`, `peer.assign`, `peer.complete`, `peer.mine`, `quiz.start`, `quiz.attempt`, `quiz.autosave`, `quiz.finish`, `quiz.submit`, `quiz.grade_question`, `quiz.moderate`, `quiz.regrade`, `quiz.item_analysis`, `quiz.manual_queue`, `assignments.bulk_dates`
 - **Who sees it:** admin, instructor, ta, designer, student
 
 ## 5. Gradebook
@@ -66,7 +66,7 @@ Weighted groups, drop rules, late/missing policies, versioned rubrics, posting, 
 - **Typical failures:** 412 on stale edits; unposted grades not visible.
 - **Recovery:** Reload and re-apply edits; post explicitly; check audit for release history.
 - **Resources:** `assignment_groups`, `grades`, `rubrics`, `posting_policies`, `peer_reviews`, `annotations`, `grading_periods`, `grading_schemes`, `grade_history`, `comment_library`, `submission_comments`, `gradebook_notes`
-- **Operations:** `grader.queue`, `gradebook.grid`, `grades.set`, `grades.post`, `grades.select_provisional`, `grades.final_override`, `grades.curve`, `grades.default`, `grades.message_students_who`, `grades.export_csv`, `grades.import_csv`, `grades.history`, `grades.totals`, `rubric.new_version`, `submission.annotate`, `submission.comment`, `submission.comments`, `ai.draft_feedback`
+- **Operations:** `grader.queue`, `gradebook.grid`, `grades.set`, `grades.post`, `grades.select_provisional`, `grades.final_override`, `grades.curve`, `grades.default`, `grades.message_students_who`, `grades.export_csv`, `grades.import_csv`, `grades.history`, `grades.totals`, `rubric.new_version`, `submission.annotate`, `submission.comment`, `submission.comments`, `ai.draft_feedback`, `gradebook.cell`, `grades.set_group`
 - **Who sees it:** admin, instructor, ta, student, observer
 
 ## 6. Collaboration
@@ -78,7 +78,7 @@ Nested discussions with tombstones, scheduled announcements and a course-scoped 
 - **Typical failures:** Announcements not delivered; recipients rejected.
 - **Recovery:** Run the announcement scheduler; check outbox dead letters; recipients must be active course members.
 - **Resources:** `discussion_topics`, `posts`, `announcements`, `conversations`, `collaborations`
-- **Operations:** `discussion.create_student_topic`, `discussion.post`, `discussion.edit`, `discussion.delete`, `discussion.like`, `discussion.report`, `discussion.subscribe`, `discussion.mark_all_read`, `discussion.thread`, `discussion.grade_checkpoints`, `announcement.read`, `inbox.send`, `inbox.reply`, `inbox.state`, `inbox.list`, `inbox.conversation`
+- **Operations:** `discussion.create_student_topic`, `discussion.post`, `discussion.edit`, `discussion.delete`, `discussion.like`, `discussion.report`, `discussion.subscribe`, `discussion.mark_all_read`, `discussion.thread`, `discussion.grade_checkpoints`, `announcement.read`, `inbox.send`, `inbox.reply`, `inbox.state`, `inbox.list`, `inbox.conversation`, `announcement.reply`, `announcement.like`, `announcement.replies`, `inbox.forward`
 - **Who sees it:** admin, instructor, ta, designer, student, observer, advisor, registrar, support
 
 ## 7. Files & Media
@@ -102,7 +102,7 @@ Minimized learning events, explainable risk signals and interventions.
 - **Typical failures:** Stale signals.
 - **Recovery:** Recompute signals; replay events.
 - **Resources:** `learning_events`, `risk_signals`, `interventions`
-- **Operations:** `analytics.course`, `analytics.student`, `analytics.access_report`, `analytics.events`, `analytics.recompute_risk`, `analytics.program`
+- **Operations:** `analytics.course`, `analytics.student`, `analytics.access_report`, `analytics.events`, `analytics.recompute_risk`, `analytics.program`, `analytics.export_csv`
 - **Who sees it:** admin, instructor, advisor
 
 ## 9. Integration
@@ -390,7 +390,7 @@ Roster, group sets with self sign-up and auto-assign, team assignments and the f
 - **Typical failures:** Members not enrolled.
 - **Recovery:** Fix membership.
 - **Resources:** `group_sets`, `groups`, `faculty_journal`
-- **Operations:** `people.roster`, `people.add`, `people.set_state`, `groups.set`, `groups.join`, `groups.leave`, `groups.auto_assign`, `groups.clone`, `groups.export_csv`, `groups.import_csv`
+- **Operations:** `people.roster`, `people.add`, `people.set_state`, `groups.set`, `groups.join`, `groups.leave`, `groups.auto_assign`, `groups.clone`, `groups.export_csv`, `groups.import_csv`, `people.edit_enrollment`
 - **Who sees it:** admin, instructor, ta, designer, student
 
 ## 33. Library & Reading Lists
@@ -596,3 +596,27 @@ Setup assistant that answers testing-environment questions with approved talking
 - **Resources:** `proctor_settings`, `proctor_talking_points`, `proctor_readiness`, `proctor_questions`
 - **Operations:** `proctor.ask`, `proctor.reply`, `proctor.my_assessments`, `proctor.readiness`, `proctor.save_readiness`, `proctor.staff_guide`, `proctor.overview`, `proctor.promote`
 - **Who sees it:** admin, instructor, ta, designer, student, observer, advisor, registrar, support
+
+## 50. Program Studio
+
+Academy program designs (#1, #12, #13, #14, #26): website pages generated from catalog data, course shells, credentials, apply → admission → sandbox seat → orientation, brochures, team and advisor inquiries, prerequisite self-checks, consented testimonials and the design-package status report.
+
+- **Purpose:** Program design packages and their public pages.
+- **Depends on:** Catalog offerings and cohorts, Admissions, Commerce (sandbox), Curriculum, Credentials.
+- **Typical failures:** Program page won't publish (copy check, missing fee or unconfirmed faculty).
+- **Recovery:** Fix the flagged wording or field and publish again; the page reads fees and dates from the catalog.
+- **Resources:** `program_pages`, `program_testimonials`, `program_inquiries`, `selfcheck_attempts`
+- **Operations:** `programs.index`, `programs.page`, `programs.self_check_questions`, `programs.self_check`, `programs.inquire`, `programs.apply`, `programs.review`, `programs.quality_gate`, `programs.publish_shells`, `programs.status`, `programs.progress`
+- **Who sees it:** admin, designer, registrar, advisor, instructor
+
+## 51. LMS Parity Status
+
+Every feature in the LMS feature-parity specification marked DONE / PARTIAL / NOT STARTED with evidence and the gap, plus the 15 acceptance tests and their test files.
+
+- **Purpose:** Honest parity reporting after each build stage.
+- **Depends on:** Parity audit list (src/campus/parity.ts), tests.
+- **Typical failures:** —
+- **Recovery:** —
+- **Resources:** —
+- **Operations:** —
+- **Who sees it:** admin, designer, instructor, registrar

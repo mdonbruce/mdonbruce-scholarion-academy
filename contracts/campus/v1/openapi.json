@@ -214,6 +214,14 @@
     {
       "name": "Proctored Assessment Support",
       "description": "Setup assistant that answers testing-environment questions with approved talking points only, a pre-test checklist that proctored assessments require, routing to the accommodations process, escalation with a response time, and a redacted question log for updating the talking points."
+    },
+    {
+      "name": "Program Studio",
+      "description": "Academy program designs (#1, #12, #13, #14, #26): website pages generated from catalog data, course shells, credentials, apply → admission → sandbox seat → orientation, brochures, team and advisor inquiries, prerequisite self-checks, consented testimonials and the design-package status report."
+    },
+    {
+      "name": "LMS Parity Status",
+      "description": "Every feature in the LMS feature-parity specification marked DONE / PARTIAL / NOT STARTED with evidence and the gap, plus the 15 acceptance tests and their test files."
     }
   ],
   "paths": {
@@ -8395,8 +8403,7 @@
                 },
                 "required": [
                   "applicantId",
-                  "program",
-                  "termId"
+                  "program"
                 ]
               }
             }
@@ -20863,6 +20870,23 @@
                       "live",
                       "blended"
                     ]
+                  },
+                  "requiresApplication": {
+                    "description": "Apply → admission review before seat reservation",
+                    "type": "boolean"
+                  },
+                  "selfCheckRequired": {
+                    "description": "Prerequisite self-check required",
+                    "type": "boolean"
+                  },
+                  "blockCourseIds": {
+                    "description": "Additional course blocks"
+                  },
+                  "lateEnrollmentDays": {
+                    "description": "Late enrollment allowed (days after start)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 60
                   }
                 },
                 "required": [
@@ -21050,6 +21074,23 @@
                       "live",
                       "blended"
                     ]
+                  },
+                  "requiresApplication": {
+                    "description": "Apply → admission review before seat reservation",
+                    "type": "boolean"
+                  },
+                  "selfCheckRequired": {
+                    "description": "Prerequisite self-check required",
+                    "type": "boolean"
+                  },
+                  "blockCourseIds": {
+                    "description": "Additional course blocks"
+                  },
+                  "lateEnrollmentDays": {
+                    "description": "Late enrollment allowed (days after start)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 60
                   }
                 },
                 "required": []
@@ -21248,6 +21289,11 @@
                   "schedule": {
                     "description": "Schedule",
                     "type": "string"
+                  },
+                  "applicationDeadline": {
+                    "description": "Application deadline",
+                    "type": "string",
+                    "format": "date-time"
                   }
                 },
                 "required": [
@@ -21357,6 +21403,11 @@
                   "schedule": {
                     "description": "Schedule",
                     "type": "string"
+                  },
+                  "applicationDeadline": {
+                    "description": "Application deadline",
+                    "type": "string",
+                    "format": "date-time"
                   }
                 },
                 "required": []
@@ -24558,6 +24609,792 @@
           "Proctored Assessment Support"
         ],
         "summary": "Delete (tombstone) a logged question",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/program_pages": {
+      "get": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "List program website pages",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProgramPages"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "Create a program page",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "offeringId": {
+                    "description": "Offering",
+                    "type": "string",
+                    "x-ref": "offerings"
+                  },
+                  "slug": {
+                    "description": "URL slug",
+                    "type": "string"
+                  },
+                  "spec": {
+                    "description": "Program design (outcomes, curriculum, projects, tools, FAQs…)"
+                  },
+                  "advisorEmail": {
+                    "description": "Program advisor email",
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "advisorPhone": {
+                    "description": "Program advisor phone",
+                    "type": "string"
+                  },
+                  "brochureNote": {
+                    "description": "Brochure footnote",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "offeringId",
+                  "slug",
+                  "spec"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/program_pages/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "Get a program page",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "Update a program page (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "offeringId": {
+                    "description": "Offering",
+                    "type": "string",
+                    "x-ref": "offerings"
+                  },
+                  "slug": {
+                    "description": "URL slug",
+                    "type": "string"
+                  },
+                  "spec": {
+                    "description": "Program design (outcomes, curriculum, projects, tools, FAQs…)"
+                  },
+                  "advisorEmail": {
+                    "description": "Program advisor email",
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "advisorPhone": {
+                    "description": "Program advisor phone",
+                    "type": "string"
+                  },
+                  "brochureNote": {
+                    "description": "Brochure footnote",
+                    "type": "string"
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "Delete (tombstone) a program page",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/program_pages/{id}/publish": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "Publish (validation runs first)",
+        "responses": {
+          "200": {
+            "description": "Published"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "Unpublish",
+        "responses": {
+          "200": {
+            "description": "Unpublished"
+          }
+        }
+      }
+    },
+    "/r/program_testimonials": {
+      "get": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "List learner testimonials (consented)",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProgramTestimonials"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "Create a learner testimonial",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "offeringId": {
+                    "description": "Offering",
+                    "type": "string",
+                    "x-ref": "offerings"
+                  },
+                  "learnerName": {
+                    "description": "Learner name as they consented",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "description": "Quote",
+                    "type": "string"
+                  },
+                  "consentRef": {
+                    "description": "Written consent reference",
+                    "type": "string"
+                  },
+                  "consentAt": {
+                    "description": "Consent date",
+                    "type": "string",
+                    "format": "date"
+                  }
+                },
+                "required": [
+                  "offeringId",
+                  "learnerName",
+                  "quote",
+                  "consentRef",
+                  "consentAt"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/program_testimonials/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "Get a learner testimonial",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "Update a learner testimonial (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "offeringId": {
+                    "description": "Offering",
+                    "type": "string",
+                    "x-ref": "offerings"
+                  },
+                  "learnerName": {
+                    "description": "Learner name as they consented",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "description": "Quote",
+                    "type": "string"
+                  },
+                  "consentRef": {
+                    "description": "Written consent reference",
+                    "type": "string"
+                  },
+                  "consentAt": {
+                    "description": "Consent date",
+                    "type": "string",
+                    "format": "date"
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "Delete (tombstone) a learner testimonial",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/program_testimonials/{id}/publish": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "Publish (validation runs first)",
+        "responses": {
+          "200": {
+            "description": "Published"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "Unpublish",
+        "responses": {
+          "200": {
+            "description": "Unpublished"
+          }
+        }
+      }
+    },
+    "/r/program_inquiries": {
+      "get": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "List team and advisor inquiries",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProgramInquiries"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/program_inquiries/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "Get a program inquiry",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "Delete (tombstone) a program inquiry",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/selfcheck_attempts": {
+      "get": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "List prerequisite self-checks",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SelfcheckAttempts"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/selfcheck_attempts/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "Get a prerequisite self-check",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Program Studio"
+        ],
+        "summary": "Delete (tombstone) a prerequisite self-check",
         "responses": {
           "200": {
             "description": "Deleted"
@@ -33840,6 +34677,36 @@
             "in": "query"
           },
           {
+            "name": "periodId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "studentGroupId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "due",
+                "points",
+                "module",
+                "title"
+              ]
+            },
+            "in": "query"
+          },
+          {
             "name": "showUnpublished",
             "required": false,
             "schema": {
@@ -35204,6 +36071,16 @@
                   },
                   "individual": {
                     "type": "boolean"
+                  },
+                  "attachments": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "File ids"
+                  },
+                  "mediaUrl": {
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -42938,6 +43815,1013 @@
         }
       }
     },
+    "/a/announcement.reply": {
+      "post": {
+        "tags": [
+          "Collaboration"
+        ],
+        "operationId": "announcement.reply",
+        "summary": "Reply to an announcement (when replies are on).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "announcementId": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "announcementId",
+                  "body"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/announcement.like": {
+      "post": {
+        "tags": [
+          "Collaboration"
+        ],
+        "operationId": "announcement.like",
+        "summary": "Like an announcement or a reply.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "announcementId": {
+                    "type": "string"
+                  },
+                  "replyId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "announcementId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/announcement.replies": {
+      "get": {
+        "tags": [
+          "Collaboration"
+        ],
+        "operationId": "announcement.replies",
+        "summary": "Replies and likes on an announcement.",
+        "parameters": [
+          {
+            "name": "announcementId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/assignments.bulk_dates": {
+      "post": {
+        "tags": [
+          "Assessment"
+        ],
+        "operationId": "assignments.bulk_dates",
+        "summary": "Bulk edit dates: per-item dates, shift all by N days, or remove dates.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "items": {
+                    "description": "[{\"kind\":\"assignment\",\"id\":\"…\",\"dueAt\":\"…\"}]"
+                  },
+                  "shiftDays": {
+                    "type": "number"
+                  },
+                  "removeDates": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "courseId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/gradebook.cell": {
+      "get": {
+        "tags": [
+          "Gradebook"
+        ],
+        "operationId": "gradebook.cell",
+        "summary": "Grade detail tray: status, submission, comments and history for one cell.",
+        "parameters": [
+          {
+            "name": "assignmentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/grades.set_group": {
+      "post": {
+        "tags": [
+          "Gradebook"
+        ],
+        "operationId": "grades.set_group",
+        "summary": "Grade a group assignment for the whole group (unless graded individually).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "assignmentId": {
+                    "type": "string"
+                  },
+                  "userId": {
+                    "type": "string"
+                  },
+                  "score": {
+                    "type": "number"
+                  },
+                  "comment": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "assignmentId",
+                  "userId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/people.edit_enrollment": {
+      "post": {
+        "tags": [
+          "People & Groups"
+        ],
+        "operationId": "people.edit_enrollment",
+        "summary": "Change an enrollment's section or role.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "enrollmentId": {
+                    "type": "string"
+                  },
+                  "sectionId": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "student",
+                      "ta",
+                      "instructor",
+                      "designer",
+                      "observer"
+                    ]
+                  }
+                },
+                "required": [
+                  "enrollmentId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/inbox.forward": {
+      "post": {
+        "tags": [
+          "Collaboration"
+        ],
+        "operationId": "inbox.forward",
+        "summary": "Forward a conversation (recipients checked on the server).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "conversationId": {
+                    "type": "string"
+                  },
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "student",
+                      "instructor",
+                      "ta",
+                      "observer",
+                      "all"
+                    ]
+                  },
+                  "sectionId": {
+                    "type": "string"
+                  },
+                  "userIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "note": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "conversationId",
+                  "courseId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/analytics.export_csv": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "operationId": "analytics.export_csv",
+        "summary": "Course analytics as CSV.",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/course.statistics": {
+      "get": {
+        "tags": [
+          "Curriculum"
+        ],
+        "operationId": "course.statistics",
+        "summary": "Course statistics: items, students, submissions, storage.",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/course.conclude": {
+      "post": {
+        "tags": [
+          "Curriculum"
+        ],
+        "operationId": "course.conclude",
+        "summary": "Conclude (or reopen) a course; concluded courses are read-only for students.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "reopen": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "courseId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/course.reset": {
+      "post": {
+        "tags": [
+          "Curriculum"
+        ],
+        "operationId": "course.reset",
+        "summary": "Reset course content (archives items; only when there is no student work).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "confirm": {
+                    "type": "string",
+                    "description": "Type the course code"
+                  }
+                },
+                "required": [
+                  "courseId",
+                  "confirm"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/page.word_count": {
+      "get": {
+        "tags": [
+          "Curriculum"
+        ],
+        "operationId": "page.word_count",
+        "summary": "Word count for a page.",
+        "parameters": [
+          {
+            "name": "pageId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/programs.index": {
+      "get": {
+        "tags": [
+          "Program Studio"
+        ],
+        "operationId": "programs.index",
+        "summary": "Published Academy programs.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/programs.page": {
+      "get": {
+        "tags": [
+          "Program Studio"
+        ],
+        "operationId": "programs.page",
+        "summary": "Program website page data (from the catalog).",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/programs.self_check_questions": {
+      "get": {
+        "tags": [
+          "Program Studio"
+        ],
+        "operationId": "programs.self_check_questions",
+        "summary": "Prerequisite self-check questions.",
+        "parameters": [
+          {
+            "name": "offeringId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/programs.self_check": {
+      "post": {
+        "tags": [
+          "Program Studio"
+        ],
+        "operationId": "programs.self_check",
+        "summary": "Take the prerequisite self-check.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "offeringId": {
+                    "type": "string"
+                  },
+                  "answers": {}
+                },
+                "required": [
+                  "offeringId",
+                  "answers"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/programs.inquire": {
+      "post": {
+        "tags": [
+          "Program Studio"
+        ],
+        "operationId": "programs.inquire",
+        "summary": "Team enrollment inquiry or advisor call request.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "offeringId": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "team",
+                      "advisor"
+                    ]
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "organization": {
+                    "type": "string"
+                  },
+                  "seats": {
+                    "type": "number"
+                  },
+                  "preferredTime": {
+                    "type": "string"
+                  },
+                  "timeZone": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "offeringId",
+                  "kind",
+                  "name",
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/programs.apply": {
+      "post": {
+        "tags": [
+          "Program Studio"
+        ],
+        "operationId": "programs.apply",
+        "summary": "Apply to a program (admission review, then seat reservation).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "offeringId": {
+                    "type": "string"
+                  },
+                  "sectionId": {
+                    "type": "string"
+                  },
+                  "statement": {
+                    "type": "string"
+                  },
+                  "experience": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "offeringId",
+                  "statement"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/programs.review": {
+      "post": {
+        "tags": [
+          "Program Studio"
+        ],
+        "operationId": "programs.review",
+        "summary": "Admit, deny or waitlist a program application.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "applicationId": {
+                    "type": "string"
+                  },
+                  "outcome": {
+                    "type": "string",
+                    "enum": [
+                      "admit",
+                      "deny",
+                      "waitlist"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "applicationId",
+                  "outcome"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/programs.quality_gate": {
+      "get": {
+        "tags": [
+          "Program Studio"
+        ],
+        "operationId": "programs.quality_gate",
+        "summary": "Quality gate for a program's course shells.",
+        "parameters": [
+          {
+            "name": "offeringId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/programs.publish_shells": {
+      "post": {
+        "tags": [
+          "Program Studio"
+        ],
+        "operationId": "programs.publish_shells",
+        "summary": "Publish a program's course shells (after the quality gate).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "offeringId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "offeringId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/programs.status": {
+      "get": {
+        "tags": [
+          "Program Studio"
+        ],
+        "operationId": "programs.status",
+        "summary": "Design-package status for every program.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/programs.progress": {
+      "get": {
+        "tags": [
+          "Program Studio"
+        ],
+        "operationId": "programs.progress",
+        "summary": "My progress toward a program credential.",
+        "parameters": [
+          {
+            "name": "offeringId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/a/lab_keys.issue": {
       "post": {
         "tags": [
@@ -45439,6 +47323,12 @@
               },
               "readBy": {
                 "description": "Read by"
+              },
+              "replies": {
+                "description": "Replies"
+              },
+              "likes": {
+                "description": "Likes"
               }
             }
           }
@@ -46009,6 +47899,17 @@
               "reviewerId": {
                 "description": "Reviewer",
                 "type": "string"
+              },
+              "offeringId": {
+                "description": "Program offering",
+                "type": "string"
+              },
+              "sectionId": {
+                "description": "Cohort",
+                "type": "string"
+              },
+              "requiredDocs": {
+                "description": "Required documents"
               }
             }
           }
@@ -48590,6 +50491,23 @@
               },
               "copyFlags": {
                 "description": "Copy check flags"
+              },
+              "requiresApplication": {
+                "description": "Apply → admission review before seat reservation",
+                "type": "boolean"
+              },
+              "selfCheckRequired": {
+                "description": "Prerequisite self-check required",
+                "type": "boolean"
+              },
+              "blockCourseIds": {
+                "description": "Additional course blocks"
+              },
+              "lateEnrollmentDays": {
+                "description": "Late enrollment allowed (days after start)",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 60
               }
             }
           }
@@ -48645,6 +50563,11 @@
               "seatsTaken": {
                 "description": "Seats taken",
                 "type": "number"
+              },
+              "applicationDeadline": {
+                "description": "Application deadline",
+                "type": "string",
+                "format": "date-time"
               }
             }
           }
@@ -49404,6 +51327,182 @@
           }
         ],
         "description": "Logged question (tab: proctor-support)"
+      },
+      "ProgramPages": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "offeringId": {
+                "description": "Offering",
+                "type": "string",
+                "x-ref": "offerings"
+              },
+              "slug": {
+                "description": "URL slug",
+                "type": "string"
+              },
+              "spec": {
+                "description": "Program design (outcomes, curriculum, projects, tools, FAQs…)"
+              },
+              "advisorEmail": {
+                "description": "Program advisor email",
+                "type": "string",
+                "format": "email"
+              },
+              "advisorPhone": {
+                "description": "Program advisor phone",
+                "type": "string"
+              },
+              "brochureNote": {
+                "description": "Brochure footnote",
+                "type": "string"
+              },
+              "packageStatus": {
+                "description": "Design package status"
+              },
+              "copyFlags": {
+                "description": "Copy check flags"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Program page (tab: program-studio)"
+      },
+      "ProgramTestimonials": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "offeringId": {
+                "description": "Offering",
+                "type": "string",
+                "x-ref": "offerings"
+              },
+              "learnerName": {
+                "description": "Learner name as they consented",
+                "type": "string"
+              },
+              "quote": {
+                "description": "Quote",
+                "type": "string"
+              },
+              "consentRef": {
+                "description": "Written consent reference",
+                "type": "string"
+              },
+              "consentAt": {
+                "description": "Consent date",
+                "type": "string",
+                "format": "date"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Learner testimonial (tab: program-studio)"
+      },
+      "ProgramInquiries": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "offeringId": {
+                "description": "Offering",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind",
+                "type": "string"
+              },
+              "name": {
+                "description": "Name",
+                "type": "string"
+              },
+              "email": {
+                "description": "Email",
+                "type": "string"
+              },
+              "organization": {
+                "description": "Organization",
+                "type": "string"
+              },
+              "seats": {
+                "description": "Seats",
+                "type": "number"
+              },
+              "preferredTime": {
+                "description": "Preferred time",
+                "type": "string"
+              },
+              "timeZone": {
+                "description": "Time zone",
+                "type": "string"
+              },
+              "message": {
+                "description": "Message",
+                "type": "string"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Program inquiry (tab: program-studio)"
+      },
+      "SelfcheckAttempts": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "offeringId": {
+                "description": "Offering",
+                "type": "string"
+              },
+              "userId": {
+                "description": "Learner",
+                "type": "string"
+              },
+              "score": {
+                "description": "Score",
+                "type": "number"
+              },
+              "of": {
+                "description": "Out of",
+                "type": "number"
+              },
+              "passed": {
+                "description": "Passed",
+                "type": "boolean"
+              },
+              "routeTo": {
+                "description": "Recommended instead"
+              }
+            }
+          }
+        ],
+        "description": "Prerequisite self-check (tab: program-studio)"
       },
       "Accounts": {
         "allOf": [

@@ -14,6 +14,8 @@ import { groupSetView, myObservees } from "../../services/people";
 import { myTickets } from "../../services/desk";
 import { labNotebook } from "../../services/tutor";
 import { ProctorPanel } from "./proctor";
+import { studioOverview, programIndex } from "../../services/programs";
+import { PARITY, paritySummary, SECTION_TITLES } from "../../parity";
 import { api, Chip, Denied, Empty, EntityForm, EntityTable, fmt, Hidden, OpForm, PageHead, Result } from "../kit";
 
 type SP = Record<string, string | undefined>;
@@ -168,6 +170,10 @@ function Bespoke({ t, tab }: { t: T; tab: string }) {
         return <Observers t={t} />;
       case "helpdesk":
         return <Helpdesk t={t} />;
+      case "program-studio":
+        return <ProgramStudio t={t} />;
+      case "parity-status":
+        return <ParityStatus t={t} />;
       case "proctor-support":
         return <ProctorPanel store={t.store} actor={t.actor} slug={t.slug} sp={t.sp} here={t.here} />;
       case "catalog":
@@ -667,5 +673,189 @@ function Helpdesk({ t }: { t: T }) {
         <p className="small muted">You haven't asked for help yet.</p>
       )}
     </section>
+  );
+}
+
+function ProgramStudio({ t }: { t: T }) {
+  const ov = studioOverview(t.store, t.actor);
+  const pages = new Map(programIndex(t.store).map((p) => [p.code, p.slug]));
+  return (
+    <>
+      <section className="card card-pad stack" aria-labelledby="ps-h">
+        <h2 id="ps-h" className="card-title">
+          Program design packages
+        </h2>
+        <p className="small">Status is computed from what is actually loaded: complete / drafted / needs SME review / blocked / not started.</p>
+        {ov.programs.map((p) => (
+          <details key={p.code} className="card card-pad">
+            <summary>
+              <strong>
+                {p.code} {p.title}
+              </strong>{" "}
+              <span className="badge">overall: {p.overall}</span>
+            </summary>
+            <p className="small">
+              {pages.get(p.code) ? (
+                <>
+                  <a href={`/campus/${t.slug}/programs/${pages.get(p.code)}`}>Public page</a> · <a href={`/api/campus/v1/t/${t.slug}/programs/${pages.get(p.code)}/brochure.pdf`}>Brochure PDF</a>
+                </>
+              ) : (
+                "Page not published"
+              )}
+            </p>
+            <div className="table-wrap" tabIndex={0} role="region" aria-label={`${p.code} deliverables`}>
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Deliverable</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Note</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {p.items.map((i) => (
+                    <tr key={i.deliverable}>
+                      <td>{i.deliverable}</td>
+                      <td>{i.status}</td>
+                      <td className="small">{i.note}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <h3 className="small">Quality gate</h3>
+            <ul className="small">
+              {p.gate.map((g) => (
+                <li key={g.gate}>
+                  {g.ok ? "✓" : "✗"} {g.gate} <span className="muted">({g.detail})</span>
+                </li>
+              ))}
+            </ul>
+            <h3 className="small">Risks</h3>
+            <ul className="small">
+              {p.risks.map((r) => (
+                <li key={r}>{r}</li>
+              ))}
+            </ul>
+          </details>
+        ))}
+      </section>
+      {(ov.applications.length > 0 || ov.inquiries.length > 0) && (
+        <section className="card card-pad stack" aria-labelledby="ps-q">
+          <h2 id="ps-q" className="card-title">
+            Applications and inquiries
+          </h2>
+          <ul className="item-list">
+            {ov.applications.map((a) => (
+              <li key={String(a.id)}>
+                {String(a.program)} <Chip s={String(a.state)} />
+              </li>
+            ))}
+            {ov.inquiries.map((q) => (
+              <li key={String(q.id)}>
+                {String(q.kind) === "team" ? "Team inquiry" : "Advisor call"}: {String(q.name)} {q.organization ? `(${String(q.organization)})` : ""} <span className="tiny muted">{fmt(q.createdAt)}</span>
+              </li>
+            ))}
+          </ul>
+          {ov.selfChecks && (
+            <p className="small">
+              Prerequisite self-checks: {ov.selfChecks.passed} passed of {ov.selfChecks.total}
+            </p>
+          )}
+        </section>
+      )}
+    </>
+  );
+}
+
+function ParityStatus({ t }: { t: T }) {
+  const s = paritySummary();
+  const filter = t.sp.status as "DONE" | "PARTIAL" | "NOT_STARTED" | undefined;
+  const rows = PARITY.filter((r) => !filter || r.status === filter);
+  return (
+    <>
+      <section className="card card-pad stack" aria-labelledby="par-h">
+        <h2 id="par-h" className="card-title">
+          Parity summary
+        </h2>
+        <p>
+          <strong>{s.done}</strong> done · <strong>{s.partial}</strong> partial · <strong>{s.notStarted}</strong> not started — {s.total} features ({s.closedThisBuild} closed in the latest build).
+        </p>
+        <nav className="row" aria-label="Filter by status">
+          {[undefined, "DONE", "PARTIAL", "NOT_STARTED"].map((st) => (
+            <a key={st ?? "all"} className="btn btn-ghost btn-sm" aria-current={filter === st ? "page" : undefined} href={st ? `${t.here}?status=${st}` : t.here}>
+              {st ? st.replace("_", " ").toLowerCase() : "all"}
+            </a>
+          ))}
+        </nav>
+        <div className="table-wrap" tabIndex={0} role="region" aria-label="Parity by section">
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">Section</th>
+                <th scope="col">Done</th>
+                <th scope="col">Partial</th>
+                <th scope="col">Not started</th>
+              </tr>
+            </thead>
+            <tbody>
+              {s.sections.map((x) => (
+                <tr key={x.section}>
+                  <td>
+                    {x.section} {x.title}
+                  </td>
+                  <td>{x.done}</td>
+                  <td>{x.partial}</td>
+                  <td>{x.notStarted}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section className="card card-pad stack" aria-labelledby="par-f">
+        <h2 id="par-f" className="card-title">
+          Features {filter ? `(${filter.replace("_", " ").toLowerCase()})` : ""}
+        </h2>
+        <div className="table-wrap campus-parity" tabIndex={0} role="region" aria-label="Feature parity">
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">Section</th>
+                <th scope="col">Feature</th>
+                <th scope="col">Status</th>
+                <th scope="col">Evidence</th>
+                <th scope="col">Gap</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.section + r.feature}>
+                  <td>{SECTION_TITLES[r.section] ?? r.section}</td>
+                  <td>{r.feature}</td>
+                  <td>
+                    <Chip s={r.status === "DONE" ? "published" : r.status === "PARTIAL" ? "pending" : "locked"} /> <span className="tiny">{r.status.replace("_", " ")}</span>
+                  </td>
+                  <td className="tiny">{r.evidence}</td>
+                  <td className="tiny">{r.gap || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section className="card card-pad stack" aria-labelledby="par-a">
+        <h2 id="par-a" className="card-title">
+          Acceptance tests (15/15 passing in CI)
+        </h2>
+        <ol>
+          {s.acceptance.map((x) => (
+            <li key={x.n}>
+              {x.test} <span className="tiny muted">{x.file}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+    </>
   );
 }

@@ -259,8 +259,8 @@ describe("Platform acceptance scenario", () => {
   it("commerce policy: deferral/refund explanations, seats, aid eligibility", () => {
     const s = as("academy", "student2", false);
     denied(() => academy.checkout(s.store, s.actor, { offeringId: "off_academy_15", funding: "federal_aid" }), 422);
-    denied(() => academy.checkout(s.store, s.actor, { offeringId: "off_academy_20" }), 409); // prerequisite #1
-    const co = academy.checkout(s.store, s.actor, { offeringId: "off_academy_1", sandboxCard: "tok_sandbox_visa" });
+    denied(() => academy.checkout(s.store, s.actor, { offeringId: "off_academy_20" }), 409); // prerequisite #1-R
+    const co = academy.checkout(s.store, s.actor, { offeringId: "off_academy_1r", sandboxCard: "tok_sandbox_visa" });
     const rf = academy.requestRefund(as("academy", "student2", false).store, s.actor, String(co.order.id), "refund", "Changed plans");
     assert.equal(rf.decision, "approved");
     const adm = as("academy", "admin");

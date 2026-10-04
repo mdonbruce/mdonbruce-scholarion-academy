@@ -162,7 +162,10 @@ export function planner(store: TenantStore, a: Actor, from: string, to: string) 
   const marks = new Map(store.list("planner_marks", (m) => m.userId === a.id).map((m) => [`${m.refType}:${m.refId}`, !!m.done]));
   const items = projection(store, a, from, to, { courseIds: myCourseIds(store, a) }).items.map((i) => ({ ...i, done: marks.get(`${i.kind}:${i.id}`) ?? false }));
   const todos = store.list("planner_items", (p) => p.userId === a.id && (!p.dueAt || (String(p.dueAt) >= from && String(p.dueAt) <= to))).map((p) => ({ id: p.id, kind: "todo" as const, title: p.title as string, start: (p.dueAt as string) ?? null, courseId: (p.courseId as string) ?? null, done: !!p.done }));
-  return [...items, ...todos].sort((x, y) => String(x.start ?? "").localeCompare(String(y.start ?? "")));
+  // Pages with a to-do date appear as planner items (students).
+  const courseIds = myCourseIds(store, a);
+  const pageTodos = store.list("pages", (p) => courseIds.includes(p.courseId as string) && p.state === "published" && !!p.todoDate && String(p.todoDate) >= from && String(p.todoDate) <= to).map((p) => ({ id: p.id, kind: "page" as const, title: `To do: ${p.title}`, start: String(p.todoDate), courseId: (p.courseId as string) ?? null, done: marks.get(`page:${p.id}`) ?? false }));
+  return [...items, ...todos, ...pageTodos].sort((x, y) => String(x.start ?? "").localeCompare(String(y.start ?? "")));
 }
 
 export function markPlanner(store: TenantStore, a: Actor, refType: string, refId: string, done: boolean) {
