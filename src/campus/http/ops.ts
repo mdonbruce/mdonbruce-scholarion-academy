@@ -1,6 +1,7 @@
 import { CampusError, replayDead, type TenantContext, type TenantStore } from "../core";
 import { hasAny, type Actor } from "../iam";
 import { permissionMatrix, setPermission } from "../permissions";
+import * as entity from "../entity";
 import * as cur from "../services/curriculum";
 import * as fil from "../services/files";
 import * as sis from "../services/sis";
@@ -163,6 +164,11 @@ qry("peer.mine", "assessment", "Peer reviews assigned to me.", [P("assignmentId"
 cmd("quiz.start", "assessment", "Start a quiz attempt.", [P("quizId"), opt("accessCode")], ({ store, actor, args }) => asm.startAttempt(store, actor, args.s("quizId"), { accessCode: args.so("accessCode") }));
 qry("quiz.attempt", "assessment", "View an attempt (questions, saved answers, time left).", [P("attemptId")], ({ store, actor, args }) => asm.attemptView(store, actor, args.s("attemptId")));
 cmd("quiz.autosave", "assessment", "Save answers (version-checked).", [P("attemptId"), P("answers", "json"), P("version", "number")], ({ store, actor, args }) => asm.autosave(store, actor, args.s("attemptId"), args.j("answers"), args.n("version")));
+cmd("quiz.finish", "assessment", "Save answers and submit the attempt.", [P("attemptId"), P("answers", "json"), P("version", "number")], ({ store, actor, args }) => {
+  asm.autosave(store, actor, args.s("attemptId"), args.j("answers"), args.n("version"));
+  return asm.submitAttempt(store, actor, args.s("attemptId"));
+});
+cmd("page.save_text", "curriculum", "Save a page from the text editor (headings, lists, images with alt text, links, tables).", [P("pageId"), P("text", "text"), opt("title"), opt("ifVersion", "number")], ({ store, actor, args }) => entity.update(store, actor, "pages", args.s("pageId"), { blocks: cur.markupToBlocks(args.s("text")), ...(args.has("title") ? { title: args.s("title") } : {}) }, args.has("ifVersion") ? args.n("ifVersion") : undefined));
 cmd("quiz.submit", "assessment", "Submit an attempt (idempotent).", [P("attemptId")], ({ store, actor, args }) => asm.submitAttempt(store, actor, args.s("attemptId")));
 cmd("quiz.grade_question", "assessment", "Score a manually graded question.", [P("attemptId"), P("questionId"), P("points", "number")], ({ store, actor, args }) => asm.gradeQuestion(store, actor, args.s("attemptId"), args.s("questionId"), args.n("points")));
 cmd("quiz.moderate", "assessment", "Extra time, an extra attempt, or reopen for one student.", [P("quizId"), P("userId"), P("action", "string", true, { options: ["extend", "extra_attempt", "reopen"] }), opt("minutes", "number")], ({ store, actor, args }) => asm.moderate(store, actor, args.s("quizId"), args.s("userId"), args.s("action") as never, args.n("minutes", 10)));
@@ -336,6 +342,10 @@ cmd("ai.draft_feedback", "gradebook", "Draft feedback for a submission (never sc
 
 /* 24 Cloud Lab / LTI */
 cmd("lti.launch", "cloud-lab", "Launch the tool for an assignment (signed LTI 1.3 id_token).", [P("assignmentId")], ({ store, actor, args }) => lti.launch(store, actor, args.s("assignmentId")));
+cmd("lab.open", "cloud-lab", "Open the Cloud Lab for an assignment (signed launch, verified by the tool).", [P("assignmentId")], ({ store, actor, args }) => {
+  const l = lti.launch(store, actor, args.s("assignmentId"));
+  return lti.toolReceiveLaunch(store, l.idToken);
+});
 cmd("lab.save", "cloud-lab", "Save lab code.", [P("sessionId"), P("code", "text")], ({ store, actor, args }) => lti.labSave(store, actor, args.s("sessionId"), args.s("code")));
 cmd("lab.submit", "cloud-lab", "Run hidden tests and pass the score back (unposted).", [P("sessionId"), opt("code", "text")], ({ store, actor, args }) => lti.labSubmit(store, actor, args.s("sessionId"), args.so("code")));
 qry("lab.sessions", "cloud-lab", "Lab sessions in a course.", [P("courseId")], ({ store, actor, args }) => lti.labSessionsFor(store, actor, args.s("courseId")));

@@ -1743,3 +1743,61 @@ details.acc > div {
     scroll-snap-align: start;
   }
 }
+
+/* ---------------- Scholarion Campus ---------------- */
+.campus-logo { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: var(--primary); color: #fff; font-weight: 700; font-size: 0.85rem; flex: none; }
+.campus-brand { display: flex; gap: 10px; align-items: center; text-decoration: none; color: inherit; font-weight: 600; }
+.campus-tabnav details { margin: 4px 0; }
+.campus-tabnav summary { cursor: pointer; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-3); padding: 6px 10px; }
+.campus-tabnav .sidenav a { font-size: 0.9rem; padding-top: 4px; padding-bottom: 4px; }
+.campus-help { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 8px; }
+.campus-powered { margin-top: 12px; }
+.campus-actas { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: #7a1f0f; color: #fff; padding: 8px 16px; }
+.campus-main { display: flex; flex-direction: column; gap: 16px; }
+.campus-head { flex-wrap: wrap; gap: 12px; }
+.campus-global form.inline, form.inline { display: inline; }
+.campus-empty { text-align: center; }
+.campus-cards { list-style: none; padding: 0; }
+.campus-card { overflow: hidden; padding: 0; }
+.campus-card-band { height: 56px; }
+.campus-course { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 20px; align-items: start; }
+.campus-coursenav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.campus-coursenav a { display: block; padding: 6px 10px; border-radius: var(--radius-sm); text-decoration: none; color: var(--text); }
+.campus-coursenav a[aria-current="page"] { background: var(--primary-soft); color: var(--primary); font-weight: 600; border-left: 3px solid var(--primary); }
+.campus-course-body { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.campus-module.locked { opacity: 0.85; }
+.campus-items li.locked { color: var(--text-3); }
+.campus-items .kind { display: inline-block; min-width: 76px; font-size: 0.72rem; text-transform: uppercase; color: var(--text-3); }
+.campus-pager { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 12px; flex-wrap: wrap; gap: 8px; }
+.campus-gradebook { max-height: 70vh; overflow: auto; }
+.campus-gradebook thead th { position: sticky; top: 0; background: var(--surface); z-index: 1; }
+.campus-gradebook tbody th { position: sticky; left: 0; background: var(--surface); }
+.gb-late { background: var(--amber-100); }
+.gb-missing { background: var(--red-100); }
+.gb-excused { background: var(--blue-50); }
+.campus-submission, .campus-json, .campus-tutor-text { white-space: pre-wrap; word-break: break-word; max-height: 420px; overflow: auto; }
+.campus-tutor-text { font-family: var(--font-sans); background: none; padding: 0; }
+.campus-matrix td, .campus-matrix th { text-align: center; white-space: nowrap; }
+.campus-matrix th[scope="row"] { text-align: left; }
+.campus-opcard { border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 12px; }
+.campus-opcard summary { cursor: pointer; font-weight: 600; font-size: 0.92rem; }
+.campus-op, .campus-entity-form { margin-top: 10px; }
+.campus-dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; }
+.campus-dl dt { font-weight: 600; }
+.campus-planner li.done { text-decoration: line-through; color: var(--text-3); }
+.campus-agenda { list-style: none; padding: 0; }
+.campus-connector { border-bottom: 1px solid var(--border); padding: 10px 0; flex-wrap: wrap; gap: 8px; }
+.campus-public-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; border-bottom: 1px solid var(--border); background: var(--surface); }
+.campus-public-head nav { gap: 16px; align-items: center; }
+.campus-public-main { padding-top: 24px; padding-bottom: 48px; display: flex; flex-direction: column; gap: 16px; }
+.campus-catalog { list-style: none; padding: 0; }
+.campus-filters { flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.campus .unread > a { font-weight: 700; }
+@media (max-width: 860px) {
+  .campus-course { grid-template-columns: 1fr; }
+  .campus-coursenav ul { flex-direction: row; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+  .campus-coursenav a { white-space: nowrap; }
+  .campus-dl { grid-template-columns: 1fr; }
+  .campus-public-head { padding: 12px 16px; }
+}
+.campus .sidenav .bell-count { position: static; margin-left: 8px; display: inline-grid; }

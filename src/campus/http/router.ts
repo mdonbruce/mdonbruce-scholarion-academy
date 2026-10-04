@@ -10,7 +10,8 @@ import { openApi } from "./openapi";
 import { executeGraphql } from "./graphql";
 import { feedOwner, ics, projection } from "../services/calendar";
 import { podcastFeed } from "../services/collaboration";
-import { readObject, receiveUpload, scanFile, verifySignature, canDownload } from "../services/files";
+import { readObject, receiveUpload, requestUpload, scanFile, verifySignature, canDownload } from "../services/files";
+import { submit } from "../services/assessment";
 import { verifyCredential } from "../services/success";
 import { redeemQrLogin, startMasquerade, stopMasquerade, activeGlobalAnnouncements } from "../services/admin";
 import { resolveApiToken, rateLimit, refreshToken, exchangeCode, scopeAllows } from "../services/integration";
@@ -89,9 +90,9 @@ async function readBody(req: Request): Promise<Body> {
     const fd = await req.formData();
     const out: Body = {};
     fd.forEach((v, k) => {
-      const val = typeof v === "string" ? v : (v as File).name;
+      const val: unknown = v;
       const key = k.endsWith("[]") ? k.slice(0, -2) : k;
-      if (k.endsWith("[]")) out[key] = [...((out[key] as string[]) ?? []), val];
+      if (k.endsWith("[]")) out[key] = [...((out[key] as unknown[]) ?? []), val];
       else out[key] = val;
     });
     return out;
@@ -248,6 +249,22 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     return ok(c, { id: a.id, name: a.name, email: a.email, roles: a.roles, courseRoles: a.courseRoles, masqueradedBy: a.masqueradedBy ?? null, platformOperator: a.platformOperator, realUserId: real?.userId ?? a.id, announcements: activeGlobalAnnouncements(store, a) });
   }
   if (route === "tabs" && method === "GET") return ok(c, visibleTabs(store, a));
+  if (route === "upload" && method === "POST") {
+    // Browser upload: signed-upload flow done server-side (quarantine → scan → promote), optional submission.
+    const file = body.file as File | undefined;
+    if (!file || typeof file === "string" || typeof (file as Blob).arrayBuffer !== "function") throw new CampusError("invalid", "Choose a file to upload.", 422);
+    const bytes = Buffer.from(await (file as Blob).arrayBuffer());
+    const purpose = (String(body.purpose ?? "") || (body.assignmentId ? "submission" : body.courseId ? "course" : "personal")) as "course" | "submission" | "personal";
+    const r = requestUpload(store, a, { name: file.name, mime: file.type || "application/octet-stream", size: bytes.length, courseId: (body.courseId as string) || null, folderId: (body.folderId as string) || null, purpose });
+    receiveUpload(store, String(r.file.id), bytes);
+    const scanned = scanFile(store, String(r.file.id));
+    if (scanned?.state !== "available") throw new CampusError("blocked", `The file didn't pass the safety scan (${scanned?.state ?? "unknown"}).`, 422);
+    if (body.assignmentId) {
+      const sub = submit(store, a, String(body.assignmentId), { mode: "file", fileId: String(r.file.id) });
+      return ok(c, { fileId: r.file.id, submissionId: sub.id }, 201, {}, "Submitted.");
+    }
+    return ok(c, { fileId: r.file.id }, 201, {}, "Uploaded and scanned.");
+  }
   if (route === "graphql" && method === "POST") {
     const r = executeGraphql(store, a, tenant, String(body.query ?? ""), (body.variables as Record<string, unknown>) ?? {}, c.scopes);
     return json(r, 200);
@@ -263,7 +280,12 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     if (!op) throw new CampusError("not_found", "Unknown operation", 404);
     if ((op.kind === "query") !== (method === "GET") && !(op.kind === "query" && method === "POST")) throw new CampusError("method_not_allowed", `${op.name} is a ${op.kind}.`, 405);
     if (c.scopes && !(c.scopes.includes("write") || (op.kind === "query" && c.scopes.includes("read")))) throw new CampusError("insufficient_scope", "This token's scopes don't allow that.", 403);
-    const raw = method === "GET" ? Object.fromEntries(url.searchParams) : { ...Object.fromEntries(url.searchParams), ...body };
+    const raw: Record<string, unknown> = method === "GET" ? Object.fromEntries(url.searchParams) : { ...Object.fromEntries(url.searchParams), ...body };
+    // HTML forms: ans__<questionId> fields become `answers`; rating__<criterion> become a rubric assessment.
+    const ans = Object.entries(raw).filter(([k]) => k.startsWith("ans__"));
+    if (ans.length && raw.answers === undefined) raw.answers = Object.fromEntries(ans.map(([k, v]) => [k.slice(5), v]));
+    const ratings = Object.entries(raw).filter(([k, v]) => k.startsWith("rating__") && v !== "");
+    if (ratings.length && raw.rubric === undefined) raw.rubric = { ratings: Object.fromEntries(ratings.map(([k, v]) => [k.slice(8), Number(v)])) };
     const result = await op.run({ store, actor: a, args: new Args(raw), tenant, sessionSecret: c.sessionSecret });
     if (method === "GET" && (raw.format === "csv" || op.name.endsWith("export_csv")) && typeof result === "string") return text(result, "text/csv; charset=utf-8", 200, { "content-disposition": `attachment; filename="${op.name}.csv"` });
     return ok(c, result, 200, {}, `${op.summary.split(/[.(]/)[0]}: done.`);
@@ -276,7 +298,7 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     if (c.scopes && !scopeAllows(c.scopes, method, table)) throw new CampusError("insufficient_scope", "This token's scopes don't allow that.", 403);
     const id = rest[2];
     const ifVersion = req.headers.get("if-match") ? Number(req.headers.get("if-match")!.replace(/[^0-9]/g, "")) : body.ifVersion !== undefined && body.ifVersion !== "" ? Number(body.ifVersion) : undefined;
-    const clean = Object.fromEntries(Object.entries(body).filter(([k]) => !["back", "_method", "notice", "ifVersion", "show_result"].includes(k)));
+    const clean = Object.fromEntries(Object.entries(body).filter(([k, v]) => !["back", "_method", "notice", "ifVersion", "show_result"].includes(k) && typeof v !== "object" || Array.isArray(v)));
     if (!id) {
       if (method === "GET") {
         const where = Object.fromEntries([...url.searchParams].filter(([k]) => !["cursor", "limit", "q", "courseId", "includeDeleted", "as_user_id", "sort"].includes(k)));

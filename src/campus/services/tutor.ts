@@ -1,4 +1,4 @@
-import { broker, CampusError, metrics, nowIso, nowMs, sha256, token, type Row, type TenantStore } from "../core";
+import { broker, CampusError, metrics, nowIso, nowMs, sha256, token, type TenantStore } from "../core";
 import { hasAny, type Actor } from "../iam";
 import { ask, auditAi, classifyFor, LOCAL_MODEL, retrieveFor } from "./ai";
 import { connectorStatus } from "./platform";

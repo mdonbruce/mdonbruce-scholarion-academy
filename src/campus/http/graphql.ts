@@ -105,7 +105,7 @@ class Parser {
     const out: Field[] = [];
     while (this.peek() !== "}") {
       if (this.s.startsWith("...", this.i)) throw new CampusError("graphql_unsupported", "Fragments aren't supported.", 400);
-      let alias = this.name();
+      const alias = this.name();
       let name = alias;
       if (this.peek() === ":") {
         this.i++;

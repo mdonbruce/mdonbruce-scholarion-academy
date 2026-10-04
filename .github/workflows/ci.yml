@@ -30,6 +30,14 @@ jobs:
         run: |
           set -o pipefail
           npm test 2>&1 | tee test.log
+      - name: Campus screens + accessibility (axe)
+        env:
+          CLOUDLAB_LOCAL_RUNNER: "1"
+        run: |
+          set -o pipefail
+          npx playwright install --with-deps chromium > pw.log 2>&1 || (tail -n 20 pw.log; exit 1)
+          (npm run campus:render && npm run campus:a11y) 2>&1 | tee a11y.log
+          echo "::notice title=Accessibility::$(grep '^axe:' a11y.log)"
       - name: Build
         env:
           NEXT_TELEMETRY_DISABLED: "1"
@@ -51,7 +59,7 @@ jobs:
       - name: Report failure output
         if: failure()
         run: |
-          for f in install test build smoke; do
+          for f in install test a11y build smoke; do
             [ -f "$f.log" ] || continue
             tail -n 80 "$f.log" | sed 's/\x1b\[[0-9;]*m//g' > tail.txt
             msg=$(python3 -c "import sys;print(open('tail.txt').read().replace('%','%25').replace('\r','').replace('\n','%0A'))")

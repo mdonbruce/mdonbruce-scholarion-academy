@@ -1,4 +1,4 @@
-import { CampusError, hmac, nowIso, nowMs, sha256, token, type Role, type Row, type TenantStore } from "../core";
+import { CampusError, hmac, nowIso, nowMs, sha256, token, type Role, type TenantStore } from "../core";
 import { hasAny, type Actor } from "../iam";
 import { actorHas } from "../permissions";
 import { accountOf } from "../entity";

@@ -1,7 +1,7 @@
 import { CampusError, id, nowIso, type Row, type TenantStore } from "../core";
 import { registerHooks } from "../entity";
 import { hasAny, type Actor } from "../iam";
-import { activeStudents, audit, course, isGrader, isStaff, notify, requireCourse, userName } from "./common";
+import { activeStudents, audit, course, isGrader, isStaff, notify, userName } from "./common";
 import { assertAccessible, groupIdsOf, sectionIdsOf } from "./curriculum";
 import { setGrade } from "./grading";
 

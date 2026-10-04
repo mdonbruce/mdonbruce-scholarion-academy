@@ -219,6 +219,54 @@ if (!offersEu.offers?.every((o) => o.currency === "EUR")) {
   console.log("FAIL EUR offers");
 } else console.log("ok   200 regional offers");
 
+
+// ---------------- Scholarion Campus (multi-tenant SIS + LMS) ----------------
+await expect("campus: choose a school", "/campus", 200);
+for (const slug of ["demo", "academy", "techdev"]) {
+  await expect(`campus: ${slug} home`, `/campus/${slug}`, 200);
+  await expect(`campus: ${slug} sign-in`, `/campus/${slug}/signin`, 200);
+  await expect(`campus: ${slug} catalog`, `/campus/${slug}/catalog`, 200);
+}
+await expect("campus: unknown tenant", "/campus/no-such-school", 404);
+await expect("campus: signed-out dashboard redirects", "/campus/demo/dashboard", 307);
+await expect("campus: health", "/api/campus/health", 200);
+await expect("campus: OpenAPI", "/api/campus/v1/t/demo/openapi.json", 200);
+await expect("campus: JWKS", "/api/campus/v1/t/demo/.well-known/jwks.json", 200);
+async function campusSignIn(slug, key, staff) {
+  const form = { email: `${key}@${slug}.scholarion.test`, password: "Scholarion-demo-1", next: `/campus/${slug}/dashboard` };
+  if (staff) form.code = totp("JBSWY3DPEHPK3PXP");
+  const r = await req(`/api/campus/v1/t/${slug}/auth/signin`, { method: "POST", form });
+  const c = (r.headers.getSetCookie?.() ?? []).find((x) => x.startsWith("scc_"));
+  const ok = r.status === 303 && !!c;
+  if (!ok) failures++;
+  console.log(`${ok ? "ok  " : "FAIL"} ${r.status} campus sign-in ${key}@${slug}`);
+  return c?.split(";")[0];
+}
+const cStudent = await campusSignIn("demo", "student1", false);
+for (const p of ["dashboard", "courses", "courses/crs_demo_cs101/modules", "courses/crs_demo_cs101/grades", "courses/crs_demo_cs101/syllabus", "calendar", "inbox", "notifications", "search?q=variables", "account", "t/registration"]) await expect(`campus student: ${p}`, `/campus/demo/${p}`, 200, { cookie: cStudent });
+const post = await req("/api/campus/v1/t/demo/a/discussion.post", { method: "POST", cookie: cStudent, form: { topicId: "dt_demo_intro", body: "Smoke test reply.", back: "/campus/demo/courses/crs_demo_cs101/discussions/dt_demo_intro" } });
+if (post.status !== 303 || !/notice=/.test(post.headers.get("location") ?? "")) {
+  failures++;
+  console.log(`FAIL campus discussion post (${post.status} ${post.headers.get("location")})`);
+} else console.log("ok   303 campus discussion reply posted");
+const cTeacher = await campusSignIn("demo", "instructor", false);
+for (const p of ["courses/crs_demo_cs101/grades", "courses/crs_demo_cs101/grader?assignmentId=asg_demo_hello", "courses/crs_demo_cs101/settings"]) await expect(`campus teacher: ${p}`, `/campus/demo/${p}`, 200, { cookie: cTeacher });
+const cAdmin = await campusSignIn("demo", "admin", true);
+for (const p of ["t/tenant-admin", "t/ai-control", "t/status-board", "t/connectors", "t/integration", "t/developer"]) await expect(`campus admin: ${p}`, `/campus/demo/${p}`, 200, { cookie: cAdmin });
+const gql = await (await fetch(`${BASE}/api/campus/v1/t/demo/graphql`, { method: "POST", headers: { "content-type": "application/json", cookie: cStudent, origin: BASE }, body: JSON.stringify({ query: "{ me { name } coursesById(id: \"crs_demo_cs101\") { title modules { title } } }" }) })).json();
+if (gql.data?.coursesById?.title !== "Foundations of Programming") {
+  failures++;
+  console.log("FAIL campus GraphQL", JSON.stringify(gql).slice(0, 200));
+} else console.log("ok   200 campus GraphQL nested query");
+const cross = await req("/api/campus/v1/t/techdev/me", { cookie: cStudent?.replace("scc_tn_demo", "scc_tn_techdev") });
+if (cross.status !== 401) {
+  failures++;
+  console.log(`FAIL campus cross-tenant cookie accepted (${cross.status})`);
+} else console.log("ok   401 campus cross-tenant session refused");
+const cOps = await campusSignIn("techdev", "ops", true);
+await expect("campus operator: tenant console", "/campus/techdev/t/tenant-console", 200, { cookie: cOps });
+await expect("campus: metrics", "/api/campus/metrics", 200);
+
 const status = await (await req("/api/v1/status")).json();
 console.log(`status board: ${status.capabilities.map((c) => `${c.key}=${c.status}`).join(", ")}`);
 

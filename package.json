@@ -16,7 +16,11 @@
     "test": "tsx --test tests/*.test.ts",
     "preview:render": "tsx --tsconfig tsconfig.scripts.json scripts/render-preview.tsx",
     "db:reset": "tsx scripts/reset-data.ts",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "campus:render": "tsx --tsconfig tsconfig.scripts.json scripts/campus-render.tsx --check",
+    "campus:a11y": "node scripts/campus-a11y.mjs",
+    "campus:grpc": "tsx scripts/campus-grpc.ts",
+    "campus:contracts": "tsx scripts/campus-contracts.ts"
   },
   "dependencies": {
     "next": "^15.5.0",
@@ -35,6 +39,8 @@
     "eslint": "^9.20.0",
     "eslint-config-next": "^15.5.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "axe-core": "^4.10.2",
+    "playwright": "^1.56.0"
   }
 }

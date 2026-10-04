@@ -223,9 +223,9 @@ function seedTenant(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
   store.insert("conversations", { courseId: cid, subject: "Lab 1 tips", participantIds: [u.instructor, s1, s2, s3, s4], messages: [{ id: "m1", authorId: u.instructor, body: "Remember: range(0, n + 1, 2) gives the even numbers up to n.", at: iso(-1), attachments: [], mediaUrl: null }], state: { [u.instructor]: { folder: "sent", read: true }, ...Object.fromEntries([s1, s2, s3, s4].map((x) => [x, { folder: "inbox", read: false }])) } }, "cv");
 
   /* Submissions & grades */
-  store.insert("submissions", { assignmentId: a1.id, userId: s1, courseId: cid, mode: "text", body: "name = input('Name? ')\nprint('Hello, ' + name)\nThe first line asks for a name; the second greets the person.", attempt: 1, state: "submitted", late: false, groupId: null, groupMemberIds: [s1] }, "sub");
-  store.insert("submissions", { assignmentId: a1.id, userId: s2, courseId: cid, mode: "text", body: "print('Hello')", attempt: 1, state: "submitted", late: true, groupId: null, groupMemberIds: [s2] }, "sub");
-  store.insert("submissions", { assignmentId: a1.id, userId: s4, courseId: cid, mode: "text", body: "n = input()\nprint(f'Hi {n}')", attempt: 1, state: "submitted", late: false, groupId: null, groupMemberIds: [s4] }, "sub");
+  store.insert("submissions", { createdAt: iso(-15), assignmentId: a1.id, userId: s1, courseId: cid, mode: "text", body: "name = input('Name? ')\nprint('Hello, ' + name)\nThe first line asks for a name; the second greets the person.", attempt: 1, state: "submitted", late: false, groupId: null, groupMemberIds: [s1] }, "sub");
+  store.insert("submissions", { createdAt: iso(-13), assignmentId: a1.id, userId: s2, courseId: cid, mode: "text", body: "print('Hello')", attempt: 1, state: "submitted", late: true, groupId: null, groupMemberIds: [s2] }, "sub");
+  store.insert("submissions", { createdAt: iso(-15), assignmentId: a1.id, userId: s4, courseId: cid, mode: "text", body: "n = input()\nprint(f'Hi {n}')", attempt: 1, state: "submitted", late: false, groupId: null, groupMemberIds: [s4] }, "sub");
   const grader = actorFor(store, u.instructor, true);
   setGrade(store, grader, { assignmentId: a1.id, userId: s1, score: 9, source: "manual", comment: "Clear explanation of each line. Nice work." });
   setGrade(store, grader, { assignmentId: a1.id, userId: s4, score: 6, source: "manual" });

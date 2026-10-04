@@ -515,6 +515,117 @@ export function renderPage(store: TenantStore, page: Row) {
   return renderBlocks(store, (page.blocks as Block[]) ?? [], page.courseId as string);
 }
 
+/**
+ * Rich content editor (text mode): a small, accessible markup turned into validated blocks.
+ *   ## Heading (### / ####)   - list item   1. ordered item   > callout   ```code```   $$ tex $$
+ *   ![alt text](https://…)    [link text](https://… or page:<id>)    | a | b | table rows (first row = header)
+ */
+export function markupToBlocks(text: string): Block[] {
+  const out: Record<string, unknown>[] = [];
+  const lines = text.replace(/\r/g, "").split("\n");
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (!line.trim()) {
+      i++;
+      continue;
+    }
+    const h = /^(#{2,4})\s+(.+)$/.exec(line);
+    if (h) {
+      out.push({ type: "heading", level: h[1].length, text: h[2].trim() });
+      i++;
+      continue;
+    }
+    if (line.startsWith("```")) {
+      const lang = line.slice(3).trim() || undefined;
+      const body: string[] = [];
+      i++;
+      while (i < lines.length && !lines[i].startsWith("```")) body.push(lines[i++]);
+      i++;
+      out.push({ type: "code", lang, text: body.join("\n") });
+      continue;
+    }
+    if (line.startsWith("$$")) {
+      out.push({ type: "equation", tex: line.replace(/\$\$/g, "").trim() });
+      i++;
+      continue;
+    }
+    const img = /^!\[([^\]]*)\]\((\S+)\)$/.exec(line.trim());
+    if (img) {
+      out.push({ type: "image", src: img[2], alt: img[1], decorative: img[1] === "" ? false : undefined });
+      i++;
+      continue;
+    }
+    const link = /^\[([^\]]+)\]\((\S+)\)$/.exec(line.trim());
+    if (link) {
+      const ref = /^(page|assignment|quiz|discussion|file|module):(\S+)$/.exec(link[2]);
+      const table = ref ? { page: "pages", assignment: "assignments", quiz: "quizzes", discussion: "discussion_topics", file: "files", module: "modules" }[ref[1]] : null;
+      out.push(ref ? { type: "link", text: link[1], ref: { table, id: ref[2] } } : { type: "link", text: link[1], href: link[2] });
+      i++;
+      continue;
+    }
+    if (/^\s*([-*]|\d+\.)\s+/.test(line)) {
+      const ordered = /^\s*\d+\./.test(line);
+      const items: string[] = [];
+      while (i < lines.length && /^\s*([-*]|\d+\.)\s+/.test(lines[i])) items.push(lines[i++].replace(/^\s*([-*]|\d+\.)\s+/, ""));
+      out.push({ type: "list", ordered, items });
+      continue;
+    }
+    if (line.startsWith(">")) {
+      out.push({ type: "callout", tone: "info", text: line.replace(/^>\s?/, "") });
+      i++;
+      continue;
+    }
+    if (line.trim().startsWith("|")) {
+      const rows: string[][] = [];
+      while (i < lines.length && lines[i].trim().startsWith("|")) {
+        const cells = lines[i].trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+        if (!cells.every((c) => /^-+$/.test(c))) rows.push(cells);
+        i++;
+      }
+      out.push({ type: "table", header: true, rows });
+      continue;
+    }
+    const para: string[] = [];
+    while (i < lines.length && lines[i].trim() && !/^(#{2,4}\s|```|\$\$|!\[|\[|>|\||\s*([-*]|\d+\.)\s)/.test(lines[i])) para.push(lines[i++].trim());
+    if (para.length) out.push({ type: "paragraph", text: para.join(" ") });
+    else i++;
+  }
+  return validateBlocks(out);
+}
+
+/** Blocks back to the text markup (for editing). */
+export function blocksToMarkup(blocks: Block[]): string {
+  return blocks
+    .map((b) => {
+      switch (b.type) {
+        case "heading":
+          return `${"#".repeat(b.level)} ${b.text}`;
+        case "paragraph":
+          return b.text;
+        case "list":
+          return b.items.map((x, i) => (b.ordered ? `${i + 1}. ${x}` : `- ${x}`)).join("\n");
+        case "image":
+          return `![${b.alt ?? ""}](${b.src})`;
+        case "code":
+          return `\`\`\`${b.lang ?? ""}\n${b.text}\n\`\`\``;
+        case "callout":
+          return `> ${b.text}`;
+        case "equation":
+          return `$$ ${b.tex} $$`;
+        case "table":
+          return b.rows.map((r) => `| ${r.join(" | ")} |`).join("\n");
+        case "link":
+          return b.ref ? `[${b.text ?? "link"}](${{ pages: "page", assignments: "assignment", quizzes: "quiz", discussion_topics: "discussion", files: "file", modules: "module" }[b.ref.table] ?? "page"}:${b.ref.id})` : `[${b.text ?? b.href}](${b.href})`;
+        case "media":
+          return `[media](file:${b.mediaId})`;
+        case "embed":
+          return `[${b.title}](${b.src ?? ""})`;
+      }
+    })
+    .join("\n\n");
+}
+
 /* ---------------- Syllabus & course navigation ---------------- */
 
 export function syllabus(store: TenantStore, a: Actor, courseId: string) {
