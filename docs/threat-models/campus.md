@@ -290,6 +290,12 @@ STRIDE-style notes per tab. Cross-cutting controls first.
 - SSRF → only configured trusted hosts; private and internal addresses are refused
 - Runaway agents → per-job request and runtime budgets, leases and retry limits; agents can't add credentials, enable billing or share learner data
 
+## 62. CX & Live Sessions Hub
+
+- Meeting-bombing → waiting room, passcodes, authenticated join, host-only screen share, link regeneration
+- Spam or unconsented outreach → consent registry, quiet hours, opt-in SMS/WhatsApp, AI disclosure on every automated message
+- Vendor lock-in or false connection claims → vendor-neutral hub; simulated meetings labelled; Genesys disabled with no API calls until licensed
+
 ## 61. Curriculum & Course Intelligence
 
 - Unreviewed AI content → AI DRAFT label, proposal workflow, creator can't approve

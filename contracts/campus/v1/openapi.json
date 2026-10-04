@@ -248,6 +248,10 @@
       "description": "Scheduled, bounded discovery and maintenance: cron schedules in America/New_York (jobs daily 6:00, resources Monday 7:00, terms review monthly, link checks daily 5:00, integration health every six hours), durable jobs with unique period keys, leases, request/runtime budgets, checkpoints, backoff with jitter and dead-letter, run-now/pause/resume, trusted-source adapters (official pages, RSS/Atom, public job-board API — no arbitrary-URL proxy), automatic publication of evidence-backed records, the versioned Scholarion Integration JSON Schema (Draft 2020-12) with semantic checks, and the API integration layer."
     },
     {
+      "name": "CX & Live Sessions Hub",
+      "description": "HavenConnect × Scholarion Academy: connector hub (Zoom Free/Basic and Webex Free with plan limits and verification dates, Genesys Cloud DISABLED until a subscription, SMS/WhatsApp, LMS, email), the 40-Minute Session Engine (35 + 5 minute segments, 1-on-1 and licensed-host exceptions), pre-created segment meetings with waiting room and passcode, Session Cards, 24-hour and 15-minute reminders, 33-minute warnings and next-link posts, recap drafts approved by the instructor, Zoom ↔ Webex failover, leaked-link regeneration, recordings with captions and consent, per-segment attendance reconciliation (flagged, never auto-penalized), the support agent with AI disclosure, CX inbox with SLAs, knowledge base and setup guides, consent registry, Genesys activation checklist with 15 capability toggles and mock-mode tests, analytics and audit."
+    },
+    {
       "name": "Curriculum & Course Intelligence",
       "description": "AI drafts, humans decide: curriculum knowledge graph, Program Design Studio with overlap analysis, alignment matrix and coverage heatmaps (Bloom fit, orphans, scaffolding), skills and roles map, standards mapper over human-loaded framework packs (evidence for review only), pathways and consolidation, course health from aggregated learning data, assessment intelligence (item difficulty and discrimination), freshness sentinel with impact analysis, accessibility audit, proposal → review → versioned-release workflow with separation of duties, the governed Curriculum Exchange (curriculum packages only — never learner data) and program review reports."
     },
@@ -34403,6 +34407,1870 @@
         }
       }
     },
+    "/r/comms_connectors": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "List communications connectors",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CommsConnectors"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Create a comms connector",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/comms_connectors/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Get a comms connector",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Update a comms connector (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Delete (tombstone) a comms connector",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/comms_sessions": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "List live sessions (40-minute engine)",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CommsSessions"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Create a live session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "description": "Course",
+                    "type": "string",
+                    "x-ref": "courses"
+                  }
+                },
+                "required": [
+                  "courseId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/comms_sessions/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Get a live session",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Update a live session (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "description": "Course",
+                    "type": "string",
+                    "x-ref": "courses"
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Delete (tombstone) a live session",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/comms_attendance": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "List segment attendance",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CommsAttendance"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Create a segment attendance",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/comms_attendance/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Get a segment attendance",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Update a segment attendance (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Delete (tombstone) a segment attendance",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/comms_attendance_confirmations": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "List attendance confirmations",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CommsAttendanceConfirmations"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Create a attendance confirmation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/comms_attendance_confirmations/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Get a attendance confirmation",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Update a attendance confirmation (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Delete (tombstone) a attendance confirmation",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/comms_recordings": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "List recordings and transcripts",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CommsRecordings"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Create a recording",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/comms_recordings/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Get a recording",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Update a recording (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Delete (tombstone) a recording",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/comms_recaps": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "List segment recaps",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CommsRecaps"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Create a segment recap",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/comms_recaps/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Get a segment recap",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Update a segment recap (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Delete (tombstone) a segment recap",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/cx_conversations": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "List cx inbox",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CxConversations"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Create a cx conversation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/cx_conversations/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Get a cx conversation",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Update a cx conversation (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Delete (tombstone) a cx conversation",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/comms_consents": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "List communication consents",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CommsConsents"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Create a communication consent",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/comms_consents/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Get a communication consent",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Update a communication consent (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Delete (tombstone) a communication consent",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/genesys_modules": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "List genesys cloud modules",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GenesysModules"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Create a genesys module",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/genesys_modules/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Get a genesys module",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Update a genesys module (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Delete (tombstone) a genesys module",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/genesys_checklist": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "List genesys activation checklist",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GenesysChecklist"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Create a genesys activation item",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/genesys_checklist/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Get a genesys activation item",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Update a genesys activation item (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "summary": "Delete (tombstone) a genesys activation item",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/r/cci_drafts": {
       "get": {
         "tags": [
@@ -61861,6 +63729,968 @@
         }
       }
     },
+    "/q/comms.connectors": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.connectors",
+        "summary": "Connector hub: status, plan limits and last verification for each communications connector.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/comms.segment_preview": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.segment_preview",
+        "summary": "Preview how a class block splits under the 40-minute engine.",
+        "parameters": [
+          {
+            "name": "totalMinutes",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "in": "query"
+          },
+          {
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "licensedHost",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/comms.plan": {
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.plan",
+        "summary": "Plan a live session: segments, pre-created meetings (simulated), Session Card and calendar entries.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "startsAt": {
+                    "type": "string"
+                  },
+                  "totalMinutes": {
+                    "type": "number"
+                  },
+                  "kind": {
+                    "type": "string"
+                  },
+                  "platform": {
+                    "type": "string"
+                  },
+                  "licensedHost": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "courseId",
+                  "title",
+                  "startsAt",
+                  "totalMinutes"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/comms.card": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.card",
+        "summary": "Session Card: every part's link, time and topic.",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/comms.live": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.live",
+        "summary": "Live monitor: current part, timer, warning and next link.",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/comms.tick": {
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.tick",
+        "summary": "Run the session automation now (reminders, 33-minute warnings, next links, recap drafts).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/comms.failover": {
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.failover",
+        "summary": "Move the remaining parts to the backup platform and broadcast new links.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sessionId": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "sessionId",
+                  "reason"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/comms.regenerate": {
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.regenerate",
+        "summary": "Regenerate a leaked part link and rebroadcast it to enrolled learners.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sessionId": {
+                    "type": "string"
+                  },
+                  "segment": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "sessionId",
+                  "segment"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/comms.recap_approve": {
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.recap_approve",
+        "summary": "Approve (and edit) a recap draft and post it to the course.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "recapId": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "recapId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/comms.attendance_record": {
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.attendance_record",
+        "summary": "Record a join/leave from the platform's participant report.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sessionId": {
+                    "type": "string"
+                  },
+                  "segment": {
+                    "type": "number"
+                  },
+                  "userId": {
+                    "type": "string"
+                  },
+                  "joinedAt": {
+                    "type": "string"
+                  },
+                  "leftAt": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "sessionId",
+                  "segment",
+                  "userId",
+                  "joinedAt",
+                  "leftAt"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/comms.attendance": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.attendance",
+        "summary": "Reconcile attendance across parts per learner (partial is flagged, never penalized).",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/comms.attendance_confirm": {
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.attendance_confirm",
+        "summary": "Instructor confirms the reconciled attendance.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sessionId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "sessionId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/comms.recording_upload": {
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.recording_upload",
+        "summary": "Upload a recording (local recording) with its transcript; captions are built for review.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sessionId": {
+                    "type": "string"
+                  },
+                  "segment": {
+                    "type": "number"
+                  },
+                  "fileName": {
+                    "type": "string"
+                  },
+                  "transcript": {
+                    "type": "string"
+                  },
+                  "consentNoticeShown": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "sessionId",
+                  "segment",
+                  "fileName"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/comms.recording_publish": {
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.recording_publish",
+        "summary": "Publish a captioned recording to the course after review.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "recordingId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "recordingId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/comms.ask": {
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.ask",
+        "summary": "Ask the support assistant (join help, links, recordings, setup guides).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "question": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "question"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/comms.inbox": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.inbox",
+        "summary": "CX inbox: conversations, AI agent activity, escalations and SLAs.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/comms.resolve": {
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.resolve",
+        "summary": "Reply to a conversation and mark it resolved once the learner confirms.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "conversationId": {
+                    "type": "string"
+                  },
+                  "reply": {
+                    "type": "string"
+                  },
+                  "learnerConfirmed": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "conversationId",
+                  "reply"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/comms.consent": {
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.consent",
+        "summary": "Opt in or out of a communication channel.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "channel": {
+                    "type": "string",
+                    "enum": [
+                      "email",
+                      "sms",
+                      "whatsapp",
+                      "voice",
+                      "outbound_campaigns"
+                    ]
+                  },
+                  "optedIn": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "channel"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/comms.genesys": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.genesys",
+        "summary": "Genesys Cloud: status, activation checklist and module toggles (disabled until licensed).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/comms.genesys_checklist": {
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.genesys_checklist",
+        "summary": "Record a Genesys activation checklist item.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "done": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "key"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/comms.genesys_module": {
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.genesys_module",
+        "summary": "Enable or disable one Genesys module (needs the checklist and its licence).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "enable": {
+                    "type": "boolean"
+                  },
+                  "licensed": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "key"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/comms.genesys_mock": {
+      "post": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.genesys_mock",
+        "summary": "Run the Genesys mock-mode test suite (no real API calls).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/comms.analytics": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.analytics",
+        "summary": "Session analytics: attendees per part, rejoin rate, minutes attended.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/comms.audit": {
+      "get": {
+        "tags": [
+          "CX & Live Sessions Hub"
+        ],
+        "operationId": "comms.audit",
+        "summary": "Audit of agent actions, sends, connector changes and recording access.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/q/cci.dashboard": {
       "get": {
         "tags": [
@@ -72094,6 +74924,376 @@
           }
         ],
         "description": "Studio output (tab: course-studio)"
+      },
+      "CommsConnectors": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "key": {
+                "description": "Key",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status",
+                "type": "string"
+              },
+              "secretRef": {
+                "description": "Key-vault reference",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Comms connector (tab: communications)"
+      },
+      "CommsSessions": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "courseId": {
+                "description": "Course",
+                "type": "string",
+                "x-ref": "courses"
+              },
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind (class / one_to_one / office_hours)",
+                "type": "string"
+              },
+              "startsAt": {
+                "description": "Starts",
+                "type": "string",
+                "format": "date-time"
+              },
+              "totalMinutes": {
+                "description": "Scheduled minutes",
+                "type": "number"
+              },
+              "platform": {
+                "description": "Platform",
+                "type": "string"
+              },
+              "backupPlatform": {
+                "description": "Backup platform",
+                "type": "string"
+              },
+              "licensedHost": {
+                "description": "Licensed host",
+                "type": "boolean"
+              },
+              "rule": {
+                "description": "Segmentation rule",
+                "type": "string"
+              },
+              "segments": {
+                "description": "Segments (simulated meetings)"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              },
+              "events": {
+                "description": "Automation log"
+              }
+            }
+          }
+        ],
+        "description": "Live session (tab: communications)"
+      },
+      "CommsAttendance": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "sessionId": {
+                "description": "Session",
+                "type": "string"
+              },
+              "segment": {
+                "description": "Part",
+                "type": "number"
+              },
+              "userId": {
+                "description": "Learner",
+                "type": "string"
+              },
+              "joinedAt": {
+                "description": "Joined",
+                "type": "string",
+                "format": "date-time"
+              },
+              "leftAt": {
+                "description": "Left",
+                "type": "string",
+                "format": "date-time"
+              },
+              "minutes": {
+                "description": "Minutes",
+                "type": "number"
+              },
+              "source": {
+                "description": "Source",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Segment attendance (tab: communications)"
+      },
+      "CommsAttendanceConfirmations": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "sessionId": {
+                "description": "Session",
+                "type": "string"
+              },
+              "confirmedBy": {
+                "description": "Confirmed by",
+                "type": "string"
+              },
+              "at": {
+                "description": "At",
+                "type": "string",
+                "format": "date-time"
+              },
+              "summary": {
+                "description": "Summary"
+              }
+            }
+          }
+        ],
+        "description": "Attendance confirmation (tab: communications)"
+      },
+      "CommsRecordings": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "sessionId": {
+                "description": "Session",
+                "type": "string"
+              },
+              "segment": {
+                "description": "Part",
+                "type": "number"
+              },
+              "fileName": {
+                "description": "File",
+                "type": "string"
+              },
+              "transcript": {
+                "description": "Transcript",
+                "type": "string"
+              },
+              "captions": {
+                "description": "Captions (WebVTT)",
+                "type": "string"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              },
+              "note": {
+                "description": "Note",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Recording (tab: communications)"
+      },
+      "CommsRecaps": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "sessionId": {
+                "description": "Session",
+                "type": "string"
+              },
+              "segment": {
+                "description": "Part",
+                "type": "number"
+              },
+              "text": {
+                "description": "Recap",
+                "type": "string"
+              },
+              "state": {
+                "description": "State (awaiting_approval / posted)",
+                "type": "string"
+              },
+              "approvedBy": {
+                "description": "Approved by",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Segment recap (tab: communications)"
+      },
+      "CxConversations": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "description": "Learner",
+                "type": "string"
+              },
+              "channel": {
+                "description": "Channel",
+                "type": "string"
+              },
+              "intent": {
+                "description": "Intent",
+                "type": "string"
+              },
+              "messages": {
+                "description": "Messages"
+              },
+              "state": {
+                "description": "State",
+                "type": "string"
+              },
+              "slaDueAt": {
+                "description": "SLA due",
+                "type": "string",
+                "format": "date-time"
+              },
+              "assignee": {
+                "description": "Assignee",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "CX conversation (tab: communications)"
+      },
+      "CommsConsents": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "description": "Learner",
+                "type": "string"
+              },
+              "channel": {
+                "description": "Channel",
+                "type": "string"
+              },
+              "optedIn": {
+                "description": "Opted in",
+                "type": "boolean"
+              },
+              "at": {
+                "description": "At",
+                "type": "string",
+                "format": "date-time"
+              },
+              "source": {
+                "description": "Source",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Communication consent (tab: communications)"
+      },
+      "GenesysModules": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "key": {
+                "description": "Key",
+                "type": "string"
+              },
+              "name": {
+                "description": "Capability",
+                "type": "string"
+              },
+              "use": {
+                "description": "Use",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status",
+                "type": "string"
+              },
+              "licensed": {
+                "description": "Licensed",
+                "type": "boolean"
+              }
+            }
+          }
+        ],
+        "description": "Genesys module (tab: communications)"
+      },
+      "GenesysChecklist": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "key": {
+                "description": "Item",
+                "type": "string"
+              },
+              "done": {
+                "description": "Done",
+                "type": "boolean"
+              },
+              "by": {
+                "description": "By",
+                "type": "string"
+              },
+              "at": {
+                "description": "At",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Genesys activation item (tab: communications)"
       },
       "CciDrafts": {
         "allOf": [

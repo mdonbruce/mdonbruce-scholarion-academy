@@ -191,6 +191,12 @@ function Bespoke({ t, tab }: { t: T; tab: string }) {
         return <AssessmentStudio t={t} />;
       case "agentic-cloud-labs":
         return <AgenticLabsPanel t={t} />;
+      case "communications":
+        return (
+          <p className="notice notice-info">
+            Work in the hub: <a href={`/campus/${t.slug}/comms/connectors`}>open the CX & Live Sessions Hub</a>.
+          </p>
+        );
       case "curriculum-intelligence":
         return (
           <p className="notice notice-info">

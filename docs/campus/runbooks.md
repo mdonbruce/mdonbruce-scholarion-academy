@@ -693,6 +693,18 @@ Scheduled, bounded discovery and maintenance: cron schedules in America/New_York
 - **Operations:** `eco.automation`, `eco.schedule_save`, `eco.schedule_pause`, `eco.schedule_resume`, `eco.run_now`, `eco.tick`, `eco.job`, `eco.job_create`, `eco.source_add`, `eco.source_toggle`, `eco.schemas`, `eco.validate`
 - **Who sees it:** admin
 
+## 62. CX & Live Sessions Hub
+
+HavenConnect × Scholarion Academy: connector hub (Zoom Free/Basic and Webex Free with plan limits and verification dates, Genesys Cloud DISABLED until a subscription, SMS/WhatsApp, LMS, email), the 40-Minute Session Engine (35 + 5 minute segments, 1-on-1 and licensed-host exceptions), pre-created segment meetings with waiting room and passcode, Session Cards, 24-hour and 15-minute reminders, 33-minute warnings and next-link posts, recap drafts approved by the instructor, Zoom ↔ Webex failover, leaked-link regeneration, recordings with captions and consent, per-segment attendance reconciliation (flagged, never auto-penalized), the support agent with AI disclosure, CX inbox with SLAs, knowledge base and setup guides, consent registry, Genesys activation checklist with 15 capability toggles and mock-mode tests, analytics and audit.
+
+- **Purpose:** Keep live classes continuous on free meeting plans and route learner questions to the right help.
+- **Depends on:** Meeting platform accounts and OAuth apps (simulated until connected), LMS calendar and announcements, email connector, knowledge base.
+- **Typical failures:** Primary platform down (failover to the backup with new links); link leaked (regenerate and rebroadcast); no transcript (recording waits for captions).
+- **Recovery:** Failover or regenerate from the Live Monitor; add a transcript; escalate to support staff from the CX inbox.
+- **Resources:** `comms_connectors`, `comms_sessions`, `comms_attendance`, `comms_attendance_confirmations`, `comms_recordings`, `comms_recaps`, `cx_conversations`, `comms_consents`, `genesys_modules`, `genesys_checklist`
+- **Operations:** `comms.connectors`, `comms.segment_preview`, `comms.plan`, `comms.card`, `comms.live`, `comms.tick`, `comms.failover`, `comms.regenerate`, `comms.recap_approve`, `comms.attendance_record`, `comms.attendance`, `comms.attendance_confirm`, `comms.recording_upload`, `comms.recording_publish`, `comms.ask`, `comms.inbox`, `comms.resolve`, `comms.consent`, `comms.genesys`, `comms.genesys_checklist`, `comms.genesys_module`, `comms.genesys_mock`, `comms.analytics`, `comms.audit`
+- **Who sees it:** admin, instructor, support, advisor
+
 ## 61. Curriculum & Course Intelligence
 
 AI drafts, humans decide: curriculum knowledge graph, Program Design Studio with overlap analysis, alignment matrix and coverage heatmaps (Bloom fit, orphans, scaffolding), skills and roles map, standards mapper over human-loaded framework packs (evidence for review only), pathways and consolidation, course health from aggregated learning data, assessment intelligence (item difficulty and discrimination), freshness sentinel with impact analysis, accessibility audit, proposal → review → versioned-release workflow with separation of duties, the governed Curriculum Exchange (curriculum packages only — never learner data) and program review reports.

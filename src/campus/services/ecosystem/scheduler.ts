@@ -1,5 +1,6 @@
 import { broker } from "../../core";
 import { tickPlans } from "../plans";
+import { tickSessions } from "../comms";
 import { ecoTick } from "./discovery";
 
 /**
@@ -20,6 +21,7 @@ export function startEcoScheduler(intervalMs = 60_000) {
         const store = broker.connect({ tenantId: t.id, slug: t.slug, via: "path", traceId: "eco-scheduler" });
         try {
           tickPlans(store); // subscription reminders, renewals and period ends (sandbox)
+          tickSessions(store); // live-session reminders, 33-minute warnings, next links, recap drafts
         } catch (e) {
           console.error(`[plans] ${t.slug}:`, (e as Error).message);
         }

@@ -2944,6 +2944,156 @@ CREATE TABLE IF NOT EXISTS studio_outputs (
   checksum text
 );
 
+-- Comms connector (tab: communications)
+CREATE TABLE IF NOT EXISTS comms_connectors (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  "key" text,
+  status text,
+  secret_ref text
+);
+
+-- Live session (tab: communications)
+CREATE TABLE IF NOT EXISTS comms_sessions (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  course_id text NOT NULL,
+  title text,
+  kind text,
+  starts_at timestamptz,
+  total_minutes numeric,
+  platform text,
+  backup_platform text,
+  licensed_host boolean,
+  rule text,
+  segments jsonb,
+  state text,
+  events jsonb
+);
+CREATE INDEX IF NOT EXISTS comms_sessions_course_id ON comms_sessions (course_id) WHERE deleted_at IS NULL;
+
+-- Segment attendance (tab: communications)
+CREATE TABLE IF NOT EXISTS comms_attendance (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  session_id text,
+  segment numeric,
+  user_id text,
+  joined_at timestamptz,
+  left_at timestamptz,
+  minutes numeric,
+  source text
+);
+
+-- Attendance confirmation (tab: communications)
+CREATE TABLE IF NOT EXISTS comms_attendance_confirmations (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  session_id text,
+  confirmed_by text,
+  at timestamptz,
+  summary jsonb
+);
+
+-- Recording (tab: communications)
+CREATE TABLE IF NOT EXISTS comms_recordings (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  session_id text,
+  segment numeric,
+  file_name text,
+  transcript text,
+  captions text,
+  state text,
+  note text
+);
+
+-- Segment recap (tab: communications)
+CREATE TABLE IF NOT EXISTS comms_recaps (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  session_id text,
+  segment numeric,
+  text text,
+  state text,
+  approved_by text
+);
+
+-- CX conversation (tab: communications)
+CREATE TABLE IF NOT EXISTS cx_conversations (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  user_id text,
+  channel text,
+  intent text,
+  messages jsonb,
+  state text,
+  sla_due_at timestamptz,
+  assignee text
+);
+
+-- Communication consent (tab: communications)
+CREATE TABLE IF NOT EXISTS comms_consents (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  user_id text,
+  channel text,
+  opted_in boolean,
+  at timestamptz,
+  source text
+);
+
+-- Genesys module (tab: communications)
+CREATE TABLE IF NOT EXISTS genesys_modules (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  "key" text,
+  name text,
+  use text,
+  status text,
+  licensed boolean
+);
+
+-- Genesys activation item (tab: communications)
+CREATE TABLE IF NOT EXISTS genesys_checklist (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  "key" text,
+  done boolean,
+  by text,
+  at timestamptz
+);
+
 -- CCI draft (tab: curriculum-intelligence)
 CREATE TABLE IF NOT EXISTS cci_drafts (
   id text PRIMARY KEY,

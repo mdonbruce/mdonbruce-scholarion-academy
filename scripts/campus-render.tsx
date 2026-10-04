@@ -28,6 +28,7 @@ import { ProgramIndexView, ProgramPageView } from "../src/campus/ui/views/progra
 import { PublicChangelog } from "../src/campus/ui/views/ecohub";
 import { AidView, PlusView, PricingView } from "../src/campus/ui/views/market";
 import { kitAssets } from "../src/campus/services/campaigns";
+import { planSession, supportAnswer, tickSessions } from "../src/campus/services/comms";
 import { generateDraft } from "../src/campus/services/assess";
 import { runLab } from "../src/campus/services/agentlabs";
 import { simLabHtml } from "../src/campus/services/simlab";
@@ -336,6 +337,16 @@ page("academy", "admin", "t/pathways?run=pathways.consolidation_report", "Consol
 {
   // Tab 60 — Program Marketing & Campaigns, with the kit files themselves.
   page("academy", "admin", "t/campaigns", "Tab 60 — Program Marketing & Campaigns");
+  {
+    // A demo 90-minute class on the 40-minute engine, part-way through.
+    const ins = as("academy", "instructor");
+    const sess = planSession(ins.store, ins.actor, { courseId: "crs_academy_ai801", title: "Module 1 live lecture", startsAt: new Date(Date.now() - 34 * 60_000).toISOString(), totalMinutes: 90 });
+    tickSessions(ins.store);
+    supportAnswer(as("academy", "student1").store, as("academy", "student1").actor, "My class ended, where do I go?");
+    for (const sec of ["connectors", "planner?total=240", "monitor", "recordings", "attendance", "inbox", "knowledge", "genesys", "analytics"]) page("academy", "admin", `comms/${sec}`, `CX & Live Sessions — ${sec.split("?")[0]}`);
+    page("academy", "student1", `comms/card/${sess.id}`, "Session Card (learner)");
+    page("academy", "student1", "comms/help", "Support assistant (learner)");
+  }
   page("academy", "admin", "t/commerce", "Commerce — financial aid queue and plan settings");
   page("academy", "student1", "account", "Account — subscriptions and financial aid");
   page("academy", "designer", "t/program-studio", "Program Studio — design packages for #1–#11");

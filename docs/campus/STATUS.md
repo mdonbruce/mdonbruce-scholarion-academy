@@ -4,7 +4,7 @@ Generated 2026-10-04 by `scripts/campus-docs.ts`. Environment: local + staging o
 
 **Capabilities:** 37 LIVE · 0 CONNECTED · 3 SIMULATED · 8 DISABLED · 6 PLANNED
 
-## Tabs (61)
+## Tabs (62)
 
 A tab is OPERATIONAL when it has persisted resources, enforced authorization, audited writes, an API surface (REST + operations + GraphQL), a working screen, and a passing test. Tabs that depend on outside services report the connector state honestly.
 
@@ -67,6 +67,7 @@ A tab is OPERATIONAL when it has persisted resources, enforced authorization, au
 | 57 | Free Education Resource Hub | Intelligence | OPERATIONAL | ecosystem suite (Tab 57: seeded verified catalog, schema validation, filters, live blocks, mappings, connections) |
 | 58 | Career Connect & Employer Portal | Student Success | OPERATIONAL | ecosystem suite (Tab 58: opt-in talent search, consent contact, idempotent applications, partner rule) |
 | 59 | Auto-Discovery & Workflow Automation | Platform | OPERATIONAL | ecosystem suite (Tab 59: terms review, link checks, dedupe, retries/dead-letter, missed runs, API v1) |
+| 62 | CX & Live Sessions Hub | Platform | OPERATIONAL | comms suite (Tab 62: segmentation table, pre-created meetings, Session Card, reminders, 33-minute warning, next link, recap approval, support agent with disclosure, failover, link regeneration, segment attendance, captioned recordings, Genesys checklist/licences/mock suite) |
 | 61 | Curriculum & Course Intelligence | Intelligence | OPERATIONAL | cci suite (Tab 61: exchange pipeline with learner-data block, design studio overlap, alignment heatmap, human-loaded standards packs as evidence for review, course health, item analysis, freshness tickets, accessibility audit, proposal workflow with separation of duties, report downloads) |
 | 60 | Program Marketing & Campaigns | Academy & Commerce | OPERATIONAL | campaigns suite (Tab 60: DST-aware 18-session schedule, flyers with the approved photo and no invented meeting details, Copy Checker on every asset, opt-in sends held without a provider, unsubscribe, manual channels, program folder export) |
 | 52 | Module Library & Catalog Consolidation | Academy & Commerce | OPERATIONAL | agentic suite (Tab 52: hub, library, policies, consolidation) |

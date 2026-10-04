@@ -9,6 +9,7 @@ import { LearnArea } from "./learn";
 import { EcoHub } from "./ecohub";
 import { AccountPlans } from "./market";
 import { CciWorkspace } from "./cci";
+import { CommsHub } from "./comms";
 
 type SP = Record<string, string | undefined>;
 
@@ -37,6 +38,8 @@ export function CampusPage({ store, actor, slug, path, sp }: { store: TenantStor
         );
       case "t":
         return <TabPage store={store} actor={actor} slug={slug} tabSlug={path[1] ?? ""} sp={sp} />;
+      case "comms":
+        return <CommsHub store={store} actor={actor} slug={slug} path={path.slice(1)} sp={sp} />;
       case "cci":
         return <CciWorkspace store={store} actor={actor} slug={slug} section={path[1] ?? "dashboard"} sp={sp} />;
       case "hub":
