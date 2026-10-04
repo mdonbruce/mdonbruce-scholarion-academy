@@ -4,6 +4,7 @@ import { renderBlocks, validateBlocks, type Block } from "./services/curriculum"
 import { ensureAgents, ensureStandardTemplate } from "./services/ai";
 import { ensureProctorDefaults } from "./services/proctor";
 import { ensurePrograms } from "./services/programs";
+import { ensureConsolidationDecision } from "./services/hub";
 import { ensureCloudLabTool } from "./services/lti";
 import { issueCredential, rebuildIndex, recomputeSignals } from "./services/success";
 import { setGrade } from "./services/grading";
@@ -398,6 +399,7 @@ function seedAcademy(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
   for (const [title, body] of [["How sandbox checkout works", "This staging site never takes real payments. Use the sandbox token tok_sandbox_visa at checkout."], ["Using the AI tutor", "The tutor answers from your course pages with citations. It won't do graded work, but it gives hints and can pass your question to your instructor."]]) store.insert("kb_articles", { title, body, tags: ["help"], state: "published" }, "kb");
   store.insert("global_announcements", { title: "Staging environment", body: "Demonstration site with fictional data. Payments are sandbox only.", roles: [], startsAt: iso(-30), endsAt: iso(365), dismissedBy: [] }, "gan");
   ensurePrograms(store);
+  ensureConsolidationDecision(store);
   ensureAgents(store);
   ensureProctorDefaults(store);
   ensureStandardTemplate(store);

@@ -45122,7 +45122,7 @@
           "Module Library & Catalog Consolidation"
         ],
         "operationId": "catalog.consolidation",
-        "summary": "Catalog consolidation report for programs #1–#38 (and proposed #27).",
+        "summary": "Catalog consolidation report for programs #1–#38, with recorded product-owner decisions.",
         "parameters": [],
         "responses": {
           "200": {
@@ -45247,6 +45247,53 @@
                 },
                 "required": [
                   "policyId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/policies.reopen": {
+      "post": {
+        "tags": [
+          "Module Library & Catalog Consolidation"
+        ],
+        "operationId": "policies.reopen",
+        "summary": "Product owner: send an approved policy back to draft for revision.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "policyId": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "policyId",
+                  "reason"
                 ]
               }
             }
@@ -52597,6 +52644,14 @@
                 "type": "string",
                 "format": "date-time"
               },
+              "approvalNote": {
+                "description": "Approval note",
+                "type": "string"
+              },
+              "revisedAfterDecision": {
+                "description": "Sent back for re-approval",
+                "type": "boolean"
+              },
               "state": {
                 "description": "State",
                 "type": "string"
@@ -52636,6 +52691,10 @@
               },
               "decisionNote": {
                 "description": "Decision note",
+                "type": "string"
+              },
+              "decisionRef": {
+                "description": "Decision reference",
                 "type": "string"
               }
             }

@@ -4,6 +4,7 @@ import { addPublishCheck } from "../entity";
 import { createUser, hasAny, type Actor } from "../iam";
 import { PROGRAMS, P26_QUIZ, TRADEMARK_NOTICE, type ProgramSpec, type QuizItem, type WeekSpec } from "../academy/programs-data";
 import { LEARNING_PATHS, LIBRARY, P15_CHECKS, PROGRAMS_2, type LibraryModule } from "../academy/programs-data-2";
+import { DECIDED_BY, DECISIONS, decisionIso } from "../academy/decisions";
 import { audit, notify, requireTenant } from "./common";
 import { copyCheck } from "./claims";
 import { renderBlocks, validateBlocks, type Block } from "./curriculum";
@@ -479,6 +480,7 @@ export function ensurePrograms(store: TenantStore) {
       if (to && !store.list("pathway_edges", (e) => e.kind === "stacks_into" && e.fromId === from.id && e.toId === to.id).length) store.insert("pathway_edges", { fromId: from.id, toId: to.id, kind: "stacks_into", moduleKey: null, note: `Recommended path: ${spec.code} → ${code}.` }, "pe");
     }
   }
+  ensureAccessModel(store);
 }
 
 /* ---------------- public page model ---------------- */
@@ -898,12 +900,41 @@ export const DEFAULT_POLICIES = [
 export function ensurePolicies(store: TenantStore) {
   const t = broker.tenant(store.tenantId)!;
   for (const p of DEFAULT_POLICIES) if (!store.list("catalog_policies", (x) => x.kind === p.kind).length) store.insert("catalog_policies", { ...p, escalationContact: `support@${t.slug}.scholarion.test`, approvedBy: null, approvedAt: null, state: "draft" }, "cpol");
+  // Product-owner decision: the policy text as written is approved. A policy an admin later sends back to draft
+  // (revisedAfterDecision) needs a fresh approval in Tab 52.
+  const approver = store.get("users", `usr_${t.slug}_admin`)?.id ?? null;
+  const decided: readonly string[] = DECISIONS.policies.approved;
+  for (const p of store.list("catalog_policies", (x) => decided.includes(String(x.kind)) && !x.approvedAt && !x.revisedAfterDecision)) {
+    store.update("catalog_policies", p.id, { state: "published", approvedAt: decisionIso(DECISIONS.policies.decidedOn), approvedBy: approver, approvalNote: DECIDED_BY });
+  }
+}
+
+/** Self-paced access model decision applied to every self-paced offering with a course. */
+export function ensureAccessModel(store: TenantStore) {
+  const models: readonly string[] = DECISIONS.accessModel.models;
+  for (const o of store.list("offerings", (x) => !!x.selfPaced && !!x.courseId)) {
+    const want = { auditAvailable: models.includes("audit"), inPlus: models.includes("subscription") };
+    if (o.auditAvailable !== want.auditAvailable || o.inPlus !== want.inPlus) store.update("offerings", o.id, want);
+  }
 }
 
 /** Policies show to learners only after the product owner (an admin) approves them. */
 export function approvedPolicy(store: TenantStore, kind: "refund" | "deferral" | "batch_change") {
   const p = store.list("catalog_policies", (x) => x.kind === kind && x.state === "published" && !!x.approvedAt)[0];
   return p ? { kind, text: String(p.text), windowDays: Number(p.windowDays ?? 0), feeAmount: Number(p.feeAmount ?? 0), processingDays: Number(p.processingDays ?? 0), escalationContact: String(p.escalationContact ?? ""), approvedAt: String(p.approvedAt) } : null;
+}
+
+/** Product owner: send an approved policy back to draft for revision; it disappears from learner pages until re-approved. */
+export function reopenPolicy(store: TenantStore, a: Actor, policyId: string, reason: string) {
+  requireTenant(store, a, ["admin"], "policies.reopen");
+  const p = store.get("catalog_policies", policyId);
+  if (!p) throw new CampusError("not_found", "Policy not found", 404);
+  if (!String(reason ?? "").trim()) throw new CampusError("invalid", "Say why the policy is going back to draft.", 422, { field: "reason" });
+  return store.tx(() => {
+    const row = store.update("catalog_policies", policyId, { state: "draft", approvedAt: null, approvedBy: null, revisedAfterDecision: true, approvalNote: `Sent back: ${String(reason).slice(0, 300)}` });
+    audit(store, a, "policies.reopen", `catalog_policies/${policyId}`, String(p.kind));
+    return row;
+  });
 }
 
 export function approvePolicy(store: TenantStore, a: Actor, policyId: string) {

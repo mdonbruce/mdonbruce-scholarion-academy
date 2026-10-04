@@ -785,7 +785,7 @@ function ModuleLibrary({ t }: { t: T }) {
         <h2 id="ml-pol" className="card-title">
           Refund, deferral and batch-change policies
         </h2>
-        <p className="small">Learner pages show a policy only after the product owner approves it. Until then they say the policy is being finalized.</p>
+        <p className="small">Learner pages show a policy only while it is approved. A policy sent back for revision disappears from learner pages until it is approved again.</p>
         <ul className="item-list">
           {policies.map((p) => (
             <li key={String(p.id)} className="stack">
@@ -797,6 +797,18 @@ function ModuleLibrary({ t }: { t: T }) {
                 Window {String(p.windowDays)} days · processing {String(p.processingDays)} business days · escalation {String(p.escalationContact)}
                 {p.approvedAt ? ` · approved ${fmt(p.approvedAt)}` : ""}
               </p>
+              {p.approvalNote ? <p className="tiny">{String(p.approvalNote)}</p> : null}
+              {isOwner && !!p.approvedAt && (
+                <form method="post" action={api(t.slug, "a/policies.reopen")} className="row">
+                  <Hidden values={{ back: t.here, policyId: String(p.id), notice: "Policy sent back to draft; learner pages say it's being finalized until you approve it again." }} />
+                  <label className="small">
+                    Reason <input name="reason" required maxLength={300} />
+                  </label>
+                  <button className="btn btn-sm" type="submit">
+                    Send back for revision
+                  </button>
+                </form>
+              )}
               {isOwner && !p.approvedAt && (
                 <form method="post" action={api(t.slug, "a/policies.approve")}>
                   <Hidden values={{ back: t.here, policyId: String(p.id), notice: "Policy approved — it now shows on program pages." }} />
@@ -939,8 +951,14 @@ function ModuleLibrary({ t }: { t: T }) {
           <strong>Referenced but not in the catalog:</strong> {rep.referencedNotInCatalog.join(", ") || "none"}
         </p>
         <p className="small">
-          <strong>Proposed:</strong> {rep.proposed.map((p) => `${p.code} ${p.title} (${p.status})`).join("; ")}
+          <strong>Proposed:</strong> {rep.proposed.length ? rep.proposed.map((p) => `${p.code} ${p.title} (${p.status})`).join("; ") : "none — every proposed program has been decided"}
         </p>
+        <h3 className="small">Decisions recorded</h3>
+        <ul className="small">
+          {rep.decisionsRecorded.map((c) => (
+            <li key={c}>{c}</li>
+          ))}
+        </ul>
         <h3 className="small">Legacy changes</h3>
         <ul className="small">
           {rep.legacyChanges.map((c) => (

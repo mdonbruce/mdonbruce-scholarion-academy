@@ -5,6 +5,7 @@ import type { ProgramSpec } from "../academy/programs-data";
 import { offeringCard, PRODUCT_LABEL } from "./academy";
 import { approvedPolicy } from "./programs";
 import { audit, requireTenant } from "./common";
+import { DECIDED_BY, DECISION_LOG, DECISIONS, decisionIso } from "../academy/decisions";
 
 /**
  * "Agentic AI Courses & Certifications" catalog hub and the catalog consolidation report.
@@ -257,6 +258,10 @@ export function hubRecommend(store: TenantStore, answers: Record<string, string>
 
 export function consolidationReport(store: TenantStore, a: Actor) {
   requireTenant(store, a, ["admin", "designer", "registrar"], "catalog.consolidation");
+  return buildConsolidation(store);
+}
+
+function buildConsolidation(store: TenantStore) {
   const offs = store.list("offerings", (o) => !/^#\d+\.\d+$/.test(String(o.code)));
   const codeOf = (id: string) => String(store.get("offerings", id)?.code ?? id);
   const libOf = (o: Row) => new Set(((o.libraryKeys as string[] | undefined) ?? []).filter((k) => k !== "responsible"));
@@ -302,7 +307,7 @@ export function consolidationReport(store: TenantStore, a: Actor) {
   overlaps.sort((x, y) => y.overlapPct - x.overlapPct);
   const report = {
     generatedAt: nowIso(),
-    scope: "Programs #1–#38 in the catalog, proposed #27, and numbers referenced by the library or learning paths",
+    scope: `Programs #1–#38 in the catalog${PROPOSED.length ? `, proposed ${PROPOSED.map((p) => p.code).join(", ")}` : ""}, and numbers referenced by the library or learning paths`,
     programs,
     referencedNotInCatalog: referenced,
     proposed: PROPOSED.map((p) => ({ ...p, status: "proposed — not built until approved" })),
@@ -314,10 +319,21 @@ export function consolidationReport(store: TenantStore, a: Actor) {
       "Earlier demo offering “Deep Learning Live Intensive” (#15) is folded into #18 Weeks 5–6; #15 is the Agentic AI Engineering Weekend Intensive.",
       "Earlier demo offerings “AI Agents Specialization” (#20) and “Machine Learning Professional Certificate” (#38) are retired; #20 and #38 now carry the new programs.",
       "The Python course formerly listed as #1 is #1-R (Week 0 refresher of #1).",
+      "#27 Certificate in MLOps & LLMOps moved from proposed to built after the product owner approved it.",
     ],
-    decisionsPending: ["Relationship of #13 to #9 (recorded as a recommendation)", "Build #27 MLOps & LLMOps?", "Self-paced access model: free audit, paid per product, and/or Scholaris Plus (all three run in the sandbox until decided)", "Refund, deferral and batch-change policy text"],
+    decisionsRecorded: DECISION_LOG,
+    decisionsPending: ["Relationship of #13 to #9 (recorded as a recommendation; not yet decided)"],
   };
   return report;
+}
+
+/** Records the product owner's approval of the consolidation report (idempotent; runs on every seed). */
+export function ensureConsolidationDecision(store: TenantStore) {
+  if (store.list("consolidation_reports", (r) => r.state === "approved" && r.decisionRef === "po-2026-10-04").length) return;
+  const t = broker.tenant(store.tenantId)!;
+  const admin = store.get("users", `usr_${t.slug}_admin`)?.id ?? null;
+  const at = decisionIso(DECISIONS.consolidation.decidedOn);
+  store.insert("consolidation_reports", { report: buildConsolidation(store), state: "approved", submittedBy: admin, decidedBy: admin, decidedAt: at, decisionNote: `${DECISIONS.consolidation.note} — ${DECIDED_BY}`, decisionRef: "po-2026-10-04" }, "ccr");
 }
 
 export function submitConsolidation(store: TenantStore, a: Actor) {

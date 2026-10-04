@@ -2189,6 +2189,8 @@ CREATE TABLE IF NOT EXISTS catalog_policies (
   escalation_contact text,
   approved_by text,
   approved_at timestamptz,
+  approval_note text,
+  revised_after_decision boolean,
   state text
 );
 
@@ -2204,7 +2206,8 @@ CREATE TABLE IF NOT EXISTS consolidation_reports (
   submitted_by text,
   decided_by text,
   decided_at timestamptz,
-  decision_note text
+  decision_note text,
+  decision_ref text
 );
 
 -- Account (tab: tenant-admin)

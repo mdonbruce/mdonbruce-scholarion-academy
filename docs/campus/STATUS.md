@@ -2,7 +2,7 @@
 
 Generated 2026-10-04 by `scripts/campus-docs.ts`. Environment: local + staging only (demonstration data, sandbox payments).
 
-**Capabilities:** 28 LIVE · 0 CONNECTED · 3 SIMULATED · 8 DISABLED · 2 PLANNED
+**Capabilities:** 30 LIVE · 0 CONNECTED · 3 SIMULATED · 8 DISABLED · 2 PLANNED
 
 ## Tabs (52)
 
@@ -86,6 +86,8 @@ A tab is OPERATIONAL when it has persisted resources, enforced authorization, au
 | SIS | Admissions, registration → enrollment projection, reconciliation, holds, transcript | LIVE | master acceptance (tests/campus-*.test.ts) | — |
 | Catalog | Product types, catalog hub, recommender, Catalog Copy Checker | LIVE | platform acceptance 2–3, 10 (tests/campus-*.test.ts) | — |
 | Catalog | Academy program pages (#1, #12, #13, #14, #26) generated from catalog data, brochure PDF, apply → admission → sandbox seat, inquiries, prerequisite self-check, pass/no-pass completion | LIVE | programs suite (tests/campus-*.test.ts) | — |
+| Catalog | Agentic AI hub (tabs, filters, rails from real data, learning paths, 9-question quiz, comparison, credential explainer, ItemList JSON-LD); programs #15–#25 and self-paced #28–#38 with batches, pay-later, audit access, autograded Cloud Lab notebooks, stacking certificates | LIVE | agentic suite (tests/campus-*.test.ts) | — |
+| Catalog | Shared module library, policy approval gate (refund / deferral / batch change) and catalog consolidation report with product-owner decision | LIVE | agentic suite (Tab 52) (tests/campus-*.test.ts) | — |
 | Pathways | Prerequisite / stacks / waives / mutually-exclusive rules, transfer credit, consolidation report | LIVE | platform acceptance 4 (tests/campus-*.test.ts) | — |
 | Commerce | Checkout, coupons, installments, subscriptions, seats, invoices, refunds | SIMULATED | Sandbox only; policy engine tested | Payment provider and go-live decision. |
 | Credentials | Open Badges 3.0 / VC signing, verification portal, revocation, reissue, CLR, honesty guard | LIVE | credential tests (tests/campus-*.test.ts) | — |

@@ -618,7 +618,7 @@ The versioned shared module library (blueprint course), the catalog consolidatio
 - **Typical failures:** Overlap above 60% flagged; policy not displayed (not approved).
 - **Recovery:** Merge or retire per the approved report; product owner approves the policy.
 - **Resources:** `library_modules`, `catalog_policies`, `consolidation_reports`
-- **Operations:** `catalog.consolidation`, `catalog.consolidation_submit`, `catalog.consolidation_decide`, `policies.approve`
+- **Operations:** `catalog.consolidation`, `catalog.consolidation_submit`, `catalog.consolidation_decide`, `policies.approve`, `policies.reopen`
 - **Who sees it:** admin, designer, registrar
 
 ## 51. LMS Parity Status

@@ -44,12 +44,18 @@ describe("Agentic AI hub and programs #15–#38 (Tab 52)", () => {
 
   it("loads every program, the shared library and the policies", () => {
     const store = storeOf("academy");
-    for (const n of [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38]) assert.ok(store.get("offerings", `off_academy_${n}`), `#${n} loaded`);
-    assert.equal(store.get("offerings", "off_academy_27"), undefined, "#27 is proposed only");
+    for (const n of [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38]) assert.ok(store.get("offerings", `off_academy_${n}`), `#${n} loaded`);
+    // #27 was approved and built: 8 weeks, a waiver into #15 Weekend 8, on the Data & AI Platforms path.
+    assert.equal(store.get("offerings", "off_academy_27")!.state, "published");
+    assert.equal(store.list("modules", (m) => m.courseId === "crs_academy_p27" && /^Week \d/.test(String(m.title))).length, 8);
+    assert.ok(store.list("pathway_edges", (e) => e.fromId === "off_academy_27" && e.toId === "off_academy_15" && e.kind === "waives" && e.moduleKey === "p15-w8").length === 1);
+    assert.ok(prog.qualityGate(store, "off_academy_27").every((g) => g.ok));
     assert.equal(store.list("library_modules").length, LIBRARY.length);
     assert.ok(store.get("courses", "crs_academy_library")!.isBlueprint);
     assert.deepEqual(store.list("catalog_policies").map((p) => p.kind).sort(), ["batch_change", "deferral", "refund"]);
-    assert.ok(store.list("catalog_policies").every((p) => p.state === "draft" && !p.approvedAt), "no policy shows before approval");
+    assert.ok(store.list("catalog_policies").every((p) => p.state === "published" && !!p.approvedAt && p.approvedBy === "usr_academy_admin"), "product-owner approval recorded");
+    // Access-model decision: every self-paced offering with a course offers audit, purchase and subscription.
+    for (const o of store.list("offerings", (x) => !!x.selfPaced && !!x.courseId)) assert.ok(o.auditAvailable && o.inPlus, `${o.code} offers all three access models`);
     // Legacy renumbering.
     assert.equal(store.get("offerings", "off_academy_37_2")!.code, "#37.2");
     assert.ok(store.list("modules", (m) => m.courseId === "crs_academy_p18" && m.moduleKey === "p18-w5").length === 1, "#18 Week 5 reuses the earlier deep learning module");
@@ -77,7 +83,7 @@ describe("Agentic AI hub and programs #15–#38 (Tab 52)", () => {
     assert.ok("Capstone" in cmp[0].rows && "Credential" in cmp[0].rows);
     for (const p of h.paths) for (const s of p.steps) assert.ok(s.title, `${p.key} only shows catalog steps`);
     assert.match(h.diagram, /^flowchart LR/);
-    assert.ok(!h.faqs.some((f) => /refund/i.test(f.q)), "refund FAQ waits for the approved policy");
+    assert.ok(h.faqs.some((f) => /refund/i.test(f.q)), "approved refund policy appears in the FAQ");
   });
 
   it("quiz: 8–10 questions; recommendations explain themselves and respect 'no coding'", () => {
@@ -117,24 +123,24 @@ describe("Agentic AI hub and programs #15–#38 (Tab 52)", () => {
     const page = prog.programPage(storeOf("academy"), null, specOf("off_academy_15").slug);
     assert.equal(page.cohorts.find((c) => c.code === "AAE-PM")!.soldOut, true);
     assert.equal(page.payLater, true);
-    assert.equal(page.policies.refund, null, "policy text hidden until approved");
+    assert.ok(page.policies.refund && page.policies.deferral && page.policies.batchChange, "approved policies show");
     const actor = admit("student3", "off_academy_15", am.id);
     const co = academy.checkout(as("academy", "student3", false).store, actor, { offeringId: "off_academy_15", sectionId: am.id, plan: "pay_later", sandboxCard: "tok_sandbox_visa" });
     assert.equal(co.order.state, "pay_later_sandbox");
     relay(storeOf("academy"));
-    assert.equal(status(() => prog.requestBatchChange(as("academy", "student3", false).store, actor, String(co.order.id), next.id)), 409, "policy pending");
+    // Sending the batch-change policy back for revision hides it and pauses batch changes.
     const adm = as("academy", "admin");
     const pol = adm.store.list("catalog_policies", (p) => p.kind === "batch_change")[0];
+    assert.equal(status(() => prog.reopenPolicy(as("academy", "designer").store, as("academy", "designer").actor, String(pol.id), "x")), 403);
+    prog.reopenPolicy(adm.store, adm.actor, String(pol.id), "Clarify the late-change wording");
+    assert.equal(prog.programPage(storeOf("academy"), null, specOf("off_academy_15").slug).policies.batchChange, null);
+    assert.equal(status(() => prog.requestBatchChange(as("academy", "student3", false).store, actor, String(co.order.id), next.id)), 409, "policy pending");
     assert.equal(status(() => prog.approvePolicy(as("academy", "designer").store, as("academy", "designer").actor, String(pol.id))), 403);
-    prog.approvePolicy(adm.store, adm.actor, String(pol.id));
+    prog.approvePolicy(as("academy", "admin").store, adm.actor, String(pol.id));
     assert.equal(status(() => prog.requestBatchChange(as("academy", "student3", false).store, actor, String(co.order.id), pm.id)), 409, "sold out");
     const moved = prog.requestBatchChange(as("academy", "student3", false).store, actor, String(co.order.id), next.id);
     assert.equal(moved.to, "AAE-NEXT");
     assert.equal(status(() => prog.requestBatchChange(as("academy", "student3", false).store, actor, String(co.order.id), am.id)), 409, "once per program");
-    // The refund FAQ appears on the hub only after the refund policy is approved.
-    const refund = adm.store.list("catalog_policies", (p) => p.kind === "refund")[0];
-    prog.approvePolicy(as("academy", "admin").store, adm.actor, String(refund.id));
-    assert.ok(hub.agenticHub(storeOf("academy")).faqs.some((f) => /refund/i.test(f.q)));
   });
 
   it("#15 completion: live modules, module checks, capstone ≥ 70 with live defense, final check → certificate + Graded Performance Certificate", () => {
@@ -221,7 +227,12 @@ describe("Agentic AI hub and programs #15–#38 (Tab 52)", () => {
     const d = as("academy", "designer");
     const rep = hub.consolidationReport(d.store, d.actor);
     assert.ok(rep.programs.some((p) => p.code === "#15") && rep.programs.some((p) => p.code === "#38"));
-    assert.equal(rep.proposed[0].code, "#27");
+    assert.equal(rep.proposed.length, 0, "#27 was decided and built");
+    assert.ok(rep.programs.some((p) => p.code === "#27"));
+    assert.deepEqual(rep.decisionsPending, ["Relationship of #13 to #9 (recorded as a recommendation; not yet decided)"]);
+    const seeded = storeOf("academy").list("consolidation_reports", (r) => r.decisionRef === "po-2026-10-04");
+    assert.equal(seeded.length, 1);
+    assert.equal(seeded[0].state, "approved");
     assert.ok(Array.isArray(rep.referencedNotInCatalog));
     for (const o of rep.overlaps) assert.ok(o.overlapPct >= 40 && o.recommendation);
     assert.equal(status(() => hub.consolidationReport(as("academy", "student1", false).store, as("academy", "student1", false).actor)), 403);

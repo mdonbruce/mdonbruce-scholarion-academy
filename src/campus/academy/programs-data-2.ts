@@ -5,6 +5,7 @@
  * Fees are sandbox placeholders an admin sets before go-live.
  */
 import { AI_TA, COMMON_FAQ, LEAD, REFUND, TECH, type ProgramSpec, type QuizItem, type SPCourse, type WeekSpec } from "./programs-data";
+import { DECISIONS } from "./decisions";
 import { LABS } from "./labs-data";
 
 /* ---------------- Shared module library ---------------- */
@@ -20,7 +21,7 @@ export interface LibraryModule {
 }
 
 export const LIBRARY: LibraryModule[] = [
-  { key: "env", title: "Python & AI Dev Environment", version: "1.0", content: "venv/conda, VS Code, Jupyter, Git and GitHub, secrets handling, async calls", usedBy: ["#15", "#16", "#17", "#18", "#21", "#22", "#24"] },
+  { key: "env", title: "Python & AI Dev Environment", version: "1.0", content: "venv/conda, VS Code, Jupyter, Git and GitHub, secrets handling, async calls", usedBy: ["#15", "#16", "#17", "#18", "#21", "#22", "#24", "#27"] },
   { key: "pyfound", title: "Python Foundations (Gaddis-aligned)", version: "1.0", content: "Syntax, decisions and loops, functions, files, OOP, exceptions", usedBy: ["#17", "#18", "#21", "#24"], textbook: "Gaddis, Starting Out with Python, 6th ed." },
   { key: "wrangle", title: "Data Wrangling & Visualization", version: "1.0", content: "NumPy, pandas, plotting, exploratory data analysis", usedBy: ["#17", "#18", "#21", "#22", "#24"] },
   { key: "mlfound", title: "ML Foundations", version: "1.0", content: "Supervised and unsupervised learning, feature engineering, train/validate/test, cross-validation, evaluation metrics, bias–variance, scikit-learn pipelines", usedBy: ["#3", "#17", "#18", "#21", "#24"], textbook: "Raschka et al.; Géron, 3rd ed. (recommended readings)" },
@@ -35,7 +36,7 @@ export const LIBRARY: LibraryModule[] = [
   { key: "mcp", title: "MCP Servers & Ecosystem Integrations", version: "1.0", content: "Hosts, clients, servers, tools/resources/prompts, transports, permission scopes", usedBy: ["#1", "#4", "#14", "#15", "#24"] },
   { key: "multiagent", title: "Multi-Agent Orchestration", version: "1.0", content: "Supervisors, crews, handoffs, shared state, failure handling", usedBy: ["#1", "#14", "#15", "#24"] },
   { key: "agenticrag", title: "Agentic RAG & GraphRAG", version: "1.0", content: "Self-RAG, corrective RAG, reranking, query expansion, knowledge graphs, multi-hop", usedBy: ["#1", "#15", "#22", "#24"] },
-  { key: "evals", title: "Evaluation, Tracing & Testing", version: "1.0", content: "Eval datasets, LLM-as-judge calibrated to human labels, regression suites, tracing", usedBy: ["#1", "#14", "#15", "#23", "#24"] },
+  { key: "evals", title: "Evaluation, Tracing & Testing", version: "1.0", content: "Eval datasets, LLM-as-judge calibrated to human labels, regression suites, tracing", usedBy: ["#1", "#14", "#15", "#23", "#24", "#27"] },
   { key: "observe", title: "Observability, Monitoring & Fine-Tuning", version: "1.0", content: "OpenTelemetry, dashboards, drift, cost, SLOs, LoRA/QLoRA", usedBy: ["#15", "#24", "#27"] },
   { key: "guardrails", title: "Guardrails, LLM Security & Red-Teaming", version: "1.0", content: "OWASP LLM Top 10, injection, validators, PII redaction, red-team suites", usedBy: ["#1", "#15", "#22", "#24"] },
   { key: "deploy", title: "Containers, CI/CD & Cloud Deployment", version: "1.0", content: "Docker, Compose, registries, CI/CD, blue/green and canary releases", usedBy: ["#1", "#15", "#22", "#24", "#27"] },
@@ -50,7 +51,7 @@ export const LEARNING_PATHS: { key: string; title: string; steps: string[]; note
   { key: "agentic-engineer", title: "AI Foundations → Agentic Engineer", steps: ["#21", "#18", "#19", "#16", "#15"], note: "Program #1 is the alternative final step (credit is mutually exclusive with #15)." },
   { key: "genai-builder", title: "GenAI Builder", steps: ["#19", "#2", "#17"] },
   { key: "no-code", title: "No-Code Professional", steps: ["#7", "#6", "#5"] },
-  { key: "data-platforms", title: "Data & AI Platforms", steps: ["#21", "#22", "#27"], note: "#27 is proposed and not built until approved." },
+  { key: "data-platforms", title: "Data & AI Platforms", steps: ["#21", "#22", "#27"], note: "#27 can also follow #18 or #37 for model builders." },
   { key: "product-strategy", title: "Product & Strategy", steps: ["#20", "#23", "#12", "#13", "#25"], note: "#23 or #12, then #13 and #25." },
   { key: "long-form", title: "Long-form (all-in-one)", steps: ["#24"] },
   { key: "self-paced-to-live", title: "Self-paced → Live", steps: ["#37", "#38", "#32", "#30", "#31", "#28", "#15"], note: "#30 or #31; finish with live #15 or #1." },
@@ -58,8 +59,8 @@ export const LEARNING_PATHS: { key: string; title: string; steps: string[]; note
   { key: "quick-start", title: "Quick-start projects", steps: ["#35", "#36"] },
 ];
 
-/** Proposed, not built until the product owner approves it. */
-export const PROPOSED = [{ code: "#27", title: "Certificate in MLOps & LLMOps", weeks: 8, library: ["observe", "deploy", "evals", "env"], rationale: "The reference category lists an MLOps certificate; the observability and deployment library modules already exist, so an 8-week program would mostly assemble them with a production capstone." }];
+/** Proposed programs awaiting a product-owner decision. #27 was approved and built on 2026-10-04. */
+export const PROPOSED: { code: string; title: string; weeks: number; library: string[]; rationale: string }[] = [];
 
 /* ---------------- helpers ---------------- */
 
@@ -105,6 +106,9 @@ function tf(prompt: string, answer: "True" | "False", explanation?: string): Qui
 }
 
 function selfPaced(p: Partial<ProgramSpec> & Pick<ProgramSpec, "code" | "slug" | "title" | "valueStatement" | "overview" | "level" | "outcomes" | "audience" | "prerequisites" | "codingRequirement" | "projects" | "tools">, sp: NonNullable<ProgramSpec["selfPaced"]>, o: { price: number; hoursPerWeek: [number, number]; weeks: number }): ProgramSpec {
+  // Product-owner decision (2026-10-04): every self-paced product offers audit, purchase and subscription.
+  const models: readonly string[] = DECISIONS.accessModel.models;
+  sp = { ...sp, audit: models.includes("audit"), inPlus: models.includes("subscription") };
   const type = sp.type;
   const typeLabel = { guided_project: "Guided Project", short_course: "Short Course", specialization: "Specialization", professional_certificate: "Professional Certificate" }[type];
   const credential =
@@ -656,7 +660,54 @@ P34.waives = [{ toCode: "#20", weeks: ["1"], note: "Completion of #34 waives #20
 P37.waives = [{ toCode: "#18", weeks: ["1", "2", "3", "4", "5"], note: "Completion of #37 waives #18 Weeks 1–5." }];
 P38.waives = [{ toCode: "#18", weeks: ["5", "6", "7", "8"], note: "Completion of #38 waives #18 Weeks 5–8." }];
 
-export const PROGRAMS_2: ProgramSpec[] = [P15, P16, P19, P21, P18, P17, P24, P22, P23, P20, P25, P32, P35, P36, P37, P38, P30, P31, P33, P28, P29, P34];
+const P27: ProgramSpec = live(
+  {
+    code: "#27", slug: "mlops-and-llmops", title: "Certificate in MLOps & LLMOps", productType: "cohort_program", track: "Builder", catalogTrack: "Data", codingRequired: true, formatKind: "cohort",
+    valueStatement: "Eight weeks to take models and LLM applications from a notebook to a monitored, versioned, reproducible service.",
+    overview: [
+      "The operations side of machine learning and LLM applications: reproducible environments, experiment tracking, model and prompt versioning, CI/CD for models, serving, evaluation gates, monitoring for drift and cost, and safe rollouts.",
+      "Every week builds on one running system. By Week 8 you ship a model service and an LLM application behind the same pipeline, with dashboards and a rollback plan you can demonstrate live.",
+    ],
+    level: "intermediate", weeks: 8,
+    outcomes: [
+      "Package models and LLM applications in reproducible, containerized environments.",
+      "Track experiments, data versions, models and prompts so any result can be reproduced.",
+      "Automate testing, evaluation gates and deployment with CI/CD.",
+      "Serve models and LLM applications with health checks, scaling limits and canary releases.",
+      "Monitor quality, drift, latency and cost, and act on alerts with a runbook.",
+      "Apply governance — model cards, access control, audit trails and incident response — to production AI.",
+    ],
+    audience: ["ML engineers and data scientists who ship models", "Backend and platform engineers supporting AI teams", "Developers running LLM applications in production"],
+    prerequisites: "Python and Git, plus one of: #18, #21, #37, or equivalent experience training a model (an advisor can confirm equivalence).",
+    codingRequirement: "Coding required — Python, the command line, Docker and YAML.",
+    curriculum: [
+      w("1", "Reproducible Foundations", "Environments, dependency pinning, project layout, secrets and the course reference system.", ["env"]),
+      w("2", "Tracking Experiments, Data and Prompts", "Experiment tracking, data and model versioning, a model registry, and prompt versioning for LLM apps.", ["evals"]),
+      w("3", "Containers and Pipelines", "Images, Compose, training and batch-inference pipelines, and artifact storage.", ["deploy"]),
+      w("4", "CI/CD With Evaluation Gates", "Unit, data and model tests; LLM regression suites; promotion only when gates pass.", ["deploy", "evals"]),
+      w("5", "Serving Models and LLM Apps", "Online and batch serving, typed APIs, streaming, caching, rate limits and health checks.", ["appdel", "deploy"]),
+      w("6", "Observability and Drift", "OpenTelemetry traces, dashboards, data and prediction drift, LLM quality signals, cost per request and SLOs.", ["observe"]),
+      w("7", "Safe Releases and Governance", "Blue/green and canary releases, rollback, model cards, access control, audit trails and incident runbooks.", ["deploy", "guardrails", "responsible"]),
+      w("8", "Capstone: Production Pipeline Demo", "A model service and an LLM application behind one pipeline, demonstrated live with a staged rollout and a rollback.", ["observe"], { kind: "capstone" }),
+    ],
+    projects: [
+      { key: "p1", kind: "project", week: "4", name: "Gated Delivery Pipeline", description: "A CI pipeline that trains, tests and evaluates a model and blocks promotion when a gate fails.", skills: ["CI/CD", "testing", "evaluation"], requirements: ["Pinned environment", "Data and model tests", "Evaluation gate with a threshold", "Registry entry on success"] },
+      { key: "p2", kind: "project", week: "6", name: "Monitoring Dashboard and Alert Runbook", description: "Dashboards for latency, errors, drift and cost, with alerts and a written runbook.", skills: ["observability", "drift", "SLOs"], requirements: ["Traces from every request", "Drift metric", "Cost per request", "Two alerts with runbook steps"] },
+      { key: "capstone", kind: "capstone", week: "8", name: "Production ML + LLM Service With Staged Rollout", description: "A versioned model service and LLM application deployed through one pipeline, monitored, released by canary and rolled back on demand during a live demo.", skills: ["MLOps", "LLMOps", "release engineering"], requirements: ["Reproducible build", "Experiment, model and prompt versions recorded", "Evaluation gates in CI", "Containerized services with health checks", "Dashboards and alerts", "Canary release and live rollback", "Model card and incident runbook"] },
+    ],
+    tools: [
+      { family: "Build and run", items: ["Python", "Git", "Docker", "Docker Compose", "GitHub Actions"] },
+      { family: "Track and version", items: ["One experiment tracker and model registry (verified at cohort start)", "Data version control"] },
+      { family: "Serve and observe", items: ["FastAPI", "OpenTelemetry", "Prometheus-compatible metrics", "A dashboard tool"] },
+      { family: "LLM operations", items: ["Prompt versioning", "An LLM evaluation harness", "A tracing tool for LLM calls"] },
+    ],
+    textbooks: ML_BOOKS,
+  },
+  { price: 1800, start: 42, hours: [7, 9], schedule: "Two live sessions a week plus labs", faqs: [{ q: "Which cloud do we use?", a: "Labs run in the Scholaris Cloud Lab and on your laptop with Docker. One cloud provider is chosen and verified before the cohort starts; the practices transfer between providers." }, { q: "Is this about training models?", a: "No — it assumes you can already train one. It covers everything after: versioning, testing, serving, monitoring and safe releases." }] },
+);
+P27.waives = [{ toCode: "#15", weeks: ["8"], note: "Completion of #27 waives #15 Weekend 8 (Ship and Observe)." }];
+
+export const PROGRAMS_2: ProgramSpec[] = [P15, P16, P19, P21, P18, P17, P24, P22, P27, P23, P20, P25, P32, P35, P36, P37, P38, P30, P31, P33, P28, P29, P34];
 
 /** #15 weekend module checks (2 items each; the final knowledge check draws 10 from all of them). */
 export const P15_CHECKS: Record<number, QuizItem[]> = {
