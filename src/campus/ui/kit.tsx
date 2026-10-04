@@ -118,9 +118,9 @@ function ParamField({ p, idp, value }: { p: Param; idp: string; value?: string }
 }
 
 /** Form for any registered operation (commands POST; queries GET into the same page). */
-export function OpForm({ slug, op, back, values = {}, hide = [], label, showResult = true }: { slug: string; op: Operation; back: string; values?: Record<string, string>; hide?: string[]; label?: string; showResult?: boolean }) {
+export function OpForm({ slug, op, back, values = {}, hide = [], label, showResult = true, uid = "f" }: { slug: string; op: Operation; back: string; values?: Record<string, string>; hide?: string[]; label?: string; showResult?: boolean; uid?: string }) {
   const params = op.params.filter((p) => !hide.includes(p.name));
-  const idp = `op-${op.name.replace(/\W/g, "-")}`;
+  const idp = `op-${uid}-${op.name.replace(/\W/g, "-")}`;
   if (op.kind === "query") {
     return (
       <form method="get" action={back} className="stack campus-op">
@@ -177,7 +177,7 @@ function fieldInput(f: FieldDef, id: string, value?: unknown) {
 export function EntityForm({ slug, table, back, row, fixed = {}, label }: { slug: string; table: string; back: string; row?: Row; fixed?: Record<string, string>; label?: string }) {
   const d = ENTITY[table];
   const fields = d.fields.filter((f) => !f.system && !(f.name in fixed) && !(f.secret && row));
-  const idp = `f-${table}-${row?.id ?? "new"}`;
+  const idp = `f-${table}-${row?.id ?? (Object.values(fixed).join("-").replace(/\W/g, "-") || "new")}`;
   return (
     <form method="post" action={api(slug, row ? `r/${table}/${row.id}` : `r/${table}`)} className="stack campus-entity-form">
       <Hidden values={{ back, ...(row ? { _method: "PATCH", ifVersion: String(row.version) } : {}), ...fixed }} />
@@ -217,7 +217,7 @@ export function EntityTable({ slug, table, rows, back, manage, columns }: { slug
   const cols = (columns ?? [d.titleField, ...d.fields.filter((f) => f.name !== d.titleField && !f.secret && f.type !== "json" && f.type !== "text").map((f) => f.name)].slice(0, 6)).map((n) => d.fields.find((f) => f.name === n) ?? ({ name: n, label: n } as FieldDef));
   if (!rows.length) return <Empty title={`No ${d.plural.toLowerCase()} yet.`} />;
   return (
-    <div className="table-wrap">
+    <div className="table-wrap" tabIndex={0} role="region" aria-label="Scrollable table">
       <table className="table">
         <caption className="sr-only">{d.plural}</caption>
         <thead>
@@ -282,7 +282,7 @@ export function Result({ value }: { value: unknown }) {
   if (Array.isArray(value) && value.length && value.every((x) => x && typeof x === "object" && !Array.isArray(x))) {
     const keys = [...new Set(value.flatMap((x) => Object.keys(x as object)))].filter((k) => !["version", "createdAt"].includes(k)).slice(0, 8);
     return (
-      <div className="table-wrap">
+      <div className="table-wrap" tabIndex={0} role="region" aria-label="Scrollable table">
         <table className="table">
           <thead>
             <tr>

@@ -312,6 +312,6 @@ export function capabilityBoard(store: TenantStore): Capability[] {
     live("Platform", "REST + OpenAPI, GraphQL, gRPC (internal), metrics, audit, outbox", "API tests"),
     live("Platform", "Content licensing between tenants (content only)", "platform acceptance 7"),
     { area: "Platform", capability: "Offboard purge after retention window", status: "PLANNED", evidence: "Runbook manual step today", blockers: "Needs a scheduled purge job with operator approval." },
-    live("Naming", "No remaining \"Scholaris Global Learning\" references", "naming check test"),
+    live("Naming", "Legacy platform names migrated to Scholarion (no old names in code, docs or data)", "naming check test"),
   ];
 }

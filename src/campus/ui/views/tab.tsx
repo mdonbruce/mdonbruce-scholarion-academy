@@ -73,7 +73,7 @@ export function TabPage({ store, actor, slug, tabSlug, sp }: { store: TenantStor
                 <summary>
                   {op.summary} <span className="tiny muted">({op.kind === "query" ? "view" : "action"})</span>
                 </summary>
-                <OpForm slug={slug} op={op} back={t.here} values={Object.fromEntries(Object.entries(sp).filter(([, v]) => v !== undefined)) as Record<string, string>} />
+                <OpForm slug={slug} op={op} back={t.here} uid="act" values={Object.fromEntries(Object.entries(sp).filter(([, v]) => v !== undefined)) as Record<string, string>} />
               </details>
             ))}
           </div>
@@ -203,7 +203,7 @@ function Registration({ t }: { t: T }) {
           <h3 className="small">
             {String(term.name)} · registration {fmt(term.registrationOpens)} – {fmt(term.registrationCloses)}
           </h3>
-          <div className="table-wrap">
+          <div className="table-wrap" tabIndex={0} role="region" aria-label="Scrollable table">
             <table className="table">
               <thead>
                 <tr>
@@ -450,7 +450,7 @@ function StatusBoard({ t }: { t: T }) {
           </span>
         ))}
       </p>
-      <div className="table-wrap">
+      <div className="table-wrap" tabIndex={0} role="region" aria-label="Scrollable table">
         <table className="table">
           <thead>
             <tr>

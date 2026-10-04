@@ -32,7 +32,7 @@ export function CoursesList({ store, actor, slug }: { store: TenantStore; actor:
     <>
       <PageHead title="Courses" sub="Courses you teach, take, design or administer." />
       {mine.length ? (
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0} role="region" aria-label="Scrollable table">
           <table className="table">
             <thead>
               <tr>
@@ -649,7 +649,7 @@ function Syllabus({ c, staff }: { c: C; staff: boolean }) {
         <p>{s.description || String(c.course.description ?? "")}</p>
       </div>
       <h2>Course summary</h2>
-      <div className="table-wrap">
+      <div className="table-wrap" tabIndex={0} role="region" aria-label="Scrollable table">
         <table className="table">
           <thead>
             <tr>
@@ -685,7 +685,7 @@ function StudentGrades({ c }: { c: C }) {
       <p>
         Total: <strong>{t.finalPct === null ? "—" : `${t.finalPct}%`}</strong> {t.letter && <span className="badge">{t.letter}</span>} {Object.keys(whatIf).length > 0 && <span className="badge badge-blue">What-If (not saved)</span>}
       </p>
-      <div className="table-wrap">
+      <div className="table-wrap" tabIndex={0} role="region" aria-label="Scrollable table">
         <table className="table">
           <thead>
             <tr>

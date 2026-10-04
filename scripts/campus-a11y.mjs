@@ -25,6 +25,7 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 let failed = 0;
 const summary = [];
+const tally = new Map();
 for (const f of files) {
   await page.goto("file://" + path.join(DIR, f));
   await page.addScriptTag({ content: axeSource });
@@ -37,8 +38,10 @@ for (const f of files) {
   const key = KEY.some((k) => k.test(f));
   summary.push(`${bad.length ? "FAIL" : "ok"} ${f}${key ? " (key screen)" : ""}${bad.length ? ": " + bad.map((v) => `${v.id} [${v.impact}] ${v.nodes.join(", ")}`).join("; ") : ""}`);
   if (bad.length) failed++;
+  for (const v of bad) for (const n of v.nodes) tally.set(`${v.id} [${v.impact}] ${n.replace(/:nth-child\(\d+\)/g, "")}`, (tally.get(`${v.id} [${v.impact}] ${n.replace(/:nth-child\(\d+\)/g, "")}`) ?? 0) + 1);
 }
 await browser.close();
 console.log(summary.join("\n"));
+if (tally.size) console.log("Distinct violations:\n" + [...tally.entries()].sort((a, b) => b[1] - a[1]).slice(0, 30).map(([k, v]) => `${v}× ${k}`).join("\n"));
 console.log(`axe: ${files.length - failed}/${files.length} screens without serious or critical violations`);
 process.exit(failed ? 1 : 0);

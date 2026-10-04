@@ -205,7 +205,7 @@ export function CatalogView({ tenant, store, actor, sp }: { tenant: Tenant; stor
           {hub.comparison.length > 1 && (
             <section className="card card-pad">
               <h2 className="card-title">Compare</h2>
-              <div className="table-wrap">
+              <div className="table-wrap" tabIndex={0} role="region" aria-label="Scrollable table">
                 <table className="table">
                   <thead>
                     <tr>

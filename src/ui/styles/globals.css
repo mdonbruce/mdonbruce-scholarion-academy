@@ -27,7 +27,7 @@
   --border-strong: #c3cde0;
   --text: #0f1a33;
   --text-2: #4a5878;
-  --text-3: #6b7896;
+  --text-3: #56637f;
   --primary: var(--blue-600);
   --primary-ink: #ffffff;
   --primary-soft: var(--blue-100);
@@ -1801,3 +1801,10 @@ details.acc > div {
   .campus-public-head { padding: 12px 16px; }
 }
 .campus .sidenav .bell-count { position: static; margin-left: 8px; display: inline-grid; }
+/* WCAG AA contrast for small status text (light theme). */
+:root:not([data-theme="dark"]) .badge-green { color: #15663a; }
+:root:not([data-theme="dark"]) .badge-amber { color: #7f4d00; }
+:root:not([data-theme="dark"]) .badge-gold { color: #6f5210; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .badge-green, :root:not([data-theme="light"]) .badge-amber, :root:not([data-theme="light"]) .badge-gold { color: var(--text); } }
+.sidenav a[aria-current="page"] .muted { color: inherit; }
+.campus-tabnav summary { color: var(--text-2); }

@@ -20,7 +20,8 @@
     "campus:render": "tsx --tsconfig tsconfig.scripts.json scripts/campus-render.tsx --check",
     "campus:a11y": "node scripts/campus-a11y.mjs",
     "campus:grpc": "tsx scripts/campus-grpc.ts",
-    "campus:contracts": "tsx scripts/campus-contracts.ts"
+    "campus:contracts": "tsx scripts/campus-contracts.ts",
+    "campus:docs": "tsx scripts/campus-docs.ts"
   },
   "dependencies": {
     "next": "^15.5.0",
