@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Formats } from "../../../ui/components/formats";
 import { FacultyCard } from "../../../ui/components/faculty";
 import { broker, CampusError, type Row, type TenantStore } from "../../core";
 import { hasAny, type Actor } from "../../iam";
@@ -721,7 +722,7 @@ function ProgramStudio({ t }: { t: T }) {
             <p className="small">
               {pages.get(p.code) ? (
                 <>
-                  <a href={`/campus/${t.slug}/programs/${pages.get(p.code)}`}>Public page</a> · <a href={`/api/campus/v1/t/${t.slug}/programs/${pages.get(p.code)}/brochure.pdf`}>Brochure PDF</a>
+                  <a href={`/campus/${t.slug}/programs/${pages.get(p.code)}`}>Public page</a> · <a href={`/api/campus/v1/t/${t.slug}/programs/${pages.get(p.code)}/brochure.pdf`}>Brochure PDF</a> <Formats href={`/api/campus/v1/t/${t.slug}/programs/${pages.get(p.code)}/brochure.pdf`} name={`${p.code} brochure`} label="also" skip="pdf" />
                 </>
               ) : (
                 "Page not published"
@@ -1207,6 +1208,7 @@ function AssessmentStudio({ t }: { t: T }) {
                 <a className="btn btn-ghost btn-sm" href={`${api1}/assess/${view.id}/item-bank.json`}>
                   Item bank JSON
                 </a>
+                <Formats href={`${api1}/assess/${view.id}/item-bank.json`} name="Item bank" />
                 <a className="btn btn-ghost btn-sm" href={`${api1}/assess/${view.id}/qti.xml`}>
                   QTI 2.1 export
                 </a>

@@ -14,12 +14,13 @@ import { readObject, receiveUpload, requestUpload, scanFile, verifySignature, ca
 import { exportCourse } from "../services/content";
 import { submit } from "../services/assessment";
 import { verifyCredential } from "../services/success";
-import { brochurePdf } from "../services/programs";
+import { brochureDoc, brochurePdf } from "../services/programs";
 import { simLabFileName, simLabHtml } from "../services/simlab";
 import { answersLocked, pinFor } from "../services/projection";
 import { gradebookCsv as gradedCsv } from "../services/graded";
 import { bundleZip, moduleStudioBundle, readOutput } from "../services/studio";
 import * as camp from "../services/campaigns";
+import { attachDoc, officeResponse } from "../../documents/http";
 import * as eco from "../services/ecosystem";
 import * as wsp from "../services/workspace";
 import { draftView, qtiXml } from "../services/assess";
@@ -222,7 +223,7 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
 
   if (rest[0] === "programs" && rest[2] === "brochure.pdf" && method === "GET") {
     const pdf = await brochurePdf(store, decodeURIComponent(rest[1] ?? ""));
-    return new Response(Buffer.from(pdf), { status: 200, headers: { "content-type": "application/pdf", "content-disposition": `inline; filename="${(rest[1] ?? "program").replace(/[^a-z0-9-]/gi, "")}-brochure.pdf"`, "cache-control": "no-store" } });
+    return attachDoc(new Response(Buffer.from(pdf), { status: 200, headers: { "content-type": "application/pdf", "content-disposition": `inline; filename="${(rest[1] ?? "program").replace(/[^a-z0-9-]/gi, "")}-brochure.pdf"`, "cache-control": "no-store" } }), brochureDoc(store, decodeURIComponent(rest[1] ?? "")));
   }
   if (rest[0] === "campaigns" && rest[1] === "unsubscribe" && method === "GET") {
     camp.unsubscribe(store, url.searchParams.get("token") ?? "");
@@ -551,7 +552,17 @@ function icalFeed(req: Request, slug: string, secret: string) {
   return text(ics(projection(store, actor, from, to).items, `${broker.tenant(store.tenantId)!.name} calendar`), "text/calendar; charset=utf-8");
 }
 
+/** Every campus download can be fetched as PDF, Word or Excel (?format=pdf|docx|xlsx); bundles carry office copies. */
 export async function handleCampus(req: Request, path: string): Promise<Response> {
+  const res = await handleCampusInner(req, path);
+  try {
+    return await officeResponse(req, res, path.split("/").filter(Boolean).slice(-1)[0] ?? "document");
+  } catch (e) {
+    return json({ error: { code: "conversion_failed", message: `The document couldn't be converted: ${(e as Error).message}` } }, 500);
+  }
+}
+
+async function handleCampusInner(req: Request, path: string): Promise<Response> {
   const started = Date.now();
   const url = new URL(req.url);
   const seg = path.split("/").filter(Boolean);

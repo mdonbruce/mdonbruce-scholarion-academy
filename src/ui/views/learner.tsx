@@ -1,4 +1,5 @@
 import type { accountVM, calendarVM, courseHomeVM, credentialsVM, dashboardVM, gradebookVM, gradesOverviewVM, itemVM, liveVM, moduleVM, myLearningVM, onboardingVM, Viewer } from "@/bff/views";
+import { Formats } from "../components/formats";
 import { LEAD_FACULTY } from "@/brand/faculty";
 import type { Notice, Product } from "@/platform/types";
 import { formatMoney } from "@/platform/pricing";
@@ -850,6 +851,9 @@ export function CredentialsView({ viewer, vm }: { viewer: V; vm: ReturnType<type
                     Download PDF
                   </a>
                 )}
+                {!c.revokedAt && (
+                  <Formats href={`/api/v1/credentials/${c.id}/pdf`} name={`${c.title} certificate`} label="also" skip="pdf" />
+                )}
                 <a className="btn btn-ghost btn-sm" href={`/verify/${c.id}?print=1`}>
                   Print view
                 </a>
@@ -1047,6 +1051,7 @@ export function AccountView({ viewer, vm, flash }: { viewer: V; vm: ReturnType<t
                       <a className="tiny" href={`/api/v1/commerce/orders/${o.id}/invoice`} download>
                         Download receipt (PDF)<span className="sr-only"> for {o.description}</span>
                       </a>
+                      <Formats href={`/api/v1/commerce/orders/${o.id}/invoice`} name={`Receipt for ${o.description}`} label="also" skip="pdf" />
                       {o.refundRequest?.status === "pending" && <span className="tiny">Refund requested — in review</span>}
                       {o.refundRequest?.status === "denied" && <span className="tiny">Refund request declined</span>}
                     </div>

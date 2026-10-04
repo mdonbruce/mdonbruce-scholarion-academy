@@ -1,4 +1,5 @@
 import type { Tenant, TenantStore } from "../../core";
+import { Formats } from "../../../ui/components/formats";
 import { CampaignOptIn } from "./campaigns";
 import { GENAI } from "../../academy/genai-program";
 import { facultyByName } from "../../../brand/faculty";
@@ -137,6 +138,7 @@ export function ProgramPageView({ tenant, store, actor, slug, sp }: { tenant: Te
           <a className="btn btn-outline" href={p.brochureUrl}>
             Download Brochure (PDF)
           </a>
+          <Formats href={p.brochureUrl} name="Brochure" label="Brochure also as" skip="pdf" />
           <a className="btn btn-outline" href="#teams">
             Team enrollment
           </a>

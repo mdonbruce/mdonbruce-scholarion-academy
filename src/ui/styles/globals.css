@@ -1966,3 +1966,5 @@ details.acc > div {
 .campus-hub .small li{margin:0 0 6px}
 .campus-hub .small li a,.campus-hub td a{display:inline-block;min-height:24px;padding:2px 0;line-height:20px}
 @media (max-width:800px){.eco-sources{columns:1}}
+.doc-formats{display:inline-flex;flex-wrap:wrap;align-items:center;gap:0 2px;margin-left:8px;color:var(--muted,#4a5672)}
+.doc-formats a{display:inline-block;min-height:24px;min-width:24px;padding:2px 4px;line-height:20px}

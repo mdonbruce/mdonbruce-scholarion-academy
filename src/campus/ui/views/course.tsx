@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Formats } from "../../../ui/components/formats";
 import { facultyByName } from "../../../brand/faculty";
 import { FacultyCard } from "../../../ui/components/faculty";
 import { CampusError, type Row, type TenantStore } from "../../core";
@@ -808,6 +809,7 @@ function Gradebook({ c }: { c: C }) {
         <a className="btn btn-outline btn-sm" href={api(c.slug, `q/grades.export_csv?courseId=${cid}`)}>
           Export CSV
         </a>
+        <Formats href={api(c.slug, `q/grades.export_csv?courseId=${cid}`)} name="Gradebook" />
       </div>
       <div className="table-wrap campus-gradebook" role="region" aria-label="Gradebook" tabIndex={0}>
         <table className="table">

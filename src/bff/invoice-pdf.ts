@@ -127,3 +127,19 @@ export async function invoicePdf({ order: o, buyerName, buyerEmail }: InvoiceInp
   text(page, "Scholarion Academy - Haven Digital Systems", L, 48, sans, 8.5, MUTED);
   return doc.save();
 }
+
+/** The same receipt as a document (for the Word and Excel downloads). */
+export function invoiceDoc({ order: o, buyerName, buyerEmail }: InvoiceInput): import("@/documents").Doc {
+  const created = new Date(o.createdAt);
+  return {
+    title: `Receipt ${o.id}`,
+    subtitle: "Scholarion Academy · SANDBOX — no real payment was taken",
+    subject: "Sandbox receipt",
+    footer: `Receipt ${o.id} · sandbox`,
+    blocks: [
+      { t: "table", caption: "Receipt", head: ["Field", "Value"], rows: [["Receipt number", o.id], ["Date", created.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" })], ["Billed to", buyerName], ...(buyerEmail ? [["Email", buyerEmail]] : []), ["Status", o.status === "refunded" ? "Refunded" : "Paid (sandbox)"]] },
+      { t: "table", caption: "Charges", head: ["Description", "Amount", "Currency"], rows: [...invoiceLines(o).map((l) => [l.label, l.amount.toFixed(2), o.currency]), ["Total", o.amount.toFixed(2), o.currency]] },
+      { t: "p", small: true, text: "Prices are placeholders set by the product owner. Any tax shown is a simulated rate set by staff, not a tax calculation." },
+    ],
+  };
+}

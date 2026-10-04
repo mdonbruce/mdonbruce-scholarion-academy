@@ -1,4 +1,5 @@
 import type { TenantStore } from "../../core";
+import { Formats } from "../../../ui/components/formats";
 import { hasAny, type Actor } from "../../iam";
 import { campaignOverview } from "../../services/campaigns";
 import { GENAI } from "../../academy/genai-program";
@@ -79,7 +80,7 @@ export function CampaignsPanel({ store, actor, slug, here }: { store: TenantStor
           {o.assets.map((a) => (
             <li key={a.path} className="between">
               <span>
-                <a href={assetUrl(a.path)}>{a.title}</a> <span className="tiny muted">{a.path}</span>
+                <a href={assetUrl(a.path)}>{a.title}</a> <span className="tiny muted">{a.path}</span> <Formats href={assetUrl(a.path)} name={a.title} label="" />
               </span>
               {a.flags.length ? <span className="badge badge-amber">Copy Checker: {a.flags.join("; ")}</span> : <span className="badge badge-green">Copy check passed</span>}
             </li>

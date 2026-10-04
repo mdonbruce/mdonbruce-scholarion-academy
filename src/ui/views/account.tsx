@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Formats } from "../components/formats";
 import type { Viewer } from "@/bff/views";
 import { fmtDateTime } from "../components/cards";
 import { AppShell, Flash, PrefsForm } from "../components/chrome";
@@ -271,6 +272,7 @@ export function SecurityView({ viewer, vm, flash }: { viewer: V; vm: SecurityVM;
             <a className="btn btn-outline btn-sm" href="/api/v1/me/export">
               Download my data
             </a>
+            <Formats href="/api/v1/me/export" name="My data" />
           </div>
         </section>
 

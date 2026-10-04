@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { Formats } from "../../../ui/components/formats";
 import { CampusError, type TenantStore } from "../../core";
 import type { Actor } from "../../iam";
 import { FacultyCard } from "../../../ui/components/faculty";
@@ -467,7 +468,7 @@ function Outputs({ t }: { t: Ctx }) {
               <ul className="small learn-files">
                 {files.map((o) => (
                   <li key={String(o.id)}>
-                    <a href={api(slug, `learn/${v.course.id}/outputs/${o.id}`)}>{String(o.relPath).split("/").slice(1).join("/") || String(o.relPath)}</a> <Chip s={String(o.status)} /> {o.access === "instructor" && <span className="badge">instructor</span>}
+                    <a href={api(slug, `learn/${v.course.id}/outputs/${o.id}`)}>{String(o.relPath).split("/").slice(1).join("/") || String(o.relPath)}</a> <Chip s={String(o.status)} />{/\.(html?|md|csv|txt|json)$/i.test(String(o.relPath)) && String(o.status) === "ready" && <Formats href={api(slug, `learn/${v.course.id}/outputs/${o.id}`)} name={String(o.relPath).split("/").pop() ?? "Output"} label="" />} {o.access === "instructor" && <span className="badge">instructor</span>}
                     {o.reason ? <span className="tiny muted"> — {String(o.reason)}</span> : null}
                   </li>
                 ))}
@@ -975,7 +976,7 @@ function CloudLabs({ t }: { t: Ctx }) {
                 Last run <strong>{lastRun.name}</strong>: <Chip s={lastRun.status} /> {lastRun.stopReason ?? ""} · steps {lastRun.budget.used.steps}/{lastRun.budget.limit.steps} · cost {lastRun.budget.used.costUnits}/{lastRun.budget.limit.costUnits}
               </p>
               <p className="small">
-                Export the run log: <a href={api(slug, `learn/${v.course.id}/runs/${lastRun.id}.json`)}>JSON</a> · <a href={api(slug, `learn/${v.course.id}/runs/${lastRun.id}.html`)}>readable HTML</a>
+                Export the run log: <a href={api(slug, `learn/${v.course.id}/runs/${lastRun.id}.json`)}>JSON</a> · <a href={api(slug, `learn/${v.course.id}/runs/${lastRun.id}.html`)}>readable HTML</a> <Formats href={api(slug, `learn/${v.course.id}/runs/${lastRun.id}.html`)} name="Run log" label="·" />
               </p>
               <ol className="small learn-runlog" aria-label="Run log">
                 {lastRun.steps.map((s) => (
@@ -1246,6 +1247,7 @@ function Gradebook({ t }: { t: Ctx }) {
           <a className="btn btn-outline btn-sm" href={api(slug, `learn/${v.course.id}/gradebook.csv`)}>
             Export CSV
           </a>
+          <Formats href={api(slug, `learn/${v.course.id}/gradebook.csv`)} name="Gradebook" />
           {g.failedPostings > 0 && (
             <form method="post" action={api(slug, "a/graded.retry")}>
               <Hidden values={{ back: here, notice: "Retried failed postings.", courseId: v.course.id }} />

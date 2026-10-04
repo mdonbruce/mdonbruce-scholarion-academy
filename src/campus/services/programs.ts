@@ -461,6 +461,14 @@ export function ensurePrograms(store: TenantStore) {
   for (const spec of all) loadProgram(x, spec);
   // #39: exact live sessions (computed in US Eastern, DST-aware) on the program's course calendar.
   const g = store.get("offerings", offeringIdFor(t.slug, GENAI.code));
+  if (g) {
+    // The cohort runs on the computed weekend sessions, not on the generic Monday start.
+    const ses = genaiSessions();
+    for (const sec of store.list("offering_sections", (x) => x.offeringId === g.id)) {
+      if (sec.startsAt === ses[0].startUtc) continue;
+      store.update("offering_sections", sec.id, { startsAt: ses[0].startUtc, endsAt: ses[ses.length - 1].endUtc, timeZone: GENAI.timeZone, registrationClosesAt: ses[2].startUtc, applicationDeadline: new Date(Date.parse(ses[0].startUtc) - 2 * 86_400_000).toISOString(), schedule: "Saturdays and Sundays 6:00–9:00 AM US Eastern (America/New_York), 16 Jan – 14 Mar 2027" });
+    }
+  }
   if (g?.courseId && !store.list("calendar_events", (e) => e.courseId === g.courseId).length) {
     for (const ses of genaiSessions()) store.insert("calendar_events", { courseId: g.courseId, title: `Weekend ${ses.weekend} · ${ses.day}: ${ses.session.topic}${ses.n === 1 && GENAI.freeDay1 ? " (free Day 1 class)" : ""}`, startsAt: ses.startUtc, endsAt: ses.endUtc, location: "Live online (link on the course home)", recurrence: "none" }, "ce");
   }
@@ -1145,4 +1153,42 @@ export function myProgramProgress(store: TenantStore, a: Actor, offeringId: stri
   if (!o) throw new CampusError("not_found", "Program not found", 404);
   const pnp = passNoPassChecks(store, a.id, o);
   return pnp ? { mode: "pass_no_pass", checks: pnp } : { mode: "graded", totals: computeTotals(store, o.courseId as string, a.id) };
+}
+
+/** The brochure as a document — the Word and Excel downloads carry the same content as the PDF. */
+export function brochureDoc(store: TenantStore, slugOrCode: string): import("../../documents").Doc {
+  const p = programPage(store, null, slugOrCode);
+  const spec = p.spec;
+  return {
+    title: `${spec.code} ${spec.title}`,
+    subtitle: `Scholaris AI Academy · ${spec.valueStatement}`,
+    subject: "Program brochure",
+    footer: `${spec.code} ${spec.title} · brochure`,
+    blocks: [
+      { t: "table", caption: "At a glance", head: ["Item", "Detail"], rows: [["Duration", p.facts.duration], ["Weekly time", p.facts.weeklyHours], ["Format", spec.formatText], ["Fee", `${p.fees.price} ${p.facts.currency} (sandbox price, set by the program team before go-live)`], ...(p.fees.earlyBird ? [["Early registration", `${p.fees.earlyBird.price} ${p.facts.currency} until ${p.fees.earlyBird.endsAt.slice(0, 10)}`]] : []), ...(p.nextCohort ? [["Next cohort", `${p.nextCohort.code}: starts ${p.nextCohort.startsAt.slice(0, 10)}; last day to enroll ${p.nextCohort.registrationClosesAt.slice(0, 10)} (${p.nextCohort.timeZone})`]] : [])] },
+      { t: "h", level: 2, text: "Overview" },
+      ...spec.overview.map((x) => ({ t: "p" as const, text: x })),
+      { t: "h", level: 2, text: "What you'll learn" },
+      { t: "list", ordered: true, items: spec.outcomes },
+      { t: "h", level: 2, text: "Who it's for" },
+      { t: "list", items: spec.audience },
+      { t: "p", text: `Prerequisites: ${spec.prerequisites} ${spec.codingRequirement}` },
+      { t: "h", level: 2, text: "Curriculum" },
+      { t: "table", caption: "Curriculum", head: ["Week", "Title", "Focus"], rows: spec.curriculum.map((w) => [`${w.week}${w.optional ? " (optional)" : ""}`, w.title, w.focus]) },
+      ...(spec.electives?.length ? [{ t: "p" as const, text: `Optional electives (not required for completion): ${spec.electives.join("; ")}` }] : []),
+      { t: "h", level: 2, text: "Projects and capstone" },
+      { t: "table", caption: "Projects", head: ["Project", "Description", "Skills"], rows: spec.projects.map((x) => [x.name, x.description, x.skills.join(", ")]) },
+      { t: "h", level: 2, text: "Tools" },
+      { t: "table", caption: "Tools", head: ["Family", "Tools"], rows: spec.tools.map((g) => [g.family, g.items.join(", ")]) },
+      { t: "p", small: true, text: p.trademark },
+      { t: "h", level: 2, text: "Certificate" },
+      { t: "p", text: `${spec.credential.certificate}. ${spec.credential.badge}. ${p.ceuStatement} ${spec.creditStatement}` },
+      { t: "h", level: 2, text: "Fees and financing" },
+      { t: "list", items: [p.fees.installments.terms, p.fees.team, p.fees.referral, spec.fundingStatement] },
+      { t: "h", level: 2, text: "How to apply" },
+      { t: "list", ordered: true, items: p.howToApply },
+      { t: "h", level: 2, text: "Faculty" },
+      { t: "list", items: spec.faculty.map((f) => { const a = facultyByName(f.name); return a ? `${a.name}, ${a.role}, ${a.org}` : `${f.name}${"role" in f && f.role ? `, ${String(f.role)}` : ""}`; }) },
+    ],
+  };
 }

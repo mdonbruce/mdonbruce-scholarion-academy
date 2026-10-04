@@ -1,4 +1,5 @@
 import type { joinVM, orgVM, teamsQuote, Viewer } from "@/bff/views";
+import { Formats } from "../components/formats";
 import { fmtDate, Progress, Stat, StatusBadge } from "../components/cards";
 import { AppShell, Flash, PublicPage } from "../components/chrome";
 
@@ -24,6 +25,7 @@ export function OrgView({ viewer, vm, flash, origin }: { viewer: V; vm: ReturnTy
         <a className="btn btn-outline btn-sm" href={`/api/v1/teams/orgs/${o.id}/report.csv`}>
           Export progress (CSV)
         </a>
+        <Formats href={`/api/v1/teams/orgs/${o.id}/report.csv`} name="Progress report" />
       </div>
       <div className="dev-banner" style={{ margin: "14px 0" }}>
         Sandbox: seat purchases record an order but take no payment. Organization sign-in is simulated by email domain until SAML/OIDC SSO is connected.

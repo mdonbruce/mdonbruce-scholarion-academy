@@ -1,8 +1,9 @@
 import QR from "./qr";
+import { attachDoc, officeResponse } from "../documents/http";
 import { isLocale, LOCALE_COOKIE, REGION_COOKIE } from "@/i18n";
 import { formatMoney, isRegion } from "@/platform/pricing";
 import { certificatePdf } from "./certificate-pdf";
-import { invoicePdf } from "./invoice-pdf";
+import { invoiceDoc, invoicePdf } from "./invoice-pdf";
 import {
   capabilities,
   catalog,
@@ -397,8 +398,9 @@ on("GET", "commerce/orders/:id/invoice", async (c) => {
   const order = getDb().orders.find((o) => o.id === c.params.id);
   if (!order || (order.userId !== c.user!.id && !identity.hasRole(c.user!, "support_agent", "platform_admin"))) throw new PlatformError("not_found", "Order not found", 404);
   const buyer = identity.getUser(order.userId);
-  const pdf = await invoicePdf({ order, buyerName: buyer?.name ?? "Learner", buyerEmail: buyer?.email ?? "" });
-  return new Response(new Uint8Array(pdf), { headers: { "content-type": "application/pdf", "content-disposition": `attachment; filename="scholarion-receipt-${order.id}.pdf"`, "cache-control": "private, no-store" } });
+  const input = { order, buyerName: buyer?.name ?? "Learner", buyerEmail: buyer?.email ?? "" };
+  const pdf = await invoicePdf(input);
+  return attachDoc(new Response(new Uint8Array(pdf), { headers: { "content-type": "application/pdf", "content-disposition": `attachment; filename="scholarion-receipt-${order.id}.pdf"`, "cache-control": "private, no-store" } }), invoiceDoc(input));
 }, "user");
 on("POST", "commerce/orders/:id/refund", (c) => {
   commerce.requestOrderRefund(c.params.id, c.user!.id, c.data.reason ?? "");
@@ -463,6 +465,15 @@ on("GET", "credentials/:id/pdf", async (c) => {
   if (!cred || (cred.userId !== c.user!.id && !identity.hasRole(c.user!, "support_agent"))) throw new PlatformError("not_found", "Credential not found", 404);
   if (cred.revokedAt) throw new PlatformError("revoked", "This credential was revoked, so there's no certificate to download.", 410);
   const product = catalog.get(cred.productId);
+  const certDoc = {
+    title: cred.title,
+    subtitle: `${product?.credential.kind === "badge" ? "Badge" : "Certificate"} · Scholarion Academy`,
+    footer: `Credential ${cred.id}`,
+    blocks: [
+      { t: "table" as const, caption: "Credential", head: ["Field", "Value"], rows: [["Awarded to", cred.holderName], ["Achievement", cred.title], ["Program", product?.title ?? cred.title], ["Issued", new Date(cred.issuedAt).toISOString().slice(0, 10)], ["Credential ID", cred.id], ["Verify at", credentials.verifyUrl(cred.id)], ...(product?.hours ? [["Learning hours", String(product.hours)]] : [])] },
+      { t: "p" as const, small: true, text: "Non-credit credential issued by Scholarion Academy. Anyone can confirm it at the verification link." },
+    ],
+  };
   const pdf = await certificatePdf({
     id: cred.id,
     holderName: cred.holderName,
@@ -474,7 +485,7 @@ on("GET", "credentials/:id/pdf", async (c) => {
     hours: product?.hours,
   });
   const file = `scholarion-${(product?.slug ?? cred.id).slice(0, 60)}-${cred.id}.pdf`;
-  return new Response(new Uint8Array(pdf), { headers: { "content-type": "application/pdf", "content-disposition": `attachment; filename="${file}"`, "cache-control": "private, no-store" } });
+  return attachDoc(new Response(new Uint8Array(pdf), { headers: { "content-type": "application/pdf", "content-disposition": `attachment; filename="${file}"`, "cache-control": "private, no-store" } }), certDoc);
 }, "user");
 on("GET", "credentials/issuer-key", () => json(credentials.publicJwk()));
 
@@ -768,7 +779,17 @@ on("POST", "admin/credentials/:id/revoke", (c) => (credentials.revoke(c.params.i
 
 /* ---------------- Dispatcher ---------------- */
 
+/** Every download can be fetched as PDF, Word or Excel (?format=pdf|docx|xlsx). */
 export async function handleApi(req: Request, path: string): Promise<Response> {
+  const res = await handleApiInner(req, path);
+  try {
+    return await officeResponse(req, res, path.split("/").filter(Boolean).slice(-1)[0] ?? "document");
+  } catch (e) {
+    return json({ error: { code: "conversion_failed", message: `The document couldn't be converted: ${(e as Error).message}` } }, 500);
+  }
+}
+
+async function handleApiInner(req: Request, path: string): Promise<Response> {
   ensurePlatform();
   const method = req.method.toUpperCase();
   const candidates = routes.filter((r) => match(r.pattern, path));

@@ -50,6 +50,9 @@ describe("GenAI program #39 schedule", () => {
     const evs = storeOf("academy").list("calendar_events", (e) => e.courseId === o.courseId);
     assert.equal(evs.length, 18);
     assert.ok(evs.some((e) => e.startsAt === "2027-01-16T11:00:00.000Z"));
+    const sec = storeOf("academy").list("offering_sections", (x) => x.offeringId === o.id)[0];
+    assert.equal(sec.startsAt, "2027-01-16T11:00:00.000Z"); // Saturday, not the generic Monday
+    assert.equal(sec.endsAt, "2027-03-14T13:00:00.000Z");
     assert.ok(JSON.stringify(p).includes(String(GENAI.offerPrice)));
   });
 });
