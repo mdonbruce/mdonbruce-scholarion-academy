@@ -50,3 +50,5 @@ export {
   checkRunMiniLab,
   type PipelineOptions,
 } from "./pipeline";
+
+export { moduleStudioBundle } from "./layout";

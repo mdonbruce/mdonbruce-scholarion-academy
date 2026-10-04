@@ -28,6 +28,10 @@ export const T = {
   matches: "eco_matches",
   applications: "eco_applications",
   contacts: "eco_contact_requests",
+  topicLinks: "eco_topic_links",
+  digests: "eco_digests",
+  changelog: "eco_changelog",
+  flags: "eco_posting_flags",
 } as const;
 
 export const DAY = 86_400_000;

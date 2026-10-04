@@ -34,17 +34,74 @@ const COMPETENCY_SKILLS: Record<string, string[]> = {
 
 /* ---------------- employers ---------------- */
 
-export function registerEmployer(store: TenantStore, a: Actor, input: { name: string; website: string; industries?: string[]; locations?: string[]; about?: string }) {
+/* ---------------- automatic checks ---------------- */
+
+const FREE_MAIL = /^(gmail|googlemail|yahoo|ymail|outlook|hotmail|live|msn|aol|icloud|me|mac|proton|protonmail|gmx|mail|yandex|zoho)\.[a-z.]+$/i;
+
+/** Automatic employer verification: business-domain email that matches the website, https website, a real name. */
+export function employerChecks(input: { name: string; website: string; contactEmail?: string | null }) {
+  const reasons: string[] = [];
+  const host = hostOf(input.website);
+  const mailDomain = String(input.contactEmail ?? "").split("@")[1]?.toLowerCase() ?? "";
+  if (!/^https:\/\//i.test(input.website)) reasons.push("The website must use https.");
+  if (!mailDomain) reasons.push("A contact email at the company's domain is required.");
+  else if (FREE_MAIL.test(mailDomain)) reasons.push(`${mailDomain} is a free email provider, not a business domain.`);
+  else if (!(mailDomain === host || mailDomain.endsWith(`.${host}`) || host.endsWith(`.${mailDomain}`))) reasons.push(`The email domain (${mailDomain}) doesn't match the website (${host}).`);
+  if (String(input.name ?? "").trim().length < 2) reasons.push("Organization name is missing.");
+  return { ok: reasons.length === 0, reasons };
+}
+
+const SCAM_PATTERNS: [RegExp, string][] = [
+  [/\b(training|registration|application|processing|starter[- ]kit|equipment)\s+fee\b|\bpay(ment)?\s+(to|before)\s+(apply|start)|\bupfront\s+(fee|payment)/i, "Asks applicants to pay a fee"],
+  [/\b(wire|western union|moneygram|gift\s*cards?|bitcoin|crypto(currency)?)\b.*\b(pay|send|deposit|purchase)|\b(send|deposit)\b.*\b(check|cheque)\b/i, "Asks applicants to move money"],
+  [/\b(social security number|ssn|bank account (number|details)|passport (number|copy))\b/i, "Requests sensitive personal data up front"],
+  [/\b(telegram|signal|whats\s?app)\s+(only|interview)\b|\binterview (via|on) (telegram|signal|whats\s?app)\b/i, "Interview only through a messaging app"],
+  [/\bearn\s+\$?\d{3,}\s*(per|a|\/)\s*(day|hour)\b|\bno experience\b.*\bguaranteed\b/i, "Unrealistic pay or guarantee"],
+];
+
+/** Posting checks: scam patterns, expired deadline, duplicates. Flagged postings are hidden and logged. */
+export function postingFlags(store: TenantStore, o: { id?: string; title: string; description?: string; employerId?: string | null; employerName?: string; closesAt?: string | null; applicationUrl?: string | null }) {
+  const text = `${o.title} ${o.description ?? ""}`;
+  const flags = SCAM_PATTERNS.filter(([re]) => re.test(text)).map(([, why]) => why);
+  if (o.closesAt && Date.parse(o.closesAt) < nowMs()) flags.push("Closing date has passed");
+  const dup = store.list(T.opportunities, (x) => x.id !== o.id && x.status === "open" && String(x.title).toLowerCase() === o.title.toLowerCase() && String(x.employerName ?? "") === String(o.employerName ?? ""))[0];
+  if (dup) flags.push("Duplicate of an open posting");
+  if (o.employerId && o.applicationUrl) {
+    const e = store.get(T.employers, o.employerId);
+    const h = hostOf(o.applicationUrl);
+    const site = e ? hostOf(String(e.website)) : "";
+    const ats = /(greenhouse\.io|lever\.co|myworkdayjobs\.com|smartrecruiters\.com|ashbyhq\.com|usajobs\.gov|adzuna\.)/i.test(h);
+    if (site && h && !ats && !(h === site || h.endsWith(`.${site}`))) flags.push(`Application link (${h}) isn't on the employer's site or a known applicant-tracking system`);
+  }
+  return flags;
+}
+
+export function logPostingFlags(store: TenantStore, opportunityId: string, flags: string[]) {
+  if (!flags.length) return;
+  store.insert(T.flags, { opportunityId, flags, at: nowIso() }, "eflg");
+  store.update(T.opportunities, opportunityId, { status: "pending", hiddenReason: flags.join("; ") });
+}
+
+export function flaggedPostings(store: TenantStore, a: Actor) {
+  requireAdmin(store, a, "eco.flags.view");
+  return store.list(T.flags, () => true).map((f) => ({ id: f.id, opportunity: String(store.get(T.opportunities, String(f.opportunityId))?.title ?? ""), flags: f.flags as string[], at: String(f.at) }));
+}
+
+export function registerEmployer(store: TenantStore, a: Actor, input: { name: string; website: string; contactEmail?: string; industries?: string[]; locations?: string[]; about?: string }) {
   const website = safePublicUrl(input.website, "website");
   const name = String(input.name ?? "").trim().slice(0, 160);
   if (!name) throw new CampusError("invalid", "Organization name is required.", 422);
   if (store.list(T.employers, (e) => hostOf(String(e.website)) === hostOf(website)).length) throw new CampusError("conflict", "An organization with that website is already registered.", 409);
   return store.tx(() => {
-    const e = store.insert(T.employers, { name, website, relationship: "registered", verification: "pending", industries: input.industries ?? [], locations: input.locations ?? [], about: String(input.about ?? "").slice(0, 2000), registeredBy: a.id, verifiedBy: null, verifiedAt: null, partnerNote: null }, "eemp");
+    // Automatic verification: no manual step when the checks pass; failures stay hidden with reasons.
+    const chk = employerChecks({ name, website, contactEmail: input.contactEmail ?? a.email });
+    const e = store.insert(T.employers, { name, website, contactEmail: input.contactEmail ?? a.email, relationship: chk.ok ? "verified" : "registered", verification: chk.ok ? "verified" : "pending", verificationReasons: chk.reasons, industries: input.industries ?? [], locations: input.locations ?? [], about: String(input.about ?? "").slice(0, 2000), registeredBy: a.id, verifiedBy: chk.ok ? "automatic-checks" : null, verifiedAt: chk.ok ? nowIso() : null, partnerNote: null }, "eemp");
     store.insert(T.members, { employerId: e.id, userId: a.id, role: "owner" }, "emem");
-    audit(store, a, "eco.employer.register", `${T.employers}/${e.id}`);
-    const admins = store.list("role_grants", (g) => g.role === "admin").map((g) => String(g.userId));
-    notify(store, admins, "employers", `Employer verification requested: ${name}`, `${name} (${hostOf(website)}) registered and is waiting for verification before it can see learner profiles.`, "/campus/{tenant}/hub/employers");
+    audit(store, a, "eco.employer.register", `${T.employers}/${e.id}`, chk.ok ? "auto-verified" : chk.reasons.join("; "));
+    if (!chk.ok) {
+      const admins = store.list("role_grants", (g) => g.role === "admin").map((g) => String(g.userId));
+      notify(store, admins, "employers", `Employer needs review: ${name}`, `Automatic checks didn't pass: ${chk.reasons.join(" ")}`, "/campus/{tenant}/hub/employers");
+    }
     return e;
   });
 }
@@ -85,7 +142,7 @@ function requireVerifiedEmployer(store: TenantStore, a: Actor, action: string): 
 
 export function employerView(e: Row) {
   const label = e.relationship === "partner" ? "Scholarion partner" : e.relationship === "verified" ? "Verified employer" : e.relationship === "registered" ? "Registered — verification pending" : "External listing (not a Scholarion partner)";
-  return { id: e.id, name: String(e.name), website: String(e.website), relationship: String(e.relationship), label, verification: String(e.verification), industries: (e.industries as string[]) ?? [], locations: (e.locations as string[]) ?? [], about: String(e.about ?? "") };
+  return { id: e.id, name: String(e.name), website: String(e.website), relationship: String(e.relationship), label, verification: String(e.verification), reasons: (e.verificationReasons as string[]) ?? [], industries: (e.industries as string[]) ?? [], locations: (e.locations as string[]) ?? [], about: String(e.about ?? "") };
 }
 
 export function listEmployers(store: TenantStore, a: Actor, f: { relationship?: string } = {}) {
@@ -105,9 +162,11 @@ export function postOpportunity(store: TenantStore, a: Actor, input: Record<stri
   const skills = [...new Set([...((input.skills as string[]) ?? []).map((s) => String(s).toLowerCase().trim()).filter(Boolean), ...extractSkills(`${title} ${input.description ?? ""}`)])].slice(0, 20);
   return store.tx(() => {
     const o = store.insert(T.opportunities, { employerId: e.id, employerName: e.name, externalId: null, sourceId: null, source: "employer_posted", title, type, description: String(input.description ?? "").slice(0, 4000), skills, qualifications: ((input.qualifications as string[]) ?? []).map(String).slice(0, 20), certificates: ((input.certificates as string[]) ?? []).map(String), location: input.location ? String(input.location) : null, remote: ["remote", "hybrid", "onsite"].includes(String(input.remote)) ? String(input.remote) : "unknown", workEligibility: input.workEligibility ? String(input.workEligibility) : null, compensation: input.compensation ? String(input.compensation) : null, applicationUrl: input.applicationUrl ? safePublicUrl(input.applicationUrl, "applicationUrl") : null, postedAt: nowIso(), closesAt: input.closesAt ? new Date(String(input.closesAt)).toISOString() : null, status: "open", lastVerifiedAt: nowIso(), legitimacy: [`Posted by verified employer ${e.name}`] }, "eopp");
-    feedItem(store, "opportunity", `New opportunity: ${title} (${e.name})`, { opportunityId: o.id, subjects: skills });
-    audit(store, a, "eco.opportunity.post", `${T.opportunities}/${o.id}`);
-    return o;
+    const flags = postingFlags(store, { id: o.id, title, description: String(o.description), employerId: e.id, employerName: String(e.name), closesAt: (o.closesAt as string) ?? null, applicationUrl: (o.applicationUrl as string) ?? null });
+    if (flags.length) logPostingFlags(store, o.id, flags);
+    else feedItem(store, "opportunity", `New opportunity: ${title} (${e.name})`, { opportunityId: o.id, subjects: skills });
+    audit(store, a, "eco.opportunity.post", `${T.opportunities}/${o.id}`, flags.length ? `hidden: ${flags.join("; ")}` : "published");
+    return store.get(T.opportunities, o.id)!;
   });
 }
 
@@ -156,6 +215,17 @@ export function listOpportunities(store: TenantStore, f: { q?: string; type?: st
 /* ---------------- learner career profile ---------------- */
 
 const DEFAULT_VISIBILITY: Record<Field, boolean> = { headline: false, skills: false, certificates: false, portfolio: false, contact: false };
+
+/** Withdraw from Employer Connect at any time: profile becomes private and pending contact requests are cancelled. */
+export function withdrawConsent(store: TenantStore, a: Actor) {
+  const p = store.list(T.profiles, (x) => x.userId === a.id)[0];
+  store.tx(() => {
+    if (p) store.update(T.profiles, p.id, { discoverable: false, visible: { ...DEFAULT_VISIBILITY }, withdrawnAt: nowIso() });
+    for (const c of store.list(T.contacts, (x) => x.userId === a.id && x.state !== "declined")) store.update(T.contacts, c.id, { state: "withdrawn" });
+  });
+  audit(store, a, "eco.consent.withdraw", `${T.profiles}/${a.id}`);
+  return myProfile(store, a);
+}
 
 export function myProfile(store: TenantStore, a: Actor) {
   const p = store.list(T.profiles, (x) => x.userId === a.id)[0];

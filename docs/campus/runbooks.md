@@ -642,7 +642,7 @@ Scholarion's own hosted learning area for each course: dashboard, modules and to
 - **Typical failures:** Grading environment unavailable (submission marked infra_failed, no attempt used); gradebook post failure (posting_failed, retried automatically); attempts exhausted (409).
 - **Recovery:** Learner resubmits after an infra failure; staff or the scheduler run graded.retry; instructor grants an extra attempt in the item settings.
 - **Resources:** `graded_items`, `graded_item_versions`, `graded_submissions`, `passbook`, `lab_workspaces`, `workspace_snapshots`, `workspace_policies`, `workspace_agent_runs`, `workspace_teams`, `projection_locks`
-- **Operations:** `learn.overview`, `learn.sections`, `graded.view`, `graded.practice`, `graded.submit`, `graded.submit_project`, `graded.review`, `graded.gradebook`, `graded.retry`, `workspace.templates`, `workspace.mine`, `workspace.launch`, `workspace.get`, `workspace.files`, `workspace.read`, `workspace.write`, `workspace.command`, `workspace.save`, `workspace.stop`, `workspace.resume`, `workspace.reset`, `workspace.snapshot`, `workspace.agent_run`, `workspace.agent_stop`, `workspace.agent_runs`, `workspace.pause`, `workspace.unpause`, `workspace.policy`, `workspace.set_policy`, `workspace.progress`, `projection.state`, `projection.lock`, `projection.unlock`
+- **Operations:** `learn.overview`, `learn.sections`, `graded.view`, `graded.practice`, `graded.submit`, `graded.submit_project`, `graded.review`, `graded.gradebook`, `graded.regrade`, `graded.retry`, `workspace.templates`, `workspace.mine`, `workspace.launch`, `workspace.get`, `workspace.files`, `workspace.read`, `workspace.write`, `workspace.command`, `workspace.save`, `workspace.stop`, `workspace.resume`, `workspace.reset`, `workspace.snapshot`, `workspace.agent_run`, `workspace.agent_stop`, `workspace.agent_runs`, `workspace.pause`, `workspace.unpause`, `workspace.policy`, `workspace.set_policy`, `workspace.progress`, `projection.state`, `projection.lock`, `projection.set_pin`, `projection.unlock`
 - **Who sees it:** admin, designer, instructor, ta, student
 
 ## 56. Course Studio (Master Studio Generator)
@@ -666,7 +666,7 @@ Scholarion AI Tools Registry and Free Course Library: an evidence-backed catalog
 - **Typical failures:** A provider changes its free terms (record drops to pending, courses are notified with a verified alternative); a page disappears (unavailable).
 - **Recovery:** Add fresh official evidence; the next verification run republishes automatically.
 - **Resources:** `eco_resources`, `eco_resource_versions`, `eco_evidence`, `eco_course_mappings`, `eco_bookmarks`, `eco_external_completions`, `eco_subscriptions`, `eco_feed`, `eco_connections`, `eco_health`, `eco_live_sessions`
-- **Operations:** `eco.summary`, `eco.resources`, `eco.resource`, `eco.curate`, `eco.add_evidence`, `eco.archive`, `eco.bookmark`, `eco.bookmarks`, `eco.report_completion`, `eco.subscribe`, `eco.unsubscribe`, `eco.whats_new`, `eco.map_course`, `eco.course_resources`, `eco.recommend`, `eco.connect`, `eco.connections`, `eco.connection_health`, `eco.disconnect`, `eco.live_schedule`, `eco.live_sessions`
+- **Operations:** `eco.summary`, `eco.resources`, `eco.resource`, `eco.curate`, `eco.add_evidence`, `eco.archive`, `eco.bookmark`, `eco.bookmarks`, `eco.report_completion`, `eco.subscribe`, `eco.unsubscribe`, `eco.whats_new`, `eco.map_course`, `eco.course_resources`, `eco.recommend`, `eco.connect`, `eco.connections`, `eco.connection_health`, `eco.disconnect`, `eco.live_schedule`, `eco.live_sessions`, `eco.library_by_course`, `eco.changelog`
 - **Who sees it:** admin, designer, instructor, ta, student, advisor
 
 ## 58. Career Connect & Employer Portal
@@ -678,7 +678,7 @@ Internship and employment board (employer-posted and externally discovered listi
 - **Typical failures:** Unverified employer (403 on talent search); closed listing (409 on apply).
 - **Recovery:** Admin verifies the employer; learners pick another listing.
 - **Resources:** `eco_employers`, `eco_employer_members`, `eco_opportunities`, `eco_career_profiles`, `eco_matches`, `eco_applications`, `eco_contact_requests`
-- **Operations:** `eco.opportunities`, `eco.employers`, `eco.profile`, `eco.profile_save`, `eco.matches`, `eco.apply`, `eco.applications`, `eco.withdraw`, `eco.contact_requests`, `eco.answer_contact`, `eco.employer_register`, `eco.employer_verify`, `eco.employer_partner`, `eco.employer_portal`, `eco.post_opportunity`, `eco.close_opportunity`, `eco.talent`, `eco.request_contact`, `eco.application_update`, `eco.placements`
+- **Operations:** `eco.opportunities`, `eco.employers`, `eco.profile`, `eco.profile_save`, `eco.matches`, `eco.apply`, `eco.applications`, `eco.withdraw`, `eco.contact_requests`, `eco.answer_contact`, `eco.employer_register`, `eco.employer_verify`, `eco.employer_partner`, `eco.employer_portal`, `eco.post_opportunity`, `eco.close_opportunity`, `eco.talent`, `eco.request_contact`, `eco.application_update`, `eco.withdraw_consent`, `eco.flags`, `eco.placements`
 - **Who sees it:** admin, advisor, student
 
 ## 59. Auto-Discovery & Workflow Automation
@@ -692,6 +692,18 @@ Scheduled, bounded discovery and maintenance: cron schedules in America/New_York
 - **Resources:** `eco_schedules`, `eco_jobs`, `eco_sources`, `eco_candidates`, `eco_checks`
 - **Operations:** `eco.automation`, `eco.schedule_save`, `eco.schedule_pause`, `eco.schedule_resume`, `eco.run_now`, `eco.tick`, `eco.job`, `eco.job_create`, `eco.source_add`, `eco.source_toggle`, `eco.schemas`, `eco.validate`
 - **Who sees it:** admin
+
+## 60. Program Marketing & Campaigns
+
+Launch kit for the 9-weekend GenAI, Agentic AI & AI Agents program (#39): program and free Day 1 flyers with the approved faculty photo, landing outline, LinkedIn/Instagram/WhatsApp copy, 60-second promo script, three-email sequence with unsubscribe links, all 18 sessions in seven time zones (.md/.csv/.ics), Copy Checker flags on every asset, consented opt-in audiences, email sends held until a provider is configured, a manual channel checklist with platform rules (never auto-posted), the meeting-platform duration check and the Scholarion_GenAI_Agentic_Program/ folder export.
+
+- **Purpose:** Promote programs honestly and lawfully from one reviewed kit.
+- **Depends on:** Program #39 catalog entry, Copy Checker, Free Education Resource Hub (meeting limits), email connector (HavenRoute).
+- **Typical failures:** No email provider (sends held); copy flagged (send blocked until fixed).
+- **Recovery:** Configure the email connector; fix the flagged wording and send again.
+- **Resources:** `campaigns`, `campaign_channels`, `campaign_contacts`, `campaign_sends`
+- **Operations:** `campaign.overview`, `campaign.settings`, `campaign.send`, `campaign.posted`, `campaign.subscribe`
+- **Who sees it:** admin, designer, advisor
 
 ## 52. Module Library & Catalog Consolidation
 

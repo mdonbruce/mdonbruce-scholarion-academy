@@ -171,7 +171,7 @@ export const SCHEDULE_V1: J = {
   properties: {
     schema_version: { const: "1.0.0" },
     key: { type: "string", pattern: "^[a-z0-9_-]{3,40}$" },
-    kind: { enum: ["job_discovery", "resource_discovery", "terms_review", "link_check", "integration_health"] },
+    kind: { enum: ["job_discovery", "resource_discovery", "terms_review", "link_check", "integration_health", "digest"] },
     cron: { type: "string", pattern: "^\\S+ \\S+ \\S+ \\S+ \\S+$" },
     time_zone: { type: "string", minLength: 3 },
     enabled: { type: "boolean" },

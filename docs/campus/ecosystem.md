@@ -212,3 +212,28 @@ Every operation is also listed in `contracts/campus/v1/openapi.json`, under the 
 - **Job sources:** the owner chooses which public job boards to ingest (for example, a Greenhouse board token). LinkedIn, Indeed and Handshake need partner API agreements.
 - **Email and SMS:** delivery needs an authorized notification service.
 - **Provider credentials:** any connected API service needs credentials placed in the key vault by the account owner.
+
+## Sources and terms of use (README for the auto-updating hubs)
+
+| Source | How Scholarion reads it | Terms that apply | Configuration |
+|---|---|---|---|
+| Vendor and course pages (official sites) | Trusted-host fetch, parsed as data; limits recorded only with an evidence URL | Each vendor's own terms; content is linked, never copied | Egress to the trusted hosts |
+| Openly licensed courses and textbooks (CC BY, CC BY-SA, MIT OCW and similar) | Imported with attribution and license link (`contentUse: import_with_attribution`) | The named license; attribution and share-alike kept | None |
+| Everything else in the library | Linked or embedded only (`contentUse: link_only`) | Copyright of the owner | None |
+| USAJOBS Search API | `api.usajobs.gov` with `Authorization-Key` and `User-Agent` headers | USAJOBS API terms; listings link to the official posting | `USAJOBS_API_KEY`, `USAJOBS_USER_AGENT` |
+| Adzuna API | `api.adzuna.com` with `app_id` / `app_key` | Adzuna API terms, including attribution | `ADZUNA_APP_ID`, `ADZUNA_APP_KEY` |
+| Greenhouse Job Board API | Public `boards-api.greenhouse.io` board for an employer that publishes one | Greenhouse's public job board API | Board token per employer |
+| Lever Postings API | Public `api.lever.co/v0/postings/{company}` | Lever's public postings API | Company slug per employer |
+| RSS / Atom feeds | Feeds the owner adds | The publisher's terms | Feed URL |
+
+**Not scraped:** LinkedIn, Indeed and Glassdoor. Their terms prohibit automated collection, so they are only usable through an official partner agreement.
+
+A source without its key is recorded as **Configuration required** (`needs_configuration`) rather than an error. Adding a source (Discovery & Update Settings → Sources) checks the URL against the allowed pattern for its kind and rejects URLs that carry credentials.
+
+**Automatic posting checks.** Every discovered or employer-posted job is checked before it is listed: verified employer domain (company email domain matches the https website; free-mail addresses are refused), no fees charged to applicants, no requests to move money or send ID or bank details, no chat-app-only interviews, realistic pay, not expired, not a duplicate, and an application link on the employer's or the board's own site. A posting that fails is hidden and logged in "Postings hidden by automatic checks" with the reasons.
+
+**Schedules (America/New_York):** jobs daily, tools and library weekly, full re-verification monthly, link checks daily, weekly digest Monday 09:00. Changes publish automatically with a "What changed" note and appear on the public changelog (`/campus/{tenant}/changelog`). A limit that can't be confirmed on an official page is shown as "unverified", never as a number.
+
+**Digests.** The weekly admin digest summarizes runs, new and retired records, hidden postings and failures. The learner digest goes only to learners who subscribed to it.
+
+**Learner consent (FERPA).** Employer Connect is opt-in with per-field choices. "Withdraw" makes the profile private and cancels open contact requests at once.

@@ -8,6 +8,7 @@ import * as G from "../../services/graded";
 import * as studio from "../../services/studio";
 import * as W from "../../services/workspace";
 import * as eco from "../../services/ecosystem";
+import { hasPin } from "../../services/projection";
 import { LEARN_SECTIONS, learnOverview, type LearnOverview, type LearnSection } from "../../services/learnarea";
 import { api, Chip, Denied, Empty, fmt, Hidden, PageHead } from "../kit";
 
@@ -455,6 +456,9 @@ function Outputs({ t }: { t: Ctx }) {
             <a className="btn btn-outline btn-sm" href={api(slug, `learn/${v.course.id}/studio/${runId}/bundle.zip`)}>
               Download {v.staff ? "full" : "learner"} bundle (.zip)
             </a>
+            <a className="btn btn-ghost btn-sm" href={api(slug, `learn/${v.course.id}/studio-module/1/bundle.zip`)}>
+              Module folder (00_Cover … 17_Requirements_Videos + manifest)
+            </a>
             {v.staff && <span className="small">Instructor files: {v.lock.locked ? "locked by the projection lock" : "unlocked"}</span>}
           </p>
           {[...groups.entries()].map(([folder, files]) => (
@@ -564,7 +568,8 @@ function ItemPanel({ t, itemId }: { t: Ctx; itemId: string }) {
             · Mandatory: <strong>{it.mandatory.join(", ")}</strong>
           </>
         ) : null}{" "}
-        · Attempts {it.attemptsUsed} of {it.maxAttempts} · Version {it.version} · AI use: {it.aiPolicy}
+        · Attempts {it.attemptsUsed} of {it.maxAttempts} · Counts: {it.gradingPolicy === "latest" ? "latest attempt" : "highest attempt"}
+        {it.dueAt ? ` · Due ${fmt(it.dueAt, true)}` : ""} · Version {it.version} · AI use: {it.aiPolicy}
       </p>
       <details>
         <summary>Rubric</summary>
@@ -694,6 +699,20 @@ function ItemPanel({ t, itemId }: { t: Ctx; itemId: string }) {
       )}
       {reviewErr && <p className="notice notice-err">{reviewErr}</p>}
       {review && <Review r={review} />}
+      {review && it.isStaff && (
+        <form method="post" action={api(slug, "a/graded.regrade")} className="row card card-pad" aria-label="Regrade">
+          <Hidden values={{ back: here, notice: "Regraded and reposted; the learner was notified.", submissionId: String(review.id) }} />
+          <label>
+            New score (0–100)
+            <input name="score" type="number" min={0} max={100} required />
+          </label>
+          <label>
+            Reason (required)
+            <input name="reason" required />
+          </label>
+          <button className="btn btn-outline btn-sm">Regrade</button>
+        </form>
+      )}
     </section>
   );
 }
@@ -954,6 +973,9 @@ function CloudLabs({ t }: { t: Ctx }) {
             <div className="stack">
               <p className="small">
                 Last run <strong>{lastRun.name}</strong>: <Chip s={lastRun.status} /> {lastRun.stopReason ?? ""} · steps {lastRun.budget.used.steps}/{lastRun.budget.limit.steps} · cost {lastRun.budget.used.costUnits}/{lastRun.budget.limit.costUnits}
+              </p>
+              <p className="small">
+                Export the run log: <a href={api(slug, `learn/${v.course.id}/runs/${lastRun.id}.json`)}>JSON</a> · <a href={api(slug, `learn/${v.course.id}/runs/${lastRun.id}.html`)}>readable HTML</a>
               </p>
               <ol className="small learn-runlog" aria-label="Run log">
                 {lastRun.steps.map((s) => (
@@ -1335,6 +1357,22 @@ function Instructor({ t }: { t: Ctx }) {
           <Hidden values={{ back: here, notice: v.lock.locked ? "Answers unlocked for 30 minutes." : "Answers hidden.", courseId: v.course.id }} />
           <button className={`btn btn-sm ${v.lock.locked ? "btn-outline" : "btn-primary"}`} disabled={v.lock.locked && !v.canUnlock}>
             {v.lock.locked ? "Unlock answer keys" : "Switch to Student View (lock now)"}
+          </button>
+        </form>
+      </section>
+      <section className="card card-pad stack" aria-labelledby="ip-pin">
+        <h3 id="ip-pin" className="card-title">
+          Instructor lab PIN
+        </h3>
+        <p className="small">Downloaded Instructor Lab files keep their answer keys encrypted with this PIN. They open behind a lock screen, and Switch to Student View removes the keys from the page. {hasPin(t.store, v.course.id) ? "A PIN is set." : "No PIN set yet — instructor files rely on the projection lock above."}</p>
+        <form method="post" action={api(slug, "a/projection.set_pin")} className="row">
+          <Hidden values={{ back: here, notice: "PIN saved. New instructor downloads use it.", courseId: v.course.id }} />
+          <label>
+            New PIN (4–8 digits)
+            <input name="pin" type="password" inputMode="numeric" pattern="\d{4,8}" required autoComplete="off" />
+          </label>
+          <button className="btn btn-outline btn-sm" disabled={!v.canUnlock}>
+            Save PIN
           </button>
         </form>
       </section>

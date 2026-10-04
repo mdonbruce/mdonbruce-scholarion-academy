@@ -5,6 +5,7 @@ import { createUser, hasAny, type Actor } from "../iam";
 import { PROGRAMS, P26_QUIZ, TRADEMARK_NOTICE, type ProgramSpec, type QuizItem, type WeekSpec } from "../academy/programs-data";
 import { LEARNING_PATHS, LIBRARY, P15_CHECKS, PROGRAMS_2, type LibraryModule } from "../academy/programs-data-2";
 import { PROGRAMS_3 } from "../academy/programs-data-3";
+import { GENAI, genaiProgramSpec, genaiSessions } from "../academy/genai-program";
 import { DECIDED_BY, DECISIONS, decisionIso } from "../academy/decisions";
 import { facultyByName, fitSize } from "../../brand/faculty";
 import { facultyImageBytes } from "../../brand/faculty-assets";
@@ -456,8 +457,13 @@ export function ensurePrograms(store: TenantStore) {
   ensureLibrary(store);
   ensurePolicies(store);
   const x: Ctx = { store, slug: t.slug, root, staff: [lead.id, ...instructors], pos: 0 };
-  const all = [...PROGRAMS, ...PROGRAMS_2, ...PROGRAMS_3];
+  const all = [...PROGRAMS, ...PROGRAMS_2, ...PROGRAMS_3, genaiProgramSpec(nowMs())];
   for (const spec of all) loadProgram(x, spec);
+  // #39: exact live sessions (computed in US Eastern, DST-aware) on the program's course calendar.
+  const g = store.get("offerings", offeringIdFor(t.slug, GENAI.code));
+  if (g?.courseId && !store.list("calendar_events", (e) => e.courseId === g.courseId).length) {
+    for (const ses of genaiSessions()) store.insert("calendar_events", { courseId: g.courseId, title: `Weekend ${ses.weekend} · ${ses.day}: ${ses.session.topic}${ses.n === 1 && GENAI.freeDay1 ? " (free Day 1 class)" : ""}`, startsAt: ses.startUtc, endsAt: ses.endUtc, location: "Live online (link on the course home)", recurrence: "none" }, "ce");
+  }
   // Waivers and transfer rules recorded in the consolidation table.
   for (const spec of all) {
     const from = store.get("offerings", offeringIdFor(t.slug, spec.code));

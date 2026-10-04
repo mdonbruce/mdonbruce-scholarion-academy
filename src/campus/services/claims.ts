@@ -15,6 +15,7 @@ const RULES: { id: string; label: string; re: RegExp }[] = [
   { id: "partnership", label: "Partnership claim", re: /\b(partner(ed|ship)? with|in partnership|endorsed by|official partner)\b/i },
   { id: "guarantee", label: "Guarantee", re: /\bguarantee(d|s)?\b/i },
   { id: "outcome_stat", label: "Outcome statistic", re: /\b\d{1,3}\s?%\s+(of\s+)?(graduates|learners|students|alumni|placement|employment|hired|pass)/i },
+  { id: "superlative", label: "Unverified superlative", re: /\b(most in-demand|in highest demand|highest[- ]paying|fastest[- ]growing|most popular)\b/i },
   { id: "salary", label: "Salary claim", re: /\b(salary|earn up to|\$\d[\d,]*\s*(k|per year|\/yr))\b/i },
 ];
 

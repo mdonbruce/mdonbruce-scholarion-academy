@@ -290,6 +290,12 @@ STRIDE-style notes per tab. Cross-cutting controls first.
 - SSRF → only configured trusted hosts; private and internal addresses are refused
 - Runaway agents → per-job request and runtime budgets, leases and retry limits; agents can't add credentials, enable billing or share learner data
 
+## 60. Program Marketing & Campaigns
+
+- Spam → opt-in only, consent wording stored, one-click unsubscribe, no repeat sends
+- Platform abuse → no automated posting to third-party sites; a person posts and records the link
+- Misleading claims → Copy Checker gate on every asset; computed time zones; meeting details never invented
+
 ## 52. Module Library & Catalog Consolidation
 
 - Unapproved refund terms shown to learners → policies display only after product-owner approval

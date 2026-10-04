@@ -8,6 +8,7 @@ import { ensureConsolidationDecision } from "./services/hub";
 import { ensureAgentLabs } from "./services/agentlabs";
 import { ensureAI801 } from "./academy/ai801-seed";
 import { ensureEcosystem } from "./services/ecosystem";
+import { ensureGenAICampaign } from "./services/campaigns";
 import { startEcoScheduler } from "./services/ecosystem/scheduler";
 import { ensureCloudLabTool } from "./services/lti";
 import { issueCredential, rebuildIndex, recomputeSignals } from "./services/success";
@@ -407,6 +408,7 @@ function seedAcademy(t: Omit<Tenant, "status" | "createdAt">): SeedUsers {
   ensureAgentLabs(store);
   ensureAI801(store);
   ensureEcosystem(store);
+  ensureGenAICampaign(store);
   ensureAgents(store);
   ensureProctorDefaults(store);
   ensureStandardTemplate(store);

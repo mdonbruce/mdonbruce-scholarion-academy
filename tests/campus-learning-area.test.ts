@@ -325,3 +325,89 @@ describe("Learning area over HTTP", () => {
     assert.equal((await get(lc, `learn/${COURSE}/gradebook.csv`)).status, 200);
   });
 });
+
+/* ---------------- Prompt 1 additions: PIN-locked instructor files, policies, regrade, similarity, run-log export ---------------- */
+import { simLabHtml } from "../src/campus/services/simlab";
+import { SIM_SCENARIOS } from "../src/campus/academy/sim-scenarios";
+import { webcrypto } from "node:crypto";
+
+async function openLock(html: string, pin: string) {
+  const m = html.match(/window\.__LOCK__=(\{[^<]*?\});/);
+  assert.ok(m, "lock payload present");
+  const L = JSON.parse(m![1]) as { salt: string; iv: string; iter: number; data: string };
+  const s = webcrypto.subtle;
+  const base = await s.importKey("raw", new TextEncoder().encode(pin), "PBKDF2", false, ["deriveKey"]);
+  const key = await s.deriveKey({ name: "PBKDF2", salt: Buffer.from(L.salt, "base64"), iterations: L.iter, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+  const plain = await s.decrypt({ name: "AES-GCM", iv: Buffer.from(L.iv, "base64") }, key, Buffer.from(L.data, "base64"));
+  return JSON.parse(new TextDecoder().decode(plain)) as { slots: Record<string, string>; worksheet: { explanation: string }[] };
+}
+
+describe("Instructor lab PIN, grading policy, regrade, similarity and run-log export", () => {
+  it("a PIN-locked Instructor Lab has no answer explanations in its source; the right PIN decrypts them, a wrong one fails", async () => {
+    const sc = SIM_SCENARIOS[0];
+    const html = simLabHtml(sc.key, "instructor", { module: "1", pin: "2468" });
+    for (const w of sc.worksheet) assert.ok(!html.includes(w.explanation), "explanation leaked");
+    assert.match(html, /Instructor Mode is locked/);
+    const p = await openLock(html, "2468");
+    assert.ok(Object.keys(p.slots).includes("control"));
+    assert.match(p.slots.k0, /Answer:/);
+    await assert.rejects(openLock(html, "1111"));
+    const student = simLabHtml(sc.key, "student", { module: "1" });
+    for (const w of sc.worksheet) assert.ok(!student.includes(w.explanation));
+  });
+
+  it("instructors set a PIN; the downloaded instructor file is then locked; learners can't set one", async () => {
+    const s = storeOf("academy");
+    assert.equal(status(() => P.setInstructorPin(s, u("student1").actor, COURSE, "1234")), 403);
+    assert.equal(status(() => P.setInstructorPin(s, u("instructor").actor, COURSE, "12a")), 422);
+    P.setInstructorPin(s, u("instructor").actor, COURSE, "9753");
+    const c = await signIn("instructor");
+    await form(c, "projection.unlock", { courseId: COURSE, back: "/x" });
+    const r = await get(c, `sim-labs/haven-guest-services/instructor.html?module=1&courseId=${COURSE}`);
+    const html = await r.text();
+    assert.match(html, /Instructor Mode is locked/);
+    assert.ok((await openLock(html, "9753")).slots.control);
+  });
+
+  it("grading policy 'latest' records the latest attempt; regrade needs a reason and reposts", () => {
+    const s = storeOf("academy");
+    const it1 = itemByKey(minilabKey("memory", 2));
+    G.upsertItem(s, null, { courseId: COURSE, module: "Module_01", topic: String(it1.topic), key: String(it1.key), kind: "minilab", title: String(it1.title), instructions: String(it1.instructions), rubric: s.list("graded_item_versions", (v) => v.itemId === it1.id)[0].rubric as G.RubricCriterion[], evaluator: s.list("graded_item_versions", (v) => v.itemId === it1.id)[0].evaluator as G.Evaluator, gradingPolicy: "latest" });
+    const st = u("student2");
+    const a1 = G.submit(st.store, st.actor, it1.id, rightTasks("memory", 2), "lat-1");
+    G.submit(st.store, st.actor, it1.id, {}, "lat-2");
+    const grade = () => s.list("grades", (g) => g.assignmentId === it1.assignmentId && g.userId === st.actor.id)[0];
+    assert.equal(grade().passFail, "no_pass", "latest attempt counts");
+    assert.equal(status(() => G.regrade(s, u("instructor").actor, a1.id, 50, "")), 422);
+    assert.equal(status(() => G.regrade(s, u("student3").actor, a1.id, 50, "x")), 403);
+    const last = s.list("graded_submissions", (x) => x.itemId === it1.id && x.userId === st.actor.id && x.attempt === 2)[0];
+    G.regrade(s, u("instructor").actor, last.id, 85, "Rubric criterion misapplied");
+    assert.equal(grade().passFail, "pass");
+    assert.equal((s.get("graded_submissions", last.id)!.overrides as unknown[]).length, 1);
+  });
+
+  it("near-identical free-text submissions are flagged for review without blocking the grade", () => {
+    const s = storeOf("academy");
+    const w = itemByKey("m01-activity-worksheet");
+    const essay = "My perception layer turns every guest message into a typed record with provenance so that retrieved or guest text is untrusted data and can never change the execution policy or the tool permissions of the agent at any time during a run";
+    const a = u("student1");
+    const b = u("student4");
+    G.submit(a.store, a.actor, w.id, { w7: essay }, "sim-a");
+    const r = G.submit(b.store, b.actor, w.id, { w7: essay + " ok" }, "sim-b");
+    assert.equal(r.state, "posted");
+    assert.ok((s.get("graded_submissions", r.id)!.similarity as { score: number }).score >= 0.8);
+  });
+
+  it("run logs export as JSON and HTML to their owner only, with no model reasoning", async () => {
+    const st = u("student1");
+    const ws = W.listMyWorkspaces(st.store, st.actor, COURSE)[0];
+    const run = W.runAgent(st.store, st.actor, ws.id, { name: "export-check", steps: [{ tool: "FILE_READ", args: { path: "/workspace/README.md" } }] }) as { id: string };
+    const c = await signIn("student1");
+    const j = await get(c, `learn/${COURSE}/runs/${run.id}.json`);
+    assert.equal(j.status, 200);
+    assert.match(await j.text(), /No model reasoning/);
+    assert.equal((await get(c, `learn/${COURSE}/runs/${run.id}.html`)).status, 200);
+    const other = await signIn("student3");
+    assert.equal((await get(other, `learn/${COURSE}/runs/${run.id}.json`)).status, 403);
+  });
+});

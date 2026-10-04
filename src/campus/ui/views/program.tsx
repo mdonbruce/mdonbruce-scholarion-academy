@@ -1,4 +1,6 @@
 import type { Tenant, TenantStore } from "../../core";
+import { CampaignOptIn } from "./campaigns";
+import { GENAI } from "../../academy/genai-program";
 import { facultyByName } from "../../../brand/faculty";
 import { FacultyCard } from "../../../ui/components/faculty";
 import { CampusError } from "../../core";
@@ -667,6 +669,8 @@ export function ProgramPageView({ tenant, store, actor, slug, sp }: { tenant: Te
           </form>
         )}
       </section>
+
+      {slug === GENAI.slug && store.list("campaigns", (c) => c.key === "genai-2027").length > 0 && <CampaignOptIn slug={tenant.slug} back={`${here}#updates`} />}
 
       {/* 15. Teams */}
       <section className="card card-pad stack" id="teams" aria-labelledby="pg-teams">

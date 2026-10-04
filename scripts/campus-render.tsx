@@ -25,6 +25,8 @@ import { openItem, moduleStates } from "../src/campus/services/curriculum";
 import { proctorAsk, saveReadiness } from "../src/campus/services/proctor";
 import { applyToProgram, programIndex, reviewProgramApplication, selfCheck } from "../src/campus/services/programs";
 import { ProgramIndexView, ProgramPageView } from "../src/campus/ui/views/program";
+import { PublicChangelog } from "../src/campus/ui/views/ecohub";
+import { kitAssets } from "../src/campus/services/campaigns";
 import { generateDraft } from "../src/campus/services/assess";
 import { runLab } from "../src/campus/services/agentlabs";
 import { simLabHtml } from "../src/campus/services/simlab";
@@ -323,6 +325,22 @@ page("academy", "instructor", "courses/crs_academy_p15/modules", "#15 course she
 page("academy", "instructor", "courses/crs_academy_p32/modules", "#32 self-paced course (modules)");
 page("academy", "instructor", "courses/crs_academy_p26/modules", "#26 course shell (modules)");
 page("academy", "admin", "t/pathways?run=pathways.consolidation_report", "Consolidation report");
+
+{
+  // Tab 60 — Program Marketing & Campaigns, with the kit files themselves.
+  page("academy", "admin", "t/campaigns", "Tab 60 — Program Marketing & Campaigns");
+  const ca = as("academy", "admin");
+  const cmp = ca.store.list("campaigns", (c) => c.key === "genai-2027")[0];
+  for (const x of kitAssets(ca.store, cmp).filter((k) => k.kind === "html")) {
+    const body = x.body.replace(/src="\/brand\//g, 'src="brand/');
+    const m = CRASH.exec(body);
+    if (m) failures.push(`campaign-${x.path}: ${body.slice(m.index - 80, m.index + 80)}`);
+    fs.writeFileSync(path.join(OUT, `campaign-${x.path}`), body);
+    index.push({ file: `campaign-${x.path}`, title: `#39 kit — ${x.title}`, who: "admin@academy" });
+  }
+  const at = broker.tenant("academy")!;
+  save("academy-public-changelog.html", "Catalog changelog", "public", <PublicFrame tenant={at}><PublicChangelog store={ca.store} /></PublicFrame>);
+}
 
 const list = index.map((i) => `<li><a href="${i.file}">${i.title}</a> <small>(${i.who})</small></li>`).join("");
 fs.writeFileSync(path.join(OUT, "index.html"), doc("Campus screens", `<main class="container campus-public-main"><h1 class="page-title">Scholarion Campus — rendered screens</h1><p>${index.length} screens rendered from the real views and seeded data.</p><ol>${list}</ol></main>`));

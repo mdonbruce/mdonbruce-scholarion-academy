@@ -2829,6 +2829,56 @@ CREATE TABLE IF NOT EXISTS eco_contact_requests (
   requested_at timestamptz
 );
 
+-- Instructor lab PIN (tab: learning-area)
+CREATE TABLE IF NOT EXISTS instructor_pins (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  course_id text,
+  set_by text,
+  set_at timestamptz
+);
+
+-- Course resource link (tab: free-resources)
+CREATE TABLE IF NOT EXISTS eco_topic_links (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  resource_id text,
+  course_label text,
+  relation text,
+  topic text
+);
+
+-- Weekly digest (tab: discovery-automation)
+CREATE TABLE IF NOT EXISTS eco_digests (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  at timestamptz,
+  admin_body text,
+  learner_recipients numeric,
+  delivery text
+);
+
+-- Hidden posting (tab: career-connect)
+CREATE TABLE IF NOT EXISTS eco_posting_flags (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  opportunity_id text,
+  flags text[],
+  at timestamptz
+);
+
 -- Studio source (tab: course-studio)
 CREATE TABLE IF NOT EXISTS studio_sources (
   id text PRIMARY KEY,
@@ -2881,6 +2931,70 @@ CREATE TABLE IF NOT EXISTS studio_outputs (
   status text,
   bytes numeric,
   checksum text
+);
+
+-- Campaign (tab: campaigns)
+CREATE TABLE IF NOT EXISTS campaigns (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  "key" text,
+  title text,
+  program_code text,
+  state text,
+  whatsapp_link text,
+  day1_join_url text,
+  day1_meeting_id text,
+  day1_passcode text
+);
+
+-- Channel (tab: campaigns)
+CREATE TABLE IF NOT EXISTS campaign_channels (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  campaign_id text,
+  "key" text,
+  name text,
+  how text,
+  rules text,
+  state text,
+  posted_url text,
+  posted_by text,
+  posted_at timestamptz
+);
+
+-- Contact (tab: campaigns)
+CREATE TABLE IF NOT EXISTS campaign_contacts (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  campaign_id text,
+  email text,
+  name text,
+  source text,
+  consent_at timestamptz,
+  consent_text text,
+  unsubscribed_at timestamptz
+);
+
+-- Send (tab: campaigns)
+CREATE TABLE IF NOT EXISTS campaign_sends (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  campaign_id text,
+  asset text,
+  contact_id text,
+  state text
 );
 
 -- Account (tab: tenant-admin)

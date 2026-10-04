@@ -16,10 +16,12 @@ import { submit } from "../services/assessment";
 import { verifyCredential } from "../services/success";
 import { brochurePdf } from "../services/programs";
 import { simLabFileName, simLabHtml } from "../services/simlab";
-import { answersLocked } from "../services/projection";
+import { answersLocked, pinFor } from "../services/projection";
 import { gradebookCsv as gradedCsv } from "../services/graded";
-import { bundleZip, readOutput } from "../services/studio";
+import { bundleZip, moduleStudioBundle, readOutput } from "../services/studio";
+import * as camp from "../services/campaigns";
 import * as eco from "../services/ecosystem";
+import * as wsp from "../services/workspace";
 import { draftView, qtiXml } from "../services/assess";
 import { coverHtml, type CoverKind } from "../services/covers";
 import { redeemQrLogin, startMasquerade, stopMasquerade, activeGlobalAnnouncements } from "../services/admin";
@@ -43,9 +45,9 @@ import { recordView } from "../services/dashboard";
  * rate-limited). Admins may act as another user (?as_user_id=) — every request is audited.
  */
 
-const PUBLIC_OPS = new Set(["catalog.hub", "catalog.recommender_questions", "catalog.recommend", "commerce.quote", "programs.index", "programs.page", "programs.self_check_questions", "agentic.hub", "agentic.quiz_questions", "agentic.recommend"]);
+const PUBLIC_OPS = new Set(["catalog.hub", "catalog.recommender_questions", "catalog.recommend", "commerce.quote", "programs.index", "programs.page", "programs.self_check_questions", "agentic.hub", "agentic.quiz_questions", "agentic.recommend", "eco.changelog"]);
 /** Commands anyone may send (same-origin forms or JSON); the signed-in user is attached when present. */
-const PUBLIC_CMDS = new Set(["programs.inquire", "programs.self_check"]);
+const PUBLIC_CMDS = new Set(["programs.inquire", "programs.self_check", "campaign.subscribe"]);
 
 type Body = Record<string, unknown>;
 
@@ -222,6 +224,10 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     const pdf = await brochurePdf(store, decodeURIComponent(rest[1] ?? ""));
     return new Response(Buffer.from(pdf), { status: 200, headers: { "content-type": "application/pdf", "content-disposition": `inline; filename="${(rest[1] ?? "program").replace(/[^a-z0-9-]/gi, "")}-brochure.pdf"`, "cache-control": "no-store" } });
   }
+  if (rest[0] === "campaigns" && rest[1] === "unsubscribe" && method === "GET") {
+    camp.unsubscribe(store, url.searchParams.get("token") ?? "");
+    return new Response(`<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Unsubscribed</title></head><body style="font:16px system-ui;margin:40px"><h1>You're unsubscribed</h1><p>Scholarion Academy won't email you about this program again. <a href="/campus/${tenant.slug}/programs">Back to programs</a></p></body></html>`, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } });
+  }
   if (rest[0] === "a" && PUBLIC_CMDS.has(rest[1] ?? "") && method === "POST" && !bearer) {
     if (!sameOrigin(req)) throw new CampusError("bad_origin", "Cross-site request blocked.", 403);
     const secret = readCookie(req, cookieName(tenant.tenantId));
@@ -257,6 +263,18 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     return isForm(req) ? redirect(`/campus/${tenant.slug}/signin`, [sessionCookie(tenant.tenantId, "", 0)]) : json({ data: { ok: true } }, 200, { "set-cookie": sessionCookie(tenant.tenantId, "", 0) });
   }
   const actor = requireActor(c);
+  if (rest[0] === "campaigns" && rest[1] && method === "GET") {
+    const a0 = requireActor(c);
+    if (rest[2] === "program-folder.zip") {
+      const pf = camp.programFolder(store, a0);
+      return new Response(new Uint8Array(pf.zip), { status: 200, headers: { "content-type": "application/zip", "content-disposition": 'attachment; filename="Scholarion_GenAI_Agentic_Program.zip"', "cache-control": "no-store" } });
+    }
+    if (rest[2] === "assets" && rest[3]) {
+      const asset = camp.assetFile(store, a0, rest[1], decodeURIComponent(rest.slice(3).join("/")));
+      const type = { html: "text/html", md: "text/markdown", txt: "text/plain", csv: "text/csv", ics: "text/calendar" }[asset.kind];
+      return new Response(asset.body, { status: 200, headers: { "content-type": `${type}; charset=utf-8`, "cache-control": "no-store", "x-content-type-options": "nosniff", ...(asset.kind === "html" ? { "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'; img-src data: 'self'" } : { "content-disposition": `inline; filename="${asset.path}"` }) } });
+    }
+  }
 
   // API act-as: ?as_user_id= (admins with the masquerade permission; audited per request).
   const asUser = url.searchParams.get("as_user_id");
@@ -344,7 +362,7 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     const lockCourse = url.searchParams.get("courseId");
     if (edition === "instructor" && lockCourse && answersLocked(store, lockCourse)) throw new CampusError("projection_locked", "Answer keys are hidden by the projection lock. Unlock them in the Instructor Control Panel first.", 423);
     const moduleNo = url.searchParams.get("module") ?? "";
-    const html = simLabHtml(rest[1], edition, { module: moduleNo, program: url.searchParams.get("program") ?? undefined });
+    const html = simLabHtml(rest[1], edition, { module: moduleNo, program: url.searchParams.get("program") ?? undefined, pin: edition === "instructor" && lockCourse ? pinFor(store, lockCourse) : undefined });
     const name = simLabFileName(rest[1], edition, moduleNo);
     return new Response(html, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "content-disposition": `${url.searchParams.get("download") ? "attachment" : "inline"}; filename="${name}"`, "cache-control": "no-store", "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'", "x-content-type-options": "nosniff" } });
   }
@@ -395,6 +413,19 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
       const body = typeof o.content === "string" ? o.content : new Uint8Array(o.content);
       const name = String(o.relPath).split("/").pop();
       return new Response(body, { status: 200, headers: { "content-type": types[ext] ?? "application/octet-stream", "content-disposition": `${url.searchParams.get("download") ? "attachment" : "inline"}; filename="${name}"`, "cache-control": "no-store", "x-content-type-options": "nosniff", "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data: 'self'; media-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'" } });
+    }
+    if (rest[2] === "runs" && rest[3] && /\.(json|html)$/.test(rest[3])) {
+      const runId = rest[3].replace(/\.(json|html)$/, "");
+      const run = wsp.getAgentRun(store, a, runId);
+      if (rest[3].endsWith(".json")) return new Response(JSON.stringify({ exportedAt: new Date().toISOString(), note: "Operational run log: actions, arguments, policy results and usage. No model reasoning is recorded.", run }, null, 2), { status: 200, headers: { "content-type": "application/json; charset=utf-8", "content-disposition": `attachment; filename="run-${runId}.json"`, "cache-control": "no-store" } });
+      const esc = (x: unknown) => String(x ?? "").replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]!);
+      const rows = run.steps.map((st) => `<tr><td>${st.index + 1}</td><td>${esc(st.tool)}</td><td><code>${esc(JSON.stringify(st.args))}</code></td><td>${st.ok ? "ok" : "blocked/failed"}</td><td>${esc(st.blockedReason ?? st.resultSummary)}</td><td>${esc(st.at)}</td></tr>`).join("");
+      const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Run log ${esc(run.name)}</title><style>body{font:14px system-ui;margin:24px;color:#0f1a33}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccd;padding:6px;text-align:left;vertical-align:top}code{font-size:12px}</style></head><body><h1>Run log: ${esc(run.name)}</h1><p>Status ${esc(run.status)}${run.stopReason ? ` — ${esc(run.stopReason)}` : ""} · policy v${run.policyVersion} · started ${esc(run.startedAt)} · simulated sandbox</p><p>Usage: ${esc(JSON.stringify(run.budget.used))} of ${esc(JSON.stringify(run.budget.limit))}</p><table><caption>Actions and policy results (no model reasoning is recorded)</caption><thead><tr><th scope="col">#</th><th scope="col">Tool</th><th scope="col">Arguments</th><th scope="col">Result</th><th scope="col">Detail</th><th scope="col">At</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+      return new Response(html, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'", "x-content-type-options": "nosniff" } });
+    }
+    if (rest[2] === "studio-module" && rest[3] && rest[4] === "bundle.zip") {
+      const b = moduleStudioBundle(store, a, courseId, Number(rest[3]));
+      return new Response(new Uint8Array(b.zip), { status: 200, headers: { "content-type": "application/zip", "content-disposition": `attachment; filename="${b.root}.zip"`, "cache-control": "no-store" } });
     }
     if (rest[2] === "studio" && rest[3] && rest[4] === "bundle.zip") {
       const z = bundleZip(store, a, rest[3]);

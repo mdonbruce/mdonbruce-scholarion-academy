@@ -106,6 +106,11 @@ export interface SeedRecord {
   status: string;
   evidence: { url: string; retrieved_at: string; claims: string[]; summary: string | null }[];
   notes: string;
+  kind?: string;
+  level?: string | null;
+  est_hours?: number | null;
+  prerequisites?: string[];
+  maps_to?: { course: string; relation: string; topic: string }[];
 }
 
 /** Terms a later review must still find on the official page for the record to stay verified. */
@@ -117,7 +122,7 @@ export function checkTermsFor(rec: { limits: { value: number | string }[]; licen
 export function upsertSeedRecord(store: TenantStore, rec: SeedRecord, source = "catalog-2026-10-04") {
   const existing = store.list(T.resources, (r) => r.key === rec.id)[0];
   if (existing) return existing;
-  const kind = rec.category === "course" ? "course" : rec.category === "reading" && /textbook|openstax/i.test(rec.name + rec.description) ? "reading" : "tool";
+  const kind = rec.kind ?? (rec.category === "course" ? "course" : "tool");
   const verified = rec.status === "verified";
   const r = store.insert(
     T.resources,
@@ -156,9 +161,15 @@ export function upsertSeedRecord(store: TenantStore, rec: SeedRecord, source = "
       nextReviewAt: daysFromNow(REVIEW_DAYS),
       version: 1,
       origin: source,
+      level: rec.level ?? null,
+      estHours: rec.est_hours ?? null,
+      prerequisites: rec.prerequisites ?? [],
+      // Openly licensed and redistributable items may be imported with attribution; everything else is linked.
+      contentUse: rec.redistribution === "allowed" && rec.license ? "import_with_attribution" : "link_only",
     },
     "eres",
   );
+  for (const m of rec.maps_to ?? []) store.insert(T.topicLinks, { resourceId: r.id, courseLabel: m.course, relation: m.relation === "Recommended" ? "Recommended" : "Supplementary", topic: m.topic }, "etl");
   for (const e of rec.evidence) store.insert(T.evidence, { resourceId: r.id, url: e.url, host: hostOf(e.url), retrievedAt: e.retrieved_at, claims: e.claims, summary: e.summary, checkTerms: checkTermsFor(rec), confirmed: verified, conflict: false }, "eev");
   store.insert(T.versions, { resourceId: r.id, version: 1, changedFields: ["created"], before: {}, after: { status: r.status }, reason: `Imported from the researched catalog (${source}).`, jobId: null, changedAt: nowIso() }, "erv");
   return r;
@@ -224,6 +235,11 @@ export function resourceView(store: TenantStore, r: Row, a?: Actor) {
     nextReviewAt: (r.nextReviewAt as string) ?? null,
     version: Number(r.version ?? 1),
     notes: (r.notes as string) ?? "",
+    level: (r.level as string) ?? null,
+    estHours: (r.estHours as number) ?? null,
+    prerequisites: (r.prerequisites as string[]) ?? [],
+    contentUse: String(r.contentUse ?? "link_only"),
+    topicLinks: store.list(T.topicLinks, (l) => l.resourceId === r.id).map((l) => ({ course: String(l.courseLabel), relation: String(l.relation), topic: String(l.topic) })),
     evidence: ev.map((e) => ({ url: String(e.url), retrievedAt: String(e.retrievedAt), claims: (e.claims as string[]) ?? [], confirmed: !!e.confirmed, summary: (e.summary as string) ?? null })),
     mappings: maps,
     bookmarked: a ? store.list(T.bookmarks, (b) => b.userId === a.id && b.resourceId === r.id).length > 0 : false,
@@ -290,6 +306,18 @@ export function definitionOf(store: TenantStore, r: Row) {
   };
 }
 
+/** Library items grouped by the Scholarion course they support (Recommended first). */
+export function libraryByCourse(store: TenantStore, a: Actor) {
+  const groups = new Map<string, { relation: string; topic: string; resource: ResourceView }[]>();
+  for (const l of store.list(T.topicLinks, () => true)) {
+    const r = store.get(T.resources, String(l.resourceId));
+    if (!r || (!isCurator(a) && !["verified", "stale"].includes(String(r.status)))) continue;
+    const key = String(l.courseLabel);
+    groups.set(key, [...(groups.get(key) ?? []), { relation: String(l.relation), topic: String(l.topic), resource: resourceView(store, r, a) }]);
+  }
+  return [...groups.entries()].sort((x, y) => x[0].localeCompare(y[0])).map(([course, items]) => ({ course, items: items.sort((x, y) => (x.relation === "Recommended" ? 0 : 1) - (y.relation === "Recommended" ? 0 : 1) || x.topic.localeCompare(y.topic)) }));
+}
+
 export function hubSummary(store: TenantStore, a: Actor) {
   const all = store.list(T.resources, (r) => r.status !== "archived");
   const recentJobs = store.list(T.jobs, () => true).sort((x, y) => String(y.updatedAt ?? y.createdAt).localeCompare(String(x.updatedAt ?? x.createdAt))).slice(0, 8);
@@ -335,7 +363,7 @@ export function curateResource(store: TenantStore, a: Actor, input: Record<strin
   };
   if (!fields.name || !fields.provider) throw new CampusError("invalid", "Name and provider are required.", 422);
   return store.tx(() => {
-    const r = existing ? saveResource(store, existing.id, fields, `Curated by ${a.name}.`).row : store.insert(T.resources, { key: slugify(String(input.key ?? fields.name)), ...fields, useCases: [], connectionState: fields.integrationMethod === "embed" ? "embedded" : fields.integrationMethod === "self_hosted" ? "self_hosted" : "link", status: "pending", statusReason: "No supporting evidence from an official source yet.", verifiedAt: null, nextReviewAt: daysFromNow(REVIEW_DAYS), version: 1, origin: "curated", certificate: null, eligibility: [], geographicRestrictions: [], expiresAt: null }, "eres");
+    const r = existing ? saveResource(store, existing.id, fields, `Curated by ${a.name}.`).row : store.insert(T.resources, { key: slugify(String(input.key ?? fields.name)), ...fields, useCases: [], connectionState: fields.integrationMethod === "embed" ? "embedded" : fields.integrationMethod === "self_hosted" ? "self_hosted" : "link", status: "pending", statusReason: "No supporting evidence from an official source yet.", verifiedAt: null, nextReviewAt: daysFromNow(REVIEW_DAYS), version: 1, origin: "curated", contentUse: fields.redistribution === "allowed" && fields.license ? "import_with_attribution" : "link_only", certificate: null, eligibility: [], geographicRestrictions: [], expiresAt: null }, "eres");
     audit(store, a, "eco.resource.curate", `${T.resources}/${r.id}`);
     return resourceView(store, store.get(T.resources, r.id)!, a);
   });
@@ -391,7 +419,7 @@ export function reportExternalCompletion(store: TenantStore, a: Actor, resourceI
 }
 
 export function subscribe(store: TenantStore, a: Actor, kind: string, value: string) {
-  if (!["subject", "course", "career", "all"].includes(kind)) throw new CampusError("invalid", "kind must be subject, course, career or all.", 422);
+  if (!["subject", "course", "career", "all", "digest"].includes(kind)) throw new CampusError("invalid", "kind must be subject, course, career, all or digest.", 422);
   const existing = store.list(T.subscriptions, (s) => s.userId === a.id && s.kind === kind && s.value === value)[0];
   if (existing) return existing;
   return store.tx(() => store.insert(T.subscriptions, { userId: a.id, kind, value: String(value ?? "").slice(0, 80) }, "esub"));

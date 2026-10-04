@@ -95,8 +95,9 @@ function Body({ t, sec }: { t: Ctx; sec: string }) {
       case "tools":
       case "ai":
       case "agentic":
-      case "library":
         return <Catalog t={t} group={sec} />;
+      case "library":
+        return <Library t={t} />;
       case "avatar":
         return <Avatar t={t} />;
       case "media":
@@ -326,6 +327,65 @@ function Catalog({ t, group }: { t: Ctx; group: string }) {
   );
 }
 
+function Library({ t }: { t: Ctx }) {
+  const { store, actor, base } = t;
+  const groups = eco.libraryByCourse(store, actor);
+  return (
+    <>
+      <p className="small">Free courses, lectures and books mapped to Scholarion courses. Openly licensed items may be imported with attribution; everything else is linked to the provider and never copied. External courses never award Scholarion grades or credit — record a completion as self-reported with your evidence.</p>
+      {groups.map((g) => (
+        <section key={g.course} className="card card-pad stack" aria-label={g.course}>
+          <h3 className="card-title">{g.course}</h3>
+          <div className="table-wrap" tabIndex={0} role="region" aria-label={`${g.course} resources`}>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th scope="col">Resource</th>
+                  <th scope="col">Use</th>
+                  <th scope="col">Level · hours</th>
+                  <th scope="col">Access and certificate</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {g.items.map((x) => (
+                  <tr key={`${x.resource.id}-${x.topic}`}>
+                    <td>
+                      <a href={`${base}/tools?r=${x.resource.id}`}>{x.resource.name}</a>
+                      <br />
+                      <span className="tiny muted">
+                        {x.resource.provider} · {x.topic}
+                      </span>
+                    </td>
+                    <td>
+                      <span className="badge">{x.relation}</span>
+                    </td>
+                    <td className="small">
+                      {x.resource.level ?? "—"} · {x.resource.estHours ? `${x.resource.estHours} h` : "duration not stated"}
+                    </td>
+                    <td className="small">
+                      {x.resource.classificationLabel}
+                      {x.resource.license ? ` (${x.resource.license})` : ""} · certificate: {x.resource.certificate ?? "—"}
+                      <br />
+                      <span className="tiny muted">{x.resource.contentUse === "import_with_attribution" ? "May be imported with attribution" : "Linked, not copied"}</span>
+                    </td>
+                    <td>
+                      <Chip s={x.resource.status} />
+                      <br />
+                      <span className="tiny muted">{fmt(x.resource.verifiedAt)}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ))}
+      <Catalog t={t} group="library" />
+    </>
+  );
+}
+
 function Detail({ t, r }: { t: Ctx; r: eco.ResourceView | ReturnType<typeof eco.getResource> }) {
   const { slug, here, actor } = t;
   const curator = hasAny(actor, ["admin", "designer"]);
@@ -368,6 +428,23 @@ function Detail({ t, r }: { t: Ctx; r: eco.ResourceView | ReturnType<typeof eco.
           <>
             <dt>Certificate</dt>
             <dd>{r.certificate === "paid" ? "Costs extra (issued by the provider, not Scholarion)" : r.certificate === "free" ? "Free certificate from the provider (not a Scholarion certificate)" : r.certificate}</dd>
+          </>
+        )}
+        {(r.level || r.estHours) && (
+          <>
+            <dt>Level and length</dt>
+            <dd>
+              {r.level ?? "—"} · {r.estHours ? `${r.estHours} hours` : "duration not stated"}
+              {r.prerequisites.length ? ` · prerequisites: ${r.prerequisites.join(", ")}` : ""}
+            </dd>
+          </>
+        )}
+        <dt>How Scholarion uses it</dt>
+        <dd>{r.contentUse === "import_with_attribution" ? "Openly licensed — may be imported with full attribution and the license shown" : "Linked or embedded where allowed; never copied or re-hosted"}</dd>
+        {r.topicLinks.length > 0 && (
+          <>
+            <dt>Scholarion courses</dt>
+            <dd>{r.topicLinks.map((l) => `${l.course} (${l.relation}: ${l.topic})`).join("; ")}</dd>
           </>
         )}
         <dt>Connection method</dt>
@@ -628,6 +705,7 @@ function WhatsNew({ t }: { t: Ctx }) {
             <option value="subject">a subject</option>
             <option value="career">new opportunities</option>
             <option value="all">everything</option>
+            <option value="digest">a weekly digest</option>
           </select>
         </label>
         <label>
@@ -711,6 +789,12 @@ function Career({ t }: { t: Ctx }) {
           <strong>Evidence-backed skills:</strong> {p.demonstrated.length ? [...new Set(p.demonstrated.map((d) => d.skill))].join(", ") : "none yet — pass graded work to add evidence"}
         </p>
       </form>
+      {p.discoverable && (
+        <form method="post" action={api(slug, "a/eco.withdraw_consent")} className="row">
+          <Hidden values={{ back: here, notice: "You've left Employer Connect. Employers can no longer see your profile." }} />
+          <button className="btn btn-ghost btn-sm">Withdraw from Employer Connect</button>
+        </form>
+      )}
       {contacts.length > 0 && (
         <section className="card card-pad stack" aria-labelledby="cc-h">
           <h3 id="cc-h" className="card-title">
@@ -856,7 +940,7 @@ function EmployerPortal({ t }: { t: Ctx }) {
     return (
       <form method="post" action={api(slug, "a/eco.employer_register")} className="card card-pad stack" aria-label="Register your organization">
         <h3 className="card-title">Register your organization</h3>
-        <p className="small">Scholarion verifies every employer before it can search learner profiles. Learners decide what you can see.</p>
+        <p className="small">Automatic checks verify your organization (a work email on your website’s domain and an https site). Learners decide what you can see.</p>
         <Hidden values={{ back: here, notice: "Registered — Scholarion will verify your organization." }} />
         <label>
           Organization name
@@ -865,6 +949,10 @@ function EmployerPortal({ t }: { t: Ctx }) {
         <label>
           Official website
           <input name="website" type="url" required />
+        </label>
+        <label>
+          Work email (on the same domain as the website)
+          <input name="contactEmail" type="email" required />
         </label>
         <button className="btn btn-primary btn-sm">Register</button>
       </form>
@@ -1050,7 +1138,25 @@ function Integrations({ t }: { t: Ctx }) {
 function EmployerAdmin({ t }: { t: Ctx }) {
   const { store, actor, slug, here } = t;
   const list = eco.listEmployers(store, actor);
+  const flags = eco.flaggedPostings(store, actor);
   return (
+    <>
+    <section className="card card-pad stack" aria-labelledby="fl-h">
+      <h3 id="fl-h" className="card-title">
+        Postings hidden by automatic checks ({flags.length})
+      </h3>
+      {flags.length ? (
+        <ul className="small">
+          {flags.map((f) => (
+            <li key={f.id}>
+              {f.opportunity}: {f.flags.join("; ")} <span className="tiny muted">{fmt(f.at, true)}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="small muted">None.</p>
+      )}
+    </section>
     <ul className="stack" aria-label="Employers">
       {list.map((e) => (
         <li key={e.id} className="card card-pad stack">
@@ -1060,6 +1166,7 @@ function EmployerAdmin({ t }: { t: Ctx }) {
           <p className="small">
             {e.website} · verification <Chip s={e.verification} />
           </p>
+          {e.reasons.length > 0 && <p className="small">Automatic checks: {e.reasons.join(" ")}</p>}
           <div className="row">
             {e.verification !== "verified" && (
               <form method="post" action={api(slug, "a/eco.employer_verify")}>
@@ -1081,6 +1188,7 @@ function EmployerAdmin({ t }: { t: Ctx }) {
         </li>
       ))}
     </ul>
+    </>
   );
 }
 
@@ -1170,6 +1278,9 @@ function Automation({ t }: { t: Ctx }) {
             <select name="kind">
               <option value="rss">RSS/Atom feed</option>
               <option value="greenhouse">Public Greenhouse job board</option>
+              <option value="lever">Public Lever postings</option>
+              <option value="usajobs">USAJOBS API (key in secrets manager)</option>
+              <option value="adzuna">Adzuna API (key in secrets manager)</option>
               <option value="official_page">Official page</option>
             </select>
           </label>
@@ -1222,5 +1333,30 @@ function Schema({ t }: { t: Ctx }) {
       </details>
       {sp.validated && <p className="notice notice-info">{sp.validated}</p>}
     </>
+  );
+}
+
+/** Public changelog: what changed in the free tools, courses and opportunities, with dates. No learner data. */
+export function PublicChangelog({ store }: { store: TenantStore }) {
+  const items = eco.whatsNew(store, 100);
+  const label: Record<string, string> = { new_tool: "Newly verified tool", new_resource: "New resource", limits_changed: "Free-plan terms changed", discontinued: "Discontinued or unavailable", stale: "Verification out of date", opportunity: "New opportunity" };
+  return (
+    <section className="card card-pad stack" aria-labelledby="cl-h">
+      <h1 id="cl-h" className="page-title">
+        Scholarion Resource Hub — what changed
+      </h1>
+      <p className="small">Free plans, course access and job listings change. Every listing in the hub shows its official source and last-verified date; this page logs the changes our automated checks found.</p>
+      {items.length ? (
+        <ol className="small">
+          {items.map((f) => (
+            <li key={f.id}>
+              <strong>{label[f.kind] ?? f.kind}:</strong> {f.title} <span className="tiny muted">({fmt(f.at, true)})</span>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p className="small muted">No changes recorded yet.</p>
+      )}
+    </section>
   );
 }

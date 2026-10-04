@@ -87,6 +87,9 @@ export interface ItemInput {
   maxAttempts?: number;
   aiPolicy?: string;
   points?: number;
+  /** Which attempt counts: the highest valid attempt (default) or the latest graded one. */
+  gradingPolicy?: "highest" | "latest";
+  dueAt?: string | null;
 }
 
 const DEFAULT_PASS = 70;
@@ -111,7 +114,7 @@ export function upsertItem(store: TenantStore, a: Actor | null, input: ItemInput
   const total = input.rubric.reduce((s, c) => s + c.points, 0);
   const existing = store.list("graded_items", (i) => i.courseId === input.courseId && i.key === input.key)[0];
   return store.tx(() => {
-    const base = { courseId: input.courseId, module: input.module, topic: input.topic ?? null, key: input.key, kind: input.kind, title: input.title, instructions: input.instructions, competencies: input.competencies ?? [], passMark: input.passMark ?? DEFAULT_PASS, maxAttempts: input.maxAttempts ?? DEFAULT_ATTEMPTS, aiPolicy: input.aiPolicy ?? "Allowed with disclosure.", points: input.points ?? total, rubricTotal: total };
+    const base = { courseId: input.courseId, module: input.module, topic: input.topic ?? null, key: input.key, kind: input.kind, title: input.title, instructions: input.instructions, competencies: input.competencies ?? [], passMark: input.passMark ?? DEFAULT_PASS, maxAttempts: input.maxAttempts ?? DEFAULT_ATTEMPTS, aiPolicy: input.aiPolicy ?? "Allowed with disclosure.", points: input.points ?? total, rubricTotal: total, gradingPolicy: input.gradingPolicy ?? "highest", dueAt: input.dueAt ?? null };
     const item = existing ? store.update("graded_items", existing.id, base) : store.insert("graded_items", { ...base, currentVersion: 0, published: false, assignmentId: null }, "gi");
     const last = store.list("graded_item_versions", (v) => v.itemId === item.id).sort((x, y) => Number(y.version) - Number(x.version))[0];
     const fingerprint = crypto.createHash("sha256").update(JSON.stringify({ r: input.rubric, e: input.evaluator, p: base.passMark })).digest("hex");
@@ -162,9 +165,11 @@ export function itemView(store: TenantStore, a: Actor, itemId: string) {
   const counted = subs.filter((s) => !["infra_failed", "rejected"].includes(String(s.state)));
   const nextAttempt = Math.min(counted.length + 1, Number(item.maxAttempts));
   const questions = (v.evaluator.questions ?? []).map((variants) => publicQuestion(variants[Math.min(nextAttempt - 1, variants.length - 1)]));
-  const best = bestOf(subs);
+  const best = bestOf(subs, String(item.gradingPolicy ?? "highest"));
   return {
     id: item.id,
+    gradingPolicy: String(item.gradingPolicy ?? "highest"),
+    dueAt: (item.dueAt as string) ?? null,
     key: String(item.key),
     kind: item.kind as ItemKind,
     title: String(item.title),
@@ -189,10 +194,10 @@ export function itemView(store: TenantStore, a: Actor, itemId: string) {
   };
 }
 
-function bestOf(subs: Row[]) {
+function bestOf(subs: Row[], policy: string = "highest") {
   const valid = subs.filter((s) => ["graded", "posted", "posting_failed"].includes(String(s.state)));
   if (!valid.length) return null;
-  const b = valid.reduce((m, s) => (Number(s.score) > Number(m.score) ? s : m));
+  const b = policy === "latest" ? valid.reduce((m, s) => (Number(s.attempt) > Number(m.attempt) ? s : m)) : valid.reduce((m, s) => (Number(s.score) > Number(m.score) ? s : m));
   return { submissionId: b.id, score: Number(b.score), passed: !!b.passed, attempt: Number(b.attempt) };
 }
 
@@ -300,7 +305,7 @@ export function submit(store: TenantStore, a: Actor, itemId: string, payload: Re
   try {
     const r = runner?.();
     files = r?.files;
-    if (r?.snapshotId) store.update("graded_submissions", sub.id, { workspaceSnapshotId: r.snapshotId });
+    if (r?.snapshotId) store.update("graded_submissions", sub.id, { workspaceSnapshotId: r.snapshotId, snapshotFiles: r.files ?? null });
   } catch (e) {
     if (e instanceof InfraFailure) {
       store.tx(() => store.update("graded_submissions", sub.id, { state: "infra_failed", attempt: null, infraReason: e.message }));
@@ -312,10 +317,58 @@ export function submit(store: TenantStore, a: Actor, itemId: string, payload: Re
   }
   const e = evaluate(v, snapshot, attempt, files);
   const passed = e.score >= Number(item.passMark) && e.mandatoryFailed.length === 0;
-  store.tx(() => store.update("graded_submissions", sub.id, { state: "graded", score: e.score, passed, criteria: e.criteria, answers: e.answers, mandatoryFailed: e.mandatoryFailed, gradedAt: nowIso() }));
+  const similarity = similarityFlag(store, item.id, a.id, snapshot, files);
+  store.tx(() => store.update("graded_submissions", sub.id, { state: "graded", score: e.score, passed, criteria: e.criteria, answers: e.answers, mandatoryFailed: e.mandatoryFailed, gradedAt: nowIso(), similarity }));
   postGrade(store, sub.id);
   audit(store, a, "graded.submit", `graded_submissions/${sub.id}`, `${item.title} attempt ${attempt}: ${e.score}`);
   return submissionResult(store.get("graded_submissions", sub.id)!);
+}
+
+/* ---------------- integrity: similarity (flag only, never a gate) ---------------- */
+
+const shingles = (t: string) => {
+  const w = t.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter(Boolean);
+  const out = new Set<string>();
+  for (let i = 0; i + 3 <= w.length; i++) out.add(w.slice(i, i + 3).join(" "));
+  return out;
+};
+function freeText(payload: Record<string, unknown>, files?: Record<string, string>) {
+  const parts = Object.values(payload).filter((v): v is string => typeof v === "string" && v.length > 40);
+  if (files) parts.push(...Object.entries(files).filter(([p]) => /\.(md|py|yaml|yml|txt)$/.test(p)).map(([, c]) => c));
+  return parts.join("\n");
+}
+/** Highest Jaccard similarity of free text against other learners' graded submissions for the item. */
+function similarityFlag(store: TenantStore, itemId: string, userId: string, payload: Record<string, unknown>, files?: Record<string, string>) {
+  const mine = shingles(freeText(payload, files));
+  if (mine.size < 25) return null;
+  let best = { score: 0, with: "" };
+  for (const o of store.list("graded_submissions", (x) => x.itemId === itemId && x.userId !== userId && x.state !== "infra_failed")) {
+    const theirs = shingles(freeText((o.snapshot as Record<string, unknown>) ?? {}, (o.snapshotFiles as Record<string, string>) ?? undefined));
+    if (theirs.size < 25) continue;
+    let inter = 0;
+    for (const x of mine) if (theirs.has(x)) inter++;
+    const j = inter / (mine.size + theirs.size - inter);
+    if (j > best.score) best = { score: j, with: o.id };
+  }
+  return best.score >= 0.8 ? { score: Math.round(best.score * 100) / 100, withSubmission: best.with, note: "Flagged for review only; the grade stands." } : null;
+}
+
+/** Post-hoc instructor override with a required reason. Never blocks or delays the original posting. */
+export function regrade(store: TenantStore, a: Actor, submissionId: string, score: number, reason: string) {
+  const s = store.get("graded_submissions", submissionId);
+  if (!s) throw new CampusError("not_found", "Submission not found", 404);
+  const item = store.get("graded_items", String(s.itemId))!;
+  if (!staff(a, String(item.courseId))) throw new CampusError("forbidden", "Course staff only.", 403);
+  if (!["graded", "posted", "posting_failed"].includes(String(s.state))) throw new CampusError("not_graded", "Only graded submissions can be regraded.", 409);
+  if (!String(reason ?? "").trim()) throw new CampusError("invalid", "A reason is required for a regrade.", 422);
+  const n = Number(score);
+  if (!(n >= 0 && n <= 100)) throw new CampusError("invalid", "Score must be 0–100.", 422);
+  const passed = n >= Number(item.passMark) && !((s.mandatoryFailed as string[]) ?? []).length;
+  store.tx(() => store.update("graded_submissions", s.id, { score: n, passed, overrides: [...((s.overrides as unknown[]) ?? []), { by: a.id, at: nowIso(), from: s.score, to: n, reason: String(reason).slice(0, 500) }] }));
+  audit(store, a, "graded.regrade", `graded_submissions/${s.id}`, `${s.score} → ${n}: ${reason}`);
+  postGrade(store, s.id);
+  notify(store, [String(s.userId)], "grades", `${item.title}: regraded to ${n}/100`, `Your instructor updated this grade. Reason: ${reason}`, `/campus/{tenant}/learn/${item.courseId}/gradebook`, String(item.courseId));
+  return submissionResult(store.get("graded_submissions", s.id)!);
 }
 
 function submissionResult(s: Row) {
@@ -334,7 +387,7 @@ export function postGrade(store: TenantStore, submissionId: string) {
     }
     store.tx(() => {
       const all = store.list("graded_submissions", (x) => x.itemId === item.id && x.userId === s.userId);
-      const best = bestOf(all)!;
+      const best = bestOf(all, String(item.gradingPolicy ?? "highest"))!;
       const asg = store.get("assignments", String(item.assignmentId));
       if (asg) {
         const score = Math.round((best.score / 100) * Number(asg.points ?? 100) * 100) / 100;
@@ -387,7 +440,7 @@ export function courseGradebook(store: TenantStore, a: Actor, courseId: string) 
     name: String(store.get("users", uid)?.name ?? uid),
     items: items.map((i) => {
       const subs = store.list("graded_submissions", (s) => s.itemId === i.id && s.userId === uid);
-      const best = bestOf(subs);
+      const best = bestOf(subs, String(i.gradingPolicy ?? "highest"));
       const latest = subs.sort((x, y) => String(y.createdAt).localeCompare(String(x.createdAt)))[0];
       return { itemId: i.id, title: String(i.title), kind: String(i.kind), attemptsUsed: subs.filter((x) => !["infra_failed", "rejected"].includes(String(x.state))).length, maxAttempts: Number(i.maxAttempts), best: best?.score ?? null, passed: best?.passed ?? null, state: latest ? String(latest.state) : "not_started" };
     }),

@@ -41,16 +41,19 @@ export function ensureEcosystem(store: TenantStore) {
     // Course mappings for the AI-801 sample course.
     const ai801 = `crs_${t.slug}_ai801`;
     if (store.get("courses", ai801)) {
+      for (const l of store.list(T.topicLinks, (x) => String(x.courseLabel).startsWith("AI-801"))) {
+        if (!store.list(T.mappings, (m) => m.courseId === ai801 && m.resourceId === l.resourceId).length) store.insert(T.mappings, { courseId: ai801, resourceId: l.resourceId, topic: l.topic, note: `${l.relation} reading`, mappedBy: "seed", idempotencyKey: null, flagged: false }, "emap");
+      }
       for (const [key, m] of Object.entries(AI801_MAP)) {
         const r = store.list(T.resources, (x) => x.key === key)[0];
-        if (r) store.insert(T.mappings, { courseId: ai801, resourceId: r.id, topic: m.topic, note: m.note, mappedBy: "seed", idempotencyKey: null, flagged: false }, "emap");
+        if (r && !store.list(T.mappings, (x) => x.courseId === ai801 && x.resourceId === r.id).length) store.insert(T.mappings, { courseId: ai801, resourceId: r.id, topic: m.topic, note: m.note, mappedBy: "seed", idempotencyKey: null, flagged: false }, "emap");
       }
     }
     // Demo employers (fictional, staging only). One verified, one awaiting verification.
     const mk = (key: string, name: string) => store.get("users", `usr_${t.slug}_${key}`)?.id ?? createUser(store, { id: `usr_${t.slug}_${key}`, name, email: `${key}@${t.slug}.scholarion.test`, password: "Scholarion-demo-1", roles: [] }).id;
     const rec1 = mk("employer1", "Riley Recruiter (Demo Corp, fictional)");
     const rec2 = mk("employer2", "Morgan Hiring (Northwind Labs, fictional)");
-    const demo = store.insert(T.employers, { name: "Demo Corp (fictional)", website: "https://democorp.example", relationship: "verified", verification: "verified", industries: ["software"], locations: ["Remote", "Lagos"], about: "A fictional employer used to demonstrate the Employer Portal in staging.", registeredBy: rec1, verifiedBy: "seed", verifiedAt: nowIso(), partnerNote: null }, "eemp");
+    const demo = store.insert(T.employers, { name: "Demo Corp (fictional)", website: "https://democorp.example", contactEmail: "riley@democorp.example", relationship: "verified", verification: "verified", industries: ["software"], locations: ["Remote", "Lagos"], about: "A fictional employer used to demonstrate the Employer Portal in staging.", registeredBy: rec1, verifiedBy: "seed", verifiedAt: nowIso(), partnerNote: null }, "eemp");
     store.insert(T.members, { employerId: demo.id, userId: rec1, role: "owner" }, "emem");
     const nw = store.insert(T.employers, { name: "Northwind Labs (fictional)", website: "https://northwind.example", relationship: "registered", verification: "pending", industries: ["analytics"], locations: ["Remote"], about: "A fictional employer awaiting verification.", registeredBy: rec2, verifiedBy: null, verifiedAt: null, partnerNote: null }, "eemp");
     store.insert(T.members, { employerId: nw.id, userId: rec2, role: "owner" }, "emem");

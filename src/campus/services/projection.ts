@@ -36,3 +36,23 @@ export function setProjectionLock(store: TenantStore, a: Actor, courseId: string
   audit(store, a, locked ? "projection.lock" : "projection.unlock", `courses/${courseId}`, locked ? "answers hidden" : `answers visible for ${UNLOCK_MINUTES} min`);
   return lockState(store, courseId);
 }
+
+/**
+ * Course PIN for the downloadable instructor lab editions. The PIN encrypts the answer keys inside
+ * each instructor file (they appear only after the PIN is typed in the browser). It's a classroom
+ * projection guard, not an account password; it's stored server-side and never sent to learners.
+ */
+export function setInstructorPin(store: TenantStore, a: Actor, courseId: string, pin: string) {
+  if (!store.get("courses", courseId)) throw new CampusError("not_found", "Course not found", 404);
+  if (!(hasAny(a, ["admin"]) || hasAny(a, ["instructor"], courseId))) throw new CampusError("forbidden", "Only the course's instructors can set the PIN.", 403);
+  if (!/^\d{4,8}$/.test(String(pin))) throw new CampusError("invalid", "The PIN is 4–8 digits.", 422);
+  const cur = store.list("instructor_pins", (p) => p.courseId === courseId)[0];
+  store.tx(() => (cur ? store.update("instructor_pins", cur.id, { pin: String(pin), setBy: a.id, setAt: nowIso() }) : store.insert("instructor_pins", { courseId, pin: String(pin), setBy: a.id, setAt: nowIso() }, "ipin")));
+  audit(store, a, "projection.pin", `courses/${courseId}`, "PIN set");
+  return { courseId, pinSet: true };
+}
+
+export function pinFor(store: TenantStore, courseId: string): string | undefined {
+  return (store.list("instructor_pins", (p) => p.courseId === courseId)[0]?.pin as string | undefined) ?? undefined;
+}
+export const hasPin = (store: TenantStore, courseId: string) => !!pinFor(store, courseId);

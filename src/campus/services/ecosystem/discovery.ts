@@ -5,6 +5,7 @@ import { audit, notify } from "../common";
 import { stripTags, urlBlockReason } from "../studio/sources";
 import type { FetchedResponse, Fetcher } from "../studio/types";
 import { feedItem, publicationDecision, saveResource } from "./catalog";
+import { logPostingFlags, postingFlags } from "./career";
 import { nextFire, prevFire, validTimeZone } from "./cron";
 import { validate, SCHEDULE_V1 } from "./schema";
 import { DAY, REVIEW_DAYS, STALE_GRACE_DAYS, T, canonicalUrl, daysFromNow, hostOf, iso, requireAdmin, safePublicUrl, slugify } from "./shared";
@@ -20,7 +21,7 @@ import { DAY, REVIEW_DAYS, STALE_GRACE_DAYS, T, canonicalUrl, daysFromNow, hostO
  * is no arbitrary-URL proxy — and retrieved content is treated as untrusted data.
  */
 
-export type JobKind = "job_discovery" | "resource_discovery" | "terms_review" | "link_check" | "integration_health";
+export type JobKind = "job_discovery" | "resource_discovery" | "terms_review" | "link_check" | "integration_health" | "digest";
 export const DEFAULT_TZ = "America/New_York";
 export const DEFAULT_SCHEDULES: { key: string; kind: JobKind; cron: string; title: string }[] = [
   { key: "jobs-daily", kind: "job_discovery", cron: "0 6 * * *", title: "Job and internship discovery (daily 6:00 AM)" },
@@ -28,6 +29,7 @@ export const DEFAULT_SCHEDULES: { key: string; kind: JobKind; cron: string; titl
   { key: "terms-monthly", kind: "terms_review", cron: "0 8 1 * *", title: "Terms, limits and licensing review (1st of month 8:00 AM)" },
   { key: "links-daily", kind: "link_check", cron: "0 5 * * *", title: "Link checks (daily 5:00 AM)" },
   { key: "health-6h", kind: "integration_health", cron: "0 */6 * * *", title: "Integration health (every six hours)" },
+  { key: "digest-weekly", kind: "digest", cron: "0 9 * * 1", title: "Weekly digest: admins and opted-in learners (Monday 9:00 AM)" },
 ];
 const DEFAULT_BUDGET = { max_requests: 60, max_runtime_ms: 120_000, max_retries: 4 };
 const LEASE_MS = 10 * 60_000;
@@ -52,7 +54,7 @@ interface FetchResult {
   error?: string;
 }
 
-async function fetchTrusted(store: TenantStore, url: string, budget: { left: number }, timeoutMs = 8000): Promise<FetchResult> {
+async function fetchTrusted(store: TenantStore, url: string, budget: { left: number }, timeoutMs = 8000, extraHeaders: Record<string, string> = {}): Promise<FetchResult> {
   const why = urlBlockReason(url);
   if (why) return { ok: false, status: 0, type: "", body: "", error: why };
   const host = hostOf(url);
@@ -63,7 +65,7 @@ async function fetchTrusted(store: TenantStore, url: string, budget: { left: num
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     const res = await Promise.race([
-      ecoNet.fetcher(url, { signal: ctrl.signal, headers: { accept: "text/html,application/json,application/rss+xml,application/atom+xml,text/xml;q=0.9,*/*;q=0.5", "user-agent": "ScholarionDiscovery/1.0 (+education catalog; respects robots and rate limits)" }, redirect: "follow" }),
+      ecoNet.fetcher(url, { signal: ctrl.signal, headers: { accept: "text/html,application/json,application/rss+xml,application/atom+xml,text/xml;q=0.9,*/*;q=0.5", "user-agent": "ScholarionDiscovery/1.0 (+education catalog; respects robots and rate limits)", ...extraHeaders }, redirect: "follow" }),
       new Promise<never>((_, rej) => ctrl.signal.addEventListener("abort", () => rej(new Error(`Timed out after ${timeoutMs / 1000} s`)))),
     ]);
     const type = (res.headers.get("content-type") ?? "").toLowerCase();
@@ -105,6 +107,51 @@ export function parseFeed(xml: string): FeedItem[] {
 export function parseGreenhouse(json: string) {
   const d = JSON.parse(json) as { jobs?: { id: number; title: string; absolute_url: string; location?: { name?: string }; updated_at?: string; content?: string }[] };
   return (d.jobs ?? []).slice(0, 500).map((j) => ({ externalId: `gh:${j.id}`, title: String(j.title).slice(0, 200), url: String(j.absolute_url), location: j.location?.name ?? null, postedAt: j.updated_at ?? null, text: stripTags(String(j.content ?? "").replace(/&lt;/g, "<").replace(/&gt;/g, ">")).slice(0, 4000) }));
+}
+
+type Listing = { externalId: string; title: string; url: string; location: string | null; postedAt: string | null; text: string; employer?: string; closesAt?: string | null; pay?: string | null };
+
+/** Lever public postings API (api.lever.co/v0/postings/{company}?mode=json). */
+export function parseLever(json: string): Listing[] {
+  const d = JSON.parse(json) as { id: string; text: string; hostedUrl: string; categories?: { location?: string; commitment?: string }; createdAt?: number; descriptionPlain?: string }[];
+  return (Array.isArray(d) ? d : []).slice(0, 500).map((j) => ({ externalId: `lever:${j.id}`, title: String(j.text).slice(0, 200), url: String(j.hostedUrl), location: j.categories?.location ?? null, postedAt: j.createdAt ? new Date(j.createdAt).toISOString() : null, text: String(j.descriptionPlain ?? "").slice(0, 4000) }));
+}
+
+/** USAJOBS Search API (data.usajobs.gov/api/search) — needs an API key and a contact user-agent. */
+export function parseUsajobs(json: string): Listing[] {
+  const d = JSON.parse(json) as { SearchResult?: { SearchResultItems?: { MatchedObjectId: string; MatchedObjectDescriptor: { PositionTitle: string; PositionURI: string; PositionLocationDisplay?: string; PublicationStartDate?: string; ApplicationCloseDate?: string; OrganizationName?: string; QualificationSummary?: string; PositionRemuneration?: { MinimumRange?: string; MaximumRange?: string; RateIntervalCode?: string }[] } }[] } };
+  return (d.SearchResult?.SearchResultItems ?? []).slice(0, 500).map((i) => {
+    const m = i.MatchedObjectDescriptor;
+    const pay = m.PositionRemuneration?.[0];
+    return { externalId: `usajobs:${i.MatchedObjectId}`, title: String(m.PositionTitle).slice(0, 200), url: String(m.PositionURI), location: m.PositionLocationDisplay ?? null, postedAt: m.PublicationStartDate ?? null, closesAt: m.ApplicationCloseDate ?? null, employer: m.OrganizationName, text: String(m.QualificationSummary ?? "").slice(0, 4000), pay: pay ? `${pay.MinimumRange}–${pay.MaximumRange} ${pay.RateIntervalCode ?? ""}`.trim() : null };
+  });
+}
+
+/** Adzuna Jobs API (api.adzuna.com/v1/api/jobs/{country}/search/{page}) — needs app_id and app_key. */
+export function parseAdzuna(json: string): Listing[] {
+  const d = JSON.parse(json) as { results?: { id: string; title: string; redirect_url: string; location?: { display_name?: string }; created?: string; description?: string; company?: { display_name?: string }; salary_min?: number; salary_max?: number; salary_is_predicted?: string }[] };
+  return (d.results ?? []).slice(0, 500).map((j) => ({ externalId: `adzuna:${j.id}`, title: String(j.title).slice(0, 200), url: String(j.redirect_url), location: j.location?.display_name ?? null, postedAt: j.created ?? null, employer: j.company?.display_name, text: String(j.description ?? "").slice(0, 4000), pay: j.salary_min && j.salary_is_predicted !== "1" ? `${j.salary_min}–${j.salary_max ?? j.salary_min}` : null }));
+}
+
+/** Credentials for job APIs come from the environment (secrets manager), never from the database or content. */
+function sourceAuth(src: Row): { url: string; headers: Record<string, string> } | { missing: string } {
+  const url = String(src.url);
+  if (src.kind === "usajobs") {
+    const key = process.env.USAJOBS_API_KEY;
+    const ua = process.env.USAJOBS_USER_AGENT;
+    if (!key || !ua) return { missing: "Set USAJOBS_API_KEY and USAJOBS_USER_AGENT (your registered email) in the secrets manager." };
+    return { url, headers: { "authorization-key": key, "user-agent": ua, host: "data.usajobs.gov" } };
+  }
+  if (src.kind === "adzuna") {
+    const id = process.env.ADZUNA_APP_ID;
+    const key = process.env.ADZUNA_APP_KEY;
+    if (!id || !key) return { missing: "Set ADZUNA_APP_ID and ADZUNA_APP_KEY in the secrets manager." };
+    const u = new URL(url);
+    u.searchParams.set("app_id", id);
+    u.searchParams.set("app_key", key);
+    return { url: u.toString(), headers: {} };
+  }
+  return { url, headers: {} };
 }
 
 /* ---------------- schedules ---------------- */
@@ -384,7 +431,7 @@ const resourceDiscovery: Runner = async (c) => {
           return;
         }
         const evidenceOk = !!src.evidenceUrl && !!defaults.classification && !!defaults.license;
-        const r = store.insert(T.resources, { key: `${slugify(String(src.key))}-${slugify(it.title)}`.slice(0, 79), kind: defaults.kind ?? "course", name: it.title, provider: String(src.provider ?? src.name), officialUrl: it.url, canonicalUrl: url, category: defaults.category ?? "course", subjects: (src.subjects as string[]) ?? [], description: it.summary, useCases: [], classification: defaults.classification ?? "unknown", accountRequired: null, cardRequired: null, apiAccess: "unavailable", limits: [], license: defaults.license ?? null, embedding: "unknown", redistribution: defaults.redistribution ?? "unknown", attributionRequired: true, certificate: defaults.certificate ?? "unknown", integrationMethod: "link", connectionState: "link", accessibility: [], geographicRestrictions: [], eligibility: [], expiresAt: null, status: "pending", statusReason: "Discovered — awaiting evidence.", verifiedAt: null, nextReviewAt: daysFromNow(REVIEW_DAYS), version: 1, origin: `feed:${src.key}` }, "eres");
+        const r = store.insert(T.resources, { key: `${slugify(String(src.key))}-${slugify(it.title)}`.slice(0, 79), kind: defaults.kind ?? "course", name: it.title, provider: String(src.provider ?? src.name), officialUrl: it.url, canonicalUrl: url, category: defaults.category ?? "course", subjects: (src.subjects as string[]) ?? [], description: it.summary, useCases: [], classification: defaults.classification ?? "unknown", accountRequired: null, cardRequired: null, apiAccess: "unavailable", limits: [], license: defaults.license ?? null, embedding: "unknown", redistribution: defaults.redistribution ?? "unknown", attributionRequired: true, certificate: defaults.certificate ?? "unknown", integrationMethod: "link", connectionState: "link", accessibility: [], geographicRestrictions: [], eligibility: [], expiresAt: null, status: "pending", statusReason: "Discovered — awaiting evidence.", verifiedAt: null, nextReviewAt: daysFromNow(REVIEW_DAYS), version: 1, origin: `feed:${src.key}`, contentUse: defaults.redistribution === "allowed" && defaults.license ? "import_with_attribution" : "link_only" }, "eres");
         if (evidenceOk) store.insert(T.evidence, { resourceId: r.id, url: String(src.evidenceUrl), host: hostOf(String(src.evidenceUrl)), retrievedAt: nowIso(), claims: [`Provider-wide terms: ${defaults.classification}, license ${defaults.license}`], summary: "Source-level license/terms page configured by an administrator.", checkTerms: [], confirmed: true, conflict: false }, "eev");
         const d = publicationDecision(store.get(T.resources, r.id)!, store.list(T.evidence, (e) => e.resourceId === r.id));
         saveResource(store, r.id, { status: d.status, statusReason: d.reason, verifiedAt: d.status === "verified" ? nowIso() : null }, `Discovered via ${src.key}.`, c.job.id);
@@ -399,20 +446,27 @@ const resourceDiscovery: Runner = async (c) => {
 /** Daily job discovery from configured job feeds (Greenhouse board API, RSS). Missing listings close. */
 const jobDiscovery: Runner = async (c) => {
   const { store } = c;
-  const sources = store.list(T.sources, (s) => !!s.enabled && !!s.trusted && (s.kind === "greenhouse" || (s.kind === "rss" && s.purpose === "jobs")));
+  const sources = store.list(T.sources, (s) => !!s.enabled && !!s.trusted && (["greenhouse", "lever", "usajobs", "adzuna"].includes(String(s.kind)) || (s.kind === "rss" && s.purpose === "jobs")));
   let anyOk = sources.length === 0;
   for (const src of sources) {
     if (!timeLeft(c)) return { complete: false, anyOk };
-    const res = await fetchTrusted(store, String(src.url), c.budget);
+    const auth = sourceAuth(src);
+    if ("missing" in auth) {
+      store.update(T.sources, src.id, { lastFetchedAt: nowIso(), lastFetchOk: false, lastError: `Configuration required: ${auth.missing}` });
+      inc(c, "needs_configuration");
+      anyOk = true;
+      continue;
+    }
+    const res = await fetchTrusted(store, auth.url, c.budget, 8000, auth.headers);
     store.update(T.sources, src.id, { lastFetchedAt: nowIso(), lastFetchOk: res.ok, lastError: res.ok ? null : res.error ?? `HTTP ${res.status}` });
     if (!res.ok) {
       c.errors.push(`${src.key}: ${res.error ?? `HTTP ${res.status}`}`);
       continue;
     }
     anyOk = true;
-    let listings: { externalId: string; title: string; url: string; location: string | null; postedAt: string | null; text: string }[] = [];
+    let listings: Listing[] = [];
     try {
-      listings = src.kind === "greenhouse" ? parseGreenhouse(res.body) : parseFeed(res.body).map((i) => ({ externalId: `rss:${i.id ?? canonicalUrl(i.url)}`, title: i.title, url: i.url, location: null, postedAt: i.published, text: i.summary }));
+      listings = src.kind === "greenhouse" ? parseGreenhouse(res.body) : src.kind === "lever" ? parseLever(res.body) : src.kind === "usajobs" ? parseUsajobs(res.body) : src.kind === "adzuna" ? parseAdzuna(res.body) : parseFeed(res.body).map((i) => ({ externalId: `rss:${i.id ?? canonicalUrl(i.url)}`, title: i.title, url: i.url, location: null, postedAt: i.published, text: i.summary }));
     } catch (e) {
       c.errors.push(`${src.key}: unreadable response (${(e as Error).message})`);
       continue;
@@ -428,14 +482,23 @@ const jobDiscovery: Runner = async (c) => {
       const skills = extractSkills(`${l.title} ${l.text}`);
       const existing = store.list(T.opportunities, (o) => o.externalId === l.externalId && o.sourceId === src.id)[0];
       store.tx(() => {
-        const fields = { title: l.title, applicationUrl: l.url, location: l.location, remote: /remote/i.test(`${l.location} ${l.title}`) ? "remote" : /hybrid/i.test(`${l.location}`) ? "hybrid" : "unknown", skills, lastVerifiedAt: nowIso(), status: "open" };
+        const employerName = String(l.employer ?? employer?.name ?? src.provider ?? src.name);
+        const flags = postingFlags(store, { id: existing?.id as string | undefined, title: l.title, description: l.text, employerName, closesAt: l.closesAt ?? null });
+        const fields = { title: l.title, description: l.text.slice(0, 1500), applicationUrl: l.url, location: l.location, remote: /remote/i.test(`${l.location} ${l.title}`) ? "remote" : /hybrid/i.test(`${l.location}`) ? "hybrid" : "unknown", skills, lastVerifiedAt: nowIso(), lastSeenAt: nowIso(), closesAt: l.closesAt ?? null, compensation: l.pay ?? null, status: "open", hiddenReason: null };
+        const api = { greenhouse: "the employer's public Greenhouse job board API", lever: "the employer's public Lever postings API", usajobs: "the USAJOBS Search API", adzuna: "the Adzuna Jobs API", rss: "a configured feed" }[String(src.kind)] ?? "a configured source";
+        let id = existing?.id;
         if (existing) {
           store.update(T.opportunities, existing.id, fields);
           inc(c, "updated");
         } else {
-          const o = store.insert(T.opportunities, { ...fields, employerId: employer?.id ?? null, employerName: employer?.name ?? String(src.provider ?? src.name), externalId: l.externalId, sourceId: src.id, source: src.kind === "greenhouse" ? "job_board_api" : "feed", type, qualifications: [], workEligibility: null, compensation: null, postedAt: l.postedAt, closesAt: null, legitimacy: [`Listed on ${hostOf(l.url)} via ${src.kind === "greenhouse" ? "the employer's public job board API" : "a configured feed"}`] }, "eopp");
-          feedItem(store, "opportunity", `New opportunity: ${l.title} (${o.employerName})`, { opportunityId: o.id, subjects: skills });
+          const o = store.insert(T.opportunities, { ...fields, employerId: employer?.id ?? null, employerName, externalId: l.externalId, sourceId: src.id, source: src.kind === "rss" ? "feed" : "job_board_api", type, qualifications: [], workEligibility: null, postedAt: l.postedAt, legitimacy: [`Listed on ${hostOf(l.url)} via ${api}`] }, "eopp");
+          id = o.id;
+          if (!flags.length) feedItem(store, "opportunity", `New opportunity: ${l.title} (${employerName})`, { opportunityId: o.id, subjects: skills });
           inc(c, "created");
+        }
+        if (flags.length && id) {
+          logPostingFlags(store, id, flags);
+          inc(c, "hidden");
         }
       });
     }
@@ -448,7 +511,27 @@ const jobDiscovery: Runner = async (c) => {
   return { complete: true, anyOk };
 };
 
-const RUNNERS: Record<JobKind, Runner> = { terms_review: termsReview, link_check: linkCheck, integration_health: integrationHealth, resource_discovery: resourceDiscovery, job_discovery: jobDiscovery };
+/** Weekly digest: admins get the run summary; learners who opted in get new tools, courses and matching roles. */
+const digest: Runner = async (c) => {
+  const { store } = c;
+  const last = store.list(T.digests, () => true).sort((x, y) => String(y.at).localeCompare(String(x.at)))[0];
+  const since = last ? String(last.at) : "1970-01-01T00:00:00.000Z";
+  const items = store.list(T.feed, (f) => String(f.at) > since);
+  const jobs = store.list(T.jobs, (j) => String(j.createdAt) > since);
+  const by = (k: string) => items.filter((f) => f.kind === k).length;
+  const adminBody = `Since ${since.slice(0, 10)}: ${jobs.length} discovery job(s) (${jobs.filter((j) => j.state === "dead").length} dead-lettered); ${by("new_tool")} newly verified tools, ${by("new_resource")} new resources, ${by("limits_changed")} changed limits, ${by("discontinued")} discontinued, ${by("opportunity")} new opportunities.`;
+  const admins = store.list("role_grants", (g) => g.role === "admin").map((g) => String(g.userId));
+  notify(store, admins, "digest", "Weekly Resource Hub digest", adminBody, "/campus/{tenant}/hub/automation");
+  const learners = [...new Set(store.list(T.subscriptions, (s) => s.kind === "digest").map((s) => String(s.userId)))];
+  const learnerBody = items.filter((f) => ["new_tool", "new_resource", "opportunity"].includes(String(f.kind))).slice(0, 10).map((f) => `• ${f.title}`).join("\n") || "No new items this week.";
+  notify(store, learners, "digest", "Your weekly Scholarion digest", learnerBody, "/campus/{tenant}/hub/whats-new");
+  store.insert(T.digests, { at: nowIso(), since, adminBody, learnerItems: items.length, adminRecipients: admins.length, learnerRecipients: learners.length, delivery: "in-site (email needs a configured provider)" }, "edg");
+  inc(c, "admins", admins.length);
+  inc(c, "learners", learners.length);
+  return { complete: true, anyOk: true };
+};
+
+const RUNNERS: Record<JobKind, Runner> = { terms_review: termsReview, link_check: linkCheck, integration_health: integrationHealth, resource_discovery: resourceDiscovery, job_discovery: jobDiscovery, digest };
 
 /* ---------------- sources ---------------- */
 
@@ -460,9 +543,13 @@ export function extractSkills(text: string): string[] {
 
 export function addSource(store: TenantStore, a: Actor, input: { key: string; name: string; kind: string; url: string; purpose?: string; provider?: string; subjects?: string[]; employerId?: string; evidenceUrl?: string; defaults?: Record<string, string>; rateLimitPerMin?: number; entryLevelOnly?: boolean }) {
   requireAdmin(store, a, "eco.source.add");
-  if (!["rss", "greenhouse", "official_page"].includes(input.kind)) throw new CampusError("invalid", "kind must be rss, greenhouse or official_page.", 422);
+  if (!["rss", "greenhouse", "lever", "usajobs", "adzuna", "official_page"].includes(input.kind)) throw new CampusError("invalid", "kind must be rss, greenhouse, lever, usajobs, adzuna or official_page.", 422);
   const url = safePublicUrl(input.url);
   if (input.kind === "greenhouse" && !/^https:\/\/boards-api\.greenhouse\.io\/v1\/boards\/[a-z0-9_-]+\/jobs/i.test(url)) throw new CampusError("invalid", "Greenhouse sources use https://boards-api.greenhouse.io/v1/boards/{board}/jobs.", 422);
+  if (input.kind === "lever" && !/^https:\/\/api\.lever\.co\/v0\/postings\/[a-z0-9_-]+/i.test(url)) throw new CampusError("invalid", "Lever sources use https://api.lever.co/v0/postings/{company}?mode=json.", 422);
+  if (input.kind === "usajobs" && !/^https:\/\/data\.usajobs\.gov\/api\/search/i.test(url)) throw new CampusError("invalid", "USAJOBS sources use https://data.usajobs.gov/api/search?… (keys come from the secrets manager).", 422);
+  if (input.kind === "adzuna" && !/^https:\/\/api\.adzuna\.com\/v1\/api\/jobs\/[a-z]{2}\/search\/\d+/i.test(url)) throw new CampusError("invalid", "Adzuna sources use https://api.adzuna.com/v1/api/jobs/{country}/search/{page}?what=… (keys come from the secrets manager).", 422);
+  if (/[?&](app_key|app_id|api_key|key|token)=/i.test(url)) throw new CampusError("invalid", "Don't put credentials in a source URL; they're read from the secrets manager.", 422);
   const key = slugify(input.key || input.name);
   if (store.list(T.sources, (s) => s.key === key).length) throw new CampusError("conflict", "A source with that key exists.", 409);
   return store.tx(() => {

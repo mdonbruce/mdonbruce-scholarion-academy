@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { CampusError } from "../core";
 import { scenarioByKey, SIM_SCENARIOS, type SimScenario } from "../academy/sim-scenarios";
 import { fitSize, LEAD_FACULTY } from "../../brand/faculty";
@@ -38,7 +39,7 @@ ol.trace li[data-t=call]{border-color:var(--brand)}ol.trace li[data-t=observe]{b
 .reply{white-space:pre-wrap;background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:8px}
 .approval{border:2px solid var(--accent);background:var(--warnbg);border-radius:10px;padding:10px;margin:8px 0}
 .key{background:var(--okbg);border-radius:8px;padding:6px 10px;margin-top:6px}
-body.student-view .instructor-only{display:none!important}body:not(.student-view) .student-return{display:none}
+body.student-view .instructor-only{display:none!important}body.relocked #toInstructor{display:inline-block}.pin-lock{border:2px solid #b45309}body:not(.student-view) .student-return{display:none}
 .timer{font-size:1.6rem;font-variant-numeric:tabular-nums;font-weight:700}
 .kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}.kpi div{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px}.kpi b{display:block;font-size:1.3rem}
 .sr{position:absolute;left:-9999px}
@@ -137,9 +138,11 @@ $("apNo").addEventListener("click",function(){E.approve(run,false);paint();});
 function board(){var tb=$("board");tb.innerHTML="";S.tasks.forEach(function(t){var tr=el("tr");tr.appendChild(el("td",null,t.id+" "+t.title));var td=el("td");var v=results[t.id];td.appendChild(el("span",{"class":v===undefined?"":(v?"pass":"fail")},v===undefined?"not run":(v?"passed":"not yet")));tr.appendChild(td);tb.appendChild(tr);});$("score").textContent=Object.keys(results).filter(function(k){return results[k];}).length+" of "+S.tasks.length+" checkpoints passed";}
 board();taskSel.dispatchEvent(new Event("change"));
 $("dlAnswers").addEventListener("click",function(){var lines=["Module worksheet — "+S.moduleTitle,"Name: "+($("wsName").value||"(not given)"),""];document.querySelectorAll("[data-ws]").forEach(function(f,i){var v="";var r=f.querySelector("input:checked");if(r)v=r.value;var ta=f.querySelector("textarea");if(ta)v=ta.value;lines.push((i+1)+". "+f.getAttribute("data-q"));lines.push("   Answer: "+(v||"(blank)"));});lines.push("","Checkpoints: "+$("score").textContent);var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/plain"}));a.download="Module_Worksheet_Answers.txt";document.body.appendChild(a);a.click();a.remove();});
-if(MODE==="instructor"){
-  $("toStudent").addEventListener("click",function(){document.body.classList.add("student-view");$("svStatus").textContent="Student View on — answers and controls hidden.";});
-  $("toInstructor").addEventListener("click",function(){document.body.classList.remove("student-view");});
+window.__initInstructor=function(){
+  $("toStudent").addEventListener("click",function(){
+    if(window.__LOCKED){document.querySelectorAll("[data-slot]").forEach(function(n){n.innerHTML="";});document.body.classList.add("student-view","relocked");var l=$("pinLock");if(l)l.hidden=true;return;}
+    document.body.classList.add("student-view");$("svStatus").textContent="Student View on — answers and controls hidden.";});
+  $("toInstructor").addEventListener("click",function(){if(window.__LOCKED){document.body.classList.remove("student-view","relocked");var l=$("pinLock");if(l){l.hidden=false;$("pinIn").focus();}return;}document.body.classList.remove("student-view");});
   var left=0,timer=null;function show(){var m=Math.floor(left/60),s=left%60;$("clock").textContent=(m<10?"0":"")+m+":"+(s<10?"0":"")+s;}
   $("tStart").addEventListener("click",function(){if(!left)left=Math.max(1,Number($("tMin").value||20))*60;if(timer)return;timer=setInterval(function(){left--;show();if(left<=0){clearInterval(timer);timer=null;$("clockMsg").textContent="Time is up.";}},1000);});
   $("tPause").addEventListener("click",function(){clearInterval(timer);timer=null;});
@@ -147,9 +150,47 @@ if(MODE==="instructor"){
   $("resetAll").addEventListener("click",function(){results={};board();run=null;trace.innerHTML="";reply.textContent="(no reply yet)";cp.textContent="";});
   $("runRef").addEventListener("click",function(){var out=$("refOut");out.innerHTML="";S.tasks.forEach(function(t){var r=E.runAuto(t.request,{policy:"auto",guard:true,limit:S.stepLimit,autoApprove:true});var c=E.check(t,r);results[t.id]=c.pass;out.appendChild(el("li",null,t.id+": "+(c.pass?"passes":"fails — "+c.why.join("; "))+" · trace: "+r.trace.map(function(x){return x.t;}).join(" > ")));});board();});
   $("hintsAll").addEventListener("click",function(){document.querySelectorAll("details.hint").forEach(function(d){d.open=!d.open;});});
-}
+};
+if(MODE==="instructor"&&!window.__LOCKED)window.__initInstructor();
 })();
 `;
+
+/**
+ * PIN lock for the instructor edition. Answer keys, the control panel and reference data are
+ * AES-GCM encrypted with a key derived from the course PIN (PBKDF2-SHA-256); they exist in the DOM
+ * only after the PIN is entered. Switch to Student View removes them again.
+ */
+const LOCK_UI = String.raw`
+(function(){
+var L=window.__LOCK__;if(!L)return;
+function b64(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
+async function unlock(pin){
+  var base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pin),"PBKDF2",false,["deriveKey"]);
+  var key=await crypto.subtle.deriveKey({name:"PBKDF2",salt:b64(L.salt),iterations:L.iter,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["decrypt"]);
+  var plain=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64(L.iv)},key,b64(L.data));
+  return JSON.parse(new TextDecoder().decode(plain));
+}
+document.getElementById("pinForm").addEventListener("submit",function(ev){
+  ev.preventDefault();var msg=document.getElementById("pinMsg");msg.textContent="Checking…";
+  unlock(document.getElementById("pinIn").value).then(function(p){
+    Object.keys(p.slots).forEach(function(k){var n=document.querySelector('[data-slot="'+k+'"]');if(n)n.innerHTML=p.slots[k];});
+    window.__SCENARIO__.worksheet=p.worksheet;
+    document.getElementById("pinLock").hidden=true;document.body.classList.remove("student-view","relocked");document.getElementById("pinIn").value="";msg.textContent="";
+    window.__initInstructor();
+  }).catch(function(){msg.textContent="That PIN didn't unlock the instructor edition.";});
+});
+})();
+`;
+
+const PBKDF2_ITERATIONS = 150_000;
+function sealForPin(pin: string, payload: unknown) {
+  const salt = crypto.randomBytes(16);
+  const iv = crypto.randomBytes(12);
+  const key = crypto.pbkdf2Sync(pin, salt, PBKDF2_ITERATIONS, 32, "sha256");
+  const c = crypto.createCipheriv("aes-256-gcm", key, iv);
+  const data = Buffer.concat([c.update(JSON.stringify(payload), "utf8"), c.final(), c.getAuthTag()]);
+  return { salt: salt.toString("base64"), iv: iv.toString("base64"), iter: PBKDF2_ITERATIONS, data: data.toString("base64") };
+}
 
 /** Application demo script. */
 const APP_UI = String.raw`
@@ -199,8 +240,15 @@ function dataTables(s: SimScenario) {
   }).join("");
 }
 
-function labPage(s: SimScenario, mode: "student" | "instructor", ctx: { program?: string; module?: string }) {
+function labPage(s: SimScenario, mode: "student" | "instructor", ctx: { program?: string; module?: string; pin?: string }) {
   const inst = mode === "instructor";
+  const locked = inst && !!ctx.pin;
+  const slots: Record<string, string> = {};
+  const slot = (id: string, cls: string, tag: string, html: string) => {
+    if (!locked) return `<${tag} class="${cls}">${html}</${tag}>`;
+    slots[id] = html;
+    return `<${tag} class="${cls}" data-slot="${id}"></${tag}>`;
+  };
   const total = s.parts.reduce((n, p) => n + p.minutes, 0);
   const title = `Module ${ctx.module ?? ""} ${inst ? "Instructor" : "Student"} Lab — ${s.moduleTitle}`.replace(/\s+/g, " ");
   const ws = s.worksheet.map((w, i) => {
@@ -208,11 +256,11 @@ function labPage(s: SimScenario, mode: "student" | "instructor", ctx: { program?
     const body = w.kind === "mc"
       ? (w.choices ?? []).map((c, j) => `<label><input type="radio" name="${name}" value="${esc(c)}" id="${name}_${j}"> ${esc(c)}</label>`).join("<br>")
       : `<label for="${name}_t" class="sr">Your answer</label><textarea id="${name}_t" rows="3"></textarea>`;
-    const key = inst ? `<div class="key instructor-only"><strong>Answer:</strong> ${esc(w.answer)}<br><span class="tiny">${esc(w.explanation)} · ${esc(w.lo)} · ${esc(w.bloom)}</span></div>` : "";
+    const key = inst ? slot(`k${i}`, "key instructor-only", "div", `<strong>Answer:</strong> ${esc(w.answer)}<br><span class="tiny">${esc(w.explanation)} · ${esc(w.lo)} · ${esc(w.bloom)}</span>`) : "";
     return `<fieldset data-ws data-q="${esc(w.q)}"><legend>${i + 1}. ${esc(w.q)} <span class="tiny muted">(${esc(w.lo)}, ${esc(w.bloom)})</span></legend>${body}${key}</fieldset>`;
   }).join("");
-  const parts = s.parts.map((p) => `<div class="card"><h3>${esc(p.title)} <span class="tiny muted">· ${p.minutes} min</span></h3><p><strong>Goal:</strong> ${esc(p.goal)}</p><ol>${p.instructions.map((x) => `<li>${esc(x)}</li>`).join("")}</ol><p><strong>Checkpoint:</strong> ${esc(p.checkpoint)}</p><details class="hint"><summary>Hint</summary><p>${esc(p.hint)}</p></details>${inst ? `<p class="instructor-only tiny"><strong>Watch for:</strong> ${esc(p.misconception)}</p>` : ""}</div>`).join("");
-  const control = inst ? `
+  const parts = s.parts.map((p) => `<div class="card"><h3>${esc(p.title)} <span class="tiny muted">· ${p.minutes} min</span></h3><p><strong>Goal:</strong> ${esc(p.goal)}</p><ol>${p.instructions.map((x) => `<li>${esc(x)}</li>`).join("")}</ol><p><strong>Checkpoint:</strong> ${esc(p.checkpoint)}</p><details class="hint"><summary>Hint</summary><p>${esc(p.hint)}</p></details>${inst ? slot(`w${s.parts.indexOf(p)}`, "instructor-only tiny", "p", `<strong>Watch for:</strong> ${esc(p.misconception)}`) : ""}</div>`).join("");
+  const controlInner = inst ? `
 <div class="banner instructor-only" role="note">INSTRUCTOR MODE — answer keys and control panel are visible on this screen; Switch to Student View before projecting student work.</div>
 <section class="card instructor-only" aria-labelledby="cp-h"><h2 id="cp-h">Instructor control panel</h2>
 <div class="grid g2"><div><button type="button" id="toStudent">Switch to Student View</button> <span id="svStatus" class="tiny" aria-live="polite"></span>
@@ -222,8 +270,12 @@ function labPage(s: SimScenario, mode: "student" | "instructor", ctx: { program?
 <div class="timer" id="clock" role="timer" aria-live="off">00:00</div><p id="clockMsg" aria-live="assertive"></p></div></div>
 <h3>Timing and grading notes</h3><table><caption>Timing per part</caption><thead><tr><th scope="col">Part</th><th scope="col">Minutes</th><th scope="col">Common misconception</th></tr></thead><tbody>${s.parts.map((p) => `<tr><td>${esc(p.title)}</td><td>${p.minutes}</td><td>${esc(p.misconception)}</td></tr>`).join("")}</tbody></table>
 <p class="tiny">Autograder spec: visible tests T1–T5 (one per checkpoint, 4 points each, 20 total); hidden tests re-run the same checks on two unseen requests per intent. Worksheet: items 1–6 auto-scored (1 point each), items 7–10 rubric-scored (0–2 points: correct reasoning, specific to this scenario).</p>
-<p class="tiny">Adapting: slower groups do Parts 1–3 in Auto policy only; faster groups add a new tool and a test for it (worksheet item 10).</p></section>
+<p class="tiny">Adapting: slower groups do Parts 1–3 in Auto policy only; faster groups add a new tool and a test for it (worksheet item 10).</p></section>` : "";
+  const lockScreen = `<section class="card pin-lock" id="pinLock" aria-labelledby="pin-h"><h2 id="pin-h">Instructor Mode is locked</h2><p class="tiny">Enter the course PIN to show answer keys and the control panel. They are encrypted in this file and appear only after unlocking; Switch to Student View removes them again.</p><form id="pinForm"><label for="pinIn">PIN</label> <input id="pinIn" type="password" inputmode="numeric" autocomplete="off" required> <button type="submit">Unlock</button> <span id="pinMsg" class="tiny" role="status" aria-live="polite"></span></form></section>`;
+  const control = inst ? `${locked ? `${lockScreen}<div data-slot="control"></div>` : controlInner}
 <button type="button" class="ghost student-return" id="toInstructor">Return to instructor mode</button>` : "";
+  if (locked) slots.control = controlInner;
+  const lock = locked ? sealForPin(String(ctx.pin), { slots, worksheet: s.worksheet }) : null;
   return `${head(title)}<body class="${inst ? "instructor" : "student"}"><div class="wrap">
 <header class="top"><div><p class="tiny"><span class="brandline">Scholarion Academy</span> · ${esc(ctx.program ?? "Scholaris AI Academy")} · ${esc(s.org)}</p><h1>${esc(title)}</h1>${facultyBlock()}</div><span class="draft">${esc(DRAFT_LABEL)}</span></header>
 ${control}
@@ -249,7 +301,7 @@ ${control}
 <p><strong>Submit:</strong> a 2–3-page APA paper with screenshots of your passing checkpoints and trace, your worksheet answers, explanations and references. Upload to the course as Word or PDF by Sunday 11:59 PM.</p>
 <p class="tiny">AI-use policy: allowed with disclosure for the paper; not allowed for worksheet items 1–6. Accessibility support and extended time are available through your accommodations plan.</p></section>
 </div>
-<script>window.__SCENARIO__=${json(scenarioPublic(s, inst))};window.__MODE__=${json(mode)};</script><script>${ENGINE}</script><script>${LAB_UI}</script></body></html>`;
+<script>window.__SCENARIO__=${json(scenarioPublic(s, inst && !locked))};window.__MODE__=${json(mode)};${lock ? `window.__LOCKED=true;window.__LOCK__=${json(lock)};` : ""}</script><script>${ENGINE}</script><script>${LAB_UI}</script>${lock ? `<script>${LOCK_UI}</script>` : ""}</body></html>`;
 }
 
 function appPage(s: SimScenario, ctx: { program?: string; module?: string }) {
@@ -272,7 +324,7 @@ function appPage(s: SimScenario, ctx: { program?: string; module?: string }) {
 </div><script>window.__SCENARIO__=${json(scenarioPublic(s, false))};window.__MODE__="app";</script><script>${ENGINE}</script><script>${APP_UI}</script></body></html>`;
 }
 
-export function simLabHtml(key: string, edition: SimEdition, ctx: { program?: string; module?: string } = {}) {
+export function simLabHtml(key: string, edition: SimEdition, ctx: { program?: string; module?: string; pin?: string } = {}) {
   const s = scenarioByKey(key);
   if (!s) throw new CampusError("not_found", "Simulated lab scenario not found", 404);
   if (edition === "app") return appPage(s, ctx);

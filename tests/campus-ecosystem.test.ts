@@ -379,3 +379,76 @@ describe("Scholarion API v1", () => {
     assert.equal(j1.id, j2.id);
   });
 });
+
+describe("Prompt 4 acceptance: catalog size, licensing, employer checks, adapters, digest", () => {
+  it("seed catalog: 40+ verified tools and a mapped free-course library", () => {
+    const s = storeOf("academy");
+    const tools = s.list(E.T.resources, (r) => r.kind === "tool" && r.status !== "archived");
+    const verifiedTools = ECO_CATALOG.filter((r) => r.kind === "tool" && r.status === "verified").length;
+    assert.ok(verifiedTools >= 40, `verified tools ${verifiedTools}`);
+    assert.ok(tools.length >= 50);
+    const lib = E.libraryByCourse(s, u("admin").actor);
+    const courses = lib.map((g) => g.course);
+    for (const c of ["CAI 4510C Machine Learning", "Python Programming (Gaddis 6th ed.)", "CTS2314 Network Security", "Advanced Artificial Intelligence"]) assert.ok(courses.includes(c), c);
+    assert.ok(ECO_CATALOG.filter((r) => r.kind !== "tool").length >= 40);
+  });
+
+  it("non-openly-licensed courses are linked, not copied; open licenses may be imported with attribution", () => {
+    const s = storeOf("academy");
+    for (const r of s.list(E.T.resources, (x) => x.kind !== "tool")) {
+      if (r.redistribution !== "allowed" || !r.license) assert.equal(r.contentUse, "link_only", String(r.key));
+    }
+    assert.ok(s.list(E.T.resources, (x) => x.contentUse === "import_with_attribution").length > 0);
+  });
+
+  it("employers are verified automatically by domain; a free-mail or mismatched domain stays hidden", () => {
+    const s = storeOf("academy");
+    assert.equal(E.employerChecks({ name: "Acme", website: "https://acme.example", contactEmail: "hr@acme.example" }).ok, true);
+    assert.equal(E.employerChecks({ name: "Acme", website: "https://acme.example", contactEmail: "acme.hr@gmail.com" }).ok, false);
+    assert.equal(E.employerChecks({ name: "Acme", website: "https://acme.example", contactEmail: "hr@other.example" }).ok, false);
+    const st = u("student5");
+    const e = E.registerEmployer(s, st.actor, { name: "Shady Hiring", website: "https://shady-hiring.example", contactEmail: "boss@gmail.com" });
+    assert.equal(e.verification, "pending");
+    assert.ok(!E.listEmployers(s, u("student3").actor).some((x) => x.id === e.id), "unverified employers are hidden");
+    assert.equal(status(() => E.postOpportunity(s, st.actor, { title: "Intern", type: "internship" })), 403);
+  });
+
+  it("scam patterns, upfront fees and duplicates hide a posting automatically and log why", () => {
+    const s = storeOf("academy");
+    const emp = u("employer1");
+    const bad = E.postOpportunity(s, emp.actor, { title: "Remote Data Intern", type: "internship", description: "Pay a $150 training fee before you start. Interview on Telegram only." });
+    assert.equal(bad.status, "pending");
+    assert.match(String(bad.hiddenReason), /fee/);
+    assert.ok(!E.listOpportunities(s).some((o) => o.id === bad.id));
+    const dup = E.postOpportunity(s, emp.actor, { title: "Agentic AI Intern (demo)", type: "internship" });
+    assert.equal(dup.status, "pending");
+    assert.ok(E.flaggedPostings(s, u("admin").actor).length >= 2);
+  });
+
+  it("Lever postings ingest; USAJOBS without keys reports configuration required (not an error)", async () => {
+    const s = storeOf("academy");
+    const admin = u("admin");
+    const lever = "https://api.lever.co/v0/postings/exampleorg?mode=json";
+    pages.set(lever, { status: 200, type: "application/json", body: JSON.stringify([{ id: "abc", text: "Machine Learning Intern", hostedUrl: "https://jobs.lever.co/exampleorg/abc", categories: { location: "Remote" }, createdAt: Date.parse("2026-10-01"), descriptionPlain: "Python, PyTorch, evaluation" }]) });
+    E.addSource(s, admin.actor, { key: "exampleorg", name: "ExampleOrg careers", kind: "lever", url: lever });
+    const usa = E.addSource(s, admin.actor, { key: "usajobs-it", name: "USAJOBS IT internships", kind: "usajobs", url: "https://data.usajobs.gov/api/search?Keyword=machine%20learning" });
+    assert.equal(status(() => E.addSource(s, admin.actor, { key: "adz", name: "x", kind: "adzuna", url: "https://api.adzuna.com/v1/api/jobs/us/search/1?app_key=SECRET" })), 422);
+    E.runNow(s, admin.actor, schedule("job_discovery").id);
+    await E.workJobs(s);
+    assert.ok(s.list(E.T.opportunities, (o) => o.externalId === "lever:abc" && o.status === "open").length);
+    assert.match(String(s.get(E.T.sources, usa.id)!.lastError), /Configuration required/);
+  });
+
+  it("weekly digest reaches admins and opted-in learners only; withdrawing consent hides the learner at once", async () => {
+    const s = storeOf("academy");
+    const st = u("student3");
+    E.subscribe(s, st.actor, "digest", "");
+    E.runNow(s, u("admin").actor, schedule("digest").id);
+    await E.workJobs(s);
+    const d = s.list(E.T.digests, () => true).at(-1)!;
+    assert.equal(d.learnerRecipients, 1);
+    const st1 = u("student1");
+    E.withdrawConsent(s, st1.actor);
+    assert.equal(E.talentSearch(s, u("employer1").actor).length, 0);
+  });
+});
