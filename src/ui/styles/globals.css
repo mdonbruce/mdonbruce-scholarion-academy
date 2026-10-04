@@ -1765,7 +1765,7 @@ details.acc > div {
 .campus-coursenav a { display: block; padding: 6px 10px; border-radius: var(--radius-sm); text-decoration: none; color: var(--text); }
 .campus-coursenav a[aria-current="page"] { background: var(--primary-soft); color: var(--primary); font-weight: 600; border-left: 3px solid var(--primary); }
 .campus-course-body { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
-.campus-module.locked { opacity: 0.85; }
+.campus-module.locked { border-style: dashed; }
 .campus-items li.locked { color: var(--text-3); }
 .campus-items .kind { display: inline-block; min-width: 76px; font-size: 0.72rem; text-transform: uppercase; color: var(--text-3); }
 .campus-pager { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 12px; flex-wrap: wrap; gap: 8px; }
@@ -1808,3 +1808,5 @@ details.acc > div {
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .badge-green, :root:not([data-theme="light"]) .badge-amber, :root:not([data-theme="light"]) .badge-gold { color: var(--text); } }
 .sidenav a[aria-current="page"] .muted { color: inherit; }
 .campus-tabnav summary { color: var(--text-2); }
+.campus .crumbs a, .campus-public .crumbs a { text-decoration: underline; text-underline-offset: 2px; }
+.campus .prose a, .campus-main p a, .campus-public-main p a, .notice a { text-decoration: underline; }

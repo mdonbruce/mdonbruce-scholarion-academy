@@ -22,7 +22,7 @@ export function Flash({ sp }: { sp: Record<string, string | undefined> }) {
       {sp.result && (
         <details>
           <summary>Result</summary>
-          <pre className="code tiny">{prettyJson(sp.result)}</pre>
+          <pre className="code tiny" tabIndex={0}>{prettyJson(sp.result)}</pre>
         </details>
       )}
     </div>
@@ -272,7 +272,7 @@ export function JsonBlock({ value, label = "Details" }: { value: unknown; label?
   return (
     <details className="card card-pad">
       <summary>{label}</summary>
-      <pre className="code tiny campus-json">{JSON.stringify(value, null, 2)}</pre>
+      <pre className="code tiny campus-json" tabIndex={0}>{JSON.stringify(value, null, 2)}</pre>
     </details>
   );
 }
@@ -307,5 +307,5 @@ export function Result({ value }: { value: unknown }) {
     );
   }
   if (Array.isArray(value) && !value.length) return <Empty title="Nothing to show." />;
-  return <pre className="code tiny campus-json">{typeof value === "string" ? value : JSON.stringify(value, null, 2)}</pre>;
+  return <pre className="code tiny campus-json" tabIndex={0}>{typeof value === "string" ? value : JSON.stringify(value, null, 2)}</pre>;
 }

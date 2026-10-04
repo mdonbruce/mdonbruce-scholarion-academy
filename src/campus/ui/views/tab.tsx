@@ -412,7 +412,7 @@ function AiControl({ t }: { t: T }) {
               <h3 className="small">{String(q.summary)}</h3>
               <details>
                 <summary className="small">Draft</summary>
-                <pre className="code tiny campus-json">{JSON.stringify(q.draft, null, 2).slice(0, 4000)}</pre>
+                <pre className="code tiny campus-json" tabIndex={0}>{JSON.stringify(q.draft, null, 2).slice(0, 4000)}</pre>
               </details>
               <div className="row">
                 <form method="post" action={api(t.slug, "a/ai.review")}>

@@ -244,7 +244,7 @@ export function CatalogView({ tenant, store, actor, sp }: { tenant: Tenant; stor
               </ul>
               <details>
                 <summary className="small">Diagram source (Mermaid)</summary>
-                <pre className="code tiny">{hub.diagram}</pre>
+                <pre className="code tiny" tabIndex={0}>{hub.diagram}</pre>
               </details>
             </section>
           )}

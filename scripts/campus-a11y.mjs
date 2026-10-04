@@ -41,7 +41,7 @@ for (const f of files) {
   for (const v of bad) for (const n of v.nodes) tally.set(`${v.id} [${v.impact}] ${n.replace(/:nth-child\(\d+\)/g, "")}`, (tally.get(`${v.id} [${v.impact}] ${n.replace(/:nth-child\(\d+\)/g, "")}`) ?? 0) + 1);
 }
 await browser.close();
-console.log(summary.join("\n"));
 if (tally.size) console.log("Distinct violations:\n" + [...tally.entries()].sort((a, b) => b[1] - a[1]).slice(0, 30).map(([k, v]) => `${v}× ${k}`).join("\n"));
+console.log(summary.filter((l) => l.startsWith("FAIL")).map((l) => l.slice(0, 160)).join("\n"));
 console.log(`axe: ${files.length - failed}/${files.length} screens without serious or critical violations`);
 process.exit(failed ? 1 : 0);

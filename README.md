@@ -51,6 +51,10 @@ State persists to `.data/db.json` when `SCHOLARION_PERSIST=1`. Run `npm run db:r
 15. **Language and region:** use the selector in the footer (or *Security & Privacy*) to switch the interface to Español or Français and prices to EUR, GBP, NGN or INR. The site picks a first guess from your browser. Checkout, renewals, receipts and the account page use the chosen currency. Regional prices are placeholders, not live exchange rates; course content stays in English with captions.
 16. **Claims checker:** *Staff → Claims checker* blocks degree, credit, salary and unregistered-partner claims. `/degrees` returns 404.
 
+## Scholarion Campus (multi-tenant SIS + LMS)
+
+`/campus` hosts the multi-tenant layer: three demonstration tenants (Scholarion Demo University, Scholaris AI Academy, TechDev Institution), 48 operational tabs, REST + GraphQL + gRPC APIs, LTI 1.3 Cloud Lab, governed AI, catalog and sandbox commerce. See [docs/campus/README.md](docs/campus/README.md) and the [status board](docs/campus/STATUS.md).
+
 ## Architecture
 
 ```

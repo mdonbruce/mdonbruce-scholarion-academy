@@ -870,7 +870,7 @@ function Grader({ c }: { c: C }) {
                   <p className="tiny muted">
                     Attempt {String(sub.attempt)} · {fmt(sub.createdAt, true)} {sub.late ? <Chip s="late" /> : null}
                   </p>
-                  {sub.body ? <pre className="code small campus-submission">{String(sub.body)}</pre> : sub.fileId ? <p>File submission ({String(sub.fileId)})</p> : sub.mode === "lti" ? <p>Cloud Lab submission (score passed back by the tool).</p> : null}
+                  {sub.body ? <pre className="code small campus-submission" tabIndex={0}>{String(sub.body)}</pre> : sub.fileId ? <p>File submission ({String(sub.fileId)})</p> : sub.mode === "lti" ? <p>Cloud Lab submission (score passed back by the tool).</p> : null}
                   <details>
                     <summary className="small">Annotate</summary>
                     <OpForm slug={c.slug} op={OPERATIONS["submission.annotate"]} back={here} values={{ submissionId: sub.id, page: "1", coords: "[0,0,100,20]" }} hide={["submissionId"]} />
@@ -1138,7 +1138,7 @@ function Tutor({ c }: { c: C }) {
         <section className="card card-pad" aria-live="polite">
           <p className="tiny muted">{reply.disclosure}</p>
           {reply.avatar && <p className="notice notice-info small">{reply.avatar.note}</p>}
-          <pre className="campus-tutor-text">{reply.text}</pre>
+          <pre className="campus-tutor-text" tabIndex={0}>{reply.text}</pre>
           {reply.citations.length > 0 && (
             <ol className="small">
               {reply.citations.map((ci) => (
@@ -1152,7 +1152,7 @@ function Tutor({ c }: { c: C }) {
           {reply.avatar && (
             <details>
               <summary className="small">Captions (WebVTT)</summary>
-              <pre className="code tiny">{reply.avatar.captionsVtt}</pre>
+              <pre className="code tiny" tabIndex={0}>{reply.avatar.captionsVtt}</pre>
             </details>
           )}
           {(c.actor.courseRoles[cid] ?? []).includes("student") && (
