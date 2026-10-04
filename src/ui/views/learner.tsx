@@ -1,4 +1,5 @@
 import type { accountVM, calendarVM, courseHomeVM, credentialsVM, dashboardVM, gradebookVM, gradesOverviewVM, itemVM, liveVM, moduleVM, myLearningVM, onboardingVM, Viewer } from "@/bff/views";
+import { LEAD_FACULTY } from "@/brand/faculty";
 import type { Notice, Product } from "@/platform/types";
 import { formatMoney } from "@/platform/pricing";
 import { t } from "@/i18n";
@@ -614,7 +615,7 @@ export function ItemView({ viewer, vm, flash, retake }: { viewer: V; vm: NonNull
             </div>
           ) : i.kind === "video" ? (
             <>
-              <VideoPlayer itemId={i.id} title={i.title} durationSec={i.video!.durationSec} transcript={i.video!.transcript} captions={i.video!.captions} resumeSec={vm.resumeSec} completed={vm.status === "completed"} notes={vm.notes} notesEnabled={vm.canView} />
+              <VideoPlayer itemId={i.id} title={i.title} durationSec={i.video!.durationSec} transcript={i.video!.transcript} captions={i.video!.captions} resumeSec={vm.resumeSec} completed={vm.status === "completed"} notes={vm.notes} notesEnabled={vm.canView} titleCard={{ course: c.title, presenter: { name: LEAD_FACULTY.name, role: LEAD_FACULTY.role, org: LEAD_FACULTY.org, photo: LEAD_FACULTY.photo.src, width: LEAD_FACULTY.photo.width, height: LEAD_FACULTY.photo.height } }} />
               {completeForm}
             </>
           ) : i.kind === "lab" && i.lab ? (

@@ -7,6 +7,7 @@ import { audit, requireTenant } from "./common";
 import { copyCheck } from "./claims";
 import { moduleKeyFor } from "./programs";
 import { DRAFT_LABEL, simLabFileName } from "./simlab";
+import { LEAD_FACULTY } from "../../brand/faculty";
 
 /**
  * Assessment & Project Studio — the Scholarion Curriculum Engine's generators for labs, in-class
@@ -81,6 +82,8 @@ export function contextHeader(store: TenantStore, offeringId: string, week: stri
     library: libs.map((l) => ({ key: l.key, title: l.title, version: l.version })),
     dataCards: spec.dataCards ?? [],
     lms: "Scholarion LMS",
+    instructor: { name: LEAD_FACULTY.name, role: LEAD_FACULTY.role, org: LEAD_FACULTY.org, photo: LEAD_FACULTY.photo.src },
+    covers: { slide: `covers/${offeringId}/${encodeURIComponent(week)}/slide.html`, titleCard: `covers/${offeringId}/${encodeURIComponent(week)}/title-card.html` },
     codingRequired: spec.codingRequired !== false,
     spec,
   };

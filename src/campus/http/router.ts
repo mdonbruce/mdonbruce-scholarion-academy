@@ -17,6 +17,7 @@ import { verifyCredential } from "../services/success";
 import { brochurePdf } from "../services/programs";
 import { simLabFileName, simLabHtml } from "../services/simlab";
 import { draftView, qtiXml } from "../services/assess";
+import { coverHtml, type CoverKind } from "../services/covers";
 import { redeemQrLogin, startMasquerade, stopMasquerade, activeGlobalAnnouncements } from "../services/admin";
 import { resolveApiToken, rateLimit, refreshToken, exchangeCode, scopeAllows } from "../services/integration";
 import * as lti from "../services/lti";
@@ -340,6 +341,12 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     const html = simLabHtml(rest[1], edition, { module: moduleNo, program: url.searchParams.get("program") ?? undefined });
     const name = simLabFileName(rest[1], edition, moduleNo);
     return new Response(html, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "content-disposition": `${url.searchParams.get("download") ? "attachment" : "inline"}; filename="${name}"`, "cache-control": "no-store", "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'", "x-content-type-options": "nosniff" } });
+  }
+  // Lecture cover slides and video title cards for any program module.
+  if (rest[0] === "covers" && rest[1] && rest[2] && rest[3] && method === "GET") {
+    const kind = rest[3].replace(/\.html$/, "") as CoverKind;
+    if (kind !== "slide" && kind !== "title-card") throw new CampusError("not_found", "Unknown cover type", 404);
+    return new Response(coverHtml(store, rest[1], decodeURIComponent(rest[2]), kind), { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'; img-src data: 'self'; base-uri 'none'; form-action 'none'", "x-content-type-options": "nosniff" } });
   }
   if (rest[0] === "assess" && rest[1] && (rest[2] === "qti.xml" || rest[2] === "item-bank.json") && method === "GET") {
     if (rest[2] === "qti.xml") return new Response(qtiXml(store, a, rest[1]), { status: 200, headers: { "content-type": "application/xml; charset=utf-8", "content-disposition": `attachment; filename="${rest[1]}-qti21.xml"`, "cache-control": "no-store" } });

@@ -1,4 +1,6 @@
 import type { Tenant, TenantStore } from "../../core";
+import { facultyByName } from "../../../brand/faculty";
+import { FacultyCard } from "../../../ui/components/faculty";
 import { CampusError } from "../../core";
 import type { Actor } from "../../iam";
 import * as prog from "../../services/programs";
@@ -406,13 +408,16 @@ export function ProgramPageView({ tenant, store, actor, slug, sp }: { tenant: Te
         <h2 id="pg-fac" className="card-title">
           Faculty and mentors
         </h2>
-        <ul>
-          {s.faculty.map((f) => (
-            <li key={f.name}>
-              <strong>{f.name}</strong>, {f.role}
-              {f.bio ? <p className="small">{f.bio}</p> : null}
-            </li>
-          ))}
+        <ul className="faculty-list">
+          {s.faculty.map((f) => {
+            const approved = facultyByName(f.name);
+            return (
+              <li key={f.name}>
+                {approved ? <FacultyCard f={approved} /> : <><strong>{f.name}</strong>, {f.role}</>}
+                {f.bio ? <p className="small">{f.bio}</p> : null}
+              </li>
+            );
+          })}
         </ul>
         <p className="tiny muted">Additional faculty, facilitators and mentors are listed once confirmed.</p>
       </section>

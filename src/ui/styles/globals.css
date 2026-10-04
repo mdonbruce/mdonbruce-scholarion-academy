@@ -1908,3 +1908,23 @@ details.acc > div {
 .campus-trace { padding-left: 1.2em; }
 .campus-trace li { margin: 2px 0; }
 .campus-agentlab textarea.mono, .campus-agentlab pre.mono, textarea.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.85rem; width: 100%; }
+
+/* Approved faculty photograph: always shown at its own proportions (width/height from the source), never stretched. */
+.faculty-photo { display: block; height: auto; max-width: 100%; border-radius: 8px; object-fit: cover; object-position: top center; background: var(--surface-2, #eef1f7); }
+.faculty-photo-round { border-radius: 50%; }
+.faculty-card { display: flex; align-items: center; gap: 14px; margin: 8px 0; }
+.faculty-card figcaption { display: flex; flex-direction: column; gap: 2px; }
+.faculty-name { font-weight: 700; }
+.faculty-role, .faculty-note { font-size: 0.9rem; color: var(--text-2); }
+.faculty-card-compact { gap: 10px; }
+.faculty-hero { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin: 8px 0 12px; }
+.faculty-list { list-style: none; padding: 0; margin: 0; }
+.hero-faculty { display: flex; align-items: center; gap: 10px; margin-top: 8px; color: #c9d4f0; }
+.campus-course-faculty { margin: 4px 0 12px; }
+.video-title-card { position: absolute; inset: 0; display: flex; align-items: center; gap: 5%; padding: 0 6%; background: #0b1f4d; color: #fff; pointer-events: none; }
+.video-title-card img { display: block; height: auto; max-height: 70%; width: auto; border-radius: 8px; }
+.video-title-card p { margin: 0; }
+.vtc-brand { color: #f2c66d; font-weight: 700; letter-spacing: 0.04em; font-size: 0.85rem; }
+.vtc-title { font-size: 1.4rem; font-weight: 700; line-height: 1.2; margin: 4px 0; }
+.vtc-course, .vtc-name { font-size: 0.9rem; color: #c9d4f0; }
+.video:has(.video-title-card) .play { position: absolute; right: 16px; bottom: 16px; z-index: 2; }

@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { facultyByName } from "../../../brand/faculty";
+import { FacultyCard } from "../../../ui/components/faculty";
 import { CampusError, type Row, type TenantStore } from "../../core";
 import { hasAny, type Actor } from "../../iam";
 import * as entity from "../../entity";
@@ -129,6 +131,16 @@ export function CourseView({ store, actor, slug, courseId, rest, sp }: { store: 
           AI tutor
         </a>
       </PageHead>
+      {(() => {
+        const fac = [...new Set(store.list("enrollments", (e) => e.courseId === courseId && e.role === "instructor" && e.state === "active").map((e) => String(store.get("users", String(e.userId))?.name ?? "")))].map((n) => facultyByName(n)).filter(Boolean);
+        return fac.length ? (
+          <div className="row campus-course-faculty" aria-label="Course faculty">
+            {fac.map((f) => (
+              <FacultyCard key={f!.slug} f={f!} compact />
+            ))}
+          </div>
+        ) : null;
+      })()}
       <div className="campus-course">
         <nav className="campus-coursenav" aria-label="Course">
           <ul>

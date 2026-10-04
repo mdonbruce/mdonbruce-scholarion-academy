@@ -1,4 +1,5 @@
 import { requestPrefs } from "@/i18n";
+import { FACULTY, LEAD_FACULTY, type FacultyMember } from "@/brand/faculty";
 import { installment, REGIONS } from "@/platform/pricing";
 import {
   capabilities,
@@ -80,11 +81,19 @@ export function exploreVM(sp: Record<string, string | string[] | undefined>) {
 /** Public educator profile: only catalog facts and confirmed bio/qualifications. */
 export function educatorVM(slug: string) {
   ensurePlatform();
+  const person = FACULTY.find((f) => f.slug === slug);
+  if (person) {
+    // A confirmed faculty member: the approved photo, name and role. As Lead Faculty they lead the
+    // Scholarion Academy catalog, so the academy's programs are listed (not claimed as sole instructor).
+    const academy = catalog.educator(catalog.educatorSlug(person.org));
+    const products = academy?.products ?? [];
+    return { slug: person.slug, name: person.name, products, bio: `${person.role}, ${person.org}. Leads the Scholarion Academy faculty and the design of its programs.`, qualifications: [] as string[], credentials: academy?.credentials ?? [], programs: products.filter((p) => p.type !== "course" && p.type !== "guided_project"), courses: products.filter((p) => p.type === "course" || p.type === "guided_project"), faculty: person, leadFaculty: null as FacultyMember | null };
+  }
   const e = catalog.educator(slug);
   if (!e) return null;
   const programs = e.products.filter((p) => p.type !== "course" && p.type !== "guided_project");
   const courses = e.products.filter((p) => p.type === "course" || p.type === "guided_project");
-  return { ...e, programs, courses };
+  return { ...e, programs, courses, faculty: null as FacultyMember | null, leadFaculty: e.name === LEAD_FACULTY.org ? LEAD_FACULTY : null };
 }
 
 export function productVM(slug: string, userId: string | null) {
@@ -99,6 +108,7 @@ export function productVM(slug: string, userId: string | null) {
   return {
     product,
     educatorHref: `/educators/${catalog.educatorSlug(product.educator)}`,
+    leadFaculty: product.educator === LEAD_FACULTY.org ? { ...LEAD_FACULTY, href: `/educators/${LEAD_FACULTY.slug}` } : null,
     saved: library.isSaved(userId, product.id),
     aidDiscount: userId ? commerce.aidDiscountFor(userId, product.id) : null,
     guided: product.type === "guided_project" ? guidedVM(product, userId) : null,

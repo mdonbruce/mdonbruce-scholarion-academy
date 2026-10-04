@@ -1,4 +1,5 @@
 import { ReviewsSection, Stars } from "../components/reviews";
+import { FacultyCard, FacultyPhoto } from "../components/faculty";
 import { formatMoney } from "@/platform/pricing";
 import { t } from "@/i18n";
 import type { aidApplyVM, checkoutVM, educatorVM, exploreVM, homeVM, pathwayVM, productVM, verifyVM, Viewer } from "@/bff/views";
@@ -405,6 +406,17 @@ export function ProductView({ viewer, vm, flash, openEnroll }: { viewer: Viewer;
             · {p.level} · {p.durationLabel} · {p.language} · Subtitles: {p.subtitles.join(", ")}
             {vm.reviews.summary.count === 0 ? " · No ratings yet" : ""}
           </p>
+          {vm.leadFaculty && (
+            <p className="hero-faculty small">
+              <FacultyPhoto size={40} round decorative />
+              <span>
+                Lead Faculty:{" "}
+                <a href={vm.leadFaculty.href} className="on-dark-link">
+                  {vm.leadFaculty.name}
+                </a>
+              </span>
+            </p>
+          )}
         </div>
       </section>
       <div className="container section" style={{ paddingTop: 28 }}>
@@ -1422,11 +1434,26 @@ export function EducatorView({ viewer, vm }: { viewer: Viewer; vm: NonNullable<R
         <nav className="crumbs" aria-label="Breadcrumb">
           <a href="/">Home</a> › <a href="/explore">Explore</a> › <span aria-current="page">{vm.name}</span>
         </nav>
-        <span className="badge badge-blue">Educator</span>
-        <h1 className="page-title" style={{ marginTop: 8 }}>
-          {vm.name}
-        </h1>
+        <span className="badge badge-blue">{vm.faculty ? vm.faculty.role : "Educator"}</span>
+        {vm.faculty ? (
+          <div className="faculty-hero">
+            <FacultyPhoto f={vm.faculty} size={148} />
+            <div>
+              <h1 className="page-title" style={{ marginTop: 8 }}>
+                {vm.name}
+              </h1>
+              <p className="faculty-role">
+                {vm.faculty.role}, {vm.faculty.org}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <h1 className="page-title" style={{ marginTop: 8 }}>
+            {vm.name}
+          </h1>
+        )}
         {vm.bio ? <p className="lede">{vm.bio}</p> : <p className="muted">No biography has been confirmed for this educator yet.</p>}
+        {vm.leadFaculty && <FacultyCard f={vm.leadFaculty} href={`/educators/${vm.leadFaculty.slug}`} />}
         <p className="small muted">
           In the current catalog: {vm.courses.length} course{vm.courses.length === 1 ? "" : "s"} or guided project{vm.courses.length === 1 ? "" : "s"} · {vm.programs.length} program{vm.programs.length === 1 ? "" : "s"}.
         </p>

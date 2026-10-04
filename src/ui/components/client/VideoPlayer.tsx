@@ -8,7 +8,12 @@ import { useEffect, useRef, useState } from "react";
  */
 type Note = { id: string; kind: "note" | "bookmark"; atSec: number; text: string };
 
-export function VideoPlayer({ itemId, title, durationSec, transcript, captions, resumeSec, completed, notes: initialNotes = [], notesEnabled = false }: { itemId: string; title: string; durationSec: number; transcript: string; captions: string[]; resumeSec: number; completed: boolean; notes?: Note[]; notesEnabled?: boolean }) {
+export interface VideoTitleCard {
+  course: string;
+  presenter: { name: string; role: string; org: string; photo: string; width: number; height: number };
+}
+
+export function VideoPlayer({ itemId, title, durationSec, transcript, captions, resumeSec, completed, notes: initialNotes = [], notesEnabled = false, titleCard }: { itemId: string; title: string; durationSec: number; transcript: string; captions: string[]; resumeSec: number; completed: boolean; notes?: Note[]; notesEnabled?: boolean; titleCard?: VideoTitleCard }) {
   const sentences = transcript.split(/(?<=\.)\s+/).filter(Boolean);
   const per = durationSec / Math.max(1, sentences.length);
   const [t, setT] = useState(resumeSec);
@@ -107,7 +112,21 @@ export function VideoPlayer({ itemId, title, durationSec, transcript, captions, 
         <button className="play" onClick={() => setPlaying((p) => !p)} aria-label={playing ? "Pause" : "Play"}>
           {playing ? "❚❚" : "▶"}
         </button>
-        {cc && <div className="cc">{sentences[idx]}</div>}
+        {titleCard && !playing && t < 1 ? (
+          <div className="video-title-card" aria-hidden="true">
+            <img src={titleCard.presenter.photo} width={titleCard.presenter.width} height={titleCard.presenter.height} alt="" />
+            <div>
+              <p className="vtc-brand">{titleCard.presenter.org}</p>
+              <p className="vtc-title">{title}</p>
+              <p className="vtc-course">{titleCard.course}</p>
+              <p className="vtc-name">
+                {titleCard.presenter.name} · {titleCard.presenter.role}
+              </p>
+            </div>
+          </div>
+        ) : (
+          cc && <div className="cc">{sentences[idx]}</div>
+        )}
       </div>
       <div className="row between small">
         <div className="row" style={{ ["--gap" as string]: "8px" }}>

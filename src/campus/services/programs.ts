@@ -6,6 +6,8 @@ import { PROGRAMS, P26_QUIZ, TRADEMARK_NOTICE, type ProgramSpec, type QuizItem, 
 import { LEARNING_PATHS, LIBRARY, P15_CHECKS, PROGRAMS_2, type LibraryModule } from "../academy/programs-data-2";
 import { PROGRAMS_3 } from "../academy/programs-data-3";
 import { DECIDED_BY, DECISIONS, decisionIso } from "../academy/decisions";
+import { facultyByName, fitSize } from "../../brand/faculty";
+import { facultyImageBytes } from "../../brand/faculty-assets";
 import { audit, notify, requireTenant } from "./common";
 import { copyCheck } from "./claims";
 import { renderBlocks, validateBlocks, type Block } from "./curriculum";
@@ -676,7 +678,23 @@ export async function brochurePdf(store: TenantStore, slugOrCode: string): Promi
   h("How to apply");
   p.howToApply.forEach((s, i) => write(`${i + 1}. ${s}`));
   h("Faculty");
-  for (const f of spec.faculty) write(`${f.name}, ${f.role}`);
+  for (const f of spec.faculty) {
+    const approved = facultyByName(f.name);
+    const bytes = approved ? facultyImageBytes(approved) : null;
+    if (approved && bytes) {
+      // The approved original photograph at its own proportions (never stretched or upscaled).
+      const img = await doc.embedPng(bytes);
+      const d = fitSize(approved.photo, 64, 75);
+      if (y - d.height < 60) {
+        page = doc.addPage([612, 792]);
+        y = 740;
+      }
+      page.drawImage(img, { x: M, y: y - d.height + 10, width: d.width, height: d.height });
+      page.drawText(ascii(approved.name), { x: M + d.width + 12, y: y - 4, size: 11, font: bold, color: rgb(0.08, 0.1, 0.2) });
+      page.drawText(ascii(`${approved.role}, ${approved.org}`), { x: M + d.width + 12, y: y - 20, size: 10, font, color: rgb(0.29, 0.34, 0.45) });
+      y -= d.height + 8;
+    } else write(`${f.name}, ${f.role}`);
+  }
   write("All payments on this staging site are sandbox only. Fees, dates and seats are read from the Scholaris catalog when this brochure is generated.", { size: 8 });
   metrics.inc("program_brochures_total", { program: spec.code });
   return doc.save();

@@ -27,6 +27,7 @@ import { ProgramIndexView, ProgramPageView } from "../src/campus/ui/views/progra
 import { generateDraft } from "../src/campus/services/assess";
 import { runLab } from "../src/campus/services/agentlabs";
 import { simLabHtml } from "../src/campus/services/simlab";
+import { coverHtml } from "../src/campus/services/covers";
 import { SIM_SCENARIOS } from "../src/campus/academy/sim-scenarios";
 
 process.env.CAMPUS_LOGS = "0";
@@ -35,6 +36,7 @@ const check = process.argv.includes("--check");
 const OUT = path.join(process.cwd(), "preview", "campus");
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
+fs.cpSync(path.join("public", "brand", "faculty"), path.join(OUT, "brand", "faculty"), { recursive: true });
 const css = fs.readFileSync("src/ui/styles/globals.css", "utf8");
 
 broker.reset();
@@ -58,7 +60,8 @@ function save(file: string, title: string, who: string, el: ReactElement) {
   }
   const m = CRASH.exec(html);
   if (m) failures.push(`${file}: page shows "${html.slice(Math.max(0, m.index - 120), m.index + 160).replace(/<[^>]+>/g, " ")}"`);
-  fs.writeFileSync(path.join(OUT, file), doc(title, html));
+  // Static preview: serve the approved brand images from the preview folder itself.
+  fs.writeFileSync(path.join(OUT, file), doc(title, html.replace(/src="\/brand\//g, 'src="brand/')));
   index.push({ file, title, who });
 }
 
@@ -216,6 +219,11 @@ page("academy", "admin", "t/module-library", "Module Library & Catalog Consolida
   runLab(as("academy", "student4").store, as("academy", "student4").actor, lab.id, "practice");
   const g = runLab(as("academy", "student4").store, as("academy", "student4").actor, lab.id, "graded", String(lab.referenceCode));
   page("academy", "student4", `agent-labs/${lab.id}?run=${g.runId}`, "Agentic Cloud Lab — workspace and traces");
+  for (const kind of ["slide", "title-card"] as const) {
+    const file = `cover-p15-weekend3-${kind}.html`;
+    fs.writeFileSync(path.join(OUT, file), coverHtml(as("academy", "admin").store, "off_academy_15", "3", kind));
+    index.push({ file, title: `#15 Weekend 3 — ${kind === "slide" ? "lecture cover slide" : "video title card"}`, who: "instructor" });
+  }
   for (const sc of SIM_SCENARIOS) for (const ed of ["student", "instructor", "app"] as const) {
     const file = `simlab-${sc.key}-${ed}.html`;
     fs.writeFileSync(path.join(OUT, file), simLabHtml(sc.key, ed, { module: "3" }));

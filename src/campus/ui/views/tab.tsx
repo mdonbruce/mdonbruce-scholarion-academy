@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { FacultyCard } from "../../../ui/components/faculty";
 import { broker, CampusError, type Row, type TenantStore } from "../../core";
 import { hasAny, type Actor } from "../../iam";
 import * as entity from "../../entity";
@@ -1179,6 +1180,15 @@ function AssessmentStudio({ t }: { t: T }) {
             {String(view.title)} — {t.sp.edition === "student" ? "student edition" : "instructor edition"}
           </h2>
           <p className="draft-label">{String(view.label)}</p>
+          <FacultyCard compact note="Lab guides, worksheets, cover slides and video title cards carry this approved photo." />
+          {(() => {
+            const cv = (view.context as { covers?: { slide: string; titleCard: string } }).covers;
+            return cv ? (
+              <p className="small">
+                <a href={`${api1}/${cv.slide}`}>Lecture cover slide</a> · <a href={`${api1}/${cv.titleCard}`}>Video title card</a>
+              </p>
+            ) : null;
+          })()}
           <div className="row">
             {view.kind === "quiz" && (
               <>

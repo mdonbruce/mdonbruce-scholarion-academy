@@ -1,5 +1,7 @@
 import { CampusError } from "../core";
 import { scenarioByKey, SIM_SCENARIOS, type SimScenario } from "../academy/sim-scenarios";
+import { fitSize, LEAD_FACULTY } from "../../brand/faculty";
+import { facultyDataUri } from "../../brand/faculty-assets";
 
 /**
  * Simulated Module labs: Module_Student_Lab.html, Module_Instructor_Lab.html and
@@ -40,6 +42,7 @@ body.student-view .instructor-only{display:none!important}body:not(.student-view
 .timer{font-size:1.6rem;font-variant-numeric:tabular-nums;font-weight:700}
 .kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}.kpi div{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px}.kpi b{display:block;font-size:1.3rem}
 .sr{position:absolute;left:-9999px}
+.faculty{display:flex;gap:10px;align-items:center;margin:6px 0}.faculty img{display:block;height:auto;border-radius:6px;border:1px solid var(--line)}.brandline{font-weight:700;letter-spacing:.04em;color:var(--brand)}
 `;
 
 /** The shared agent engine (plain JS, no template literals). */
@@ -167,6 +170,15 @@ kpis();log();
 })();
 `;
 
+/** The approved faculty photo (embedded original, never stretched) with name and Scholarion Academy branding. */
+function facultyBlock() {
+  const f = LEAD_FACULTY;
+  const uri = facultyDataUri(f);
+  if (!uri) return `<p class="tiny">${esc(f.name)} · ${esc(f.role)}, ${esc(f.org)}</p>`;
+  const d = fitSize(f.photo, 64, 74);
+  return `<figure class="faculty"><img src="${uri}" width="${d.width}" height="${d.height}" alt="${esc(f.photo.alt)}"><figcaption><strong>${esc(f.name)}</strong><br><span class="tiny">${esc(f.role)}, ${esc(f.org)}</span></figcaption></figure>`;
+}
+
 function head(title: string) {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><style>${CSS}</style></head>`;
 }
@@ -213,7 +225,7 @@ function labPage(s: SimScenario, mode: "student" | "instructor", ctx: { program?
 <p class="tiny">Adapting: slower groups do Parts 1–3 in Auto policy only; faster groups add a new tool and a test for it (worksheet item 10).</p></section>
 <button type="button" class="ghost student-return" id="toInstructor">Return to instructor mode</button>` : "";
   return `${head(title)}<body class="${inst ? "instructor" : "student"}"><div class="wrap">
-<header class="top"><div><p class="tiny muted">${esc(ctx.program ?? "Scholaris AI Academy")} · ${esc(s.org)}</p><h1>${esc(title)}</h1></div><span class="draft">${esc(DRAFT_LABEL)}</span></header>
+<header class="top"><div><p class="tiny"><span class="brandline">Scholarion Academy</span> · ${esc(ctx.program ?? "Scholaris AI Academy")} · ${esc(s.org)}</p><h1>${esc(title)}</h1>${facultyBlock()}</div><span class="draft">${esc(DRAFT_LABEL)}</span></header>
 ${control}
 <section class="card" aria-labelledby="ov-h"><h2 id="ov-h">Overview</h2><p>${esc(s.orgNote)} You'll work with a <strong>${esc(s.title)}</strong>: an agent loop that decides, calls a tool, observes the result and repeats until it finishes or reaches a step limit of ${s.stepLimit}. About ${total} minutes.</p>
 <h3>Learning outcomes</h3><ul>${s.outcomes.map((o) => `<li><strong>${esc(o.id)}</strong> (${esc(o.bloom)}): ${esc(o.text)}</li>`).join("")}</ul>
@@ -243,7 +255,7 @@ ${control}
 function appPage(s: SimScenario, ctx: { program?: string; module?: string }) {
   const title = `Module ${ctx.module ?? ""} Simulated Application Demo — ${s.title}`.replace(/\s+/g, " ");
   return `${head(title)}<body><div class="wrap">
-<header class="top"><div><p class="tiny muted">${esc(s.org)} · class demonstration</p><h1>${esc(s.title)} <span class="tiny muted">(simulated)</span></h1></div><span class="draft">${esc(DRAFT_LABEL)}</span></header>
+<header class="top"><div><p class="tiny"><span class="brandline">Scholarion Academy</span> · ${esc(s.org)} · class demonstration</p><h1>${esc(s.title)} <span class="tiny muted">(simulated)</span></h1>${facultyBlock()}</div><span class="draft">${esc(DRAFT_LABEL)}</span></header>
 <p class="tiny muted">${esc(s.orgNote)} Decisions come from a visible rule-based policy; connect a model provider in the Cloud Lab to swap in a live model behind the same tools, gates and guardrails.</p>
 <div class="grid g3">
 <section class="card" aria-labelledby="in-h"><h2 id="in-h">Inbox</h2><p class="tiny">Sample messages</p><div id="samples" role="group" aria-label="Sample messages"></div>

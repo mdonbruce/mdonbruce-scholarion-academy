@@ -10,7 +10,7 @@ type P = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: P): Promise<Metadata> {
   const vm = educatorVM((await params).slug);
   if (!vm) return {};
-  return { title: `${vm.name} — educator`, description: vm.bio ?? `Courses and programs by ${vm.name}.`, alternates: { canonical: `/educators/${vm.slug}` } };
+  return { title: `${vm.name} — ${vm.faculty ? vm.faculty.role : "educator"}`, description: vm.bio ?? `Courses and programs by ${vm.name}.`, alternates: { canonical: `/educators/${vm.slug}` }, ...(vm.faculty ? { openGraph: { title: vm.name, description: vm.bio ?? undefined, images: [{ url: vm.faculty.photo.src, width: vm.faculty.photo.width, height: vm.faculty.photo.height, alt: vm.faculty.photo.alt }] } } : {}) };
 }
 
 export default async function Page({ params }: P) {
@@ -18,7 +18,9 @@ export default async function Page({ params }: P) {
   const vm = educatorVM(slug);
   if (!vm) notFound();
   const ld = [
-    { "@context": "https://schema.org", "@type": "Organization", name: vm.name, ...(vm.bio ? { description: vm.bio } : {}) },
+    vm.faculty
+      ? { "@context": "https://schema.org", "@type": "Person", name: vm.name, jobTitle: vm.faculty.role, image: vm.faculty.photo.src, worksFor: { "@type": "Organization", name: vm.faculty.org } }
+      : { "@context": "https://schema.org", "@type": "Organization", name: vm.name, ...(vm.bio ? { description: vm.bio } : {}) },
     breadcrumbLd([
       ["Home", "/"],
       ["Explore", "/explore"],

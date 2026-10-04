@@ -191,7 +191,7 @@ describe("Agentic Cloud Labs (Tab 54)", () => {
     assert.ok(r.criteria.find((c) => c.key === "permissions")!.earned < 15);
     const detail = al.runDetail(as("academy", "student2", false).store, s.actor, r.runId);
     assert.ok(detail.traces.some((t) => t.trace.some((row) => row.type === "violation")));
-    assert.ok(detail.traces.every((t) => t.trace.every((row) => row.type !== "approval")), "no approval gates");
+    assert.ok(detail.traces.every((t) => t.trace.every((row) => (row.type as string) !== "approval")), "no approval gates");
     const looping = JSON.stringify({ routes: [{ intent: "x", whenAny: ["hv-"], steps: Array.from({ length: 8 }, () => ({ tool: "lookup_booking", arg: "id" })) }] });
     const b = al.runLab(as("academy", "student2", false).store, s.actor, labId, "practice", looping);
     assert.ok(b.criteria.find((c) => c.key === "budget")!.earned < 15, "budget enforced");
