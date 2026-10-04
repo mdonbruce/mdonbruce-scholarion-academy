@@ -1835,3 +1835,4 @@ details.acc > div {
 .campus-calgrid td { min-width: 110px; height: 84px; vertical-align: top; }
 .campus-calday { list-style: none; padding: 0; margin: 2px 0 0; font-size: 0.78rem; }
 .campus-calday li { margin-bottom: 2px; }
+.campus-program .eyebrow { color: var(--text-2, #334155); }
