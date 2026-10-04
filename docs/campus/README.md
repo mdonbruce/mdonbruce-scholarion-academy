@@ -110,7 +110,7 @@ npm run campus:docs        # regenerate schemas, OpenAPI, runbooks, threat model
 src/campus/core.ts           tenants, broker (per-tenant stores), outbox + idempotent consumers, audit, metrics
 src/campus/iam.ts            actors, sessions, TOTP, role grants, support grants, act-as
 src/campus/permissions.ts    permission matrix with account inheritance and locks
-src/campus/registry.ts       247 resources and 66 tabs (fields, permissions, runbooks, threats)
+src/campus/registry.ts       253 resources and 66 tabs (fields, permissions, runbooks, threats)
 src/campus/entity.ts         generic CRUD with authorization, validation, publish checks, tombstones
 src/campus/services/*        domain services (curriculum, assessment, grading, sis, ai, lti, academy, tutor, proctor, platform…)
 src/campus/http/*            REST router, operations registry, OpenAPI, GraphQL, gRPC

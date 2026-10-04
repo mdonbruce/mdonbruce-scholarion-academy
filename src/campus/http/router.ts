@@ -20,6 +20,8 @@ import { simLabFileName, simLabHtml } from "../services/simlab";
 import { answersLocked, pinFor } from "../services/projection";
 import { gradebookCsv as gradedCsv } from "../services/graded";
 import { bundleZip, moduleStudioBundle, readOutput, studioLmsPackage } from "../services/studio";
+import { importForeignPackage } from "../services/lmsimport";
+import { importStandards } from "../services/outcomes";
 import * as camp from "../services/campaigns";
 import * as designPkg from "../services/design";
 import * as cciSvc from "../services/cci";
@@ -325,6 +327,16 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     const file = body.file as File | undefined;
     if (!file || typeof file === "string" || typeof (file as Blob).arrayBuffer !== "function") throw new CampusError("invalid", "Choose a file to upload.", 422);
     const bytes = Buffer.from(await (file as Blob).arrayBuffer());
+    // Course packages from other platforms and standards CSVs are imported directly (never stored as files).
+    if (body.purpose === "lms_import") {
+      if (bytes.length > 100 * 1024 * 1024) throw new CampusError("too_large", "Packages are limited to 100 MB.", 413);
+      const r = importForeignPackage(store, a, String(body.courseId ?? ""), bytes, { idempotencyKey: (body.idempotencyKey as string) || undefined, platform: (body.platform as "moodle") || undefined });
+      return ok(c, r, 201, {}, `Imported a ${r.platform === "ims" ? "content" : r.platform} package — see the import report.`);
+    }
+    if (body.purpose === "outcomes_import") {
+      const r = importStandards(store, a, { csv: bytes.toString("utf8"), courseId: (body.courseId as string) || null, dryRun: body.dryRun === "true" || body.dryRun === "on", source: (body.source as string) || file.name });
+      return ok(c, r, r.dryRun ? 200 : 201, {}, `${r.dryRun ? "Dry run" : "Imported"}: ${r.outcomes.create} new and ${r.outcomes.update} updated outcomes, ${r.groups.create + r.groups.update} folders, ${r.issues.length} issue(s).`);
+    }
     const purpose = (String(body.purpose ?? "") || (body.assignmentId || body.gradedItemId ? "submission" : body.courseId ? "course" : "personal")) as "course" | "submission" | "personal";
     const r = requestUpload(store, a, { name: file.name, mime: mimeFor(file.name, file.type), size: bytes.length, courseId: (body.courseId as string) || null, folderId: (body.folderId as string) || null, purpose });
     receiveUpload(store, String(r.file.id), bytes);

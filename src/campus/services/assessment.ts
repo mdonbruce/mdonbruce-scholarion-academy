@@ -1,3 +1,4 @@
+import { assertParticipation } from "./terms";
 import { CampusError, hmac, nowIso, nowMs, type Row, type TenantStore } from "../core";
 import { registerHooks } from "../entity";
 import { hasAny, type Actor } from "../iam";
@@ -23,6 +24,7 @@ export function submit(store: TenantStore, a: Actor, assignmentId: string, input
   if (!asg || asg.state !== "published") throw new CampusError("not_found", "Assignment not found", 404);
   const courseId = asg.courseId as string;
   if (!hasAny(a, ["student"], courseId)) throw new CampusError("forbidden", "Only students in this course can submit.", 403);
+  assertParticipation(store, a, courseId, "student");
   const crs = store.get("courses", courseId);
   if (crs?.concludedAt && String(crs.concludedAt) <= nowIso()) throw new CampusError("concluded", "This course has concluded and is read-only.", 423);
   if (store.list("enrollments", (e) => e.userId === a.id && e.courseId === courseId && e.state === "active" && !!e.audit).length) throw new CampusError("audit_only", "You're auditing this course. Buy it or use your subscription to submit graded work.", 402);
@@ -290,6 +292,7 @@ export function startAttempt(store: TenantStore, a: Actor, quizId: string, opts:
   const courseId = quiz.courseId as string;
   // Transactional start: availability, enrollment, attempt count, accommodations.
   if (!hasAny(a, ["student"], courseId)) throw new CampusError("forbidden", "Only enrolled students can take this quiz.", 403);
+  assertParticipation(store, a, courseId, "student");
   assertAccessible(store, a, "quiz", quiz.id);
   const d = quizDates(store, quiz, a.id);
   if (!d.assigned) throw new CampusError("not_assigned", "This quiz isn't assigned to you.", 403);

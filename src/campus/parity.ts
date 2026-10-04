@@ -1237,23 +1237,26 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.13",
   "feature": "Outcomes account/course",
-  "status": "PARTIAL",
-  "evidence": "outcomes entity (no courseId); outcome_alignments.courseId",
-  "gap": "no course-level outcome definitions"
+  "status": "DONE",
+  "evidence": "outcomes.courseId (blank = account); outcomes.ts:outcomesFor; grading.ts:outcomeResults scoped to account + course; structure.tsx:OutcomesPanel",
+  "gap": "",
+  "closedIn": "this build"
  },
  {
   "section": "3.13",
   "feature": "Outcome folders",
-  "status": "NOT_STARTED",
-  "evidence": "no outcome group/folder entity",
-  "gap": "not implemented"
+  "status": "DONE",
+  "evidence": "outcome_groups (nested, course or account); outcomes.ts:createGroup/moveItem (no cycles)/outcomeTree; ops outcomes.tree/group_create/move",
+  "gap": "",
+  "closedIn": "this build"
  },
  {
   "section": "3.13",
   "feature": "Mastery scales",
-  "status": "PARTIAL",
-  "evidence": "outcomes.masteryThreshold",
-  "gap": "single threshold only; no multi-level scale/ratings"
+  "status": "DONE",
+  "evidence": "mastery_scales (2–10 ordered ratings, mastery level); outcomes.ts:validateScale/ratingFor; outcomeResults returns the rating",
+  "gap": "",
+  "closedIn": "this build"
  },
  {
   "section": "3.13",
@@ -1265,9 +1268,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.13",
   "feature": "Import standards",
-  "status": "NOT_STARTED",
-  "evidence": "none found",
-  "gap": "no standards import"
+  "status": "DONE",
+  "evidence": "outcomes.ts:importStandards (outcomes CSV, dry run, idempotent by vendor_guid, per-row issues)/exportStandards; upload purpose outcomes_import",
+  "gap": "",
+  "closedIn": "this build"
  },
  {
   "section": "3.13",
@@ -1455,9 +1459,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.19",
   "feature": "Apps/LTI placements",
-  "status": "PARTIAL",
-  "evidence": "tool_registrations (tenant); module_items kind lti",
-  "gap": "no course-level app install or placement config"
+  "status": "DONE",
+  "evidence": "tool_installs (course scope) with placements; apps.ts:installTool/updatePlacements/setHiddenInCourse; AppsPanel",
+  "gap": "",
+  "closedIn": "this build"
  },
  {
   "section": "3.19",
@@ -1651,16 +1656,18 @@ export const PARITY: ParityRow[] = [
  {
   "section": "6",
   "feature": "Terms with role access overrides",
-  "status": "NOT_STARTED",
-  "evidence": "terms entity has no access override fields",
-  "gap": "no per-role term date overrides"
+  "status": "DONE",
+  "evidence": "term_role_overrides; terms.ts:setRoleOverride/accessWindow/assertParticipation (enforced in assessment.submit, startAttempt, graded.submit); TermAccessPanel",
+  "gap": "",
+  "closedIn": "this build"
  },
  {
   "section": "6",
   "feature": "Account grading schemes / grading-period sets",
-  "status": "PARTIAL",
-  "evidence": "grading_schemes courseId blank=account; grading_periods per term",
-  "gap": "no grading-period set entity attachable to terms/accounts"
+  "status": "DONE",
+  "evidence": "grading_period_sets (terms, weighted, account default); terms.ts:createPeriodSet/addPeriodToSet/periodsForCourse; grading.ts:periodClosed uses the course's set",
+  "gap": "",
+  "closedIn": "this build"
  },
  {
   "section": "6",
@@ -1700,9 +1707,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "6",
   "feature": "Account LTI apps inherited",
-  "status": "PARTIAL",
-  "evidence": "tool_registrations tenant-wide",
-  "gap": "no per-account install/inheritance"
+  "status": "DONE",
+  "evidence": "tool_installs (account scope) inherited down the account tree; courses can hide; apps.ts:placementsFor",
+  "gap": "",
+  "closedIn": "this build"
  },
  {
   "section": "6",
@@ -1770,9 +1778,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "7",
   "feature": "Import other LMS packages",
-  "status": "NOT_STARTED",
-  "evidence": "importPackage requires imsmanifest",
-  "gap": "no Moodle/Blackboard/D2L converters"
+  "status": "DONE",
+  "evidence": "lmsimport.ts: Moodle .mbz (tar.gz/zip), Blackboard (x-bb .dat), D2L (d2l_2p0) → IMS package → content.importPackage (quarantine, issue report, idempotency); ForeignImportPanel",
+  "gap": "",
+  "closedIn": "this build"
  },
  {
   "section": "7",
@@ -2081,9 +2090,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "12",
   "feature": "LTI placements list",
-  "status": "NOT_STARTED",
-  "evidence": "none found",
-  "gap": "no placement model/endpoint"
+  "status": "DONE",
+  "evidence": "apps.ts:PLACEMENTS, placementsFor (course + inherited accounts, nearest wins); ops apps.placements/apps.placement_types",
+  "gap": "",
+  "closedIn": "this build"
  },
  {
   "section": "12",

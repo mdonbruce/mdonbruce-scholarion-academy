@@ -708,6 +708,21 @@ CREATE TABLE IF NOT EXISTS tool_registrations (
   secret_ref text
 );
 
+-- App install (tab: integration)
+CREATE TABLE IF NOT EXISTS tool_installs (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  tool_id text,
+  scope text,
+  account_id text,
+  course_id text,
+  placements jsonb,
+  state text
+);
+
 -- Sync job (tab: integration)
 CREATE TABLE IF NOT EXISTS sync_jobs (
   id text PRIMARY KEY,
@@ -830,7 +845,34 @@ CREATE TABLE IF NOT EXISTS terms (
   ends_at date NOT NULL,
   registration_opens timestamptz NOT NULL,
   registration_closes timestamptz NOT NULL,
-  max_credits numeric
+  max_credits numeric,
+  enforce_access boolean
+);
+
+-- Term role access (tab: registration)
+CREATE TABLE IF NOT EXISTS term_role_overrides (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  term_id text,
+  role text,
+  starts_at timestamptz,
+  ends_at timestamptz
+);
+
+-- Grading-period set (tab: gradebook)
+CREATE TABLE IF NOT EXISTS grading_period_sets (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  title text,
+  term_ids jsonb,
+  weighted boolean,
+  account_default boolean
 );
 
 -- Catalog entry (tab: registration)
@@ -1052,8 +1094,61 @@ CREATE TABLE IF NOT EXISTS outcomes (
   description text,
   mastery_threshold numeric,
   framework text,
+  group_id text,
+  course_id text,
+  scale_id text,
+  vendor_guid text,
   calculation_method text CHECK (calculation_method IN ('decaying_average', 'n_mastery', 'latest', 'highest', 'average')),
   n_mastery numeric
+);
+CREATE INDEX IF NOT EXISTS outcomes_group_id ON outcomes (group_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS outcomes_course_id ON outcomes (course_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS outcomes_scale_id ON outcomes (scale_id) WHERE deleted_at IS NULL;
+
+-- Outcome folder (tab: outcomes)
+CREATE TABLE IF NOT EXISTS outcome_groups (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  title text NOT NULL,
+  description text,
+  parent_id text,
+  course_id text,
+  vendor_guid text
+);
+CREATE INDEX IF NOT EXISTS outcome_groups_parent_id ON outcome_groups (parent_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS outcome_groups_course_id ON outcome_groups (course_id) WHERE deleted_at IS NULL;
+
+-- Mastery scale (tab: outcomes)
+CREATE TABLE IF NOT EXISTS mastery_scales (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  title text NOT NULL,
+  ratings jsonb,
+  mastery_points numeric,
+  course_id text
+);
+CREATE INDEX IF NOT EXISTS mastery_scales_course_id ON mastery_scales (course_id) WHERE deleted_at IS NULL;
+
+-- Standards import (tab: outcomes)
+CREATE TABLE IF NOT EXISTS outcome_imports (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  source text,
+  course_id text,
+  created numeric,
+  updated numeric,
+  issues jsonb,
+  by text,
+  at timestamptz
 );
 
 -- Outcome alignment (tab: outcomes)
@@ -3742,7 +3837,9 @@ CREATE TABLE IF NOT EXISTS grading_periods (
   name text NOT NULL,
   starts_at timestamptz NOT NULL,
   ends_at timestamptz NOT NULL,
-  close_at timestamptz NOT NULL
+  close_at timestamptz NOT NULL,
+  set_id text,
+  weight numeric
 );
 CREATE INDEX IF NOT EXISTS grading_periods_term_id ON grading_periods (term_id) WHERE deleted_at IS NULL;
 

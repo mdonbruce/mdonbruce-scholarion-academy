@@ -65,8 +65,8 @@ Weighted groups, drop rules, late/missing policies, versioned rubrics, posting, 
 - **Depends on:** Assessment, Rubrics, Outcomes.
 - **Typical failures:** 412 on stale edits; unposted grades not visible.
 - **Recovery:** Reload and re-apply edits; post explicitly; check audit for release history.
-- **Resources:** `assignment_groups`, `grades`, `rubrics`, `posting_policies`, `peer_reviews`, `annotations`, `grading_periods`, `grading_schemes`, `grade_history`, `comment_library`, `submission_comments`, `gradebook_notes`
-- **Operations:** `grader.queue`, `gradebook.grid`, `grades.set`, `grades.post`, `grades.select_provisional`, `grades.final_override`, `grades.curve`, `grades.default`, `grades.message_students_who`, `grades.export_csv`, `grades.import_csv`, `grades.history`, `grades.totals`, `rubric.new_version`, `submission.annotate`, `submission.comment`, `submission.comments`, `ai.draft_feedback`, `gradebook.cell`, `grades.set_group`
+- **Resources:** `assignment_groups`, `grades`, `rubrics`, `posting_policies`, `peer_reviews`, `annotations`, `grading_periods`, `grading_period_sets`, `grading_schemes`, `grade_history`, `comment_library`, `submission_comments`, `gradebook_notes`
+- **Operations:** `grader.queue`, `gradebook.grid`, `grades.set`, `grades.post`, `grades.select_provisional`, `grades.final_override`, `grades.curve`, `grades.default`, `grades.message_students_who`, `grades.export_csv`, `grades.import_csv`, `grades.history`, `grades.totals`, `rubric.new_version`, `submission.annotate`, `submission.comment`, `submission.comments`, `ai.draft_feedback`, `grading_periods.set_create`, `grading_periods.add`, `grading_periods.for_course`, `gradebook.cell`, `grades.set_group`
 - **Who sees it:** admin, instructor, ta, student, observer
 
 ## 6. Collaboration
@@ -113,8 +113,8 @@ LTI 1.3 tools, OneRoster sync jobs with diff reports, signed webhooks with retri
 - **Depends on:** Secret manager references, outbox.
 - **Typical failures:** Webhook failures, sync conflicts.
 - **Recovery:** Replay from dead letter; re-run the idempotent sync with the same key.
-- **Resources:** `tool_registrations`, `sync_jobs`, `webhooks`, `webhook_deliveries`
-- **Operations:** `oneroster.export`, `oneroster.import`, `sis.import`, `webhooks.create`, `webhooks.deliver`, `webhooks.replay`, `outbox.replay`, `lti.deep_link`, `lti.deep_link_return`, `lti.register`, `lti.rotate_key`
+- **Resources:** `tool_registrations`, `tool_installs`, `sync_jobs`, `webhooks`, `webhook_deliveries`
+- **Operations:** `oneroster.export`, `oneroster.import`, `sis.import`, `webhooks.create`, `webhooks.deliver`, `webhooks.replay`, `outbox.replay`, `lti.deep_link`, `lti.deep_link_return`, `lti.register`, `lti.rotate_key`, `apps.placement_types`, `apps.install`, `apps.placements_update`, `apps.course_visibility`, `apps.placements`
 - **Who sees it:** admin
 
 ## 10. Admissions
@@ -131,14 +131,14 @@ Applicants, applications, document checklists, review and decision letters.
 
 ## 11. Registration & Records
 
-Terms, catalog, holds, validated registration (window, holds, prerequisites, conflicts, capacity, credits) and unofficial transcripts.
+Terms (with per-role access windows that make a course read-only outside them), catalog, holds, validated registration (window, holds, prerequisites, conflicts, capacity, credits) and unofficial transcripts.
 
 - **Purpose:** Authoritative registration; emits EnrollmentCommitted.
 - **Depends on:** Holds, academic history, sections.
 - **Typical failures:** Registration refused with a reason; waitlisted when full.
 - **Recovery:** Release hold / adjust capacity; idempotent retry with the same key.
-- **Resources:** `terms`, `catalog_entries`, `registrations`, `holds`, `academic_history`
-- **Operations:** `registration.check`, `registration.register`, `registration.drop`, `records.transcript`, `ai.registration_guide`
+- **Resources:** `terms`, `term_role_overrides`, `catalog_entries`, `registrations`, `holds`, `academic_history`
+- **Operations:** `registration.check`, `registration.register`, `registration.drop`, `records.transcript`, `ai.registration_guide`, `terms.access`, `terms.role_override`, `terms.enforce`, `terms.window`
 - **Who sees it:** admin, registrar, advisor, student
 
 ## 12. Financial Aid & Accounts
@@ -179,14 +179,14 @@ Zoom/Teams sessions through scoped connectors (disabled by default) and attendan
 
 ## 15. Outcomes & Evidence
 
-Outcomes aligned to rubric criteria and questions, mastery rollups and evidence exports (demonstration only).
+Outcomes aligned to rubric criteria and questions, mastery rollups and evidence exports (demonstration only). Outcome folders, account- and course-level outcomes, multi-level mastery scales, and standards import/export in the outcomes CSV format (dry run, idempotent by standard ID, per-row issue report).
 
 - **Purpose:** Outcome alignment and mastery.
 - **Depends on:** Rubrics, grades, questions.
 - **Typical failures:** Empty rollups when nothing aligned.
 - **Recovery:** Align criteria/questions, regrade or recompute.
-- **Resources:** `outcomes`, `outcome_alignments`, `evidence_exports`
-- **Operations:** `mastery.gradebook`, `outcomes.results`, `outcomes.evidence_export`
+- **Resources:** `outcomes`, `outcome_groups`, `mastery_scales`, `outcome_imports`, `outcome_alignments`, `evidence_exports`
+- **Operations:** `mastery.gradebook`, `outcomes.results`, `outcomes.evidence_export`, `outcomes.tree`, `outcomes.group_create`, `outcomes.move`, `outcomes.scale_create`, `outcomes.import`, `outcomes.export_csv`
 - **Who sees it:** admin, designer, instructor
 
 ## 16. Student Success & Advising
@@ -450,7 +450,7 @@ Course copy with date shifting, package import/export, blueprint sync with locks
 - **Typical failures:** Import issues listed in report; locked items blocked.
 - **Recovery:** Fix issues and rerun (idempotent).
 - **Resources:** `content_jobs`, `blueprint_syncs`, `shared_content`
-- **Operations:** `ai.migration_plan`, `content.copy`, `content.import_package`, `blueprint.associate`, `blueprint.lock`, `blueprint.preview`, `blueprint.sync`, `library.share`, `library.list`, `library.import`
+- **Operations:** `ai.migration_plan`, `content.copy`, `content.import_foreign`, `content.import_package`, `blueprint.associate`, `blueprint.lock`, `blueprint.preview`, `blueprint.sync`, `library.share`, `library.list`, `library.import`
 - **Who sees it:** admin, designer, instructor
 
 ## 38. Developer Keys & API

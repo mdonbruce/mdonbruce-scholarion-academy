@@ -1,3 +1,4 @@
+import { assertParticipation } from "./terms";
 import crypto from "node:crypto";
 import { CampusError, nowIso, type Row, type TenantStore } from "../core";
 import { hasAny, type Actor } from "../iam";
@@ -290,6 +291,7 @@ export function submit(store: TenantStore, a: Actor, itemId: string, payload: Re
   const item = itemRow(store, itemId);
   const courseId = String(item.courseId);
   if (!learner(a, courseId)) throw new CampusError("forbidden", "Graded attempts are for enrolled learners.", 403);
+  assertParticipation(store, a, courseId, "student");
   if (!idempotencyKey || idempotencyKey.length > 120) throw new CampusError("invalid", "An idempotency key is required.", 422);
   const dup = store.list("graded_submissions", (s) => s.itemId === item.id && s.userId === a.id && s.idempotencyKey === idempotencyKey && !["infra_failed", "rejected"].includes(String(s.state)))[0];
   if (dup) return { ...submissionResult(dup), duplicate: true };

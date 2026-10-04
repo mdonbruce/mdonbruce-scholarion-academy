@@ -61,7 +61,7 @@
     },
     {
       "name": "Registration & Records",
-      "description": "Terms, catalog, holds, validated registration (window, holds, prerequisites, conflicts, capacity, credits) and unofficial transcripts."
+      "description": "Terms (with per-role access windows that make a course read-only outside them), catalog, holds, validated registration (window, holds, prerequisites, conflicts, capacity, credits) and unofficial transcripts."
     },
     {
       "name": "Financial Aid & Accounts",
@@ -77,7 +77,7 @@
     },
     {
       "name": "Outcomes & Evidence",
-      "description": "Outcomes aligned to rubric criteria and questions, mastery rollups and evidence exports (demonstration only)."
+      "description": "Outcomes aligned to rubric criteria and questions, mastery rollups and evidence exports (demonstration only). Outcome folders, account- and course-level outcomes, multi-level mastery scales, and standards import/export in the outcomes CSV format (dry run, idempotent by standard ID, per-row issue report)."
     },
     {
       "name": "Student Success & Advising",
@@ -7659,6 +7659,191 @@
         }
       }
     },
+    "/r/tool_installs": {
+      "get": {
+        "tags": [
+          "Integration"
+        ],
+        "summary": "List app installs & placements",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ToolInstalls"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Integration"
+        ],
+        "summary": "Create a app install",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/tool_installs/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Integration"
+        ],
+        "summary": "Get a app install",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Integration"
+        ],
+        "summary": "Update a app install (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Integration"
+        ],
+        "summary": "Delete (tombstone) a app install",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/r/sync_jobs": {
       "get": {
         "tags": [
@@ -9067,6 +9252,10 @@
                     "type": "number",
                     "minimum": 1,
                     "maximum": 30
+                  },
+                  "enforceAccess": {
+                    "description": "Enforce access windows (students and role overrides)",
+                    "type": "boolean"
                   }
                 },
                 "required": [
@@ -9167,6 +9356,10 @@
                     "type": "number",
                     "minimum": 1,
                     "maximum": 30
+                  },
+                  "enforceAccess": {
+                    "description": "Enforce access windows (students and role overrides)",
+                    "type": "boolean"
                   }
                 },
                 "required": []
@@ -9194,6 +9387,376 @@
           "Registration & Records"
         ],
         "summary": "Delete (tombstone) a term",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/term_role_overrides": {
+      "get": {
+        "tags": [
+          "Registration & Records"
+        ],
+        "summary": "List term role access overrides",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TermRoleOverrides"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Registration & Records"
+        ],
+        "summary": "Create a term role access",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/term_role_overrides/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Registration & Records"
+        ],
+        "summary": "Get a term role access",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Registration & Records"
+        ],
+        "summary": "Update a term role access (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Registration & Records"
+        ],
+        "summary": "Delete (tombstone) a term role access",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/grading_period_sets": {
+      "get": {
+        "tags": [
+          "Gradebook"
+        ],
+        "summary": "List grading-period sets",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GradingPeriodSets"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Gradebook"
+        ],
+        "summary": "Create a grading-period set",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/grading_period_sets/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Gradebook"
+        ],
+        "summary": "Get a grading-period set",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Gradebook"
+        ],
+        "summary": "Update a grading-period set (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Gradebook"
+        ],
+        "summary": "Delete (tombstone) a grading-period set",
         "responses": {
           "200": {
             "description": "Deleted"
@@ -11795,6 +12358,21 @@
                     "description": "Framework label — Internal label only. Not an accreditation claim.",
                     "type": "string"
                   },
+                  "groupId": {
+                    "description": "Folder",
+                    "type": "string",
+                    "x-ref": "outcome_groups"
+                  },
+                  "courseId": {
+                    "description": "Course (blank = account-level)",
+                    "type": "string",
+                    "x-ref": "courses"
+                  },
+                  "scaleId": {
+                    "description": "Mastery scale",
+                    "type": "string",
+                    "x-ref": "mastery_scales"
+                  },
                   "calculationMethod": {
                     "description": "Mastery calculation",
                     "type": "string",
@@ -11901,6 +12479,21 @@
                     "description": "Framework label — Internal label only. Not an accreditation claim.",
                     "type": "string"
                   },
+                  "groupId": {
+                    "description": "Folder",
+                    "type": "string",
+                    "x-ref": "outcome_groups"
+                  },
+                  "courseId": {
+                    "description": "Course (blank = account-level)",
+                    "type": "string",
+                    "x-ref": "courses"
+                  },
+                  "scaleId": {
+                    "description": "Mastery scale",
+                    "type": "string",
+                    "x-ref": "mastery_scales"
+                  },
                   "calculationMethod": {
                     "description": "Mastery calculation",
                     "type": "string",
@@ -11944,6 +12537,623 @@
           "Outcomes & Evidence"
         ],
         "summary": "Delete (tombstone) a outcome",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/outcome_groups": {
+      "get": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "summary": "List outcome folders",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/OutcomeGroups"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "summary": "Create a outcome folder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "description": "Title",
+                    "type": "string"
+                  },
+                  "description": {
+                    "description": "Description",
+                    "type": "string"
+                  },
+                  "parentId": {
+                    "description": "Parent folder",
+                    "type": "string",
+                    "x-ref": "outcome_groups"
+                  },
+                  "courseId": {
+                    "description": "Course (blank = account-level)",
+                    "type": "string",
+                    "x-ref": "courses"
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/outcome_groups/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "summary": "Get a outcome folder",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "summary": "Update a outcome folder (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "description": "Title",
+                    "type": "string"
+                  },
+                  "description": {
+                    "description": "Description",
+                    "type": "string"
+                  },
+                  "parentId": {
+                    "description": "Parent folder",
+                    "type": "string",
+                    "x-ref": "outcome_groups"
+                  },
+                  "courseId": {
+                    "description": "Course (blank = account-level)",
+                    "type": "string",
+                    "x-ref": "courses"
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "summary": "Delete (tombstone) a outcome folder",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/mastery_scales": {
+      "get": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "summary": "List mastery scales",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MasteryScales"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "summary": "Create a mastery scale",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "description": "Title",
+                    "type": "string"
+                  },
+                  "courseId": {
+                    "description": "Course (blank = account-level)",
+                    "type": "string",
+                    "x-ref": "courses"
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/mastery_scales/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "summary": "Get a mastery scale",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "summary": "Update a mastery scale (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "description": "Title",
+                    "type": "string"
+                  },
+                  "courseId": {
+                    "description": "Course (blank = account-level)",
+                    "type": "string",
+                    "x-ref": "courses"
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "summary": "Delete (tombstone) a mastery scale",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/outcome_imports": {
+      "get": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "summary": "List standards imports",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/OutcomeImports"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "summary": "Create a standards import",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/outcome_imports/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "summary": "Get a standards import",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "summary": "Update a standards import (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "summary": "Delete (tombstone) a standards import",
         "responses": {
           "200": {
             "description": "Deleted"
@@ -57955,6 +59165,873 @@
         }
       }
     },
+    "/q/outcomes.tree": {
+      "get": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "operationId": "outcomes.tree",
+        "summary": "Outcome folders, outcomes and mastery scales (account-level, plus a course's own when courseId is given).",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/outcomes.group_create": {
+      "post": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "operationId": "outcomes.group_create",
+        "summary": "Create an outcome folder (account-level, or in a course).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "parentId": {
+                    "type": "string"
+                  },
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/outcomes.move": {
+      "post": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "operationId": "outcomes.move",
+        "summary": "Move a folder or outcome into another folder (or to the root).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "group",
+                      "outcome"
+                    ]
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "toGroupId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/outcomes.scale_create": {
+      "post": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "operationId": "outcomes.scale_create",
+        "summary": "Create a mastery scale: ratings highest-first as JSON [{label, points}] and the mastery points.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "ratings": {},
+                  "masteryPoints": {
+                    "type": "number"
+                  },
+                  "courseId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "title",
+                  "ratings",
+                  "masteryPoints"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/outcomes.import": {
+      "post": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "operationId": "outcomes.import",
+        "summary": "Import standards from the outcomes CSV (dry run supported; idempotent by vendor_guid; per-row issue report).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "csv": {
+                    "type": "string"
+                  },
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "dryRun": {
+                    "type": "boolean"
+                  },
+                  "source": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "csv"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/outcomes.export_csv": {
+      "get": {
+        "tags": [
+          "Outcomes & Evidence"
+        ],
+        "operationId": "outcomes.export_csv",
+        "summary": "Export outcomes in the same CSV format (round-trips through outcomes.import).",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/terms.access": {
+      "get": {
+        "tags": [
+          "Registration & Records"
+        ],
+        "operationId": "terms.access",
+        "summary": "A term's per-role access windows and its grading-period set.",
+        "parameters": [
+          {
+            "name": "termId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/terms.role_override": {
+      "post": {
+        "tags": [
+          "Registration & Records"
+        ],
+        "operationId": "terms.role_override",
+        "summary": "Set a role's access window for a term (blank = term dates).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "termId": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "student",
+                      "ta",
+                      "instructor",
+                      "designer",
+                      "observer"
+                    ]
+                  },
+                  "startsAt": {
+                    "type": "string"
+                  },
+                  "endsAt": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "termId",
+                  "role"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/terms.enforce": {
+      "post": {
+        "tags": [
+          "Registration & Records"
+        ],
+        "operationId": "terms.enforce",
+        "summary": "Turn access-window enforcement on or off for a term.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "termId": {
+                    "type": "string"
+                  },
+                  "enforce": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "termId",
+                  "enforce"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/terms.window": {
+      "get": {
+        "tags": [
+          "Registration & Records"
+        ],
+        "operationId": "terms.window",
+        "summary": "The access window that applies to a role in a course.",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "role",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "student",
+                "ta",
+                "instructor",
+                "designer",
+                "observer"
+              ]
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/grading_periods.set_create": {
+      "post": {
+        "tags": [
+          "Gradebook"
+        ],
+        "operationId": "grading_periods.set_create",
+        "summary": "Create a grading-period set attached to terms (or the account default).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "termIds": {},
+                  "weighted": {
+                    "type": "boolean"
+                  },
+                  "accountDefault": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/grading_periods.add": {
+      "post": {
+        "tags": [
+          "Gradebook"
+        ],
+        "operationId": "grading_periods.add",
+        "summary": "Add a period to a set (no overlaps; start < end ≤ close).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "setId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "startsAt": {
+                    "type": "string"
+                  },
+                  "endsAt": {
+                    "type": "string"
+                  },
+                  "closeAt": {
+                    "type": "string"
+                  },
+                  "weight": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "setId",
+                  "name",
+                  "startsAt",
+                  "endsAt",
+                  "closeAt"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/grading_periods.for_course": {
+      "get": {
+        "tags": [
+          "Gradebook"
+        ],
+        "operationId": "grading_periods.for_course",
+        "summary": "A course's grading periods and where they come from (term's set, account default set, or term).",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/apps.placement_types": {
+      "get": {
+        "tags": [
+          "Integration"
+        ],
+        "operationId": "apps.placement_types",
+        "summary": "The LTI placements an app can use.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/apps.install": {
+      "post": {
+        "tags": [
+          "Integration"
+        ],
+        "operationId": "apps.install",
+        "summary": "Install a registered LTI tool at an account (inherited below it) or in one course, with its placements (JSON [{key, label}]).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "toolId": {
+                    "type": "string"
+                  },
+                  "scope": {
+                    "type": "string",
+                    "enum": [
+                      "account",
+                      "course"
+                    ]
+                  },
+                  "accountId": {
+                    "type": "string"
+                  },
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "placements": {}
+                },
+                "required": [
+                  "toolId",
+                  "scope",
+                  "placements"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/apps.placements_update": {
+      "post": {
+        "tags": [
+          "Integration"
+        ],
+        "operationId": "apps.placements_update",
+        "summary": "Change an install's placements (JSON [{key, label, enabled}]).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "installId": {
+                    "type": "string"
+                  },
+                  "placements": {}
+                },
+                "required": [
+                  "installId",
+                  "placements"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/apps.course_visibility": {
+      "post": {
+        "tags": [
+          "Integration"
+        ],
+        "operationId": "apps.course_visibility",
+        "summary": "Hide (or show again) an inherited account app in one course.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "toolId": {
+                    "type": "string"
+                  },
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "hidden": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "toolId",
+                  "courseId",
+                  "hidden"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/apps.placements": {
+      "get": {
+        "tags": [
+          "Integration"
+        ],
+        "operationId": "apps.placements",
+        "summary": "Apps that appear in a course, optionally at one placement, with where each comes from.",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          },
+          {
+            "name": "placement",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/content.import_foreign": {
+      "post": {
+        "tags": [
+          "Copy, Import, Blueprints & Sharing"
+        ],
+        "operationId": "content.import_foreign",
+        "summary": "Import a Moodle (.mbz), Blackboard or D2L export, or any IMS package (base64). Detected automatically unless platform is given.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "packageBase64": {
+                    "type": "string"
+                  },
+                  "platform": {
+                    "type": "string",
+                    "enum": [
+                      "moodle",
+                      "blackboard",
+                      "d2l",
+                      "ims"
+                    ]
+                  },
+                  "idempotencyKey": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "courseId",
+                  "packageBase64"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/a/content.import_package": {
       "post": {
         "tags": [
@@ -73284,6 +75361,42 @@
         ],
         "description": "LTI tool (tab: integration)"
       },
+      "ToolInstalls": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "toolId": {
+                "description": "Tool",
+                "type": "string"
+              },
+              "scope": {
+                "description": "Scope (account / course)",
+                "type": "string"
+              },
+              "accountId": {
+                "description": "Account",
+                "type": "string"
+              },
+              "courseId": {
+                "description": "Course",
+                "type": "string"
+              },
+              "placements": {
+                "description": "Placements"
+              },
+              "state": {
+                "description": "State (active / hidden)",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "App install (tab: integration)"
+      },
       "SyncJobs": {
         "allOf": [
           {
@@ -73593,11 +75706,74 @@
                 "type": "number",
                 "minimum": 1,
                 "maximum": 30
+              },
+              "enforceAccess": {
+                "description": "Enforce access windows (students and role overrides)",
+                "type": "boolean"
               }
             }
           }
         ],
         "description": "Term (tab: registration)"
+      },
+      "TermRoleOverrides": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "termId": {
+                "description": "Term",
+                "type": "string"
+              },
+              "role": {
+                "description": "Role",
+                "type": "string"
+              },
+              "startsAt": {
+                "description": "Access starts",
+                "type": "string",
+                "format": "date-time"
+              },
+              "endsAt": {
+                "description": "Access ends",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Term role access (tab: registration)"
+      },
+      "GradingPeriodSets": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "termIds": {
+                "description": "Terms"
+              },
+              "weighted": {
+                "description": "Weighted",
+                "type": "boolean"
+              },
+              "accountDefault": {
+                "description": "Account default",
+                "type": "boolean"
+              }
+            }
+          }
+        ],
+        "description": "Grading-period set (tab: gradebook)"
       },
       "CatalogEntries": {
         "allOf": [
@@ -74168,6 +76344,25 @@
                 "description": "Framework label — Internal label only. Not an accreditation claim.",
                 "type": "string"
               },
+              "groupId": {
+                "description": "Folder",
+                "type": "string",
+                "x-ref": "outcome_groups"
+              },
+              "courseId": {
+                "description": "Course (blank = account-level)",
+                "type": "string",
+                "x-ref": "courses"
+              },
+              "scaleId": {
+                "description": "Mastery scale",
+                "type": "string",
+                "x-ref": "mastery_scales"
+              },
+              "vendorGuid": {
+                "description": "Standard ID (vendor GUID)",
+                "type": "string"
+              },
               "calculationMethod": {
                 "description": "Mastery calculation",
                 "type": "string",
@@ -74189,6 +76384,111 @@
           }
         ],
         "description": "Outcome (tab: outcomes)"
+      },
+      "OutcomeGroups": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "description": {
+                "description": "Description",
+                "type": "string"
+              },
+              "parentId": {
+                "description": "Parent folder",
+                "type": "string",
+                "x-ref": "outcome_groups"
+              },
+              "courseId": {
+                "description": "Course (blank = account-level)",
+                "type": "string",
+                "x-ref": "courses"
+              },
+              "vendorGuid": {
+                "description": "Standard ID (vendor GUID)",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Outcome folder (tab: outcomes)"
+      },
+      "MasteryScales": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "ratings": {
+                "description": "Ratings (highest first)"
+              },
+              "masteryPoints": {
+                "description": "Mastery at (points)",
+                "type": "number"
+              },
+              "courseId": {
+                "description": "Course (blank = account-level)",
+                "type": "string",
+                "x-ref": "courses"
+              }
+            }
+          }
+        ],
+        "description": "Mastery scale (tab: outcomes)"
+      },
+      "OutcomeImports": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "source": {
+                "description": "Source",
+                "type": "string"
+              },
+              "courseId": {
+                "description": "Course",
+                "type": "string"
+              },
+              "created": {
+                "description": "Created",
+                "type": "number"
+              },
+              "updated": {
+                "description": "Updated",
+                "type": "number"
+              },
+              "issues": {
+                "description": "Issues"
+              },
+              "by": {
+                "description": "By",
+                "type": "string"
+              },
+              "at": {
+                "description": "At",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "Standards import (tab: outcomes)"
       },
       "OutcomeAlignments": {
         "allOf": [
@@ -81227,6 +83527,14 @@
                 "description": "Closes (locks edits)",
                 "type": "string",
                 "format": "date-time"
+              },
+              "setId": {
+                "description": "Grading-period set",
+                "type": "string"
+              },
+              "weight": {
+                "description": "Weight %",
+                "type": "number"
               }
             }
           }

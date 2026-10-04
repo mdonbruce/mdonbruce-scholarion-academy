@@ -74,7 +74,7 @@ describe("Departments & Policy Rules (64)", () => {
     const day2 = D.holdActions(P, { balance_minor: 5000, due_at: due }, due + 2 * DAY);
     assert.deepEqual(day2.map((x) => x.key), ["reminder:1"]);
     const late = D.holdActions(P, { balance_minor: 5000, due_at: due }, due + 20 * DAY);
-    const soft = late.find((x) => x.key === "notice:soft")!;
+    const soft = late.find((x) => x.key === "notice:soft") as Record<string, unknown>;
     // A late run announces now and postpones enforcement by the notice period.
     assert.equal(soft.effective_at, due + 20 * DAY + 3 * DAY);
     const placed = D.holdActions(P, { balance_minor: 5000, due_at: due, announcements: { soft: due + 11 * DAY } }, due + 15 * DAY);

@@ -20,6 +20,7 @@ import { CampaignsPanel } from "./campaigns";
 import { DesignPanel } from "./design";
 import { AidQueuePanel } from "./market";
 import { AcceptancePanel, BridgePanel, DepartmentsPanel, VoicePanel } from "./governed";
+import { AppsPanel, ForeignImportPanel, OutcomesPanel, TermAccessPanel } from "./structure";
 import { isDesignProgram } from "../../academy/design";
 import { studioOverview, programIndex } from "../../services/programs";
 import { PARITY, paritySummary, SECTION_TITLES } from "../../parity";
@@ -163,7 +164,18 @@ function Bespoke({ t, tab }: { t: T; tab: string }) {
   try {
     switch (tab) {
       case "registration":
-        return <Registration t={t} />;
+        return (
+          <>
+            <Registration t={t} />
+            <TermAccessPanel store={t.store} actor={t.actor} slug={t.slug} here={t.here} sp={t.sp} />
+          </>
+        );
+      case "outcomes":
+        return <OutcomesPanel store={t.store} actor={t.actor} slug={t.slug} here={t.here} sp={t.sp} />;
+      case "integration":
+        return <AppsPanel store={t.store} actor={t.actor} slug={t.slug} here={t.here} sp={t.sp} />;
+      case "content":
+        return <ForeignImportPanel store={t.store} actor={t.actor} slug={t.slug} here={t.here} sp={t.sp} />;
       case "tenant-admin":
         return hasAny(t.actor, ["admin"]) ? <AdminConsole t={t} /> : null;
       case "ai-control":

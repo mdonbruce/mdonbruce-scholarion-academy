@@ -1,3 +1,5 @@
+import { ratingFor, type Rating } from "./outcomes";
+import { periodsForCourse } from "./terms";
 import { CampusError, nowIso, registerConsumer, type Row, type TenantStore } from "../core";
 import { registerHooks } from "../entity";
 import { hasAny, type Actor } from "../iam";
@@ -28,7 +30,10 @@ function postingMode(store: TenantStore, item: Row): "automatic" | "manual" {
 function periodClosed(store: TenantStore, item: Row, userId: string): Row | undefined {
   const d = effectiveDates(store, item, userId).dueAt;
   if (!d) return undefined;
-  return store.list("grading_periods", (p) => String(p.startsAt) <= d && String(p.endsAt) >= d && String(p.closeAt) < nowIso())[0];
+  // The course's own periods (its term's set, the account default set, or the term's periods) decide.
+  const own = periodsForCourse(store, String(item.courseId)).periods;
+  const pool = own.length ? own : store.list("grading_periods");
+  return pool.find((p) => String(p.startsAt) <= d && String(p.endsAt) >= d && String(p.closeAt) < nowIso());
 }
 
 function latestSubmission(store: TenantStore, itemId: string, userId: string): Row | undefined {
@@ -585,8 +590,9 @@ export function masteryScore(scores: number[], method: MasteryMethod, threshold:
 
 /** Outcome results per student from rubric criteria and quiz questions aligned to outcomes. */
 export function outcomeResults(store: TenantStore, courseId: string, userId: string) {
-  const outcomes = store.list("outcomes");
-  const out: { outcomeId: string; code: string; title: string; scores: number[]; mastery: number | null; mastered: boolean; method: string }[] = [];
+  // Account-level outcomes plus this course's own; another course's outcomes never appear.
+  const outcomes = store.list("outcomes", (o) => !o.courseId || o.courseId === courseId);
+  const out: { outcomeId: string; code: string; title: string; scores: number[]; mastery: number | null; mastered: boolean; method: string; rating?: { label: string; points: number } | null }[] = [];
   for (const o of outcomes) {
     const scores: number[] = [];
     for (const g of store.list("grades", (x) => x.courseId === courseId && x.userId === userId && !!x.posted && !!x.rubricAssessment).sort((x, y) => String(x.updatedAt).localeCompare(String(y.updatedAt)))) {
@@ -605,9 +611,11 @@ export function outcomeResults(store: TenantStore, courseId: string, userId: str
       }
     }
     if (!scores.length) continue;
-    const threshold = Number(o.masteryThreshold ?? 70);
+    const scale = o.scaleId ? store.get("mastery_scales", String(o.scaleId)) : undefined;
+    const threshold = scale ? (Number(scale.masteryPoints) / (Number((scale.ratings as Rating[])[0]?.points) || 1)) * 100 : Number(o.masteryThreshold ?? 70);
     const m = masteryScore(scores, (o.calculationMethod as MasteryMethod) ?? "decaying_average", threshold, Number(o.nMastery ?? 2));
-    out.push({ outcomeId: o.id, code: o.code as string, title: o.title as string, scores, mastery: m === null ? null : Math.round(m * 10) / 10, mastered: m !== null && m >= threshold, method: (o.calculationMethod as string) ?? "decaying_average" });
+    const rating = scale && m !== null ? ratingFor({ ratings: scale.ratings as Rating[], masteryPoints: Number(scale.masteryPoints) }, m) : null;
+    out.push({ outcomeId: o.id, code: o.code as string, title: o.title as string, scores, mastery: m === null ? null : Math.round(m * 10) / 10, mastered: rating ? rating.mastered : m !== null && m >= threshold, method: (o.calculationMethod as string) ?? "decaying_average", rating: rating ? { label: rating.label, points: rating.points } : null });
   }
   return out;
 }

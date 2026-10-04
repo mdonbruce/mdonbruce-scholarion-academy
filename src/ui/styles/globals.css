@@ -1981,3 +1981,6 @@ details.acc > div {
 /* Studio branding profile */
 .brand-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;align-items:end}
 .brand-form label{display:flex;flex-direction:column;gap:4px}
+
+/* Outcome folders */
+.outcome-tree{list-style:none;padding-left:0;margin:4px 0}.outcome-tree.nested{padding-left:1.25rem;border-left:1px solid var(--border,#d6dae4)}.outcome-tree li{margin:3px 0}
