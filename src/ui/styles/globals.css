@@ -2003,3 +2003,5 @@ details.acc > div {
 .campus[dir="rtl"] .sidenav, .campus[dir="rtl"] .crumbs { text-align: right; }
 .campus[dir="rtl"] .bell-count { margin-left: 0; margin-right: 6px; }
 .campus[dir="rtl"] pre, .campus[dir="rtl"] code, .campus[dir="rtl"] .mono { direction: ltr; text-align: left; }
+
+details > summary.small { min-height: 24px; line-height: 24px; }
