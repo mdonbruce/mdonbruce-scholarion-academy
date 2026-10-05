@@ -2,6 +2,7 @@ import { broker, type Tenant, type TenantStore } from "../../core";
 import type { Actor } from "../../iam";
 import { catalogHub, offeringCard, quote, recommend, RECOMMENDER_QUESTIONS, evaluatePathway } from "../../services/academy";
 import { verifyCredential } from "../../services/success";
+import { enabledOidc } from "../../services/oidc";
 import { DEMO_PASSWORD } from "../../seed";
 import { api, Chip, Denied, Empty, fmt, Flash, Hidden } from "../kit";
 
@@ -91,7 +92,25 @@ export function SigninView({ tenant, sp }: { tenant: Tenant; sp: SP }) {
             Sign in
           </button>
         </form>
-        <p className="tiny muted">Realm: {tenant.realm.protocol.toUpperCase()} ({tenant.realm.issuer}) — federation is simulated in staging; this form signs in to the tenant's local realm.</p>
+        {(() => {
+          let sso: { id: string; name: string }[] = [];
+          try {
+            sso = enabledOidc(broker.connect({ tenantId: tenant.id, slug: tenant.slug, via: "path", traceId: "signin" }));
+          } catch {
+            sso = [];
+          }
+          return sso.length ? (
+            <div className="stack">
+              <p className="small">Or sign in with your organization:</p>
+              {sso.map((p) => (
+                <a key={p.id} className="btn btn-outline" href={`${api(tenant.slug, "auth/oidc/start")}?idp=${encodeURIComponent(p.id)}&next=${encodeURIComponent(sp.next ?? `/campus/${tenant.slug}/dashboard`)}`}>
+                  Sign in with {p.name}
+                </a>
+              ))}
+            </div>
+          ) : null;
+        })()}
+        <p className="tiny muted">Campus passwords and two-step codes always work. Single sign-on appears here once an administrator checks and enables an OpenID Connect provider.</p>
       </section>
       {staging && (
         <section className="card card-pad" aria-labelledby="demo-h">

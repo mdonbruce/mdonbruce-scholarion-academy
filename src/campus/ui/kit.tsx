@@ -1,3 +1,4 @@
+import { formatDate } from "../i18n";
 import type { ReactNode } from "react";
 import type { Row } from "../core";
 import { ENTITY, type FieldDef } from "../registry";
@@ -8,10 +9,8 @@ import type { Operation, Param } from "../http/ops";
 export const api = (slug: string, path: string) => `/api/campus/v1/t/${slug}/${path}`;
 
 export function fmt(iso: unknown, withTime = false): string {
-  if (!iso) return "—";
-  const d = new Date(String(iso));
-  if (Number.isNaN(d.getTime())) return String(iso);
-  return d.toLocaleString("en-GB", withTime ? { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "UTC" } : { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }) + (withTime ? " UTC" : "");
+  // In the viewer's own time zone and language (Account → Profile); UTC/English by default.
+  return formatDate(iso, withTime);
 }
 
 export function Flash({ sp }: { sp: Record<string, string | undefined> }) {

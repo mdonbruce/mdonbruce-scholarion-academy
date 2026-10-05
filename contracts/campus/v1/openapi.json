@@ -21031,6 +21031,376 @@
         }
       }
     },
+    "/r/group_pages": {
+      "get": {
+        "tags": [
+          "People & Groups"
+        ],
+        "summary": "List group pages",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GroupPages"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "People & Groups"
+        ],
+        "summary": "Create a group page",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/group_pages/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "People & Groups"
+        ],
+        "summary": "Get a group page",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "People & Groups"
+        ],
+        "summary": "Update a group page (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "People & Groups"
+        ],
+        "summary": "Delete (tombstone) a group page",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/group_posts": {
+      "get": {
+        "tags": [
+          "People & Groups"
+        ],
+        "summary": "List group discussion",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GroupPosts"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "People & Groups"
+        ],
+        "summary": "Create a group post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/group_posts/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "People & Groups"
+        ],
+        "summary": "Get a group post",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "People & Groups"
+        ],
+        "summary": "Update a group post (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "People & Groups"
+        ],
+        "summary": "Delete (tombstone) a group post",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/r/groups": {
       "get": {
         "tags": [
@@ -44035,6 +44405,191 @@
         }
       }
     },
+    "/r/oidc_states": {
+      "get": {
+        "tags": [
+          "Admin Console"
+        ],
+        "summary": "List oidc sign-in states",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/OidcStates"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin Console"
+        ],
+        "summary": "Create a oidc sign-in state",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/oidc_states/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Admin Console"
+        ],
+        "summary": "Get a oidc sign-in state",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Admin Console"
+        ],
+        "summary": "Update a oidc sign-in state (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin Console"
+        ],
+        "summary": "Delete (tombstone) a oidc sign-in state",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/r/async_jobs": {
       "get": {
         "tags": [
@@ -49258,7 +49813,9 @@
                     "enum": [
                       "en",
                       "es",
-                      "fr"
+                      "fr",
+                      "pt",
+                      "ar"
                     ]
                   },
                   "timeZone": {
@@ -49375,7 +49932,9 @@
                     "enum": [
                       "en",
                       "es",
-                      "fr"
+                      "fr",
+                      "pt",
+                      "ar"
                     ]
                   },
                   "timeZone": {
@@ -52287,6 +52846,56 @@
         }
       }
     },
+    "/a/page.save_html": {
+      "post": {
+        "tags": [
+          "Curriculum"
+        ],
+        "operationId": "page.save_html",
+        "summary": "Save a page from the HTML view. HTML is converted to validated blocks through an allow-list; anything removed is reported.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pageId": {
+                    "type": "string"
+                  },
+                  "html": {
+                    "type": "string"
+                  },
+                  "ifVersion": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "pageId",
+                  "html"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/a/quiz.submit": {
       "post": {
         "tags": [
@@ -52697,6 +53306,49 @@
                 "required": [
                   "assignmentId",
                   "userId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/grades.set_many": {
+      "post": {
+        "tags": [
+          "Gradebook"
+        ],
+        "operationId": "grades.set_many",
+        "summary": "Save several gradebook cells at once (keyboard grid). Fields g__<assignmentId>__<userId> carry the new score; only changed cells are written.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "courseId"
                 ]
               }
             }
@@ -59199,6 +59851,786 @@
             "in": "query"
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/similarity.report": {
+      "post": {
+        "tags": [
+          "Assessment"
+        ],
+        "operationId": "similarity.report",
+        "summary": "A similarity tool posts a signed report (JWT: submission_id, score 0–100, report_url, status).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "jwt": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "jwt"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/similarity.rescan": {
+      "post": {
+        "tags": [
+          "Assessment"
+        ],
+        "operationId": "similarity.rescan",
+        "summary": "Re-run the built-in similarity check for a submission.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "submissionId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "submissionId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/similarity.get": {
+      "get": {
+        "tags": [
+          "Assessment"
+        ],
+        "operationId": "similarity.get",
+        "summary": "Similarity result for a submission (learners see their own score and report link).",
+        "parameters": [
+          {
+            "name": "submissionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/similarity.use_builtin": {
+      "post": {
+        "tags": [
+          "Assessment"
+        ],
+        "operationId": "similarity.use_builtin",
+        "summary": "Turn on the built-in similarity check for an assignment.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "assignmentId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "assignmentId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/groups.mine": {
+      "get": {
+        "tags": [
+          "People & Groups"
+        ],
+        "operationId": "groups.mine",
+        "summary": "My groups across every course, plus account groups I can join.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/groups.home": {
+      "get": {
+        "tags": [
+          "People & Groups"
+        ],
+        "operationId": "groups.home",
+        "summary": "A group's home: members, pages, discussion and files.",
+        "parameters": [
+          {
+            "name": "groupId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/groups.create_account_group": {
+      "post": {
+        "tags": [
+          "People & Groups"
+        ],
+        "operationId": "groups.create_account_group",
+        "summary": "Create an account-level group that spans courses (admins).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "selfJoin": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/groups.join_account_group": {
+      "post": {
+        "tags": [
+          "People & Groups"
+        ],
+        "operationId": "groups.join_account_group",
+        "summary": "Join or leave an account group.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "groupId": {
+                    "type": "string"
+                  },
+                  "leave": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "groupId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/groups.add_members": {
+      "post": {
+        "tags": [
+          "People & Groups"
+        ],
+        "operationId": "groups.add_members",
+        "summary": "Add members to a group (course staff, or admins for account groups).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "groupId": {
+                    "type": "string"
+                  },
+                  "userIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "groupId",
+                  "userIds"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/groups.save_page": {
+      "post": {
+        "tags": [
+          "People & Groups"
+        ],
+        "operationId": "groups.save_page",
+        "summary": "Create or edit a group page (members).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "groupId": {
+                    "type": "string"
+                  },
+                  "pageId": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "groupId",
+                  "title",
+                  "text"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/groups.post": {
+      "post": {
+        "tags": [
+          "People & Groups"
+        ],
+        "operationId": "groups.post",
+        "summary": "Start a group thread or reply.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "groupId": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "parentId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "groupId",
+                  "body"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/media.library": {
+      "get": {
+        "tags": [
+          "Files & Media"
+        ],
+        "operationId": "media.library",
+        "summary": "My media library and media shared with me.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/media.add": {
+      "post": {
+        "tags": [
+          "Files & Media"
+        ],
+        "operationId": "media.add",
+        "summary": "Add one of my audio/video files to my media library.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fileId": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "fileId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/media.share": {
+      "post": {
+        "tags": [
+          "Files & Media"
+        ],
+        "operationId": "media.share",
+        "summary": "Share a library item with people and/or into a course I teach.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mediaId": {
+                    "type": "string"
+                  },
+                  "userIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "courseId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "mediaId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/media.captions": {
+      "post": {
+        "tags": [
+          "Files & Media"
+        ],
+        "operationId": "media.captions",
+        "summary": "Add captions (WebVTT) or a transcript to a library item.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mediaId": {
+                    "type": "string"
+                  },
+                  "language": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "captions",
+                      "transcript"
+                    ]
+                  }
+                },
+                "required": [
+                  "mediaId",
+                  "language",
+                  "text"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/media.play": {
+      "get": {
+        "tags": [
+          "Files & Media"
+        ],
+        "operationId": "media.play",
+        "summary": "Playback details for media I can see.",
+        "parameters": [
+          {
+            "name": "mediaId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/identity_providers.check_oidc": {
+      "post": {
+        "tags": [
+          "Admin Console"
+        ],
+        "operationId": "identity_providers.check_oidc",
+        "summary": "Live check of an OIDC provider: discovery document and signing keys.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/identity_providers.enable_oidc": {
+      "post": {
+        "tags": [
+          "Admin Console"
+        ],
+        "operationId": "identity_providers.enable_oidc",
+        "summary": "Enable or disable OIDC sign-in with a checked provider.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "on": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "id",
+                  "on"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/identity_providers.sign_in_options": {
+      "get": {
+        "tags": [
+          "Admin Console"
+        ],
+        "operationId": "identity_providers.sign_in_options",
+        "summary": "Enabled single sign-on providers (public).",
+        "parameters": [],
         "responses": {
           "200": {
             "description": "OK"
@@ -76619,6 +78051,20 @@
               "offline": {
                 "description": "Submitted offline",
                 "type": "boolean"
+              },
+              "similarity": {
+                "description": "Similarity review"
+              },
+              "groupId": {
+                "description": "Group",
+                "type": "string"
+              },
+              "groupMemberIds": {
+                "description": "Group members",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -77325,6 +78771,25 @@
                 "description": "Source file",
                 "type": "string",
                 "x-ref": "files"
+              },
+              "ownerId": {
+                "description": "Owner",
+                "type": "string"
+              },
+              "scope": {
+                "description": "Scope (course / personal)",
+                "type": "string"
+              },
+              "sharedWith": {
+                "description": "Shared with",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "sourceMediaId": {
+                "description": "Shared from",
+                "type": "string"
               },
               "renditions": {
                 "description": "Renditions"
@@ -80278,6 +81743,78 @@
         ],
         "description": "Accommodation (tab: accommodations)"
       },
+      "GroupPages": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "groupId": {
+                "description": "Group",
+                "type": "string"
+              },
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "blocks": {
+                "description": "Blocks"
+              },
+              "html": {
+                "description": "Rendered HTML",
+                "type": "string"
+              },
+              "authorId": {
+                "description": "Author",
+                "type": "string"
+              },
+              "lastEditedBy": {
+                "description": "Last edited by",
+                "type": "string"
+              },
+              "revisions": {
+                "description": "Revisions"
+              }
+            }
+          }
+        ],
+        "description": "Group page (tab: groups)"
+      },
+      "GroupPosts": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "groupId": {
+                "description": "Group",
+                "type": "string"
+              },
+              "parentId": {
+                "description": "Reply to",
+                "type": "string"
+              },
+              "title": {
+                "description": "Title",
+                "type": "string"
+              },
+              "body": {
+                "description": "Message",
+                "type": "string"
+              },
+              "authorId": {
+                "description": "Author",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Group post (tab: groups)"
+      },
       "Groups": {
         "allOf": [
           {
@@ -80306,6 +81843,18 @@
                 "description": "Team assignment",
                 "type": "string",
                 "x-ref": "assignments"
+              },
+              "accountId": {
+                "description": "Account (account groups)",
+                "type": "string"
+              },
+              "selfJoin": {
+                "description": "Anyone can join (account groups)",
+                "type": "boolean"
+              },
+              "description": {
+                "description": "Description",
+                "type": "string"
               },
               "quotaMb": {
                 "description": "File quota (MB; blank = account default)",
@@ -85455,6 +87004,41 @@
         ],
         "description": "SIS import (tab: tenant-admin)"
       },
+      "OidcStates": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "stateHash": {
+                "description": "State (hashed)",
+                "type": "string"
+              },
+              "idpId": {
+                "description": "Provider",
+                "type": "string"
+              },
+              "next": {
+                "description": "Return to",
+                "type": "string"
+              },
+              "expiresAt": {
+                "description": "Expires",
+                "type": "string",
+                "format": "date-time"
+              },
+              "usedAt": {
+                "description": "Used",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "OIDC sign-in state (tab: tenant-admin)"
+      },
       "AsyncJobs": {
         "allOf": [
           {
@@ -85566,6 +87150,9 @@
               },
               "lastTest": {
                 "description": "Last connection test"
+              },
+              "discovery": {
+                "description": "Discovered endpoints (OIDC)"
               }
             }
           }
@@ -86555,7 +88142,9 @@
                 "enum": [
                   "en",
                   "es",
-                  "fr"
+                  "fr",
+                  "pt",
+                  "ar"
                 ]
               },
               "timeZone": {

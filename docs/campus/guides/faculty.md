@@ -45,3 +45,11 @@ Press **Student View** to create (or reuse) the course's test student, then **En
 - Learners work in saved workspaces (files, editor, simulated terminal, run/stop/reset/save/resume, budgets). Agent runs are autonomous within the lab policy you set in Environment; blocked actions fail automatically.
 - The graded lab **Implement a bounded tool runner** is scored on architecture (30), tool bounds (30, must pass), task completion (30) and code structure (10). Learner code is never executed on the server: structure is checked and the learner's plan is replayed against their bounds.
 - Every graded lab, mini-lab, quiz, worksheet and project allows two attempts; the highest counts; practice never uses an attempt.
+
+## New in 0.3.0
+
+- **Similarity check:** turn on the built-in check for an assignment (`similarity.use_builtin`) or choose a registered similarity tool. The grader shows the score and any report link; it's a signal to review, not a finding.
+- **HTML view:** under Edit page → HTML view. Scripts, styles, forms, event handlers and unsafe links are removed and listed.
+- **Quick grader (mobile):** in the course menu; one ungraded submission at a time.
+- **Keyboard gradebook:** Grades → Edit with keyboard. Arrows/Enter move, Escape undoes a cell, EX excuses.
+- **Media library:** Files → My media library to record or upload, caption, and share into your course.

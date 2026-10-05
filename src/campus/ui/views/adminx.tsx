@@ -215,7 +215,7 @@ export function AccountAdminPanel({ store, actor, slug, here, sp }: P) {
           <h2 id="ax-idp" className="card-title">
             Identity providers
           </h2>
-          <p className="notice notice-info tiny">Configuration records only. SAML, OIDC and LDAP are not connected in this environment; people sign in with campus passwords and MFA.</p>
+          <p className="notice notice-info tiny">OpenID Connect sign-in works once a provider passes a live check and is enabled (authorization code + PKCE; ID tokens verified against the provider's keys). The client secret, if any, stays in a server environment variable named by clientSecretEnv. SAML and LDAP records are configuration only.</p>
           <ul className="item-list small">
             {idps.map((p) => (
               <li key={p.id} className="row wrap">
@@ -226,11 +226,27 @@ export function AccountAdminPanel({ store, actor, slug, here, sp }: P) {
                     Check configuration
                   </button>
                 </form>
+                {p.kind === "oidc" && (
+                  <>
+                    <form method="post" action={api(slug, "a/identity_providers.check_oidc")}>
+                      <Hidden values={{ back: here, id: p.id, notice: "Provider checked." }} />
+                      <button className="btn btn-ghost btn-sm" type="submit">
+                        Live check
+                      </button>
+                    </form>
+                    <form method="post" action={api(slug, "a/identity_providers.enable_oidc")}>
+                      <Hidden values={{ back: here, id: p.id, on: p.state === "enabled" ? "false" : "true", notice: p.state === "enabled" ? "Disabled." : "Enabled — the sign-in page now offers it." }} />
+                      <button className="btn btn-ghost btn-sm" type="submit">
+                        {p.state === "enabled" ? "Disable" : "Enable sign-in"}
+                      </button>
+                    </form>
+                  </>
+                )}
                 {Boolean(p.lastTest) && <span className="tiny muted">{(p.lastTest as { configComplete: boolean }).configComplete ? "complete" : `missing ${(p.lastTest as { missing: string[] }).missing.join(", ")}`}</span>}
               </li>
             ))}
           </ul>
-          <OpForm slug={slug} op={OPERATIONS["identity_providers.configure"]} back={here} uid="idp" label="Save provider" values={{ config: '{"entityId":"","ssoUrl":"https://"}' }} />
+          <OpForm slug={slug} op={OPERATIONS["identity_providers.configure"]} back={here} uid="idp" label="Save provider" values={{ config: '{"issuer":"https://","clientId":"","scopes":"openid email profile","clientSecretEnv":"CAMPUS_OIDC_SECRET"}' }} />
         </section>
       </div>
 

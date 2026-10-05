@@ -153,9 +153,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "2",
   "feature": "Groups across courses with own pages/discussions/files",
-  "status": "PARTIAL",
-  "evidence": "groups/group_sets entities; collaboration.ts:thread groupSetId",
-  "gap": "groups are course-scoped; no group home, pages or group files; no cross-course groups view"
+  "status": "DONE",
+  "evidence": "groupspace.ts: account groups spanning courses (createAccountGroup, join), myGroups across courses, group pages with revisions, threaded group discussion, group files with quota; structure.tsx GroupSpacesPanel",
+  "gap": "",
+  "closedIn": "parity round 3"
  },
  {
   "section": "2",
@@ -167,9 +168,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "2",
   "feature": "Media library (record/upload/caption/share)",
-  "status": "PARTIAL",
-  "evidence": "media, caption_tracks entities; files.ts media-transcoder consumer",
-  "gap": "course-scoped only; no personal library, in-browser recording or sharing"
+  "status": "DONE",
+  "evidence": "medialib.ts: personal library, captions (WebVTT), share with people or into a course (captions copied, bytes shared); client/MediaRecorderForm.tsx in-browser audio/video recording through the scanned upload route (purpose media); scanner recognizes WebM/Ogg/WAV/MP3",
+  "gap": "",
+  "closedIn": "parity round 3"
  },
  {
   "section": "2",
@@ -417,10 +419,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "3.5",
   "feature": "Plagiarism hook",
-  "status": "PARTIAL",
-  "evidence": "assessment.ts:submit queues similarity request + submissions.similarity_requested event",
-  "gap": "No similarity tool connected; results aren't posted back yet",
-  "closedIn": "this build"
+  "status": "DONE",
+  "evidence": "similarity.ts: built-in provider (consumer on submissions.similarity_requested; shingle overlap within the course) and signed external reports (receiveReport verifies the tool key, tool and submission); ops similarity.report/rescan/get/use_builtin; grader shows score, report link, re-check",
+  "gap": "",
+  "closedIn": "parity round 3"
  },
  {
   "section": "3.5",
@@ -1706,8 +1708,8 @@ export const PARITY: ParityRow[] = [
   "section": "6",
   "feature": "Authentication providers (SAML/OIDC/LDAP, MFA policy)",
   "status": "PARTIAL",
-  "evidence": "accountcfg.ts:configureIdp,testIdp (records, no secrets, LDAP TLS required); realm.mfaRequiredForStaff",
-  "gap": "IdP records are configuration only; no SAML/OIDC/LDAP connection from this environment"
+  "evidence": "oidc.ts: OpenID Connect sign-in (discovery, authorization code + PKCE, RS256 ID tokens verified against JWKS, nonce, audience, JIT provisioning, amr→MFA); accountcfg.ts configureIdp/testIdp; MFA policy realm.mfaRequiredForStaff",
+  "gap": "SAML and LDAP are configuration records only (no XML-signature or directory bind implementation)"
  },
  {
   "section": "6",
@@ -1931,9 +1933,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "8",
   "feature": "HTML view sanitized",
-  "status": "PARTIAL",
-  "evidence": "renderBlocks escaped HTML stored",
-  "gap": "no HTML editing view; markup only"
+  "status": "DONE",
+  "evidence": "htmlimport.ts: allow-list HTML → validated blocks (scripts, styles, forms, event handlers, unsafe URLs removed and reported); op page.save_html; course.tsx HTML view",
+  "gap": "",
+  "closedIn": "parity round 3"
  },
  {
   "section": "8",
@@ -2001,9 +2004,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "10",
   "feature": "Teacher mini grader",
-  "status": "PARTIAL",
-  "evidence": "course.tsx:Grader",
-  "gap": "no mobile-specific grader"
+  "status": "DONE",
+  "evidence": "course.tsx: MiniGrader (courses/:id/mini-grader) — one ungraded submission at a time, large touch targets, Save and next",
+  "gap": "",
+  "closedIn": "parity round 3"
  },
  {
   "section": "10",
@@ -2144,9 +2148,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "13",
   "feature": "Keyboard gradebook",
-  "status": "PARTIAL",
-  "evidence": "course.tsx:Gradebook focusable table region",
-  "gap": "no keyboard cell navigation/editing"
+  "status": "DONE",
+  "evidence": "course.tsx: KeyboardGradebook (?edit=1) with client/GridKeys.tsx (arrows, Enter, Escape); op grades.set_many writes only changed cells, accepts EX",
+  "gap": "",
+  "closedIn": "parity round 3"
  },
  {
   "section": "13",
@@ -2181,9 +2186,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "13",
   "feature": "Localization (strings, RTL, per-user language/tz)",
-  "status": "PARTIAL",
-  "evidence": "profiles.language/timeZone; src/i18n (not used by campus)",
-  "gap": "campus strings hard-coded English; dates UTC; no RTL"
+  "status": "DONE",
+  "evidence": "i18n.ts: catalogs en/es/fr/pt/ar for the campus chrome (complete; test enforces), dir=rtl for Arabic, per-user time zone and language via profile (viewer() per request); kit.fmt uses them",
+  "gap": "",
+  "closedIn": "parity round 3"
  }
 ];
 

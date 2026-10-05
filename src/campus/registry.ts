@@ -170,7 +170,7 @@ export const ENTITIES: EntityDef[] = [
     fields: [sys("name", "Name"), sys("mime", "Declared type"), sys("detectedMime", "Detected type"), sys("size", "Size", "number"), sys("ownerId", "Owner"), f("courseId", "Course", "ref", { ref: "courses" }), sys("objectKey", "Object key"), sys("state", "State"), sys("classification", "Classification"), sys("sha256", "Checksum")],
     perms: { read: TEACH, archive: ["admin"] } },
   { table: "media", label: "Media", plural: "Media", tab: "files", prefix: "med", titleField: "title", course: true, publishable: true,
-    fields: [courseRef, req("title", "Title"), req("fileId", "Source file", "ref", { ref: "files" }), sys("renditions", "Renditions", "json"), f("captionException", "Caption exception reason", "text"), sys("captionExceptionBy", "Exception approved by"), sys("state", "State")],
+    fields: [courseRef, req("title", "Title"), req("fileId", "Source file", "ref", { ref: "files" }), sys("ownerId", "Owner"), sys("scope", "Scope (course / personal)"), sys("sharedWith", "Shared with", "tags"), sys("sourceMediaId", "Shared from"), sys("renditions", "Renditions", "json"), f("captionException", "Caption exception reason", "text"), sys("captionExceptionBy", "Exception approved by"), sys("state", "State")],
     perms: { read: ALL, create: TEACH, update: TEACH, archive: TEACH, publish: TEACH } },
   { table: "caption_tracks", label: "Caption track", plural: "Caption tracks", tab: "files", prefix: "cap", titleField: "language", course: true,
     fields: [courseRef, req("mediaId", "Media", "ref", { ref: "media" }), req("language", "Language"), req("kind", "Kind", "enum", { options: ["captions", "transcript"] }), req("text", "WebVTT or transcript", "text")],
@@ -442,8 +442,14 @@ export const ENTITIES: EntityDef[] = [
     perms: { read: ["admin", "instructor", "ta", "advisor"], create: ["admin", "advisor"], update: ["admin", "advisor"], archive: ["admin", "advisor"] } },
 
   /* 32 Groups & team projects (added) */
+  { table: "group_pages", label: "Group page", plural: "Group pages", tab: "groups", prefix: "gpg", titleField: "title",
+    fields: [sys("groupId", "Group"), sys("title", "Title"), sys("blocks", "Blocks", "json"), sys("html", "Rendered HTML", "text"), sys("authorId", "Author"), sys("lastEditedBy", "Last edited by"), sys("revisions", "Revisions", "json")],
+    perms: { read: ["admin"] } },
+  { table: "group_posts", label: "Group post", plural: "Group discussion", tab: "groups", prefix: "gps", titleField: "title",
+    fields: [sys("groupId", "Group"), sys("parentId", "Reply to"), sys("title", "Title"), sys("body", "Message", "text"), sys("authorId", "Author")],
+    perms: { read: ["admin"] } },
   { table: "groups", label: "Group", plural: "Groups", tab: "groups", prefix: "grp", titleField: "name", course: true,
-    fields: [courseRef, req("name", "Name"), req("memberIds", "Members", "tags"), f("assignmentId", "Team assignment", "ref", { ref: "assignments" }), f("quotaMb", "File quota (MB; blank = account default)", "number", { min: 1, max: 10240 })],
+    fields: [courseRef, req("name", "Name"), req("memberIds", "Members", "tags"), f("assignmentId", "Team assignment", "ref", { ref: "assignments" }), sys("accountId", "Account (account groups)"), sys("selfJoin", "Anyone can join (account groups)", "boolean"), sys("description", "Description", "text"), f("quotaMb", "File quota (MB; blank = account default)", "number", { min: 1, max: 10240 })],
     perms: { read: ALL, create: TEACH, update: TEACH, archive: TEACH } },
 
   /* 33 Library & reading lists (added) */
@@ -512,6 +518,7 @@ ENTITIES.push({
   perms: { read: ALL, create: TEACH, update: TEACH, archive: TEACH },
 });
 extend("files", [sys("purpose", "Purpose"), sys("submissionCourseId", "Submitted in course"), sys("groupId", "Group"), sys("groupCourseId", "Group's course")]);
+extend("submissions", [sys("similarity", "Similarity review", "json"), sys("groupId", "Group"), sys("groupMemberIds", "Group members", "tags")]);
 extend("assignment_groups", [f("dropHighest", "Drop highest", "number", { min: 0 }), f("neverDrop", "Never drop (assignment ids)", "tags")]);
 extend("assignments", [f("finalGraderId", "Moderated: final grader", "ref", { ref: "users" })]);
 extend("outcomes", [f("calculationMethod", "Mastery calculation", "enum", { options: ["decaying_average", "n_mastery", "latest", "highest", "average"] }), f("nMastery", "n (for n-mastery)", "number", { min: 1, max: 10 })]);
@@ -892,6 +899,9 @@ ENTITIES.push(
   { table: "sis_imports", label: "SIS import", plural: "SIS imports", tab: "tenant-admin", prefix: "sis", titleField: "kind", workflow: true,
     fields: [sys("kind", "Kind"), sys("diffing", "Diffing mode", "boolean"), sys("state", "State"), sys("counts", "Counts", "json"), sys("errors", "Errors", "json"), sys("startedBy", "Started by")],
     perms: { read: ["admin", "registrar"] } },
+  { table: "oidc_states", label: "OIDC sign-in state", plural: "OIDC sign-in states", tab: "tenant-admin", prefix: "ost", titleField: "idpId",
+    fields: [sys("stateHash", "State (hashed)"), sys("idpId", "Provider"), f("nonce", "Nonce", "string", { secret: true, system: true }), f("verifier", "PKCE verifier", "string", { secret: true, system: true }), sys("next", "Return to"), sys("expiresAt", "Expires", "datetime"), sys("usedAt", "Used", "datetime")],
+    perms: { read: ["admin"] } },
   { table: "async_jobs", label: "Background job", plural: "Background jobs", tab: "tenant-admin", prefix: "job", titleField: "kind",
     fields: [sys("kind", "Kind"), sys("params", "Parameters", "json"), sys("state", "State (queued / running / completed / completed_with_errors / failed)"), sys("progress", "Progress %", "number"), sys("resultRef", "Result"), sys("issues", "Issues", "json"), sys("requestedBy", "Requested by"), sys("startedAt", "Started", "datetime"), sys("finishedAt", "Finished", "datetime")],
     perms: { read: ["admin", "registrar"] } },
@@ -899,7 +909,7 @@ ENTITIES.push(
     fields: [sys("name", "Name"), sys("email", "Email"), sys("state", "State (pending / approved / declined)"), sys("userId", "User"), sys("decidedBy", "Decided by")],
     perms: { read: ["admin", "registrar"] } },
   { table: "identity_providers", label: "Identity provider", plural: "Identity providers (SAML / OIDC / LDAP)", tab: "tenant-admin", prefix: "idp", titleField: "name",
-    fields: [sys("kind", "Kind (saml / oidc / ldap)"), sys("name", "Name"), sys("config", "Configuration (no secrets)", "json"), sys("state", "State (not_connected / disabled)"), sys("jitProvisioning", "Create users on first sign-in", "boolean"), sys("lastTest", "Last connection test", "json")],
+    fields: [sys("kind", "Kind (saml / oidc / ldap)"), sys("name", "Name"), sys("config", "Configuration (no secrets)", "json"), sys("state", "State (not_connected / disabled)"), sys("jitProvisioning", "Create users on first sign-in", "boolean"), sys("lastTest", "Last connection test", "json"), sys("discovery", "Discovered endpoints (OIDC)", "json")],
     perms: { read: ["admin"] } },
 
   /* Modules, differentiation, mastery paths, pacing */
@@ -990,7 +1000,7 @@ ENTITIES.push(
 
   /* Account, profile, planner, history */
   { table: "profiles", label: "Profile", plural: "Profiles", tab: "account", prefix: "prf", titleField: "displayName", owner: "userId", ownerOps: ["read", "create", "update"],
-    fields: [sys("userId", "User"), f("displayName", "Display name"), f("pronouns", "Pronouns"), f("bio", "Bio", "text"), f("avatarUrl", "Avatar", "url"), f("contactMethods", "Contact methods", "tags"), f("language", "Language", "enum", { options: ["en", "es", "fr"] }), f("timeZone", "Time zone"),
+    fields: [sys("userId", "User"), f("displayName", "Display name"), f("pronouns", "Pronouns"), f("bio", "Bio", "text"), f("avatarUrl", "Avatar", "url"), f("contactMethods", "Contact methods", "tags"), f("language", "Language", "enum", { options: ["en", "es", "fr", "pt", "ar"] }), f("timeZone", "Time zone"),
       f("highContrast", "High-contrast UI", "boolean"), f("dyslexiaFont", "Dyslexia-friendly font", "boolean"), f("underlineLinks", "Underline links", "boolean"), f("reducedMotion", "Reduce motion", "boolean")],
     perms: { read: ["admin", "support"], create: ALL } },
   { table: "dashboard_prefs", label: "Dashboard settings", plural: "Dashboard settings", tab: "dashboard", prefix: "dsh", titleField: "view", owner: "userId", ownerOps: ["read", "create", "update"],
@@ -1118,7 +1128,7 @@ export const TABS: TabDef[] = [
   { n: 31, slug: "accommodations", title: "Accommodations", group: "Added", phase: 2, summary: "Extra time, attempts and deadline extensions applied automatically to quizzes and due dates.", entities: ["accommodations"], nav: ["admin", "advisor", "instructor", "ta", "student"],
     runbook: { purpose: "Accessibility services accommodations.", deps: "Quiz engine, calendar.", failure: "Accommodation not applied to an already started attempt.", recovery: "Instructor grants an extra attempt." },
     threats: ["Disclosure of disability → only kind and effect shown to instructors"] },
-  { n: 32, slug: "groups", title: "People & Groups", group: "Added", phase: 3, summary: "Roster, group sets with self sign-up and auto-assign, team assignments and the faculty journal.", entities: ["group_sets", "groups", "faculty_journal"], nav: ["admin", "instructor", "ta", "designer", "student"],
+  { n: 32, slug: "groups", title: "People & Groups", group: "Added", phase: 3, summary: "Roster, group sets with self sign-up and auto-assign, team assignments and the faculty journal.", entities: ["group_sets", "groups", "group_pages", "group_posts", "faculty_journal"], nav: ["admin", "instructor", "ta", "designer", "student"],
     runbook: { purpose: "Course groups.", deps: "Enrollment.", failure: "Members not enrolled.", recovery: "Fix membership." },
     threats: ["Membership spoofing → members must be enrolled students"] },
   { n: 33, slug: "library", title: "Library & Reading Lists", group: "Added", phase: 2, summary: "Course reading lists with citations and accessible-format flags; feeds the AI Companion as assigned reading.", entities: ["reading_items"], nav: ALL,

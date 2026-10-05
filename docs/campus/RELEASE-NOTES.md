@@ -1,5 +1,20 @@
 # Release notes
 
+## Scholarion Campus 0.3.0 — parity round 3 (2026-10-05)
+
+Version identifier: `campus-0.3.0+parity3`. Staging only.
+
+- **Similarity review:** built-in text-similarity check (within the course) and signed reports from external tools; shown in the grader as a signal for review, never a penalty.
+- **Group spaces:** account-level groups that span courses, plus every course group, now have pages (with revisions), a threaded discussion and shared files with quotas.
+- **Media library:** personal audio/video library with in-browser recording (up to 5 minutes), WebVTT captions, and sharing with people or into a course.
+- **Single sign-on:** OpenID Connect sign-in (authorization code + PKCE, ID tokens verified against the provider's keys, optional just-in-time accounts). The client secret stays in a server environment variable.
+- **HTML view:** teachers can edit page HTML; it is converted through an allow-list into safe page blocks and anything removed is reported.
+- **Quick grader:** a phone-friendly grader that walks through ungraded submissions.
+- **Keyboard gradebook:** edit scores in a grid with arrow keys, Enter and Escape; only changed cells are saved.
+- **Localization:** campus navigation and frame in English, Spanish, French, Portuguese and Arabic (right-to-left); dates in each person's own time zone.
+
+Still partial: SAML and LDAP sign-in (configuration records only).
+
 ## Scholarion Campus 0.2.0 — parity round 2 (2026-10-04)
 
 Version identifier: `campus-0.2.0+parity2`. Staging only.

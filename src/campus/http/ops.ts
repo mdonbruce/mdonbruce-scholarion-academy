@@ -55,7 +55,12 @@ import * as comms from "../services/comms";
 import * as uploads from "../services/uploads";
 import * as acfg from "../services/accountcfg";
 import * as pfo from "../services/portfolio";
-import { isStaff, requireTenant } from "../services/common";
+import * as simx from "../services/similarity";
+import * as gsp from "../services/groupspace";
+import * as mlib from "../services/medialib";
+import * as oidcSvc from "../services/oidc";
+import { htmlToValidBlocks } from "../services/htmlimport";
+import { isStaff, requireCourse, requireTenant } from "../services/common";
 import { decideSupportGrant, grantAccountAdmin, grantRole, requestSupportGrant, revokeRole } from "../iam";
 
 /**
@@ -203,6 +208,12 @@ cmd("quiz.finish", "assessment", "Save answers and submit the attempt.", [P("att
   return asm.submitAttempt(store, actor, args.s("attemptId"));
 });
 cmd("page.save_text", "curriculum", "Save a page from the text editor (headings, lists, images with alt text, links, tables).", [P("pageId"), P("text", "text"), opt("title"), opt("ifVersion", "number")], ({ store, actor, args }) => cur.savePageText(store, actor, args.s("pageId"), args.s("text"), args.so("title"), args.has("ifVersion") ? args.n("ifVersion") : undefined) ?? entity.update(store, actor, "pages", args.s("pageId"), { blocks: cur.markupToBlocks(args.s("text")), ...(args.has("title") ? { title: args.s("title") } : {}) }, args.has("ifVersion") ? args.n("ifVersion") : undefined));
+cmd("page.save_html", "curriculum", "Save a page from the HTML view. HTML is converted to validated blocks through an allow-list; anything removed is reported.", [P("pageId"), P("html", "text"), opt("ifVersion", "number")], ({ store, actor, args }) => {
+  const r = htmlToValidBlocks(args.s("html"), cur.validateBlocks);
+  if (!r.blocks.length) throw new CampusError("invalid", `Nothing usable in that HTML${r.removed.length ? ` (removed: ${r.removed.join(", ")})` : ""}.`, 422);
+  const row = entity.update(store, actor, "pages", args.s("pageId"), { blocks: r.blocks }, args.has("ifVersion") ? args.n("ifVersion") : undefined);
+  return { id: row.id, version: row.version, blocks: r.blocks.length, removed: r.removed };
+});
 cmd("quiz.submit", "assessment", "Submit an attempt (idempotent).", [P("attemptId")], ({ store, actor, args }) => asm.submitAttempt(store, actor, args.s("attemptId")));
 cmd("quiz.grade_question", "assessment", "Score a manually graded question.", [P("attemptId"), P("questionId"), P("points", "number")], ({ store, actor, args }) => asm.gradeQuestion(store, actor, args.s("attemptId"), args.s("questionId"), args.n("points")));
 cmd("quiz.moderate", "assessment", "Extra time, an extra attempt, or reopen for one student.", [P("quizId"), P("userId"), P("action", "string", true, { options: ["extend", "extra_attempt", "reopen"] }), opt("minutes", "number")], ({ store, actor, args }) => asm.moderate(store, actor, args.s("quizId"), args.s("userId"), args.s("action") as never, args.n("minutes", 10)));
@@ -213,6 +224,35 @@ qry("quiz.manual_queue", "assessment", "Questions waiting for manual grading.", 
 /* 5 Gradebook */
 qry("gradebook.grid", "gradebook", "Gradebook grid with filters.", [P("courseId"), opt("sectionId"), opt("groupId"), opt("moduleId"), opt("periodId"), opt("studentGroupId"), opt("sort", "string", { options: ["due", "points", "module", "title"] }), opt("showUnpublished", "boolean")], ({ store, actor, args }) => grd.gradebookGrid(store, actor, args.s("courseId"), { sectionId: args.so("sectionId"), groupId: args.so("groupId"), moduleId: args.so("moduleId"), periodId: args.so("periodId"), studentGroupId: args.so("studentGroupId"), sort: args.so("sort") as never, showUnpublished: args.b("showUnpublished") }));
 cmd("grades.set", "gradebook", "Enter or change a grade (pass ifVersion to avoid overwriting someone else's change).", [P("assignmentId"), P("userId"), opt("score", "number"), opt("excused", "boolean"), opt("status", "string", { options: ["none", "late", "missing", "excused"] }), opt("rubric", "json"), opt("ifVersion", "number"), opt("comment", "text")], ({ store, actor, args }) => grd.setGrade(store, actor, { assignmentId: args.s("assignmentId"), userId: args.s("userId"), score: args.has("score") ? args.n("score") : undefined, excused: args.has("excused") ? args.b("excused") : undefined, status: args.so("status") as never, rubric: args.has("rubric") ? args.j("rubric") : undefined, ifVersion: args.has("ifVersion") ? args.n("ifVersion") : undefined, comment: args.so("comment") }));
+cmd("grades.set_many", "gradebook", "Save several gradebook cells at once (keyboard grid). Fields g__<assignmentId>__<userId> carry the new score; only changed cells are written.", [P("courseId")], ({ store, actor, args }) => {
+  const cid = args.s("courseId");
+  if (!isStaff(actor, cid)) throw new CampusError("forbidden", "Graders only.", 403);
+  const saved: string[] = [];
+  const errors: { cell: string; message: string }[] = [];
+  for (const [k, v] of Object.entries(args.raw)) {
+    const m = /^g__([A-Za-z0-9_]+)__([A-Za-z0-9_]+)$/.exec(k);
+    if (!m) continue;
+    const before = String(args.raw[`o__${m[1]}__${m[2]}`] ?? "");
+    const now = String(v ?? "").trim();
+    if (now === before) continue;
+    const ex = now.toUpperCase() === "EX";
+    const score = now === "" ? null : Number(now);
+    if (!ex && score !== null && !Number.isFinite(score)) {
+      errors.push({ cell: k, message: `"${now}" isn't a number` });
+      continue;
+    }
+    try {
+      const asg = store.get("assignments", m[1]) ?? store.get("quizzes", m[1]);
+      if (!asg || asg.courseId !== cid) throw new CampusError("not_found", "Not in this course", 404);
+      grd.setGrade(store, actor, ex ? { assignmentId: m[1], userId: m[2], excused: true } : { assignmentId: m[1], userId: m[2], score });
+      saved.push(k);
+    } catch (e) {
+      errors.push({ cell: k, message: (e as Error).message });
+    }
+  }
+  if (errors.length && !saved.length) throw new CampusError("invalid", errors.map((x) => x.message).join("; "), 422, { errors });
+  return { saved: saved.length, errors };
+});
 cmd("grades.post", "gradebook", "Post (release) or hide grades for an assignment.", [P("assignmentId"), opt("sectionId"), opt("gradedOnly", "boolean"), opt("hide", "boolean")], ({ store, actor, args }) => grd.postGrades(store, actor, args.s("assignmentId"), { sectionId: args.so("sectionId"), gradedOnly: args.b("gradedOnly"), hide: args.b("hide") }));
 cmd("grades.select_provisional", "gradebook", "Moderated grading: choose the final grade.", [P("gradeId"), opt("graderId"), opt("score", "number")], ({ store, actor, args }) => grd.selectProvisional(store, actor, args.s("gradeId"), args.so("graderId") ?? null, args.has("score") ? args.n("score") : undefined));
 cmd("grades.final_override", "gradebook", "Override a student's final course grade.", [P("courseId"), P("userId"), opt("grade")], ({ store, actor, args }) => grd.setFinalOverride(store, actor, args.s("courseId"), args.s("userId"), args.so("grade") ?? null));
@@ -447,6 +487,39 @@ qry("roles.account_admins", "identity", "Sub-account admins.", [], ({ store, act
 cmd("portfolios.set_public", "credentials", "Turn my portfolio's public link on or off (off removes the link).", [P("portfolioId"), P("on", "boolean")], ({ store, actor, args }) => pfo.setPortfolioPublic(store, actor, args.s("portfolioId"), args.b("on")));
 cmd("live_recordings.add", "live", "Add a recording to a live session (deleted after the session's retention days).", [P("liveSessionId"), P("fileId"), opt("title"), opt("durationMinutes", "number"), opt("captions", "text")], ({ store, actor, args }) => cal.addLiveRecording(store, actor, { liveSessionId: args.s("liveSessionId"), fileId: args.s("fileId"), title: args.so("title"), durationMinutes: args.has("durationMinutes") ? args.n("durationMinutes") : undefined, captions: args.so("captions") }));
 qry("live_recordings.for_course", "live", "Recordings in a course, with their delete-after dates.", [P("courseId")], ({ store, actor, args }) => cal.liveRecordings(store, actor, args.s("courseId")));
+cmd("similarity.report", "assessment", "A similarity tool posts a signed report (JWT: submission_id, score 0–100, report_url, status).", [P("jwt", "text")], ({ store, args }) => simx.receiveReport(store, args.s("jwt")));
+cmd("similarity.rescan", "assessment", "Re-run the built-in similarity check for a submission.", [P("submissionId")], ({ store, actor, args }) => simx.rescan(store, actor, args.s("submissionId")));
+qry("similarity.get", "assessment", "Similarity result for a submission (learners see their own score and report link).", [P("submissionId")], ({ store, actor, args }) => simx.similarityFor(store, actor, args.s("submissionId")));
+cmd("similarity.use_builtin", "assessment", "Turn on the built-in similarity check for an assignment.", [P("assignmentId")], ({ store, actor, args }) => {
+  const asg = store.get("assignments", args.s("assignmentId"));
+  if (!asg) throw new CampusError("not_found", "Assignment not found", 404);
+  requireCourse(store, actor, String(asg.courseId), ["admin", "instructor", "designer"], "similarity.enable");
+  const tool = simx.ensureSimilarityTool(store);
+  return store.tx(() => store.update("assignments", asg.id, { plagiarismToolId: tool.id }));
+});
+qry("groups.mine", "groups", "My groups across every course, plus account groups I can join.", [], ({ store, actor }) => gsp.myGroups(store, actor));
+qry("groups.home", "groups", "A group's home: members, pages, discussion and files.", [P("groupId")], ({ store, actor, args }) => gsp.groupHome(store, actor, args.s("groupId")));
+cmd("groups.create_account_group", "groups", "Create an account-level group that spans courses (admins).", [P("name"), opt("description", "text"), opt("selfJoin", "boolean")], ({ store, actor, args }) => gsp.createAccountGroup(store, actor, { name: args.s("name"), description: args.so("description"), selfJoin: args.b("selfJoin") }));
+cmd("groups.join_account_group", "groups", "Join or leave an account group.", [P("groupId"), opt("leave", "boolean")], ({ store, actor, args }) => gsp.joinAccountGroup(store, actor, args.s("groupId"), !args.b("leave")));
+cmd("groups.add_members", "groups", "Add members to a group (course staff, or admins for account groups).", [P("groupId"), P("userIds", "list")], ({ store, actor, args }) => gsp.addGroupMembers(store, actor, args.s("groupId"), args.l("userIds")));
+cmd("groups.save_page", "groups", "Create or edit a group page (members).", [P("groupId"), opt("pageId"), P("title"), P("text", "text")], ({ store, actor, args }) => gsp.saveGroupPage(store, actor, args.s("groupId"), { pageId: args.so("pageId"), title: args.s("title"), text: args.s("text") }));
+cmd("groups.post", "groups", "Start a group thread or reply.", [P("groupId"), opt("title"), P("body", "text"), opt("parentId")], ({ store, actor, args }) => gsp.postInGroup(store, actor, args.s("groupId"), { title: args.so("title"), body: args.s("body"), parentId: args.so("parentId") }));
+qry("media.library", "files", "My media library and media shared with me.", [], ({ store, actor }) => mlib.myLibrary(store, actor));
+cmd("media.add", "files", "Add one of my audio/video files to my media library.", [P("fileId"), opt("title")], ({ store, actor, args }) => mlib.addToLibrary(store, actor, { fileId: args.s("fileId"), title: args.so("title") }));
+cmd("media.share", "files", "Share a library item with people and/or into a course I teach.", [P("mediaId"), opt("userIds", "list"), opt("courseId")], ({ store, actor, args }) => mlib.shareMedia(store, actor, args.s("mediaId"), { userIds: args.l("userIds"), courseId: args.so("courseId") }));
+cmd("media.captions", "files", "Add captions (WebVTT) or a transcript to a library item.", [P("mediaId"), P("language"), P("text", "text"), opt("kind", "string", { options: ["captions", "transcript"] })], ({ store, actor, args }) => mlib.addCaptions(store, actor, args.s("mediaId"), { language: args.s("language"), text: args.s("text"), kind: (args.so("kind") as "captions") ?? "captions" }));
+qry("media.play", "files", "Playback details for media I can see.", [P("mediaId")], ({ store, actor, args }) => mlib.mediaForPlayback(store, actor, args.s("mediaId")));
+cmd("identity_providers.check_oidc", "tenant-admin", "Live check of an OIDC provider: discovery document and signing keys.", [P("id")], async ({ store, actor, args }) => {
+  requireTenant(store, actor, ["admin"], "identity_providers.test");
+  return oidcSvc.checkOidc(store, args.s("id"));
+});
+cmd("identity_providers.enable_oidc", "tenant-admin", "Enable or disable OIDC sign-in with a checked provider.", [P("id"), P("on", "boolean")], ({ store, actor, args }) => {
+  requireTenant(store, actor, ["admin"], "identity_providers.enable");
+  const r = oidcSvc.setOidcEnabled(store, args.s("id"), args.b("on"));
+  store.audit({ actorId: actor.id, actorRoles: actor.roles, action: "identity_providers.enable", resource: `identity_providers/${r.id}`, outcome: "allowed", reason: String(r.state) });
+  return r;
+});
+qry("identity_providers.sign_in_options", "tenant-admin", "Enabled single sign-on providers (public).", [], ({ store }) => oidcSvc.enabledOidc(store));
 qry("outbox.status", "tenant-admin", "Outbox events (pending, delivered, dead).", [opt("status")], ({ store, actor, args }) => {
   requireTenant(store, actor, ["admin"], "outbox.read");
   return store.outbox().filter((e) => !args.has("status") || e.status === args.s("status")).slice(-200).reverse();

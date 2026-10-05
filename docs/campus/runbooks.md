@@ -5,7 +5,7 @@ Generated from the tab registry (`src/campus/registry.ts`). One section per tab.
 Common tools for every tab:
 
 - **Audit log:** Admin Console → Recent audit, or `GET /q/audit.log`. Every denial is recorded with the reason; act-as records carry the real admin.
-- **Outbox:** `GET /q/outbox.status?status=dead`; replay with `POST /a/outbox.replay`. Consumers: lms-enrollment-projection, observer-alerts, analytics-events, notifications, search-indexer, file-scanner, media-transcoder, ai-support-triage, webhook-fanout, bundle-badge, completion-evaluator.
+- **Outbox:** `GET /q/outbox.status?status=dead`; replay with `POST /a/outbox.replay`. Consumers: lms-enrollment-projection, observer-alerts, analytics-events, notifications, search-indexer, file-scanner, media-transcoder, ai-support-triage, webhook-fanout, bundle-badge, completion-evaluator, similarity-builtin.
 - **Metrics:** `/api/campus/metrics` (Prometheus text). Health: `/api/campus/health`.
 - **Jobs:** `POST /a/ops.run_jobs` (announcements, missing work, overdue holds, retention, digests, outbox relay, webhooks).
 
@@ -30,7 +30,7 @@ Courses, sections, modules and accessible block pages with publish validation, p
 - **Typical failures:** Publish blocked by validation; blueprint conflicts.
 - **Recovery:** Read the validation report; fix references/alt text/captions; re-run the blueprint push (idempotent).
 - **Resources:** `courses`, `sections`, `modules`, `module_items`, `pages`, `page_revisions`, `module_progress`
-- **Operations:** `course.modules`, `course.nav`, `course.syllabus`, `course.checklist`, `course.progress`, `module.open_item`, `module.mark_done`, `module.duplicate`, `module.move_item`, `page.restore_revision`, `page.a11y`, `course.student_view`, `page.save_text`, `course.statistics`, `course.conclude`, `course.reset`, `page.word_count`
+- **Operations:** `course.modules`, `course.nav`, `course.syllabus`, `course.checklist`, `course.progress`, `module.open_item`, `module.mark_done`, `module.duplicate`, `module.move_item`, `page.restore_revision`, `page.a11y`, `course.student_view`, `page.save_text`, `page.save_html`, `course.statistics`, `course.conclude`, `course.reset`, `page.word_count`
 - **Who sees it:** admin, instructor, ta, designer, student, observer, advisor, registrar, support
 
 ## 3. Enrollment
@@ -54,7 +54,7 @@ Assignments, quizzes with snapshots and seeded randomization, question banks, at
 - **Typical failures:** Attempt start refused; submission blocked by scan.
 - **Recovery:** Check availability, attempt count, accommodations; re-scan file; idempotent resubmit.
 - **Resources:** `assignments`, `quizzes`, `question_banks`, `questions`, `attempts`, `submissions`
-- **Operations:** `submission.create`, `submission.mine`, `peer.assign`, `peer.complete`, `peer.mine`, `quiz.start`, `quiz.attempt`, `quiz.autosave`, `quiz.finish`, `quiz.submit`, `quiz.grade_question`, `quiz.moderate`, `quiz.regrade`, `quiz.item_analysis`, `quiz.manual_queue`, `lti.proctor_launch`, `lti.proctor_start_assessment`, `quizzes.student_analysis`, `quizzes.student_analysis_export_csv`, `quizzes.outcomes_analysis`, `question_banks.share`, `question_banks.for_course`, `quizzes.add_pool`, `assignments.bulk_dates`, `submission.formats`
+- **Operations:** `submission.create`, `submission.mine`, `peer.assign`, `peer.complete`, `peer.mine`, `quiz.start`, `quiz.attempt`, `quiz.autosave`, `quiz.finish`, `quiz.submit`, `quiz.grade_question`, `quiz.moderate`, `quiz.regrade`, `quiz.item_analysis`, `quiz.manual_queue`, `lti.proctor_launch`, `lti.proctor_start_assessment`, `similarity.report`, `similarity.rescan`, `similarity.get`, `similarity.use_builtin`, `quizzes.student_analysis`, `quizzes.student_analysis_export_csv`, `quizzes.outcomes_analysis`, `question_banks.share`, `question_banks.for_course`, `quizzes.add_pool`, `assignments.bulk_dates`, `submission.formats`
 - **Who sees it:** admin, instructor, ta, designer, student
 
 ## 5. Gradebook
@@ -66,7 +66,7 @@ Weighted groups, drop rules, late/missing policies, versioned rubrics, posting, 
 - **Typical failures:** 412 on stale edits; unposted grades not visible.
 - **Recovery:** Reload and re-apply edits; post explicitly; check audit for release history.
 - **Resources:** `assignment_groups`, `grades`, `rubrics`, `posting_policies`, `peer_reviews`, `annotations`, `grading_periods`, `grading_period_sets`, `grading_schemes`, `grade_history`, `comment_library`, `submission_comments`, `gradebook_notes`
-- **Operations:** `grader.queue`, `gradebook.grid`, `grades.set`, `grades.post`, `grades.select_provisional`, `grades.final_override`, `grades.curve`, `grades.default`, `grades.message_students_who`, `grades.export_csv`, `grades.import_csv`, `grades.history`, `grades.totals`, `rubric.new_version`, `submission.annotate`, `submission.comment`, `submission.comments`, `ai.draft_feedback`, `grades.gpa`, `grading_periods.set_create`, `grading_periods.add`, `grading_periods.for_course`, `gradebook.cell`, `grades.set_group`
+- **Operations:** `grader.queue`, `gradebook.grid`, `grades.set`, `grades.set_many`, `grades.post`, `grades.select_provisional`, `grades.final_override`, `grades.curve`, `grades.default`, `grades.message_students_who`, `grades.export_csv`, `grades.import_csv`, `grades.history`, `grades.totals`, `rubric.new_version`, `submission.annotate`, `submission.comment`, `submission.comments`, `ai.draft_feedback`, `grades.gpa`, `grading_periods.set_create`, `grading_periods.add`, `grading_periods.for_course`, `gradebook.cell`, `grades.set_group`
 - **Who sees it:** admin, instructor, ta, student, observer
 
 ## 6. Collaboration
@@ -90,7 +90,7 @@ Signed short-lived uploads into quarantine, scan, MIME check, promotion; media r
 - **Typical failures:** Files stuck in quarantine; media can't publish without captions.
 - **Recovery:** Re-run scan; add caption track or record an authorized exception.
 - **Resources:** `files`, `folders`, `media`, `caption_tracks`
-- **Operations:** `files.request_upload`, `groups.quota`, `files.download_url`, `files.publish`, `files.bulk`
+- **Operations:** `files.request_upload`, `groups.quota`, `files.download_url`, `files.publish`, `files.bulk`, `media.library`, `media.add`, `media.share`, `media.captions`, `media.play`
 - **Who sees it:** admin, instructor, ta, designer, student
 
 ## 8. Analytics
@@ -306,7 +306,7 @@ Accounts and sub-accounts, the permission matrix with locks, custom roles, theme
 - **Typical failures:** Unverified domains don't resolve (expected).
 - **Recovery:** Verify domain; toggle flags.
 - **Resources:** `accounts`, `custom_roles`, `permission_overrides`, `global_announcements`, `feature_options`, `masquerades`, `sis_imports`, `role_templates`, `async_jobs`, `self_registrations`, `identity_providers`
-- **Operations:** `permissions.matrix`, `permissions.set`, `admin.overview`, `admin.theme`, `admin.flag`, `features.matrix`, `features.set`, `admin.add_domain`, `admin.verify_domain`, `global_announcements.active`, `global_announcements.dismiss`, `admin.help_links`, `admin.help_links.get`, `custom_roles.grant`, `audit.log`, `audit.search`, `audit.search_export_csv`, `audit.auth_log`, `admin.account_settings`, `admin.account_settings.set`, `admin.legal_links`, `accounts.self_register`, `self_registrations.decide`, `admin.theme_extras`, `jobs.enqueue_report`, `jobs.enqueue_sis_import`, `jobs.status`, `identity_providers.configure`, `identity_providers.test`, `outbox.status`
+- **Operations:** `permissions.matrix`, `permissions.set`, `admin.overview`, `admin.theme`, `admin.flag`, `features.matrix`, `features.set`, `admin.add_domain`, `admin.verify_domain`, `global_announcements.active`, `global_announcements.dismiss`, `admin.help_links`, `admin.help_links.get`, `custom_roles.grant`, `audit.log`, `audit.search`, `audit.search_export_csv`, `audit.auth_log`, `admin.account_settings`, `admin.account_settings.set`, `admin.legal_links`, `accounts.self_register`, `self_registrations.decide`, `admin.theme_extras`, `jobs.enqueue_report`, `jobs.enqueue_sis_import`, `jobs.status`, `identity_providers.configure`, `identity_providers.test`, `identity_providers.check_oidc`, `identity_providers.enable_oidc`, `identity_providers.sign_in_options`, `outbox.status`
 - **Who sees it:** admin
 
 ## 26. Privacy & Compliance
@@ -389,8 +389,8 @@ Roster, group sets with self sign-up and auto-assign, team assignments and the f
 - **Depends on:** Enrollment.
 - **Typical failures:** Members not enrolled.
 - **Recovery:** Fix membership.
-- **Resources:** `group_sets`, `groups`, `faculty_journal`
-- **Operations:** `people.roster`, `people.add`, `people.set_state`, `groups.set`, `groups.join`, `groups.leave`, `groups.auto_assign`, `groups.clone`, `groups.export_csv`, `groups.import_csv`, `people.edit_enrollment`
+- **Resources:** `group_sets`, `groups`, `group_pages`, `group_posts`, `faculty_journal`
+- **Operations:** `people.roster`, `people.add`, `people.set_state`, `groups.mine`, `groups.home`, `groups.create_account_group`, `groups.join_account_group`, `groups.add_members`, `groups.save_page`, `groups.post`, `groups.set`, `groups.join`, `groups.leave`, `groups.auto_assign`, `groups.clone`, `groups.export_csv`, `groups.import_csv`, `people.edit_enrollment`
 - **Who sees it:** admin, instructor, ta, designer, student
 
 ## 33. Library & Reading Lists

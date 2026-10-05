@@ -344,7 +344,7 @@ export function jobStatus(store: TenantStore, a: Actor, jobId?: string) {
 
 /* ---------------- identity providers ---------------- */
 
-const IDP_FIELDS: Record<string, string[]> = { saml: ["entityId", "ssoUrl", "metadataUrl", "certificateFingerprint", "nameIdFormat"], oidc: ["issuer", "clientId", "authorizationEndpoint", "tokenEndpoint", "scopes"], ldap: ["host", "port", "baseDn", "userFilter", "useTls"] };
+const IDP_FIELDS: Record<string, string[]> = { saml: ["entityId", "ssoUrl", "metadataUrl", "certificateFingerprint", "nameIdFormat"], oidc: ["issuer", "clientId", "scopes", "clientSecretEnv"], ldap: ["host", "port", "baseDn", "userFilter", "useTls"] };
 
 export function configureIdp(store: TenantStore, a: Actor, input: { kind: string; name: string; config: Record<string, unknown>; jitProvisioning?: boolean; id?: string }) {
   requireTenant(store, a, ["admin"], "identity_providers.configure");
@@ -353,10 +353,11 @@ export function configureIdp(store: TenantStore, a: Actor, input: { kind: string
   const name = String(input.name ?? "").trim().slice(0, 80);
   if (!name) throw new CampusError("invalid", "Name the provider.", 422);
   const raw = input.config ?? {};
-  if (Object.keys(raw).some((k) => /secret|password|private/i.test(k))) throw new CampusError("no_secrets", "Don't store secrets here. Client secrets and bind passwords belong in the deployment's secret manager.", 422);
+  if (raw.clientSecretEnv !== undefined && !/^[A-Z][A-Z0-9_]{2,63}$/.test(String(raw.clientSecretEnv))) throw new CampusError("invalid", "clientSecretEnv is the NAME of a server environment variable (like CAMPUS_OIDC_SECRET), not the secret.", 422);
+  if (Object.keys(raw).some((k) => k !== "clientSecretEnv" && /secret|password|private/i.test(k))) throw new CampusError("no_secrets", "Don't store secrets here. Client secrets and bind passwords belong in the deployment's secret manager.", 422);
   const config: Record<string, unknown> = {};
   for (const k of fields) if (raw[k] !== undefined && raw[k] !== "") config[k] = raw[k];
-  for (const k of ["ssoUrl", "metadataUrl", "issuer", "authorizationEndpoint", "tokenEndpoint"]) if (config[k] !== undefined && !/^https:\/\//.test(String(config[k]))) throw new CampusError("invalid", `${k} must be an https:// address.`, 422);
+  for (const k of ["ssoUrl", "metadataUrl", "issuer"]) if (config[k] !== undefined && !/^https:\/\//.test(String(config[k]))) throw new CampusError("invalid", `${k} must be an https:// address.`, 422);
   if (input.kind === "ldap" && config.useTls === false) throw new CampusError("invalid", "LDAP must use TLS (ldaps or StartTLS).", 422);
   return store.tx(() => {
     const vals = { kind: input.kind, name, config, state: "not_connected", jitProvisioning: !!input.jitProvisioning };

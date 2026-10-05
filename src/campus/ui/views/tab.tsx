@@ -21,7 +21,7 @@ import { DesignPanel } from "./design";
 import { AidQueuePanel } from "./market";
 import { AcceptancePanel, BridgePanel, DepartmentsPanel, VoicePanel } from "./governed";
 import { AccountAdminPanel } from "./adminx";
-import { AppsPanel, ForeignImportPanel, GroupFilesPanel, OutcomesPanel, TermAccessPanel } from "./structure";
+import { AppsPanel, ForeignImportPanel, GroupSpacesPanel, MediaLibraryPanel, OutcomesPanel, TermAccessPanel } from "./structure";
 import { isDesignProgram } from "../../academy/design";
 import { studioOverview, programIndex } from "../../services/programs";
 import { PARITY, paritySummary, SECTION_TITLES } from "../../parity";
@@ -189,8 +189,10 @@ function Bespoke({ t, tab }: { t: T; tab: string }) {
         return hasAny(t.actor, ["admin"]) ? <Connectors t={t} /> : null;
       case "cloud-lab":
         return <CloudLab t={t} />;
+      case "files":
+        return <MediaLibraryPanel store={t.store} actor={t.actor} slug={t.slug} here={t.here} sp={t.sp} />;
       case "groups":
-        return t.sp.setId ? <GroupSet t={t} /> : <GroupFilesPanel store={t.store} actor={t.actor} slug={t.slug} here={t.here} sp={t.sp} />;
+        return t.sp.setId ? <GroupSet t={t} /> : <GroupSpacesPanel store={t.store} actor={t.actor} slug={t.slug} here={t.here} sp={t.sp} />;
       case "observers":
         return <Observers t={t} />;
       case "helpdesk":

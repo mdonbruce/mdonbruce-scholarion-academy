@@ -6,6 +6,7 @@ import { facultyByName } from "../../../brand/faculty";
 import { FacultyCard } from "../../../ui/components/faculty";
 import { CampusError, type Row, type TenantStore } from "../../core";
 import { hasAny, type Actor } from "../../iam";
+import GridKeys from "../client/GridKeys";
 import * as entity from "../../entity";
 import { ENTITY } from "../../registry";
 import * as cur from "../../services/curriculum";
@@ -167,6 +168,13 @@ export function CourseView({ store, actor, slug, courseId, rest, sp }: { store: 
                 </a>
               </li>
             )}
+            {isGrader(actor, courseId) && (
+              <li>
+                <a href={`${base(c)}/mini-grader`} aria-current={tab === "mini-grader" ? "page" : undefined}>
+                  Quick grader (mobile)
+                </a>
+              </li>
+            )}
           </ul>
         </nav>
         <section className="campus-course-body" aria-label="Course content">
@@ -199,6 +207,8 @@ function renderTab(c: C, tab: string, staff: boolean): ReactNode {
       return <Syllabus c={c} staff={staff} />;
     case "grades":
       return staff ? <Gradebook c={c} /> : <StudentGrades c={c} />;
+    case "mini-grader":
+      return isGrader(c.actor, String(c.course.id)) ? <MiniGrader c={c} /> : <Denied message="Graders only." />;
     case "grader":
       return <Grader c={c} />;
     case "people":
@@ -526,6 +536,17 @@ function PageDetail({ c, staff }: { c: C; staff: boolean }) {
                 Save page
               </button>
             </form>
+            <details>
+              <summary className="small">HTML view</summary>
+              <form method="post" action={api(c.slug, "a/page.save_html")} className="stack">
+                <Hidden values={{ back: here, pageId: p.id, ifVersion: String(p.version), notice: "Saved from HTML. Unsupported markup was removed." }} />
+                <label htmlFor="pg-html">HTML (converted to safe page blocks; scripts, styles, forms and event handlers are removed)</label>
+                <textarea id="pg-html" name="html" rows={12} className="mono" defaultValue={String(p.html ?? "")} />
+                <button className="btn btn-outline btn-sm" type="submit">
+                  Save HTML
+                </button>
+              </form>
+            </details>
             <h3 className="small">Revisions</h3>
             <ul className="item-list">
               {c.store.list("page_revisions", (r) => r.pageId === p.id).map((r) => (
@@ -1008,6 +1029,59 @@ function RubricFeedback({ c }: { c: C }) {
   );
 }
 
+/** Keyboard-editable grid: arrows/Enter move between cells, Escape undoes a cell, one Save writes changed cells only. */
+function KeyboardGradebook({ c, g }: { c: C; g: ReturnType<typeof grading.gradebookGrid> }) {
+  const cid = String(c.course.id);
+  return (
+    <form method="post" action={api(c.slug, "a/grades.set_many")} className="stack">
+      <Hidden values={{ back: `${base(c)}/grades?edit=1`, courseId: cid, notice: "Gradebook saved." }} />
+      <p className="tiny muted">Type a score, or EX to excuse. Arrow keys and Enter move between cells; Escape restores a cell. Only changed cells are saved.</p>
+      <GridKeys gridId="kb-grid" />
+      <div className="table-wrap campus-gradebook" role="region" aria-label="Editable gradebook" tabIndex={0}>
+        <table className="table" id="kb-grid">
+          <caption className="sr-only">Editable gradebook for {String(c.course.title)}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Student</th>
+              {g.columns.map((col) => (
+                <th scope="col" key={col.id}>
+                  {col.title} <span className="tiny muted">/{col.points}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {g.rows.map((r, ri) => (
+              <tr key={r.userId}>
+                <th scope="row">{r.name}</th>
+                {g.columns.map((col, ci) => {
+                  const cell = r.cells[col.id] as { score: number | null; status: string; assigned?: boolean };
+                  const v = cell.status === "excused" ? "EX" : cell.score === null || cell.score === undefined ? "" : String(cell.score);
+                  return (
+                    <td key={col.id}>
+                      {cell.assigned === false ? (
+                        <span className="muted">n/a</span>
+                      ) : (
+                        <>
+                          <input type="hidden" name={`o__${col.id}__${r.userId}`} value={v} />
+                          <input className="gb-input" name={`g__${col.id}__${r.userId}`} defaultValue={v} inputMode="decimal" size={4} data-row={ri} data-col={ci} aria-label={`${r.name}, ${col.title}, out of ${col.points}`} />
+                        </>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <button className="btn btn-primary btn-sm" type="submit">
+        Save changed cells
+      </button>
+    </form>
+  );
+}
+
 function Gradebook({ c }: { c: C }) {
   if (c.sp.view === "individual") return <IndividualGradebook c={c} />;
   const cid = String(c.course.id);
@@ -1038,7 +1112,11 @@ function Gradebook({ c }: { c: C }) {
         <a className="btn btn-ghost btn-sm" href={`${base(c)}/grades?view=individual`}>
           Individual view
         </a>
+        <a className="btn btn-ghost btn-sm" href={c.sp.edit ? `${base(c)}/grades` : `${base(c)}/grades?edit=1`}>
+          {c.sp.edit ? "Done editing" : "Edit with keyboard"}
+        </a>
       </div>
+      {c.sp.edit && <KeyboardGradebook c={c} g={g} />}
       <div className="table-wrap campus-gradebook" role="region" aria-label="Gradebook" tabIndex={0}>
         <table className="table">
           <caption className="sr-only">Gradebook for {String(c.course.title)}</caption>
@@ -1099,6 +1177,58 @@ function Gradebook({ c }: { c: C }) {
   );
 }
 
+/** Mobile mini grader: one ungraded submission at a time, big touch targets, save and move on. */
+function MiniGrader({ c }: { c: C }) {
+  const cid = String(c.course.id);
+  const pending = c.store
+    .list("assignments", (a) => a.courseId === cid && a.state === "published")
+    .map((a) => ({ a, queue: (asm.graderQueue(c.store, c.actor, a.id) as unknown as { userId: string; display: string; needsGrading: boolean; submission: Row | null; grade: { score: unknown; version: number } | null }[]).filter((q) => q.needsGrading) }))
+    .filter((x) => x.queue.length);
+  const aid = c.sp.assignmentId && pending.some((x) => x.a.id === c.sp.assignmentId) ? c.sp.assignmentId : pending[0]?.a.id;
+  const here = `${base(c)}/mini-grader`;
+  if (!aid) return <Empty title="Nothing to grade — all caught up." />;
+  const cur0 = pending.find((x) => x.a.id === aid)!;
+  const item = cur0.queue[0];
+  const sub = item.submission;
+  return (
+    <div className="stack mini-grader">
+      <form method="get" className="row wrap">
+        <label htmlFor="mg-a" className="sr-only">
+          Assignment
+        </label>
+        <select id="mg-a" name="assignmentId" defaultValue={aid}>
+          {pending.map((x) => (
+            <option key={x.a.id} value={x.a.id}>
+              {String(x.a.title)} ({x.queue.length})
+            </option>
+          ))}
+        </select>
+        <button className="btn btn-ghost btn-sm" type="submit">
+          Go
+        </button>
+      </form>
+      <section className="card card-pad stack" aria-labelledby="mg-h">
+        <h2 id="mg-h" className="card-title">
+          {item.display} <span className="tiny muted">· {cur0.queue.length} left</span>
+        </h2>
+        {sub?.body ? <pre className="code small campus-submission" tabIndex={0}>{String(sub.body)}</pre> : sub?.fileId ? <a href={api(c.slug, `files/${String(sub.fileId)}/preview`)}>Open the submitted file</a> : <p className="small">{String(sub?.url ?? sub?.mode ?? "")}</p>}
+        <form method="post" action={api(c.slug, "a/grades.set")} className="stack">
+          <Hidden values={{ back: `${here}?assignmentId=${aid}`, assignmentId: aid, userId: item.userId, ifVersion: item.grade ? String(item.grade.version) : undefined, notice: "Saved — next submission." }} />
+          <label htmlFor="mg-score">
+            Score (out of {Number(cur0.a.points)})
+          </label>
+          <input id="mg-score" name="score" type="number" inputMode="decimal" min={0} step="0.5" required className="mini-grader-score" />
+          <label htmlFor="mg-comment">Comment (optional)</label>
+          <textarea id="mg-comment" name="comment" rows={3} />
+          <button className="btn btn-primary mini-grader-save" type="submit">
+            Save and next
+          </button>
+        </form>
+      </section>
+    </div>
+  );
+}
+
 function Grader({ c }: { c: C }) {
   const cid = String(c.course.id);
   const assignments = c.store.list("assignments", (a) => a.courseId === cid);
@@ -1148,6 +1278,34 @@ function Grader({ c }: { c: C }) {
                     Attempt {String(sub.attempt)} · {fmt(sub.createdAt, true)} {sub.late ? <Chip s="late" /> : null}
                   </p>
                   {sub.body ? <pre className="code small campus-submission" tabIndex={0}>{String(sub.body)}</pre> : sub.fileId ? <p>File submission ({String(sub.fileId)})</p> : sub.mode === "lti" ? <p>Cloud Lab submission (score passed back by the tool).</p> : null}
+                  {(() => {
+                    const sim = sub.similarity as { status?: string; score?: number; provider?: string; reportUrl?: string | null; note?: string } | undefined;
+                    return (
+                      <div className="row wrap small">
+                        {sim ? (
+                          <span>
+                            Similarity: {sim.status === "scored" ? `${sim.score}%` : sim.status} <span className="tiny muted">({sim.provider ?? "tool"}; a signal for review, not a finding)</span>
+                            {sim.reportUrl && (
+                              <>
+                                {" "}
+                                · <a href={sim.reportUrl} rel="noopener noreferrer">report</a>
+                              </>
+                            )}
+                          </span>
+                        ) : (
+                          <span className="tiny muted">No similarity check.</span>
+                        )}
+                        {sub.body ? (
+                          <form method="post" action={api(c.slug, "a/similarity.rescan")}>
+                            <Hidden values={{ back: here, submissionId: sub.id, notice: "Similarity checked." }} />
+                            <button className="btn btn-ghost btn-sm" type="submit">
+                              {sim ? "Re-check" : "Check similarity"}
+                            </button>
+                          </form>
+                        ) : null}
+                      </div>
+                    );
+                  })()}
                   <details>
                     <summary className="small">Annotate</summary>
                     <OpForm slug={c.slug} op={OPERATIONS["submission.annotate"]} back={here} values={{ submissionId: sub.id, page: "1", coords: "[0,0,100,20]" }} hide={["submissionId"]} />

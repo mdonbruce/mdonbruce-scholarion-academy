@@ -7,6 +7,7 @@ import { activeGlobalAnnouncements, helpLinks } from "../services/admin";
 import { myNotifications } from "../services/success";
 import { api, Hidden } from "./kit";
 import { broker } from "../core";
+import { asLocale, dirFor, setViewer, t } from "../i18n";
 import { legalLinks } from "../services/accountcfg";
 
 /** Logo image when the school set one, otherwise initials from the logo text. */
@@ -50,26 +51,28 @@ export function CampusShell({ tenant, store, actor, current, children }: { tenan
   const here = `/campus/${slug}/${current}`;
   // Personal accessibility settings (Account → Profile) apply to every campus screen.
   const prof = store.list("profiles", (p) => p.userId === actor.id)[0];
+  setViewer({ tz: prof?.timeZone, locale: prof?.language });
+  const loc = asLocale(prof?.language);
   const a11y = [prof?.highContrast && "a11y-contrast", prof?.dyslexiaFont && "a11y-dyslexia", prof?.underlineLinks && "a11y-underline", prof?.reducedMotion && "a11y-reduce-motion"].filter(Boolean).join(" ");
   return (
-    <div className={`app campus campus-custom ${a11y}`.trim()} style={theme} data-tenant={slug} lang={String(prof?.language ?? "en")}>
+    <div className={`app campus campus-custom ${a11y}`.trim()} style={theme} data-tenant={slug} lang={loc} dir={dirFor(loc)}>
       <SchoolCss tenant={tenant} />
       <a className="skip-link" href="#main">
-        Skip to content
+        {t(loc, "skip")}
       </a>
       <aside className="sidebar campus-sidebar" aria-label={`${tenant.name} navigation`}>
         <a className="brand campus-brand" href={`/campus/${slug}/dashboard`}>
           <BrandMark tenant={tenant} />
           <span className="brand-word">{tenant.theme.logoText}</span>
         </a>
-        <nav aria-label="Main">
+        <nav aria-label={t(loc, "nav.main")}>
           <ul className="sidenav">
-            {[...PRIMARY, ...(hasAny(actor, ["admin", "designer", "instructor", "registrar"]) ? ([["cci", "Curriculum Intelligence"]] as [string, string][]) : [])].map(([path, label]) => (
+            {[...PRIMARY, ...(hasAny(actor, ["admin", "designer", "instructor", "registrar"]) ? ([["cci", "Curriculum Intelligence"]] as [string, string][]) : [])].map(([path, fallback]) => [path, t(loc, `nav.${path}`) === `nav.${path}` ? fallback : t(loc, `nav.${path}`)] as [string, string]).map(([path, label]) => (
               <li key={path}>
                 <a href={`/campus/${slug}/${path}`} aria-current={current === path || current.startsWith(`${path}/`) ? "page" : undefined}>
                   {label}
                   {path === "notifications" && unread > 0 && (
-                    <span className="bell-count" aria-label={`${unread} unread`}>
+                    <span className="bell-count" aria-label={`${unread} ${t(loc, "unread")}`}>
                       {unread > 99 ? "99+" : unread}
                     </span>
                   )}
@@ -110,7 +113,7 @@ export function CampusShell({ tenant, store, actor, current, children }: { tenan
         {actor.masqueradedBy && (
           <div className="campus-actas" role="alert">
             <span>
-              Acting as <strong>{actor.name}</strong> (by {actor.masqueradedBy.name}). Everything you do is recorded.
+              {t(loc, "acting.as")} <strong>{actor.name}</strong> ({actor.masqueradedBy.name}). {t(loc, "acting.recorded")}
             </span>
             <form method="post" action={api(slug, "auth/masquerade")}>
               <Hidden values={{ back: here, _method: "DELETE", stop: "1" }} />
@@ -139,7 +142,7 @@ export function CampusShell({ tenant, store, actor, current, children }: { tenan
             </div>
             <form method="post" action={api(slug, "auth/signout")}>
               <button className="btn btn-ghost btn-sm" type="submit">
-                Sign out
+                {t(loc, "signout")}
               </button>
             </form>
           </div>
@@ -154,7 +157,7 @@ export function CampusShell({ tenant, store, actor, current, children }: { tenan
               <form method="post" action={api(slug, "a/global_announcements.dismiss")} className="inline">
                 <Hidden values={{ back: here, id: String(g.id) }} />
                 <button className="linkish" type="submit">
-                  Dismiss
+                  {t(loc, "dismiss")}
                 </button>
               </form>
             </div>

@@ -199,6 +199,17 @@ page("demo", "instructor", `${C}/grades?view=individual`, "Gradebook — individ
   const on = setPortfolioPublic(st.store, st.actor, pf.id, true);
   save("demo-public-portfolio.html", "Public portfolio", "public", <PublicFrame tenant={dt}><PublicPortfolioView tenant={dt} token={on.token!} /></PublicFrame>);
 }
+page("demo", "instructor", `${C}/mini-grader`, "Quick grader (mobile)");
+page("demo", "instructor", `${C}/grades?edit=1`, "Gradebook — keyboard editing");
+page("demo", "student1", "t/files", "My media library");
+page("demo", "student1", "t/groups", "My groups");
+{
+  const st = as("demo", "student2");
+  const ex = st.store.list("profiles", (p) => p.userId === st.actor.id)[0];
+  if (ex) st.store.update("profiles", ex.id, { language: "ar", timeZone: "Africa/Lagos" });
+  else st.store.insert("profiles", { userId: st.actor.id, language: "ar", timeZone: "Africa/Lagos" }, "prf");
+}
+page("demo", "student2", "notifications", "Arabic, right-to-left, Lagos time");
 page("demo", "advisor", "t/advising", "Advising");
 page("demo", "parent", "t/observers", "Observers");
 page("demo", "admin", "t/tenant-admin?accountId=acc_demo_computing", "Permissions (sub-account)");

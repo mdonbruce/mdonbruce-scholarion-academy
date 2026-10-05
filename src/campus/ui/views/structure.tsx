@@ -5,6 +5,9 @@ import { periodsForCourse, termAccessSummary } from "../../services/terms";
 import { PLACEMENTS, placementsFor } from "../../services/apps";
 import { api, Chip, Hidden } from "../kit";
 import { groupQuota } from "../../services/files";
+import { groupHome, myGroups } from "../../services/groupspace";
+import { myLibrary } from "../../services/medialib";
+import MediaRecorderForm from "../client/MediaRecorderForm";
 
 type P = { store: TenantStore; actor: Actor; slug: string; here: string; sp: Record<string, string | undefined> };
 
@@ -398,6 +401,264 @@ export function GroupFilesPanel({ store, actor, slug, here }: P) {
           </details>
         );
       })}
+    </section>
+  );
+}
+
+/** Group spaces: my groups across courses, and a group's home (pages, discussion, files, members). */
+export function GroupSpacesPanel({ store, actor, slug, here, sp }: P) {
+  const g = myGroups(store, actor);
+  if (sp.group) {
+    let h: ReturnType<typeof groupHome> | null = null;
+    try {
+      h = groupHome(store, actor, sp.group);
+    } catch {
+      h = null;
+    }
+    if (!h) return <p className="notice notice-info">That group isn't available to you.</p>;
+    const back = `${here}?group=${h.group.id}`;
+    const pct = Math.min(100, Math.round((h.quota.usedBytes / h.quota.limitBytes) * 100));
+    return (
+      <div className="stack">
+        <p>
+          <a href={here}>← All my groups</a>
+        </p>
+        <section className="card card-pad stack" aria-labelledby="gh-h">
+          <h2 id="gh-h" className="card-title">
+            {h.group.name} <span className="tiny muted">· {h.group.course}</span>
+          </h2>
+          {h.group.description && <p className="small">{h.group.description}</p>}
+          <p className="small">Members: {h.members.map((m) => m.name).join(", ") || "none yet"}</p>
+        </section>
+        <div className="grid g2">
+          <section className="card card-pad stack" aria-labelledby="gh-pages">
+            <h3 id="gh-pages" className="card-title">
+              Pages
+            </h3>
+            {h.pages.map((p) => (
+              <details key={p.id}>
+                <summary>
+                  {p.title} <span className="tiny muted">· edited by {p.editedBy}</span>
+                </summary>
+                <div className="prose" dangerouslySetInnerHTML={{ __html: p.html }} />
+              </details>
+            ))}
+            <form method="post" action={api(slug, "a/groups.save_page")} className="stack">
+              <Hidden values={{ back, groupId: h.group.id, notice: "Page saved." }} />
+              <label htmlFor="gp-title">New page title</label>
+              <input id="gp-title" name="title" required maxLength={120} />
+              <label htmlFor="gp-text">Content (## heading, - list, [link](https://…))</label>
+              <textarea id="gp-text" name="text" rows={4} required />
+              <button className="btn btn-outline btn-sm" type="submit">
+                Add page
+              </button>
+            </form>
+          </section>
+          <section className="card card-pad stack" aria-labelledby="gh-files">
+            <h3 id="gh-files" className="card-title">
+              Files <span className="tiny muted">· {pct}% of {Math.round(h.quota.limitBytes / 1024 / 1024)} MB</span>
+            </h3>
+            <ul className="item-list small">
+              {h.files.map((f) => (
+                <li key={f.id}>
+                  <a href={api(slug, `files/${f.id}/preview`)}>{f.name}</a> <span className="tiny muted">· {f.owner}</span>
+                </li>
+              ))}
+            </ul>
+            <form method="post" action={api(slug, "upload")} encType="multipart/form-data" className="row wrap">
+              <Hidden values={{ back, groupId: h.group.id, purpose: "group" }} />
+              <label className="sr-only" htmlFor="gh-file">
+                Add a group file
+              </label>
+              <input id="gh-file" type="file" name="file" required />
+              <button className="btn btn-outline btn-sm" type="submit">
+                Upload
+              </button>
+            </form>
+          </section>
+        </div>
+        <section className="card card-pad stack" aria-labelledby="gh-disc">
+          <h3 id="gh-disc" className="card-title">
+            Discussion
+          </h3>
+          {h.threads.map((t) => (
+            <article key={t.id} className="stack">
+              <h4>
+                {t.title} <span className="tiny muted">· {t.author}</span>
+              </h4>
+              <p className="small" style={{ whiteSpace: "pre-wrap" }}>
+                {t.body}
+              </p>
+              <ul className="item-list small">
+                {t.replies.map((r) => (
+                  <li key={r.id}>
+                    <strong>{r.author}:</strong> {r.body}
+                  </li>
+                ))}
+              </ul>
+              <form method="post" action={api(slug, "a/groups.post")} className="row wrap">
+                <Hidden values={{ back, groupId: h.group.id, parentId: t.id, notice: "Reply posted." }} />
+                <label className="sr-only" htmlFor={`gr-${t.id}`}>
+                  Reply to {t.title}
+                </label>
+                <input id={`gr-${t.id}`} name="body" required placeholder="Reply…" />
+                <button className="btn btn-ghost btn-sm" type="submit">
+                  Reply
+                </button>
+              </form>
+            </article>
+          ))}
+          <form method="post" action={api(slug, "a/groups.post")} className="stack">
+            <Hidden values={{ back, groupId: h.group.id, notice: "Thread started." }} />
+            <label htmlFor="gt-title">New thread</label>
+            <input id="gt-title" name="title" required maxLength={120} />
+            <label htmlFor="gt-body">Message</label>
+            <textarea id="gt-body" name="body" rows={3} required />
+            <button className="btn btn-outline btn-sm" type="submit">
+              Post
+            </button>
+          </form>
+        </section>
+      </div>
+    );
+  }
+  return (
+    <section className="card card-pad stack" aria-labelledby="mg-h">
+      <h2 id="mg-h" className="card-title">
+        My groups
+      </h2>
+      {g.mine.length ? (
+        <ul className="item-list">
+          {g.mine.map((x) => (
+            <li key={x.id}>
+              <a href={`${here}?group=${x.id}`}>{x.name}</a> <span className="tiny muted">· {x.course} · {x.members} members · {x.pages} pages · {x.posts} posts</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="small muted">You're not in any groups yet.</p>
+      )}
+      {g.joinable.length > 0 && (
+        <>
+          <h3 className="h4">Account groups you can join</h3>
+          <ul className="item-list">
+            {g.joinable.map((x) => (
+              <li key={x.id} className="row wrap">
+                {x.name} <span className="tiny muted">· {x.members} members</span>
+                <form method="post" action={api(slug, "a/groups.join_account_group")}>
+                  <Hidden values={{ back: here, groupId: x.id, notice: "Joined." }} />
+                  <button className="btn btn-ghost btn-sm" type="submit">
+                    Join
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      {hasAny(actor, ["admin"]) && (
+        <details>
+          <summary className="small">Create an account group (spans courses)</summary>
+          <form method="post" action={api(slug, "a/groups.create_account_group")} className="stack">
+            <Hidden values={{ back: here, notice: "Group created." }} />
+            <label htmlFor="ag-name">Name</label>
+            <input id="ag-name" name="name" required />
+            <label>
+              <input type="checkbox" name="selfJoin" value="true" /> Anyone can join
+            </label>
+            <button className="btn btn-outline btn-sm" type="submit">
+              Create
+            </button>
+          </form>
+        </details>
+      )}
+    </section>
+  );
+}
+
+/** Personal media library: record in the browser or upload, caption, and share. */
+export function MediaLibraryPanel({ store, actor, slug, here }: P) {
+  const lib = myLibrary(store, actor);
+  const teaching = Object.entries(actor.courseRoles ?? {}).filter(([, r]) => r.some((x) => ["instructor", "ta", "designer"].includes(x))).map(([id]) => ({ id, code: String(store.get("courses", id)?.code ?? id) }));
+  const Item = ({ m }: { m: (typeof lib.mine)[number] }) => (
+    <li className="stack">
+      <div>
+        <strong>{m.title}</strong> <span className="tiny muted">{m.mine ? `· shared with ${m.sharedWith}` : `· from ${m.owner}`} · {m.captions.length ? m.captions.map((c) => `${c.kind} (${c.language})`).join(", ") : "no captions yet"}</span>
+      </div>
+      <a className="small" href={api(slug, `files/${m.fileId}/preview`)}>
+        Play
+      </a>
+      {m.mine && (
+        <details>
+          <summary className="small">Captions and sharing</summary>
+          <form method="post" action={api(slug, "a/media.captions")} className="stack">
+            <Hidden values={{ back: here, mediaId: m.id, notice: "Captions added." }} />
+            <label htmlFor={`cap-l-${m.id}`}>Language</label>
+            <input id={`cap-l-${m.id}`} name="language" defaultValue="en" required />
+            <label htmlFor={`cap-t-${m.id}`}>WebVTT</label>
+            <textarea id={`cap-t-${m.id}`} name="text" rows={3} defaultValue={"WEBVTT\n\n00:00.000 --> 00:04.000\n"} required />
+            <button className="btn btn-ghost btn-sm" type="submit">
+              Add captions
+            </button>
+          </form>
+          <form method="post" action={api(slug, "a/media.share")} className="stack">
+            <Hidden values={{ back: here, mediaId: m.id, notice: "Shared." }} />
+            {teaching.length > 0 && (
+              <>
+                <label htmlFor={`sh-c-${m.id}`}>Into a course I teach</label>
+                <select id={`sh-c-${m.id}`} name="courseId" defaultValue="">
+                  <option value="">—</option>
+                  {teaching.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.code}
+                    </option>
+                  ))}
+                </select>
+              </>
+            )}
+            <label htmlFor={`sh-u-${m.id}`}>With people (user ids, comma-separated)</label>
+            <input id={`sh-u-${m.id}`} name="userIds" />
+            <button className="btn btn-ghost btn-sm" type="submit">
+              Share
+            </button>
+          </form>
+        </details>
+      )}
+    </li>
+  );
+  return (
+    <section className="card card-pad stack" aria-labelledby="ml-h">
+      <h2 id="ml-h" className="card-title">
+        My media library
+      </h2>
+      <MediaRecorderForm action={api(slug, "upload")} back={here} />
+      <form method="post" action={api(slug, "upload")} encType="multipart/form-data" className="row wrap">
+        <Hidden values={{ back: here, purpose: "media", notice: "Saved to your media library." }} />
+        <label htmlFor="ml-file">Or upload audio/video</label>
+        <input id="ml-file" type="file" name="file" accept="audio/*,video/*" required />
+        <button className="btn btn-outline btn-sm" type="submit">
+          Upload
+        </button>
+      </form>
+      {lib.mine.length ? (
+        <ul className="item-list">
+          {lib.mine.map((m) => (
+            <Item key={m.id} m={m} />
+          ))}
+        </ul>
+      ) : (
+        <p className="small muted">Nothing in your library yet.</p>
+      )}
+      {lib.sharedWithMe.length > 0 && (
+        <>
+          <h3 className="h4">Shared with me</h3>
+          <ul className="item-list">
+            {lib.sharedWithMe.map((m) => (
+              <Item key={m.id} m={m} />
+            ))}
+          </ul>
+        </>
+      )}
     </section>
   );
 }

@@ -381,7 +381,10 @@ CREATE TABLE IF NOT EXISTS submissions (
   attempt numeric,
   state text,
   late boolean,
-  offline boolean
+  offline boolean,
+  similarity jsonb,
+  group_id text,
+  group_member_ids text[]
 );
 CREATE INDEX IF NOT EXISTS submissions_course_id ON submissions (course_id) WHERE deleted_at IS NULL;
 
@@ -632,6 +635,10 @@ CREATE TABLE IF NOT EXISTS media (
   course_id text NOT NULL,
   title text NOT NULL,
   file_id text NOT NULL,
+  owner_id text,
+  scope text,
+  shared_with text[],
+  source_media_id text,
   renditions jsonb,
   caption_exception text,
   caption_exception_by text,
@@ -1783,6 +1790,36 @@ CREATE TABLE IF NOT EXISTS accommodations (
 CREATE INDEX IF NOT EXISTS accommodations_user_id ON accommodations (user_id) WHERE deleted_at IS NULL;
 CREATE INDEX IF NOT EXISTS accommodations_course_id ON accommodations (course_id) WHERE deleted_at IS NULL;
 
+-- Group page (tab: groups)
+CREATE TABLE IF NOT EXISTS group_pages (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  group_id text,
+  title text,
+  blocks jsonb,
+  html text,
+  author_id text,
+  last_edited_by text,
+  revisions jsonb
+);
+
+-- Group post (tab: groups)
+CREATE TABLE IF NOT EXISTS group_posts (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  group_id text,
+  parent_id text,
+  title text,
+  body text,
+  author_id text
+);
+
 -- Group (tab: groups)
 CREATE TABLE IF NOT EXISTS groups (
   id text PRIMARY KEY,
@@ -1794,6 +1831,9 @@ CREATE TABLE IF NOT EXISTS groups (
   name text NOT NULL,
   member_ids text[] NOT NULL,
   assignment_id text,
+  account_id text,
+  self_join boolean,
+  description text,
   quota_mb numeric,
   set_id text,
   leader_id text,
@@ -3749,6 +3789,22 @@ CREATE TABLE IF NOT EXISTS sis_imports (
   started_by text
 );
 
+-- OIDC sign-in state (tab: tenant-admin)
+CREATE TABLE IF NOT EXISTS oidc_states (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  state_hash text,
+  idp_id text,
+  nonce text,
+  verifier text,
+  next text,
+  expires_at timestamptz,
+  used_at timestamptz
+);
+
 -- Background job (tab: tenant-admin)
 CREATE TABLE IF NOT EXISTS async_jobs (
   id text PRIMARY KEY,
@@ -3793,7 +3849,8 @@ CREATE TABLE IF NOT EXISTS identity_providers (
   config jsonb,
   state text,
   jit_provisioning boolean,
-  last_test jsonb
+  last_test jsonb,
+  discovery jsonb
 );
 
 -- Module item (tab: curriculum)
@@ -4189,7 +4246,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   bio text,
   avatar_url text,
   contact_methods text[],
-  language text CHECK (language IN ('en', 'es', 'fr')),
+  language text CHECK (language IN ('en', 'es', 'fr', 'pt', 'ar')),
   time_zone text,
   high_contrast boolean,
   dyslexia_font boolean,

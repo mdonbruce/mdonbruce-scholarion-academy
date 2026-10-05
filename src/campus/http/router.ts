@@ -33,6 +33,8 @@ import { coverHtml, type CoverKind } from "../services/covers";
 import { redeemQrLogin, startMasquerade, stopMasquerade, activeGlobalAnnouncements } from "../services/admin";
 import { resolveApiToken, rateLimit, refreshToken, exchangeCode, scopeAllows } from "../services/integration";
 import * as lti from "../services/lti";
+import * as medialib from "../services/medialib";
+import * as oidc from "../services/oidc";
 import { recordRequest } from "../services/ops";
 import { recordView } from "../services/dashboard";
 
@@ -51,9 +53,9 @@ import { recordView } from "../services/dashboard";
  * rate-limited). Admins may act as another user (?as_user_id=) — every request is audited.
  */
 
-const PUBLIC_OPS = new Set(["catalog.hub", "catalog.recommender_questions", "catalog.recommend", "commerce.quote", "programs.index", "programs.page", "programs.self_check_questions", "agentic.hub", "agentic.quiz_questions", "agentic.recommend", "eco.changelog", "plans.options", "plans.quote", "plans.settings_view", "readiness.questions", "readiness.score", "admin.legal_links"]);
+const PUBLIC_OPS = new Set(["catalog.hub", "catalog.recommender_questions", "catalog.recommend", "commerce.quote", "programs.index", "programs.page", "programs.self_check_questions", "agentic.hub", "agentic.quiz_questions", "agentic.recommend", "eco.changelog", "plans.options", "plans.quote", "plans.settings_view", "readiness.questions", "readiness.score", "admin.legal_links", "identity_providers.sign_in_options"]);
 /** Commands anyone may send (same-origin forms or JSON); the signed-in user is attached when present. */
-const PUBLIC_CMDS = new Set(["programs.inquire", "programs.self_check", "campaign.subscribe", "accounts.self_register"]);
+const PUBLIC_CMDS = new Set(["programs.inquire", "programs.self_check", "campaign.subscribe", "accounts.self_register", "similarity.report"]);
 
 type Body = Record<string, unknown>;
 
@@ -200,6 +202,17 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     if (isForm(req)) return redirect(safeBack(body.next, `/campus/${tenant.slug}/dashboard`), [cookie]);
     return json({ data: { userId: r.actor.id, name: r.actor.name } }, 200, { "set-cookie": cookie });
   }
+  if (route === "auth/oidc/start" && method === "GET") {
+    const base = `${req.headers.get("x-forwarded-proto") ?? url.protocol.replace(":", "")}://${req.headers.get("x-forwarded-host") ?? url.host}`;
+    const to = await oidc.startOidc(store, String(url.searchParams.get("idp") ?? ""), base, safeBack(url.searchParams.get("next"), ""));
+    return new Response(null, { status: 303, headers: { location: to, "cache-control": "no-store" } });
+  }
+  if (route === "auth/oidc/callback" && method === "GET") {
+    const base = `${req.headers.get("x-forwarded-proto") ?? url.protocol.replace(":", "")}://${req.headers.get("x-forwarded-host") ?? url.host}`;
+    if (url.searchParams.get("error")) return redirect(withQuery(`/campus/${tenant.slug}/signin`, { error: "The sign-in provider didn't complete sign-in." }));
+    const r = await oidc.finishOidc(store, { state: String(url.searchParams.get("state") ?? ""), code: String(url.searchParams.get("code") ?? ""), base });
+    return redirect(safeBack(r.next, `/campus/${tenant.slug}/dashboard`), [sessionCookie(tenant.tenantId, r.token, 12 * 3600)]);
+  }
   if (route === "auth/qr" && method === "POST") {
     const r = redeemQrLogin(store, String(body.code ?? ""));
     return json({ data: { ok: true } }, 200, { "set-cookie": sessionCookie(tenant.tenantId, r.token, 12 * 3600) });
@@ -343,6 +356,15 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     if (body.purpose === "outcomes_import") {
       const r = importStandards(store, a, { csv: bytes.toString("utf8"), courseId: (body.courseId as string) || null, dryRun: body.dryRun === "true" || body.dryRun === "on", source: (body.source as string) || file.name });
       return ok(c, r, r.dryRun ? 200 : 201, {}, `${r.dryRun ? "Dry run" : "Imported"}: ${r.outcomes.create} new and ${r.outcomes.update} updated outcomes, ${r.groups.create + r.groups.update} folders, ${r.issues.length} issue(s).`);
+    }
+    if (body.purpose === "media") {
+      // Media library: personal upload (or in-browser recording) → scan → library item.
+      const r = requestUpload(store, a, { name: file.name, mime: mimeFor(file.name, file.type), size: bytes.length, purpose: "personal" });
+      receiveUpload(store, String(r.file.id), bytes);
+      const scanned = scanFile(store, String(r.file.id));
+      if (scanned?.state !== "available") throw new CampusError("blocked", `The recording didn't pass the safety scan (${scanned?.state ?? "unknown"}).`, 422);
+      const m = medialib.addToLibrary(store, a, { fileId: String(r.file.id), title: (body.title as string) || file.name });
+      return ok(c, { mediaId: m.id, fileId: r.file.id }, 201, {}, "Saved to your media library.");
     }
     const purpose = (String(body.purpose ?? "") || (body.groupId ? "group" : body.assignmentId || body.gradedItemId ? "submission" : body.courseId ? "course" : "personal")) as "course" | "submission" | "personal" | "group";
     const r = requestUpload(store, a, { name: file.name, mime: mimeFor(file.name, file.type), size: bytes.length, courseId: (body.courseId as string) || null, folderId: (body.folderId as string) || null, purpose, groupId: (body.groupId as string) || null });

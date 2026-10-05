@@ -35,7 +35,8 @@ export function groupQuota(store: TenantStore, groupId: string): { used: number;
   const g = store.get("groups", groupId);
   if (!g) throw new CampusError("not_found", "Group not found", 404);
   const c = store.get("courses", String(g.courseId));
-  const acc = c?.accountId ? store.get("accounts", c.accountId as string) : store.list("accounts", (a) => !a.parentId)[0];
+  const accId = (c?.accountId ?? g.accountId) as string | undefined;
+  const acc = accId ? store.get("accounts", accId) : store.list("accounts", (a) => !a.parentId)[0];
   const limit = Number(g.quotaMb ?? acc?.groupQuotaMb ?? 50) * 1024 * 1024;
   const used = store.list("files", (f) => f.groupId === groupId).reduce((s, f) => s + Number(f.size ?? 0), 0);
   return { used, limit };
@@ -65,7 +66,7 @@ export function requestUpload(store: TenantStore, a: Actor, input: { name: strin
     const g = store.get("groups", String(input.groupId ?? ""));
     if (!g) throw new CampusError("not_found", "Group not found", 404);
     const member = ((g.memberIds as string[]) ?? []).includes(a.id);
-    if (!member && !isStaff(a, String(g.courseId))) throw new CampusError("forbidden", "Only group members can add group files.", 403);
+    if (!member && !(g.courseId ? isStaff(a, String(g.courseId)) : hasAny(a, ["admin"]))) throw new CampusError("forbidden", "Only group members can add group files.", 403);
     const gq = groupQuota(store, g.id);
     if (gq.used + size > gq.limit) throw new CampusError("quota_exceeded", `This group's storage is full (${Math.round(gq.limit / 1024 / 1024)} MB).`, 507);
     return store.tx(() => {
@@ -111,6 +112,10 @@ export function sniff(bytes: Buffer): string {
   if (hex.startsWith("4d5a")) return "application/x-msdownload";
   if (bytes.subarray(0, 4).toString() === "WEBV") return "text/vtt";
   if (hex.startsWith("000000") && bytes.subarray(4, 8).toString() === "ftyp") return "video/mp4";
+  if (hex.startsWith("1a45dfa3")) return "video/webm"; // Matroska/WebM (in-browser recordings)
+  if (bytes.subarray(0, 4).toString() === "OggS") return "audio/ogg";
+  if (bytes.subarray(0, 4).toString() === "RIFF" && bytes.subarray(8, 12).toString() === "WAVE") return "audio/wav";
+  if (bytes.subarray(0, 3).toString() === "ID3" || hex.startsWith("fffb") || hex.startsWith("fff3")) return "audio/mpeg";
   const text = bytes.subarray(0, 512).toString("utf8");
   return /^[\x09\x0a\x0d\x20-\x7e -￿]*$/.test(text) ? "text/plain" : "application/octet-stream";
 }
@@ -119,6 +124,10 @@ const COMPATIBLE: Record<string, string[]> = {
   "application/zip": ["application/zip", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/epub+zip"],
   "text/plain": ["text/plain", "text/csv", "text/markdown", "text/x-python", "text/x-python-script", "application/x-python-code", "application/x-ipynb+json", "text/x-r", "application/sql", "text/x-sql", "application/json", "text/vtt", "text/html", "application/xml", "text/xml"],
   "application/x-cfb": ["application/msword", "application/vnd.ms-excel", "application/vnd.ms-powerpoint"],
+  "video/webm": ["video/webm", "audio/webm", "video/x-matroska"],
+  "video/mp4": ["video/mp4", "audio/mp4", "audio/x-m4a", "video/quicktime"],
+  "audio/ogg": ["audio/ogg", "video/ogg", "application/ogg"],
+  "audio/wav": ["audio/wav", "audio/x-wav", "audio/wave"],
 };
 
 /** Scanner consumer: quarantine → scan → promote or reject. */
@@ -156,7 +165,7 @@ export function canDownload(store: TenantStore, a: Actor, f: Row): boolean {
   if (f.ownerId === a.id) return true;
   if (f.groupId) {
     const g = store.get("groups", String(f.groupId));
-    return !!g && (((g.memberIds as string[]) ?? []).includes(a.id) || isStaff(a, String(g.courseId)));
+    return !!g && (((g.memberIds as string[]) ?? []).includes(a.id) || (g.courseId ? isStaff(a, String(g.courseId)) : hasAny(a, ["admin"])));
   }
   const courseId = (f.courseId ?? f.submissionCourseId) as string | null;
   if (!courseId) return a.roles.includes("admin");

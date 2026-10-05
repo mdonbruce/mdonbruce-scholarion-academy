@@ -76,7 +76,7 @@ export function verifyJwt(jwt: string, publicPem: string, opts: { aud?: string; 
 
 /* ---------------- Keys ---------------- */
 
-function rsaKey(store: TenantStore, kind: "lti_platform" | "lti_tool"): Row {
+export function rsaKey(store: TenantStore, kind: "lti_platform" | "lti_tool"): Row {
   let k = store.list("lti_keys", (x) => x.kind === kind && !x.retiredAt)[0];
   if (!k) {
     const { publicKey, privateKey } = generateKeyPairSync("rsa", { modulusLength: 2048 });
@@ -116,7 +116,7 @@ export function ensureCloudLabTool(store: TenantStore): Row {
   return store.insert("tool_registrations", { name: "Scholarion Cloud Lab", clientId: CLOUD_LAB_CLIENT_ID, issuer: "https://cloudlab.scholarion.local", launchUrl: "https://cloudlab.scholarion.local/lti/launch", jwksUrl: "https://cloudlab.scholarion.local/.well-known/jwks.json", services: ["ags", "nrps", "deep_linking"], enabled: true, secretRef: "internal://cloud-lab-key", deploymentId: "dep-cloudlab", builtIn: true }, "lti");
 }
 
-function toolPublicPem(store: TenantStore, tool: Row): string {
+export function toolPublicPem(store: TenantStore, tool: Row): string {
   if (tool.clientId === CLOUD_LAB_CLIENT_ID) return String(rsaKey(store, "lti_tool").publicPem);
   if (!tool.publicPem) throw new CampusError("tool_key_missing", "This tool has no registered public key.", 409);
   return String(tool.publicPem);

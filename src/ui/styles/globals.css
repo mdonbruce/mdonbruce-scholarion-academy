@@ -1991,3 +1991,15 @@ details.acc > div {
 .bar-track { height: 8px; background: color-mix(in srgb, currentColor 10%, transparent); border-radius: 4px; overflow: hidden; }
 .bar { display: block; height: 8px; background: var(--primary, #1f4e79); border-radius: 4px; }
 .bar-alt { background: var(--accent, #c2410c); margin-top: 2px; }
+
+.mini-grader .mini-grader-score { font-size: 1.4rem; padding: 10px; }
+.mini-grader .mini-grader-save { min-height: 48px; width: 100%; font-size: 1.05rem; }
+@media (max-width: 640px) { .mini-grader select { width: 100%; } }
+
+.gb-input { width: 4.5em; padding: 4px 6px; font: inherit; border: 1px solid var(--line, #c7cdd9); border-radius: 4px; }
+.gb-input:focus { outline: 2px solid var(--primary, #1f4e79); outline-offset: 1px; }
+
+/* Right-to-left (Arabic): mirror spacing that uses physical sides. */
+.campus[dir="rtl"] .sidenav, .campus[dir="rtl"] .crumbs { text-align: right; }
+.campus[dir="rtl"] .bell-count { margin-left: 0; margin-right: 6px; }
+.campus[dir="rtl"] pre, .campus[dir="rtl"] code, .campus[dir="rtl"] .mono { direction: ltr; text-align: left; }

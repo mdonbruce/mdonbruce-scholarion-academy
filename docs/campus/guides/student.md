@@ -36,3 +36,9 @@ If your school allows it, use **Request an account** on the sign-in pages. An ad
 ## Agentic Cloud Labs
 
 Launch a lab workspace from **Agentic Cloud Labs**; your files save automatically and you can stop and resume later. Run practice checks as often as you like — they never use an attempt. Each graded lab has two submissions and the higher score counts. In the bounded tool runner lab, keep every tool inside `/workspace` and block path tricks like `/workspace/../etc`; that criterion must pass.
+
+## Language, time zone and media
+
+- Account → Profile sets your language (English, Español, Français, Português, العربية) and time zone; dates across the campus use your zone.
+- Files → My media library lets you record audio or video in the browser (up to 5 minutes), add captions and share with classmates.
+- Groups → My groups shows every group you're in across courses, with pages, a discussion and shared files.
