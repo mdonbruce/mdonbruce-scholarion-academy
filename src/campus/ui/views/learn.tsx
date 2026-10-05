@@ -7,7 +7,7 @@ import { CampusError, type TenantStore } from "../../core";
 import type { Actor } from "../../iam";
 import { FacultyCard } from "../../../ui/components/faculty";
 import { AI801_ACTIVITY, AI801_TOPICS } from "../../academy/ai801";
-import { AI801_LAB_KEY, AI801_PROJECT_KEY } from "../../academy/ai801-seed";
+import { AI801_LAB_KEY, AI801_PROJECT_KEY, AI801_RUNNER_ITEM_KEY, AI801_RUNNER_LAB_KEY } from "../../academy/ai801-seed";
 import * as G from "../../services/graded";
 import * as studio from "../../services/studio";
 import * as W from "../../services/workspace";
@@ -579,7 +579,8 @@ function ItemPanel({ t, itemId }: { t: Ctx; itemId: string }) {
   }
   const learner = !it.isStaff;
   const isProject = it.kind === "project";
-  const workspaces = isProject ? W.listMyWorkspaces(store, actor, t.v.course.id).filter((w) => w.labKey === AI801_LAB_KEY) : [];
+  const labKeyFor = it.key === AI801_RUNNER_ITEM_KEY ? AI801_RUNNER_LAB_KEY : AI801_LAB_KEY;
+  const workspaces = isProject ? W.listMyWorkspaces(store, actor, t.v.course.id).filter((w) => w.labKey === labKeyFor) : [];
   const fb = (id: string) => practice?.results.find((r) => r.id === id);
   return (
     <section className="card card-pad stack learn-item" aria-labelledby="li-h">
@@ -950,6 +951,49 @@ function Quizzes({ t }: { t: Ctx }) {
 
 const DEFAULT_PLAN = JSON.stringify({ name: "read-schedule", onBlocked: "continue", steps: [{ tool: "FILE_READ", args: { path: "/workspace/data/schedule.csv" } }, { tool: "HTTP_REQUEST", args: { url: "sim://api.scholarion.local/v1/schedule" } }, { tool: "FILE_READ", args: { path: "/etc/passwd" } }] }, null, 2);
 
+/** Graded Agentic Cloud Lab: implement a bounded tool runner (rubric 30/30/30/10, two attempts, never executes learner code). */
+function RunnerLab({ t }: { t: Ctx }) {
+  const { v, slug, here, actor } = t;
+  const item = v.items.find((i) => i.key === AI801_RUNNER_ITEM_KEY);
+  if (!item) return null;
+  const ws = v.workspaces.find((w) => w.labKey === AI801_RUNNER_LAB_KEY);
+  const isLearner = !v.staff || !!actor.courseRoles?.[v.course.id]?.includes("student");
+  return (
+    <section className="card card-pad stack" aria-labelledby="rl-h">
+      <h3 id="rl-h" className="card-title">
+        Graded lab: implement a bounded tool runner
+      </h3>
+      <p className="small">Make the runner keep EXECUTE_BASH and FILE_WRITE inside /workspace, block traversal, allow HTTP only to the simulated API, and finish a log-summary task within its step budget. Practice is unlimited and ungraded; two graded submissions, the highest counts. Your code is never executed on the server — its structure is checked and your plan is replayed against your bounds.</p>
+      <p className="row">
+        {ws ? (
+          <>
+            <Chip s={String(ws.status)} />
+            <a className="btn btn-outline btn-sm" href={`${t.base}/workspaces?ws=${ws.id}`}>
+              Open workspace
+            </a>
+            {isLearner && (
+              <form method="post" action={api(slug, "a/graded.practice_runner_lab")}>
+                <Hidden values={{ back: here, notice: "Practice checked — no attempt used.", itemId: item.id, workspaceId: String(ws.id) }} />
+                <button className="btn btn-ghost btn-sm">Run practice check</button>
+              </form>
+            )}
+          </>
+        ) : isLearner ? (
+          <form method="post" action={api(slug, "a/workspace.launch")}>
+            <Hidden values={{ back: here, notice: "Workspace launched.", courseId: v.course.id, labKey: AI801_RUNNER_LAB_KEY, templateId: "bounded-runner" }} />
+            <button className="btn btn-primary btn-sm">Launch lab workspace</button>
+          </form>
+        ) : (
+          <span className="small muted">Staff: class progress is in the Instructor Control Panel.</span>
+        )}
+        <a className="btn btn-ghost btn-sm" href={`${t.base}/assignments?item=${item.id}`}>
+          Rubric and graded submission
+        </a>
+      </p>
+    </section>
+  );
+}
+
 function CloudLabs({ t }: { t: Ctx }) {
   const { v, slug, here, store, actor } = t;
   const ws = v.workspaces.find((w) => w.labKey === AI801_LAB_KEY);
@@ -984,6 +1028,7 @@ function CloudLabs({ t }: { t: Ctx }) {
           Also available: <a href={`/campus/${slug}/agent-labs`}>declarative agent labs</a> with hidden test tasks.
         </p>
       </section>
+      <RunnerLab t={t} />
       {ws && (
         <section className="card card-pad stack" aria-labelledby="cl-run">
           <h3 id="cl-run" className="card-title">

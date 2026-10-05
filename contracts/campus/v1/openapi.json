@@ -65573,6 +65573,53 @@
         }
       }
     },
+    "/a/graded.practice_runner_lab": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "graded.practice_runner_lab",
+        "summary": "Practice the bounded-runner lab against your current workspace files: rubric feedback only, no attempt used, no grade posted.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string"
+                  },
+                  "workspaceId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "itemId",
+                  "workspaceId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/q/graded.review": {
       "get": {
         "tags": [

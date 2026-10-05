@@ -21,6 +21,9 @@ Version identifier: `campus-0.2.0+parity2`. Staging only.
 - Background jobs for reports and SIS imports with progress and issues.
 - Identity provider records (SAML/OIDC/LDAP), never connected from staging.
 
+### Agentic Cloud Labs
+- Graded lab "Implement a bounded tool runner" with the module rubric (architecture 30, tool bounds 30 — mandatory, task completion 30, code structure 10), a new `bounded-runner` workspace template, and practice checks. Graded without executing learner code. Acceptance map: `docs/campus/agentic-cloud-labs-acceptance.md`.
+
 ### Courses
 - Student View isolated from rosters, gradebook, analytics and reports; staff can act as their course's test student.
 - Home page types: front page and recent activity.

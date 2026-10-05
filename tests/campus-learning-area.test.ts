@@ -36,7 +36,7 @@ describe("AI-801 seed", () => {
     assert.equal(s.get("courses", COURSE)?.code, "AI-801");
     assert.equal(s.list("studio_sources", (x) => x.courseKey === COURSE).length, 5);
     const items = s.list("graded_items", (i) => i.courseId === COURSE);
-    assert.equal(items.length, 11, "8 mini-labs + quiz + worksheet + project");
+    assert.equal(items.length, 12, "8 mini-labs + quiz + worksheet + project + bounded-runner lab");
     for (const i of items) {
       assert.equal(i.published, true);
       assert.equal(i.passMark, 70);

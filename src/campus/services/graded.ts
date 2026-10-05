@@ -2,6 +2,7 @@ import { assertParticipation } from "./terms";
 import crypto from "node:crypto";
 import { CampusError, nowIso, type Row, type TenantStore } from "../core";
 import { hasAny, type Actor } from "../iam";
+import { gradeBoundedRunner } from "./labgrade";
 import { audit, notify } from "./common";
 
 /**
@@ -71,6 +72,8 @@ export interface Evaluator {
   shortAnswers?: { id: string; prompt: string; evidenceTerms: string[]; points: number; lo: string; model: string }[];
   /** activity/project: required artifacts in the workspace snapshot and validation checks. */
   artifacts?: { path: string; mustContain?: string[]; points: number; criterion: string }[];
+  /** Graded bounded-runner lab: criteria shares come from labgrade.gradeBoundedRunner (no learner code executed). */
+  boundedRunner?: { files: string[] };
 }
 
 export interface ItemInput {
@@ -188,7 +191,7 @@ export function itemView(store: TenantStore, a: Actor, itemId: string) {
     questions,
     tasks: (v.evaluator.tasks ?? []).map(publicTask),
     shortAnswers: (v.evaluator.shortAnswers ?? []).map(({ model: _m, evidenceTerms: _t, ...rest }) => rest),
-    artifacts: (v.evaluator.artifacts ?? []).map(({ mustContain: _m, ...rest }) => rest),
+    artifacts: [...(v.evaluator.artifacts ?? []).map(({ mustContain: _m, ...rest }) => rest), ...(v.evaluator.boundedRunner?.files ?? []).map((path) => ({ path, points: 0, criterion: "lab" }))],
     submissions: subs.map((s) => ({ id: s.id, attempt: (s.attempt as number) ?? null, state: String(s.state), score: (s.score as number) ?? null, passed: (s.passed as boolean) ?? null, createdAt: String(s.createdAt), infraReason: (s.infraReason as string) ?? null })),
     best,
     isStaff,
@@ -261,8 +264,15 @@ export function evaluate(v: { rubric: RubricCriterion[]; evaluator: Evaluator },
   const objectivePts = answers.reduce((s, x) => s + x.points, 0);
   const objectiveEarned = answers.reduce((s, x) => s + x.earned, 0);
   const objectiveShare = objectivePts ? objectiveEarned / objectivePts : 1;
+  const lab = ev.boundedRunner ? gradeBoundedRunner(snapshotFiles) : null;
   const criteria = v.rubric.map((c) => {
     const arts = artifactResults.filter((r) => r.criterion === c.key);
+    if (lab?.[c.key]) {
+      const { share, notes } = lab[c.key];
+      const earned = Math.round(share * c.points * 100) / 100;
+      const level = [...c.levels].sort((x, y) => y.pct - x.pct).find((l) => share * 100 >= l.pct) ?? c.levels[c.levels.length - 1];
+      return { key: c.key, label: c.label, points: c.points, earned, feedback: `${level?.label ?? ""}: ${level?.descriptor ?? ""}${notes.length ? ` Fix: ${notes.join("; ")}.` : ""}`, mandatory: !!c.mandatory, met: share >= 0.7 };
+    }
     const share = arts.length ? arts.filter((r) => r.ok).length / arts.length : objectiveShare;
     const earned = Math.round(share * c.points * 100) / 100;
     const level = [...c.levels].sort((x, y) => y.pct - x.pct).find((l) => share * 100 >= l.pct) ?? c.levels[c.levels.length - 1];

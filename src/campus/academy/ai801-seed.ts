@@ -2,9 +2,9 @@ import { CampusError, sha256, type Row, type TenantStore } from "../core";
 import { actorFor, type Actor } from "../iam";
 import { releaseRun, startRun } from "../services/studio";
 import { studioInputFor } from "../services/learnarea";
-import { InfraFailure, submit, upsertItem } from "../services/graded";
-import { getWorkspace, savePolicyVersion, snapshotForSubmission } from "../services/workspace";
-import { AI801, AI801_ACTIVITY, AI801_BRIEF, AI801_MINILABS, AI801_PROJECT_ARTIFACTS, AI801_QUIZ, AI801_TOPICS, AI801_WORKSHEET, MINILAB_RUBRIC, PROJECT_RUBRIC, QUIZ_RUBRIC, WORKSHEET_RUBRIC } from "./ai801";
+import { evaluate, InfraFailure, submit, upsertItem } from "../services/graded";
+import { getWorkspace, readFile, savePolicyVersion, snapshotForSubmission } from "../services/workspace";
+import { AI801, AI801_ACTIVITY, AI801_BRIEF, AI801_MINILABS, AI801_PROJECT_ARTIFACTS, AI801_QUIZ, AI801_TOPICS, AI801_WORKSHEET, BOUNDED_LAB_RUBRIC, MINILAB_RUBRIC, PROJECT_RUBRIC, QUIZ_RUBRIC, WORKSHEET_RUBRIC } from "./ai801";
 
 /**
  * Seeds the sample hosted learning area: course AI-801, Module 1, its instructor sources, the
@@ -15,11 +15,16 @@ import { AI801, AI801_ACTIVITY, AI801_BRIEF, AI801_MINILABS, AI801_PROJECT_ARTIF
 export const AI801_PROJECT_KEY = "m01-activity-project";
 export const AI801_LAB_KEY = "m01-guest-services";
 export const AI801_MODULE = "Module_01";
+export const AI801_RUNNER_LAB_KEY = "m01-bounded-runner";
+export const AI801_RUNNER_ITEM_KEY = "m01-bounded-runner-lab";
 
 export function ensureAI801(store: TenantStore) {
   const slug = store.tenantId.replace(/^tn_/, "");
   const courseId = AI801.courseId.replace("academy", slug);
-  if (store.get("courses", courseId)) return courseId;
+  if (store.get("courses", courseId)) {
+    ensureRunnerLab(store, courseId);
+    return courseId;
+  }
   const u = (k: string) => `usr_${slug}_${k}`;
   const staff = [u("lead"), u("instructor")].filter((id) => store.get("users", id));
   const students = [1, 2, 3, 4].map((n) => u(`student${n}`)).filter((id) => store.get("users", id));
@@ -50,6 +55,7 @@ export function ensureAI801(store: TenantStore) {
     const proj = upsertItem(store, null, { courseId, module: AI801_MODULE, key: AI801_PROJECT_KEY, kind: "project", title: "Workspace project: Guest services agent (Haven Hospitality sandbox)", instructions: `${AI801_ACTIVITY.context} Deliverables: ${AI801_ACTIVITY.deliverables.join(", ")}. Submit from your saved workspace; the files are frozen as a snapshot and graded against the rubric.`, rubric: PROJECT_RUBRIC, evaluator: { artifacts: AI801_PROJECT_ARTIFACTS }, competencies: ["C2", "C5"] });
     item("graded_item", proj.id, proj.title as string);
     // Bounded execution policy for the lab (instructor-editable; changes apply to future runs only).
+    ensureRunnerLab(store, courseId);
     savePolicyVersion(store, courseId, AI801_LAB_KEY, { tools: { EXECUTE_BASH: true, FILE_READ: true, FILE_WRITE: true, HTTP_REQUEST: true }, limits: { maxSteps: 200, costUnits: 100 } }, staff[0] ?? "system");
     store.insert("posting_policies", { courseId, mode: "automatic" }, "pp");
   });
@@ -61,6 +67,46 @@ export function ensureAI801(store: TenantStore) {
     if (run.state === "completed" || run.state === "needs_configuration") { try { releaseRun(store, inst, run.id); } catch (e) { console.warn("[seed] studio release skipped:", (e as Error).message); } }
   }
   return courseId;
+}
+
+/** The graded Agentic Cloud Lab "Implement a bounded tool runner" (added idempotently to existing courses). */
+export function ensureRunnerLab(store: TenantStore, courseId: string) {
+  if (store.list("graded_items", (i) => i.courseId === courseId && i.key === AI801_RUNNER_ITEM_KEY).length) return;
+  const mod = store.list("modules", (m) => m.courseId === courseId && m.moduleKey === "ai801-m01")[0];
+  store.tx(() => {
+    const gi = upsertItem(store, null, {
+      courseId,
+      module: AI801_MODULE,
+      topic: "Bounded Tool Execution",
+      key: AI801_RUNNER_ITEM_KEY,
+      kind: "project",
+      title: "Graded Agentic Cloud Lab: Implement a bounded tool runner",
+      instructions: "Configure an autonomous runner that keeps EXECUTE_BASH and FILE_WRITE inside /workspace, blocks traversal, allows HTTP only to the simulated API, and completes a log-summary task within its step budget. Practice runs are unlimited and ungraded; two graded submissions, the highest counts; pass mark 70% and tool bounds must pass. Your code is never executed on the server: structure is checked and your plan is replayed against your bounds.",
+      rubric: BOUNDED_LAB_RUBRIC,
+      evaluator: { boundedRunner: { files: ["runner/agent.py", "runner/bounds.json", "runner/plan.json"] } },
+      competencies: ["C1", "C2"],
+    });
+    if (mod) store.insert("module_items", { courseId, moduleId: mod.id, kind: "graded_item", refId: gi.id, title: gi.title, position: store.list("module_items", (x) => x.moduleId === mod.id).length + 1, indent: 0, requirement: "submit", state: "published" }, "mi");
+    savePolicyVersion(store, courseId, AI801_RUNNER_LAB_KEY, { tools: { EXECUTE_BASH: true, FILE_READ: true, FILE_WRITE: true, HTTP_REQUEST: true }, limits: { maxSteps: 50, costUnits: 50 } }, "system");
+  });
+}
+
+/** Practice the bounded-runner lab against the current workspace files: feedback only, no attempt, no grade. */
+export function practiceRunnerLab(store: TenantStore, a: Actor, itemId: string, wsId: string) {
+  const item = store.get("graded_items", itemId);
+  if (!item || item.key !== AI801_RUNNER_ITEM_KEY) throw new CampusError("not_found", "Lab not found", 404);
+  const ws = getWorkspace(store, a, wsId) as { courseId?: string };
+  if (ws.courseId !== item.courseId) throw new CampusError("invalid", "Use a workspace from this course.", 422);
+  const files: Record<string, string> = {};
+  for (const p of ["runner/agent.py", "runner/bounds.json", "runner/plan.json"]) {
+    try {
+      files[p] = String(readFile(store, a, wsId, p).content ?? "");
+    } catch {
+      /* missing file: graded as missing */
+    }
+  }
+  const e = evaluate({ rubric: BOUNDED_LAB_RUBRIC, evaluator: { boundedRunner: { files: Object.keys(files) } } }, {}, 1, files);
+  return { practice: true, score: e.score, criteria: e.criteria, mandatoryFailed: e.mandatoryFailed, note: "Practice only — no attempt used and nothing posted to the gradebook." };
 }
 
 /** Submit the workspace project: freeze the workspace as a snapshot, then grade that snapshot. */

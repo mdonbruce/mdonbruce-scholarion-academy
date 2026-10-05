@@ -32,3 +32,7 @@
 ## Getting an account
 
 If your school allows it, use **Request an account** on the sign-in pages. An administrator approves each request.
+
+## Agentic Cloud Labs
+
+Launch a lab workspace from **Agentic Cloud Labs**; your files save automatically and you can stop and resume later. Run practice checks as often as you like — they never use an attempt. Each graded lab has two submissions and the higher score counts. In the bounded tool runner lab, keep every tool inside `/workspace` and block path tricks like `/workspace/../etc`; that criterion must pass.

@@ -44,7 +44,7 @@ import { readinessQuestions, readinessScore } from "../services/readiness";
 import * as wsp from "../services/workspace";
 import * as learn from "../services/learnarea";
 import * as proj from "../services/projection";
-import { submitProject } from "../academy/ai801-seed";
+import { practiceRunnerLab, submitProject } from "../academy/ai801-seed";
 import * as eco from "../services/ecosystem";
 import * as plat from "../services/platform";
 import * as camp from "../services/campaigns";
@@ -657,6 +657,7 @@ cmd("graded.practice", "learning-area", "Practice an item: unlimited, immediate 
 });
 cmd("graded.submit", "learning-area", "Submit a graded attempt (idempotent by key). Two attempts; the highest valid attempt is posted to the gradebook and passbook.", [P("itemId"), P("idempotencyKey"), opt("answers", "json")], ({ store, actor, args }) => graded.submit(store, actor, args.s("itemId"), answersOf(args as never), args.s("idempotencyKey")));
 cmd("graded.submit_project", "learning-area", "Submit a workspace project: the workspace is frozen as a snapshot and that snapshot is graded. Infrastructure failures don't use an attempt.", [P("itemId"), P("workspaceId"), P("idempotencyKey")], ({ store, actor, args }) => submitProject(store, actor, args.s("itemId"), args.s("workspaceId"), args.s("idempotencyKey")));
+cmd("graded.practice_runner_lab", "learning-area", "Practice the bounded-runner lab against your current workspace files: rubric feedback only, no attempt used, no grade posted.", [P("itemId"), P("workspaceId")], ({ store, actor, args }) => practiceRunnerLab(store, actor, args.s("itemId"), args.s("workspaceId")));
 qry("graded.review", "learning-area", "Check Answers for a graded submission (learner after grading; staff any time).", [P("submissionId")], ({ store, actor, args }) => graded.reviewAnswers(store, actor, args.s("submissionId")));
 qry("graded.gradebook", "learning-area", "Course gradebook and competency passbook (learners see their own row).", [P("courseId")], ({ store, actor, args }) => graded.courseGradebook(store, actor, args.s("courseId")));
 cmd("graded.regrade", "learning-area", "Staff: post-hoc regrade with a required reason (audited; the learner is notified; never delays the original grade).", [P("submissionId"), P("score", "number"), P("reason", "text")], ({ store, actor, args }) => graded.regrade(store, actor, args.s("submissionId"), args.n("score"), args.s("reason")));

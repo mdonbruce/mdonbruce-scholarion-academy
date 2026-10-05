@@ -1,6 +1,6 @@
 # Scholarion Campus — status board
 
-Generated 2026-10-04 by `scripts/campus-docs.ts`. Environment: local + staging only (demonstration data, sandbox payments).
+Generated 2026-10-05 by `scripts/campus-docs.ts`. Environment: local + staging only (demonstration data, sandbox payments).
 
 **Capabilities:** 37 LIVE · 0 CONNECTED · 3 SIMULATED · 8 DISABLED · 6 PLANNED
 

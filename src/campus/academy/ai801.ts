@@ -110,6 +110,19 @@ export const WORKSHEET_RUBRIC: RubricCriterion[] = [
   { key: "short", label: "Short answers", description: "Items 7–10, scored on evidence of the required ideas.", points: 40, levels: lv("Every required idea present.", "Most ideas present.", "Some ideas present.", "Ideas missing."), evidence: "Worksheet responses 7–10", lo: "LO3–LO4" },
 ];
 
+/** Graded Agentic Cloud Lab rubric from the module brief: Target 100% · Partial 50% · Unacceptable 0%. */
+const tri = (target: string, partial: string, none: string) => [
+  { label: "Target", pct: 100, descriptor: target },
+  { label: "Partial credit", pct: 50, descriptor: partial },
+  { label: "Unacceptable", pct: 0, descriptor: none },
+];
+export const BOUNDED_LAB_RUBRIC: RubricCriterion[] = [
+  { key: "architecture", label: "Agentic architecture design", description: "runner/agent.py implements perception, planning and memory modules.", points: 30, levels: tri("Implements perceive(), plan() and remember().", "Implements 2 of the 3 required modules.", "Missing core modules or non-functional design."), evidence: "runner/agent.py (structure only — never executed)", lo: "LO1" },
+  { key: "bounds", label: "Tool bounds & safety gating", description: "Bounds keep EXECUTE_BASH and FILE_WRITE inside /workspace, block traversal and look-alike roots, and allow HTTP only to allowlisted simulated APIs.", points: 30, levels: tri("Every hidden tool-call check decides correctly.", "Partial enforcement (at least half of the checks).", "No effective limits."), evidence: "runner/bounds.json, applied by the grader to hidden tool-call vectors", lo: "LO2", mandatory: true },
+  { key: "completion", label: "Task completion & output", description: "The plan reads /workspace/system.log and writes /workspace/summary.txt within the step budget with no blocked step.", points: 30, levels: tri("Goal completed within budget and bounds.", "Partially completed, or over budget, or a step blocked.", "No working plan."), evidence: "runner/plan.json replayed against your bounds and the lab policy", lo: "LO2" },
+  { key: "code", label: "Code structure & readability", description: "Error handling and logging in the runner.", points: 10, levels: tri("try/except error handling and logging.", "One of error handling or logging.", "Neither."), evidence: "runner/agent.py", lo: "LO4" },
+];
+
 /* ---------------- mini-labs: two per topic ---------------- */
 
 const match = (id: string, prompt: string, items: string[], targets: string[], key: number[], lo: string, explanation: string, hint: string[]): MiniTask => ({ id, kind: "match", prompt, items, targets, key, points: 1, hint, explanation, lo });

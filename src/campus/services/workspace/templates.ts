@@ -1,3 +1,4 @@
+import { BOUNDED_RUNNER_FILES } from "../labgrade";
 import { CampusError } from "../../core";
 import { relPath, vfsFromFiles, vfsStat, vfsToFiles, WORKSPACE_ROOT, type Vfs } from "./vfs";
 
@@ -192,7 +193,25 @@ const lecture: WorkspaceTemplate = {
   validations: [{ id: "notes", label: "notes/today.md exists", kind: "exists", path: "notes/today.md" }],
 };
 
-export const TEMPLATES: Record<string, WorkspaceTemplate> = Object.fromEntries([programming, agentic, data, devops, cloud, lecture].map((t) => [t.id, t]));
+const boundedRunner: WorkspaceTemplate = {
+  id: "bounded-runner",
+  version: 1,
+  kind: "agentic",
+  title: "Bounded tool runner (graded lab)",
+  description: "Perceive / plan / remember runner, its tool bounds and a plan to summarize a synthetic system log.",
+  files: BOUNDED_RUNNER_FILES,
+  envConfig: { AGENT_MODE: "simulated", WORKSPACE_ROOT: "/workspace" },
+  dependencies: [],
+  instructions: ["Add remember() to runner/agent.py.", "Tighten runner/bounds.json: block traversal; allow HTTP only to api.scholarion.local.", "Finish runner/plan.json: read /workspace/system.log, write /workspace/summary.txt.", "Add error handling and logging.", "Run practice, then submit (two graded attempts)."],
+  labDirs: ["."],
+  simEndpoints: { ...COMMON_ENDPOINTS, "api.scholarion.local/v1/status": { status: 200, body: { sandbox: "simulated", status: "degraded" } } },
+  validations: [
+    { id: "bounds", label: "runner/bounds.json exists", kind: "exists", path: "runner/bounds.json" },
+    { id: "remember", label: "runner/agent.py defines remember()", kind: "contains", path: "runner/agent.py", text: "def remember(" },
+  ],
+};
+
+export const TEMPLATES: Record<string, WorkspaceTemplate> = Object.fromEntries([programming, agentic, data, devops, cloud, lecture, boundedRunner].map((t) => [t.id, t]));
 
 export function getTemplate(templateId: string): WorkspaceTemplate {
   const t = Object.prototype.hasOwnProperty.call(TEMPLATES, templateId) ? TEMPLATES[templateId] : undefined;

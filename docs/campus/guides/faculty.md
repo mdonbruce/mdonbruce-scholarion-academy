@@ -39,3 +39,9 @@ Press **Student View** to create (or reuse) the course's test student, then **En
 
 - Group members share **group files** with a storage quota (set per group, or the account's default).
 - Live sessions can carry recordings. Each recording gets a delete-after date from the session's recording retention (days); a nightly job removes expired recordings. Retention 0 means recordings aren't kept.
+
+## Agentic Cloud Labs (AI-801 and similar courses)
+
+- Learners work in saved workspaces (files, editor, simulated terminal, run/stop/reset/save/resume, budgets). Agent runs are autonomous within the lab policy you set in Environment; blocked actions fail automatically.
+- The graded lab **Implement a bounded tool runner** is scored on architecture (30), tool bounds (30, must pass), task completion (30) and code structure (10). Learner code is never executed on the server: structure is checked and the learner's plan is replayed against their bounds.
+- Every graded lab, mini-lab, quiz, worksheet and project allows two attempts; the highest counts; practice never uses an attempt.
