@@ -69,7 +69,11 @@ jobs:
         run: |
           for f in install test python a11y build smoke; do
             [ -f "$f.log" ] || continue
-            tail -n 80 "$f.log" | sed 's/\x1b\[[0-9;]*m//g' > tail.txt
+            if [ "$f" = test ] && grep -q "not ok" test.log; then
+              grep -n -A30 "^\s*not ok" test.log | grep -v "^\S*-\s*\(duration_ms\|type:\|\.\.\.\|---\)" | head -n 120 | sed 's/\x1b\[[0-9;]*m//g' > tail.txt
+            else
+              tail -n 80 "$f.log" | sed 's/\x1b\[[0-9;]*m//g' > tail.txt
+            fi
             msg=$(python3 -c "import sys;print(open('tail.txt').read().replace('%','%25').replace('\r','').replace('\n','%0A'))")
             echo "::error title=$f output (last 80 lines)::$msg"
           done
