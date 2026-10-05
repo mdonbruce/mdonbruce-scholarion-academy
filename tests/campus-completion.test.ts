@@ -219,11 +219,11 @@ describe("Localization", () => {
 });
 
 describe("Parity ledger", () => {
-  it("only SAML/LDAP federation remains partial", () => {
+  it("every row is done, each with evidence", () => {
     const s = paritySummary();
     assert.equal(s.notStarted, 0);
-    const open = PARITY.filter((r) => r.status !== "DONE");
-    assert.deepEqual(open.map((r) => r.feature.slice(0, 24)), ["Authentication providers"]);
-    assert.match(open[0].gap, /SAML and LDAP/);
+    assert.equal(s.partial, 0);
+    assert.deepEqual(PARITY.filter((r) => r.status !== "DONE").map((r) => r.feature), []);
+    for (const r of PARITY) assert.ok(r.evidence.trim().length > 0, r.feature);
   });
 });

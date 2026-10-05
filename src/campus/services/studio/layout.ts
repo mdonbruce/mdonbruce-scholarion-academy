@@ -94,8 +94,15 @@ export function moduleStudioBundle(store: TenantStore, a: Actor, courseKey: stri
     };
     const put = (rel: string, to: string, type: string) => {
       const g = get(rel);
-      if (g) add(to, Buffer.isBuffer(g.raw) ? g.raw : g.text, topic, type, g.status === "ready" ? "complete" : g.status, g.refs, g.access);
+      if (g) add(to, Buffer.isBuffer(g.raw) ? g.raw : g.text, topic, type, g.status === "ready" || g.status === "rendered" ? "complete" : g.status, g.refs, g.access);
       return g;
+    };
+    /** Narrated media is included once rendered; until then the bundle says how to render it. */
+    const media = (rel: string, to: string, type: string) => {
+      const g = get(rel);
+      if (g && g.status === "rendered" && Buffer.isBuffer(g.raw) && g.raw.length) return put(rel, to, type);
+      todo(to, topic, type, "needs render", "Narration not rendered yet: use Render narration in the Lecture Studio (offline synthetic voices).");
+      return null;
     };
     if (i === 0) {
       put("03_Lecture_Deck/cover_variant_A.html", "00_Cover/cover_slide.html", "cover_slide");
@@ -109,7 +116,7 @@ export function moduleStudioBundle(store: TenantStore, a: Actor, courseKey: stri
       const e = entries[entries.length - 1];
       e.note = `${words} words (~${Math.round(words / 145)} min); the target is ~2,300–2,500 (~16 min). Add more sources to lengthen it — the Studio doesn't pad beyond the sources.`;
     }
-    todo(`01_Audio_Overview/${TT}_audio_overview.mp3`, topic, "audio_overview", "needs render", "No text-to-speech provider is configured.");
+    media("04_Audio/deep_dive.mp3", `01_Audio_Overview/${TT}_audio_overview.mp3`, "audio_overview");
     put("07_Study_Guides_and_Flashcards/study_guide.md", `02_Study_Guides/${TT}_study_guide.md`, "study_guide");
     put("06_Infographics_and_Mind_Maps/mind_map.mmd", `03_Mind_Maps/${TT}_mindmap.mmd`, "mind_map");
     todo(`03_Mind_Maps/${TT}_mindmap.svg`, topic, "mind_map", "needs render", "Render the Mermaid file (no renderer configured).");
@@ -117,7 +124,7 @@ export function moduleStudioBundle(store: TenantStore, a: Actor, courseKey: stri
     put("03_Lecture_Deck/speaker_notes.md", `04_Lecture_Decks/${TT}_speaker_notes.md`, "speaker_notes");
     if (!put("03_Lecture_Deck/lecture_deck.pptx", `04_Lecture_Decks/${TT}_lecture_deck.pptx`, "lecture_deck")) todo(`04_Lecture_Decks/${TT}_lecture_deck.pptx`, topic, "lecture_deck", "needs render", "Regenerate this topic to build the PowerPoint deck.");
     put("04_Audio/audio_lecture_script.md", `05_Audio_Lectures/${TT}_audio_lecture_script.md`, "audio_lecture");
-    todo(`05_Audio_Lectures/${TT}_audio_lecture.mp3`, topic, "audio_lecture", "needs render", "No text-to-speech provider is configured.");
+    media("04_Audio/audio_lecture.mp3", `05_Audio_Lectures/${TT}_audio_lecture.mp3`, "audio_lecture");
     put("02_Overview_and_Lessons/lecture_overview.md", `06_Lecture_Overviews/${TT}_lecture_overview.md`, "lecture_overview");
     put("06_Infographics_and_Mind_Maps/infographic_alt_text.md", `07_Infographics/${TT}_infographic_spec.md`, "infographic");
     put("06_Infographics_and_Mind_Maps/infographic.html", `07_Infographics/${TT}_infographic.html`, "infographic");

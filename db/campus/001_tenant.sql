@@ -3805,6 +3805,33 @@ CREATE TABLE IF NOT EXISTS oidc_states (
   used_at timestamptz
 );
 
+-- SAML request (tab: tenant-admin)
+CREATE TABLE IF NOT EXISTS saml_requests (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  request_id text,
+  idp_id text,
+  relay_state text,
+  next text,
+  expires_at timestamptz,
+  used_at timestamptz
+);
+
+-- SAML assertion seen (tab: tenant-admin)
+CREATE TABLE IF NOT EXISTS saml_assertions_seen (
+  id text PRIMARY KEY,
+  version integer NOT NULL DEFAULT 1,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  assertion_id text,
+  idp_id text,
+  seen_at timestamptz
+);
+
 -- Background job (tab: tenant-admin)
 CREATE TABLE IF NOT EXISTS async_jobs (
   id text PRIMARY KEY,

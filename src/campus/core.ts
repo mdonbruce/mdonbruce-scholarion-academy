@@ -174,7 +174,8 @@ export class TenantStore {
   }
   insert<T extends Record<string, unknown>>(name: string, values: T, prefix = name.slice(0, 4)): Row & T {
     const t = nowIso();
-    const row = { id: (values.id as string) ?? id(prefix), version: 1, createdAt: t, updatedAt: t, ...values } as Row & T;
+    // An explicit `id: undefined` must not erase the generated id.
+    const row = { version: 1, createdAt: t, updatedAt: t, ...values, id: (values.id as string | undefined) ?? id(prefix) } as Row & T;
     if (this.table(name)[row.id]) throw new CampusError("conflict", `${name} ${row.id} already exists`, 409);
     this.table(name)[row.id] = row;
     return row;

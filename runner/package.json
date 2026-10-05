@@ -1,0 +1,10 @@
+{
+  "name": "scholarion-lab-runner",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "description": "Runs Scholarion lab-terminal commands in throwaway, network-less containers.",
+  "main": "server.mjs",
+  "scripts": { "start": "node server.mjs" },
+  "engines": { "node": ">=20" }
+}

@@ -33,7 +33,7 @@ Queue account reports and SIS imports as background jobs. Each shows its state (
 
 ## Identity providers
 
-Record SAML, OIDC or LDAP settings (no secrets — client secrets and bind passwords belong in the deployment's secret manager; LDAP must use TLS). **Check configuration** confirms required fields. Providers stay "not connected": people sign in with campus passwords and two-step verification until a deployment connects one.
+Record SAML, OIDC or LDAP settings. Secrets are never stored: for client secrets and LDAP bind passwords you enter the **name** of a server environment variable. **Live check** tests the provider for real (OIDC discovery and keys, SAML certificate and pin, an LDAP bind over TLS); a provider can only be enabled after a passing check. Campus passwords with two-step verification keep working alongside.
 
 ## Retention
 
@@ -46,7 +46,29 @@ Retention policies (Privacy) and the recording retention job remove data on sche
 3. **Live check** fetches the discovery document and signing keys; then **Enable sign-in**. The sign-in page shows "Sign in with …".
 4. People are matched by verified email. Turn on "create users on first sign-in" only if anyone at the provider should get an account.
 
-SAML and LDAP records are configuration only in this release.
+## Single sign-on (SAML 2.0)
+
+1. Identity providers → save a SAML provider: the IdP entity ID, its single sign-on URL (https), and its signing certificate (PEM). Optionally pin the certificate's SHA-256 fingerprint.
+2. Give your IdP the service-provider metadata at `https://<campus host>/api/campus/v1/t/<school>/auth/saml/metadata?idp=<provider id>`. The assertion consumer service is `…/auth/saml/acs` (HTTP-POST).
+3. The IdP must sign the **assertion** (RSA-SHA256, exclusive canonicalization) and release an email attribute (`mail`/`email`) or an email-format NameID. Encrypted assertions aren't accepted.
+4. **Live check**, then **Enable sign-in**. An AuthnContext of multifactor or a `amr`-style MFA class counts as two-step verification.
+
+Each sign-in is checked for: a request this campus started (single use), the destination, a valid signature over the assertion by the configured certificate, issuer, audience, recipient, time window (two minutes' clock skew) and replay of the assertion ID. Documents with DTDs or entity declarations are refused outright.
+
+## Directory sign-in (LDAP)
+
+1. Identity providers → save an LDAP provider: host, port (636), base DN, user filter with `{username}` (for example `(&(objectClass=person)(uid={username}))`), and optionally a service bind DN with `bindPasswordEnv` (the environment variable name). Add the directory's CA certificate if it isn't publicly trusted.
+2. **Live check** connects over TLS and binds as the service account; then **Enable sign-in**. The sign-in page shows a directory username/password form.
+
+The campus searches for the person (the username is always one literal value in the filter, never filter syntax), then binds as them with their password. Empty passwords are refused, repeated failures lock out like campus passwords, and every failure gives the same message.
+
+## Lab terminal: Run in container
+
+Real command execution for lab workspaces runs in a separate **lab runner** service (`runner/`), never in the campus web app. Deploy it on a dedicated host (gVisor recommended) and set `SCHOLARION_RUNNER_URL` and `SCHOLARION_RUNNER_SECRET`. Learners then see **Run in container** next to the simulated terminal. Each command gets a fresh container with no network, a read-only root, uid 1000, CPU/memory/process limits and a time limit taken from the lab's runtime budget; changed files come back and are saved only where the lab policy allows writing. See `runner/README.md`.
+
+## Narration
+
+**Render narration** in the Lecture Studio produces the narrated lecture and deep-dive MP3s, the narrated video overview and one narrated video per requirement (MP4, 1280×720, captions timed to the audio). Voices are offline synthetic voices (ffmpeg with Flite) and every file is labelled as synthetic narration. Rendering runs as a background job; its status shows on the Studio page. Without ffmpeg+Flite each file says what's needed. `SCHOLARION_TTS=off` turns rendering off.
 
 ## Account groups
 

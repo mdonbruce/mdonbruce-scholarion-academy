@@ -116,6 +116,7 @@ export type OutputStatus =
   | "needs_more_sources"
   | "awaiting_rendering"
   | "preview_rendered_silent"
+  | "rendered"
   | "configuration_required"
   | "failed";
 

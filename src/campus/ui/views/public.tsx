@@ -2,7 +2,7 @@ import { broker, type Tenant, type TenantStore } from "../../core";
 import type { Actor } from "../../iam";
 import { catalogHub, offeringCard, quote, recommend, RECOMMENDER_QUESTIONS, evaluatePathway } from "../../services/academy";
 import { verifyCredential } from "../../services/success";
-import { enabledOidc } from "../../services/oidc";
+import { enabledProviders } from "../../services/accountcfg";
 import { DEMO_PASSWORD } from "../../seed";
 import { api, Chip, Denied, Empty, fmt, Flash, Hidden } from "../kit";
 
@@ -93,24 +93,44 @@ export function SigninView({ tenant, sp }: { tenant: Tenant; sp: SP }) {
           </button>
         </form>
         {(() => {
-          let sso: { id: string; name: string }[] = [];
+          let sso: { id: string; name: string; kind: "oidc" | "saml" | "ldap" }[] = [];
           try {
-            sso = enabledOidc(broker.connect({ tenantId: tenant.id, slug: tenant.slug, via: "path", traceId: "signin" }));
+            sso = enabledProviders(broker.connect({ tenantId: tenant.id, slug: tenant.slug, via: "path", traceId: "signin" }));
           } catch {
             sso = [];
           }
+          const next = sp.next ?? `/campus/${tenant.slug}/dashboard`;
           return sso.length ? (
             <div className="stack">
               <p className="small">Or sign in with your organization:</p>
-              {sso.map((p) => (
-                <a key={p.id} className="btn btn-outline" href={`${api(tenant.slug, "auth/oidc/start")}?idp=${encodeURIComponent(p.id)}&next=${encodeURIComponent(sp.next ?? `/campus/${tenant.slug}/dashboard`)}`}>
-                  Sign in with {p.name}
-                </a>
-              ))}
+              {sso
+                .filter((p) => p.kind !== "ldap")
+                .map((p) => (
+                  <a key={p.id} className="btn btn-outline" href={`${api(tenant.slug, `auth/${p.kind}/start`)}?idp=${encodeURIComponent(p.id)}&next=${encodeURIComponent(next)}`}>
+                    Sign in with {p.name}
+                  </a>
+                ))}
+              {sso
+                .filter((p) => p.kind === "ldap")
+                .map((p) => (
+                  <form key={p.id} method="post" action={api(tenant.slug, "auth/ldap")} className="stack card card-pad">
+                    <Hidden values={{ idp: p.id, next }} />
+                    <p className="small">
+                      <strong>{p.name}</strong> (directory account)
+                    </p>
+                    <label htmlFor={`ld-u-${p.id}`}>Username</label>
+                    <input id={`ld-u-${p.id}`} name="username" autoComplete="username" required />
+                    <label htmlFor={`ld-p-${p.id}`}>Password</label>
+                    <input id={`ld-p-${p.id}`} name="password" type="password" autoComplete="current-password" required />
+                    <button className="btn btn-outline" type="submit">
+                      Sign in with {p.name}
+                    </button>
+                  </form>
+                ))}
             </div>
           ) : null;
         })()}
-        <p className="tiny muted">Campus passwords and two-step codes always work. Single sign-on appears here once an administrator checks and enables an OpenID Connect provider.</p>
+        <p className="tiny muted">Campus passwords and two-step codes always work. Single sign-on (OpenID Connect, SAML or your directory) appears here once an administrator checks and enables it.</p>
       </section>
       {staging && (
         <section className="card card-pad" aria-labelledby="demo-h">

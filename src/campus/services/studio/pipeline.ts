@@ -17,6 +17,7 @@ import {
   genMapOutcomes,
   genRenderPlaceholders,
   genStudioTextVisual,
+  narrationPlan,
   genValidate,
   quizFiles,
   requirementsSegments,
@@ -25,6 +26,9 @@ import {
   type OutputView,
 } from "./generate";
 import { renderSegmentPreview, type RenderResult } from "./render";
+import { detectTts, renderAudio, renderVideo, VOICE_LABEL, VOICES } from "./narrate";
+import { LEAD_FACULTY } from "../../../brand/faculty";
+import nodePath from "node:path";
 import { cleanProfile, getProfile } from "./brand";
 import { addSource as addSourceImpl, canGenerate, canSeeInstructor, genSources, isLearnerOf, listSources as listSourcesImpl, requireGenerate } from "./sources";
 import { DRAFT_LABEL, STEP_KEYS, type Access, type AddSourceInput, type Fetcher, type GeneratedFile, type LabCheckResult, type LabSpec, type RunStep, type StepKey, type StudioInput, type StudioSource } from "./types";
@@ -55,6 +59,10 @@ export interface PipelineOptions {
   render?: boolean;
   /** Override ffmpeg/font detection (tests). */
   ffmpeg?: string;
+  /** Render narrated audio and video with text-to-speech (instructor action; off for routine runs and tests). */
+  narrate?: boolean;
+  /** Narrated media rendered ahead of time (asynchronously) for the render_media step to save. */
+  precomputedMedia?: GeneratedFile[];
   env?: NodeJS.ProcessEnv;
 }
 
@@ -195,7 +203,7 @@ function runStep(store: TenantStore, run: RunRow, key: StepKey, opts: PipelineOp
       return { files: genStudioTextVisual(model(store, run)), status: "completed" };
     case "render_media": {
       const m = model(store, run);
-      const files = genRenderPlaceholders(m);
+      const files = opts.precomputedMedia ? [...opts.precomputedMedia] : genRenderPlaceholders(m);
       let status: "completed" | "configuration_required" = "completed";
       const notes: string[] = [];
       for (const a of m.assessments) {
@@ -208,7 +216,7 @@ function runStep(store: TenantStore, run: RunRow, key: StepKey, opts: PipelineOp
         const segs = requirementsSegments(m, a).map((s) => ({ start: s.start, end: s.end, title: s.title, lines: s.lines }));
         const r: RenderResult = renderSegmentPreview(segs, textOf(vttRow ?? ({} as Row)) ?? "WEBVTT\n", { ffmpeg: opts.ffmpeg, env: opts.env });
         if (r.status === "preview_rendered_silent") {
-          files.push({ step: key, path, format: "mp4", content: r.mp4, access: "learner", status: "preview_rendered_silent", reason: "Silent visual preview with soft captions; the narrated MP4 is awaiting rendering (no TTS).", sourceRefs: [], meta: { durationSec: r.durationSec, encoder: r.encoder, width: 1280, height: 720 } });
+          files.push({ step: key, path, format: "mp4", content: r.mp4, access: "learner", status: "preview_rendered_silent", reason: opts.narrate ? "Silent visual preview with soft captions; the narrated MP4 is rendered alongside it." : "Silent visual preview with soft captions; use Render narration for the narrated MP4.", sourceRefs: [], meta: { durationSec: r.durationSec, encoder: r.encoder, width: 1280, height: 720 } });
           notes.push(`${a.key}: preview rendered`);
         } else {
           if (r.status === "configuration_required") status = "configuration_required";
@@ -234,6 +242,81 @@ function runStep(store: TenantStore, run: RunRow, key: StepKey, opts: PipelineOp
       return { files: [], status: "completed", note: "Saved to the course as an AI DRAFT awaiting instructor review; learners see it only after release.", patch: { reviewState: "pending_review", publishedAt: nowIso() } };
     }
   }
+}
+
+/**
+ * Narrated media: audio lecture, two-host deep dive, video overview and one requirements video per
+ * assessment, all with captions timed to the synthesized speech. Synthetic voices only (labelled).
+ * If text-to-speech isn't available, each file says exactly what's missing.
+ */
+async function narratedMedia(m: Model, opts: PipelineOptions): Promise<GeneratedFile[]> {
+  const R = "render_media" as const;
+  const tts = detectTts(opts.env ?? process.env, opts.ffmpeg);
+  const out: GeneratedFile[] = [];
+  const blocked = (path: string, format: string, reason: string) => out.push({ step: R, path, format, content: "", access: "learner", status: "configuration_required", reason, sourceRefs: [] });
+  const plan = narrationPlan(m);
+  const paths = ["04_Audio/audio_lecture.mp3", "04_Audio/deep_dive.mp3", "05_Video/video_overview.mp4", ...plan.requirements.map((r) => `05_Video/${r.key}_requirements.mp4`)];
+  if (!tts.ok) {
+    for (const p of paths) blocked(p, p.endsWith(".mp3") ? "mp3" : "mp4", tts.reason);
+    return out;
+  }
+  const photoFile = nodePath.join(process.cwd(), "public", LEAD_FACULTY.photo.src.replace(/^\//, ""));
+  const photo = { file: photoFile, caption: LEAD_FACULTY.name };
+  const header = `Scholarion Academy | ${m.input.courseCode} Module ${String(m.input.moduleNumber).padStart(2, "0")}`;
+  const meta = (extra: Record<string, unknown>) => ({ ...extra, voiceLabel: VOICE_LABEL, engine: "flite (offline)" });
+  const attempt = async (path: string, format: string, fn: () => Promise<GeneratedFile[]>) => {
+    try {
+      out.push(...(await fn()));
+    } catch (e) {
+      out.push({ step: R, path, format, content: "", access: "learner", status: "failed", reason: (e as Error).message.slice(0, 300), sourceRefs: [] });
+    }
+  };
+  await attempt("04_Audio/audio_lecture.mp3", "mp3", async () => {
+    const a = await renderAudio(tts, plan.lecture.map((text) => ({ voice: VOICES.narrator, text })), { gapSec: 0.6 });
+    return [
+      { step: R, path: "04_Audio/audio_lecture.mp3", format: "mp3", content: a.mp3, access: "learner", status: "rendered", sourceRefs: [], meta: meta({ durationSec: Math.round(a.durationSec), voices: a.voices }) },
+      { step: R, path: "04_Audio/audio_lecture_narrated.vtt", format: "vtt", content: a.vtt, access: "learner", status: "ready", sourceRefs: [] },
+    ];
+  });
+  await attempt("04_Audio/deep_dive.mp3", "mp3", async () => {
+    const a = await renderAudio(tts, plan.deepDive.map((l) => ({ voice: l.speaker.startsWith("Host A") ? VOICES.hostA : VOICES.hostB, speaker: l.speaker, text: l.text })), { gapSec: 0.45, targetSec: 16 * 60 });
+    return [
+      { step: R, path: "04_Audio/deep_dive.mp3", format: "mp3", content: a.mp3, access: "learner", status: "rendered", reason: a.durationSec < 14 * 60 ? `About ${Math.round(a.durationSec / 60)} minutes: the supplied sources support a shorter conversation than the ~16-minute target; add sources and re-render to lengthen it.` : undefined, sourceRefs: [], meta: meta({ durationSec: Math.round(a.durationSec), voices: a.voices, hosts: { "Host A": VOICES.hostA, "Host B": VOICES.hostB } }) },
+      { step: R, path: "04_Audio/deep_dive_narrated.vtt", format: "vtt", content: a.vtt, access: "learner", status: "ready", sourceRefs: [] },
+    ];
+  });
+  await attempt("05_Video/video_overview.mp4", "mp4", async () => {
+    const v = await renderVideo(tts, plan.overview, { header: `${header} | Video overview`, photo, env: opts.env });
+    return [
+      { step: R, path: "05_Video/video_overview.mp4", format: "mp4", content: v.mp4, access: "learner", status: "rendered", sourceRefs: [], meta: meta({ durationSec: Math.round(v.durationSec), width: v.width, height: v.height, encoder: v.encoder }) },
+      { step: R, path: "05_Video/video_overview_narrated.vtt", format: "vtt", content: v.vtt, access: "learner", status: "ready", sourceRefs: [] },
+    ];
+  });
+  for (const r of plan.requirements) {
+    const p = `05_Video/${r.key}_requirements.mp4`;
+    await attempt(p, "mp4", async () => {
+      const v = await renderVideo(tts, r.segments, { header: `${header} | Requirements: ${r.title}`.slice(0, 90), photo, env: opts.env });
+      return [
+        { step: R, path: p, format: "mp4", content: v.mp4, access: "learner", status: "rendered", sourceRefs: [], meta: meta({ durationSec: Math.round(v.durationSec), width: v.width, height: v.height, encoder: v.encoder, target: "about 5 minutes at 720p" }) },
+        { step: R, path: `05_Video/${r.key}_requirements_narrated.vtt`, format: "vtt", content: v.vtt, access: "learner", status: "ready", sourceRefs: [] },
+      ];
+    });
+  }
+  return out;
+}
+
+/** Instructor action: render (or re-render) the narrated audio and video for a run. */
+export async function renderNarration(store: TenantStore, actor: Actor, runId: string, opts: PipelineOptions = {}): Promise<RunRow> {
+  const run = getRun(store, runId);
+  requireGenerate(store, actor, run.courseKey, "studio.run.render_media");
+  if (run.steps.some((s) => s.key !== "render_media" && STEP_KEYS.indexOf(s.key) < STEP_KEYS.indexOf("render_media") && s.status !== "completed")) throw new CampusError("not_ready", "Finish generating the package before rendering narration.", 409);
+  audit(store, actor, "studio.run.render_media", `${RUNS}/${runId}`);
+  // Synthesis and encoding run asynchronously (the server keeps serving); only saving is synchronous.
+  const media = await narratedMedia(model(store, run), opts);
+  const redo = new Set(["render_media", "validate_artifacts", "save_output_set", "publish_to_course"]);
+  const fresh = getRun(store, runId);
+  store.update(RUNS, runId, { steps: fresh.steps.map((s) => (redo.has(s.key) ? { ...s, status: "queued", error: null } : s)), state: "queued" });
+  return execute(store, actor, runId, { ...opts, narrate: true, precomputedMedia: media });
 }
 
 function execute(store: TenantStore, actor: Actor, runId: string, opts: PipelineOptions): RunRow {

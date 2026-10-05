@@ -58,4 +58,6 @@ export {
 } from "./pipeline";
 
 export { moduleStudioBundle } from "./layout";
+export { renderNarration } from "./pipeline";
+export { detectTts, VOICES, VOICE_LABEL } from "./narrate";
 export { PROFILES, getProfile, setProfile, resolveProfile, coverShapes, coverHtml, coverPptx, deckPptx, twoTone } from "./brand";

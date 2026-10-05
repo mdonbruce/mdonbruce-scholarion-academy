@@ -42,6 +42,7 @@ import * as voice from "../services/voice";
 import * as oat from "../services/acceptance";
 import { readinessQuestions, readinessScore } from "../services/readiness";
 import * as wsp from "../services/workspace";
+import * as runnerSvc from "../services/runnerclient";
 import * as learn from "../services/learnarea";
 import * as proj from "../services/projection";
 import { practiceRunnerLab, submitProject } from "../academy/ai801-seed";
@@ -59,6 +60,8 @@ import * as simx from "../services/similarity";
 import * as gsp from "../services/groupspace";
 import * as mlib from "../services/medialib";
 import * as oidcSvc from "../services/oidc";
+import * as samlSvc from "../services/sso/saml";
+import * as ldapSvc from "../services/sso/ldap";
 import { htmlToValidBlocks } from "../services/htmlimport";
 import { isStaff, requireCourse, requireTenant } from "../services/common";
 import { decideSupportGrant, grantAccountAdmin, grantRole, requestSupportGrant, revokeRole } from "../iam";
@@ -509,17 +512,14 @@ cmd("media.add", "files", "Add one of my audio/video files to my media library."
 cmd("media.share", "files", "Share a library item with people and/or into a course I teach.", [P("mediaId"), opt("userIds", "list"), opt("courseId")], ({ store, actor, args }) => mlib.shareMedia(store, actor, args.s("mediaId"), { userIds: args.l("userIds"), courseId: args.so("courseId") }));
 cmd("media.captions", "files", "Add captions (WebVTT) or a transcript to a library item.", [P("mediaId"), P("language"), P("text", "text"), opt("kind", "string", { options: ["captions", "transcript"] })], ({ store, actor, args }) => mlib.addCaptions(store, actor, args.s("mediaId"), { language: args.s("language"), text: args.s("text"), kind: (args.so("kind") as "captions") ?? "captions" }));
 qry("media.play", "files", "Playback details for media I can see.", [P("mediaId")], ({ store, actor, args }) => mlib.mediaForPlayback(store, actor, args.s("mediaId")));
-cmd("identity_providers.check_oidc", "tenant-admin", "Live check of an OIDC provider: discovery document and signing keys.", [P("id")], async ({ store, actor, args }) => {
+cmd("identity_providers.check", "tenant-admin", "Live check of a sign-in provider (OIDC discovery and keys; SAML certificate and endpoints; LDAP TLS connection and service bind).", [P("id")], async ({ store, actor, args }) => {
   requireTenant(store, actor, ["admin"], "identity_providers.test");
-  return oidcSvc.checkOidc(store, args.s("id"));
+  const p = store.get("identity_providers", args.s("id"));
+  if (!p) throw new CampusError("not_found", "Provider not found", 404);
+  return p.kind === "oidc" ? oidcSvc.checkOidc(store, p.id) : p.kind === "saml" ? samlSvc.checkSaml(store, p.id) : ldapSvc.checkLdap(store, p.id);
 });
-cmd("identity_providers.enable_oidc", "tenant-admin", "Enable or disable OIDC sign-in with a checked provider.", [P("id"), P("on", "boolean")], ({ store, actor, args }) => {
-  requireTenant(store, actor, ["admin"], "identity_providers.enable");
-  const r = oidcSvc.setOidcEnabled(store, args.s("id"), args.b("on"));
-  store.audit({ actorId: actor.id, actorRoles: actor.roles, action: "identity_providers.enable", resource: `identity_providers/${r.id}`, outcome: "allowed", reason: String(r.state) });
-  return r;
-});
-qry("identity_providers.sign_in_options", "tenant-admin", "Enabled single sign-on providers (public).", [], ({ store }) => oidcSvc.enabledOidc(store));
+cmd("identity_providers.enable", "tenant-admin", "Enable or disable sign-in with a checked provider.", [P("id"), P("on", "boolean")], ({ store, actor, args }) => acfg.setIdpEnabled(store, actor, args.s("id"), args.b("on")));
+qry("identity_providers.sign_in_options", "tenant-admin", "Enabled sign-in providers (public).", [], ({ store }) => acfg.enabledProviders(store));
 qry("outbox.status", "tenant-admin", "Outbox events (pending, delivered, dead).", [opt("status")], ({ store, actor, args }) => {
   requireTenant(store, actor, ["admin"], "outbox.read");
   return store.outbox().filter((e) => !args.has("status") || e.status === args.s("status")).slice(-200).reverse();
@@ -743,6 +743,8 @@ qry("workspace.files", "learning-area", "File listing.", [P("wsId")], ({ store, 
 qry("workspace.read", "learning-area", "Read a file.", [P("wsId"), P("path")], ({ store, actor, args }) => wsp.readFile(store, actor, args.s("wsId"), args.s("path")));
 cmd("workspace.write", "learning-area", "Write a file (autosaved).", [P("wsId"), P("path"), P("content", "text")], ({ store, actor, args }) => wsp.writeFile(store, actor, args.s("wsId"), args.s("path"), args.s("content")));
 cmd("workspace.command", "learning-area", "Run a command in the simulated terminal (virtual filesystem; nothing executes on a server).", [P("wsId"), P("command", "text")], ({ store, actor, args }) => wsp.runCommand(store, actor, args.s("wsId"), args.s("command")));
+cmd("workspace.exec", "learning-area", "Run a command in a real, throwaway container via the separate lab runner (no network, resource and time limits); changed files sync back under the lab policy.", [P("wsId"), P("command", "text")], ({ store, actor, args }) => runnerSvc.execInContainer(store, actor, args.s("wsId"), args.s("command")));
+qry("workspace.runner_status", "learning-area", "Whether the container runner is configured for the lab terminal.", [], () => runnerSvc.runnerStatus());
 cmd("workspace.save", "learning-area", "Save now.", [P("wsId")], ({ store, actor, args }) => wsp.saveWorkspace(store, actor, args.s("wsId")));
 cmd("workspace.stop", "learning-area", "Stop (files are kept).", [P("wsId")], ({ store, actor, args }) => wsp.stopWorkspace(store, actor, args.s("wsId")));
 cmd("workspace.resume", "learning-area", "Resume a stopped workspace.", [P("wsId")], ({ store, actor, args }) => wsp.resumeWorkspace(store, actor, args.s("wsId")));
@@ -765,6 +767,15 @@ cmd("studio.add_source", "course-studio", "Add a source (pasted text, uploaded d
 qry("studio.sources", "course-studio", "Sources for a course (staff).", [P("courseKey"), opt("module", "number"), opt("topic")], ({ store, actor, args }) => studio.listSources(store, actor, { courseKey: args.s("courseKey"), module: args.has("module") ? args.n("module") : undefined, topic: args.so("topic") }));
 cmd("studio.start", "course-studio", "Generate the full topic package (resumable). For AI-801 pass topicKey; otherwise pass input JSON.", [opt("courseId"), opt("topicKey"), opt("input", "json")], ({ store, actor, args }) => studio.startRun(store, actor, args.has("input") ? args.j("input") : learn.studioInputFor(store, args.s("courseId"), args.s("topicKey")), { render: process.env.STUDIO_RENDER_PREVIEW === "1" }));
 cmd("studio.resume", "course-studio", "Resume a failed or partial run from the failed step.", [P("runId")], ({ store, actor, args }) => studio.resumeRun(store, actor, args.s("runId"), { render: process.env.STUDIO_RENDER_PREVIEW === "1" }));
+cmd("studio.render_media", "course-studio", "Render the narrated audio lecture, two-host deep dive, video overview and requirements videos in the background (synthetic voices; captions timed to the audio). Check progress with jobs.status; learners see the media after you release the version.", [P("runId")], ({ store, actor, args }) => {
+  const runId = args.s("runId");
+  studio.getRunStatus(store, actor, runId);
+  return acfg.startBackgroundJob(store, actor, "studio_narration", { runId }, async () => {
+    const r = await studio.renderNarration(store, actor, runId, { render: process.env.STUDIO_RENDER_PREVIEW === "1" });
+    const issues = store.list("studio_outputs", (o) => o.runId === runId && o.setVersion === r.outputsVersion && /\.(mp3|mp4)$/.test(String(o.relPath)) && ["failed", "configuration_required"].includes(String(o.status))).map((o) => ({ path: o.relPath, message: o.reason }));
+    return { resultRef: `studio_runs/${runId}`, issues };
+  });
+});
 cmd("studio.regenerate", "course-studio", "Regenerate as a new version (instructor-edited files are kept).", [P("runId")], ({ store, actor, args }) => studio.regenerateRun(store, actor, args.s("runId"), { render: process.env.STUDIO_RENDER_PREVIEW === "1" }));
 cmd("studio.regenerate_quiz", "course-studio", "A new practice-quiz set that avoids earlier stems.", [P("runId")], ({ store, actor, args }) => studio.regenerateQuiz(store, actor, args.s("runId")));
 cmd("studio.release", "course-studio", "Instructor review complete: release learner files of this version (QA must pass).", [P("runId")], ({ store, actor, args }) => studio.releaseRun(store, actor, args.s("runId")));

@@ -1707,9 +1707,10 @@ export const PARITY: ParityRow[] = [
  {
   "section": "6",
   "feature": "Authentication providers (SAML/OIDC/LDAP, MFA policy)",
-  "status": "PARTIAL",
-  "evidence": "oidc.ts: OpenID Connect sign-in (discovery, authorization code + PKCE, RS256 ID tokens verified against JWKS, nonce, audience, JIT provisioning, amr→MFA); accountcfg.ts configureIdp/testIdp; MFA policy realm.mfaRequiredForStaff",
-  "gap": "SAML and LDAP are configuration records only (no XML-signature or directory bind implementation)"
+  "status": "DONE",
+  "evidence": "oidc.ts: OpenID Connect (discovery, code + PKCE, RS256 ID tokens against JWKS, nonce, audience, amr→MFA); sso/saml.ts: SAML 2.0 SP (strict XML parser without DTDs, exclusive C14N, enveloped RSA-SHA256 signature over the Assertion, certificate pin, audience/recipient/InResponseTo/time checks, replay guard, AuthnContext→MFA, SP metadata); sso/ldap.ts: LDAPS search-then-bind with injection-safe filters and lockout; live check before enable; MFA policy realm.mfaRequiredForStaff; tests/campus-federation.test.ts (lxml-signed fixtures, fake directory)",
+  "gap": "",
+  "closedIn": "round 4"
  },
  {
   "section": "6",

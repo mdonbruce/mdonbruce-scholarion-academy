@@ -44590,6 +44590,376 @@
         }
       }
     },
+    "/r/saml_requests": {
+      "get": {
+        "tags": [
+          "Admin Console"
+        ],
+        "summary": "List saml requests",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SamlRequests"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin Console"
+        ],
+        "summary": "Create a saml request",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/saml_requests/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Admin Console"
+        ],
+        "summary": "Get a saml request",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Admin Console"
+        ],
+        "summary": "Update a saml request (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin Console"
+        ],
+        "summary": "Delete (tombstone) a saml request",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/saml_assertions_seen": {
+      "get": {
+        "tags": [
+          "Admin Console"
+        ],
+        "summary": "List saml assertions seen (replay guard)",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 200
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of results. Next page in the Link header (rel=\"next\"); total in X-Total-Count.",
+            "headers": {
+              "Link": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SamlAssertionsSeen"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin Console"
+        ],
+        "summary": "Create a saml assertion seen",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/r/saml_assertions_seen/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Admin Console"
+        ],
+        "summary": "Get a saml assertion seen",
+        "responses": {
+          "200": {
+            "description": "OK (ETag = version)"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Admin Console"
+        ],
+        "summary": "Update a saml assertion seen (send If-Match: version)",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "412": {
+            "description": "Changed since you loaded it"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin Console"
+        ],
+        "summary": "Delete (tombstone) a saml assertion seen",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/r/async_jobs": {
       "get": {
         "tags": [
@@ -60533,13 +60903,13 @@
         }
       }
     },
-    "/a/identity_providers.check_oidc": {
+    "/a/identity_providers.check": {
       "post": {
         "tags": [
           "Admin Console"
         ],
-        "operationId": "identity_providers.check_oidc",
-        "summary": "Live check of an OIDC provider: discovery document and signing keys.",
+        "operationId": "identity_providers.check",
+        "summary": "Live check of a sign-in provider (OIDC discovery and keys; SAML certificate and endpoints; LDAP TLS connection and service bind).",
         "requestBody": {
           "content": {
             "application/json": {
@@ -60576,13 +60946,13 @@
         }
       }
     },
-    "/a/identity_providers.enable_oidc": {
+    "/a/identity_providers.enable": {
       "post": {
         "tags": [
           "Admin Console"
         ],
-        "operationId": "identity_providers.enable_oidc",
-        "summary": "Enable or disable OIDC sign-in with a checked provider.",
+        "operationId": "identity_providers.enable",
+        "summary": "Enable or disable sign-in with a checked provider.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -60629,7 +60999,7 @@
           "Admin Console"
         ],
         "operationId": "identity_providers.sign_in_options",
-        "summary": "Enabled single sign-on providers (public).",
+        "summary": "Enabled sign-in providers (public).",
         "parameters": [],
         "responses": {
           "200": {
@@ -67504,6 +67874,74 @@
         }
       }
     },
+    "/a/workspace.exec": {
+      "post": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.exec",
+        "summary": "Run a command in a real, throwaway container via the separate lab runner (no network, resource and time limits); changed files sync back under the lab policy.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "wsId": {
+                    "type": "string"
+                  },
+                  "command": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "wsId",
+                  "command"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/q/workspace.runner_status": {
+      "get": {
+        "tags": [
+          "Hosted Learning Area (Agentic Cloud Labs)"
+        ],
+        "operationId": "workspace.runner_status",
+        "summary": "Whether the container runner is configured for the lab terminal.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/a/workspace.save": {
       "post": {
         "tags": [
@@ -68405,6 +68843,49 @@
         ],
         "operationId": "studio.resume",
         "summary": "Resume a failed or partial run from the failed step.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "runId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "runId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/a/studio.render_media": {
+      "post": {
+        "tags": [
+          "Course Studio (Master Studio Generator)"
+        ],
+        "operationId": "studio.render_media",
+        "summary": "Render the narrated audio lecture, two-host deep dive, video overview and requirements videos in the background (synthetic voices; captions timed to the audio). Check progress with jobs.status; learners see the media after you release the version.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -87038,6 +87519,67 @@
           }
         ],
         "description": "OIDC sign-in state (tab: tenant-admin)"
+      },
+      "SamlRequests": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "requestId": {
+                "description": "Request ID",
+                "type": "string"
+              },
+              "idpId": {
+                "description": "Provider",
+                "type": "string"
+              },
+              "next": {
+                "description": "Return to",
+                "type": "string"
+              },
+              "expiresAt": {
+                "description": "Expires",
+                "type": "string",
+                "format": "date-time"
+              },
+              "usedAt": {
+                "description": "Used",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "SAML request (tab: tenant-admin)"
+      },
+      "SamlAssertionsSeen": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Meta"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "assertionId": {
+                "description": "Assertion ID",
+                "type": "string"
+              },
+              "idpId": {
+                "description": "Provider",
+                "type": "string"
+              },
+              "seenAt": {
+                "description": "Seen",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ],
+        "description": "SAML assertion seen (tab: tenant-admin)"
       },
       "AsyncJobs": {
         "allOf": [

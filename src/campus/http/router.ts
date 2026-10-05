@@ -35,6 +35,8 @@ import { resolveApiToken, rateLimit, refreshToken, exchangeCode, scopeAllows } f
 import * as lti from "../services/lti";
 import * as medialib from "../services/medialib";
 import * as oidc from "../services/oidc";
+import * as saml from "../services/sso/saml";
+import * as ldap from "../services/sso/ldap";
 import { recordRequest } from "../services/ops";
 import { recordView } from "../services/dashboard";
 
@@ -212,6 +214,26 @@ async function tenantApi(req: Request, url: URL, slug: string, rest: string[]): 
     if (url.searchParams.get("error")) return redirect(withQuery(`/campus/${tenant.slug}/signin`, { error: "The sign-in provider didn't complete sign-in." }));
     const r = await oidc.finishOidc(store, { state: String(url.searchParams.get("state") ?? ""), code: String(url.searchParams.get("code") ?? ""), base });
     return redirect(safeBack(r.next, `/campus/${tenant.slug}/dashboard`), [sessionCookie(tenant.tenantId, r.token, 12 * 3600)]);
+  }
+  if (route === "auth/saml/metadata" && method === "GET") {
+    const base = `${req.headers.get("x-forwarded-proto") ?? url.protocol.replace(":", "")}://${req.headers.get("x-forwarded-host") ?? url.host}`;
+    return new Response(saml.spMetadata(store, base, String(url.searchParams.get("idp") ?? "")), { status: 200, headers: { "content-type": "application/samlmetadata+xml; charset=utf-8", "cache-control": "no-store" } });
+  }
+  if (route === "auth/saml/start" && method === "GET") {
+    const base = `${req.headers.get("x-forwarded-proto") ?? url.protocol.replace(":", "")}://${req.headers.get("x-forwarded-host") ?? url.host}`;
+    const r = saml.startSaml(store, String(url.searchParams.get("idp") ?? ""), base, safeBack(url.searchParams.get("next"), ""));
+    return new Response(null, { status: 303, headers: { location: r.url, "cache-control": "no-store" } });
+  }
+  if (route === "auth/saml/acs" && method === "POST") {
+    const base = `${req.headers.get("x-forwarded-proto") ?? url.protocol.replace(":", "")}://${req.headers.get("x-forwarded-host") ?? url.host}`;
+    const r = saml.consumeSaml(store, { samlResponse: String(body.SAMLResponse ?? ""), relayState: body.RelayState === undefined ? undefined : String(body.RelayState), base });
+    return redirect(safeBack(r.next, `/campus/${tenant.slug}/dashboard`), [sessionCookie(tenant.tenantId, r.token, 12 * 3600)]);
+  }
+  if (route === "auth/ldap" && method === "POST") {
+    const r = await ldap.ldapSignIn(store, String(body.idp ?? ""), String(body.username ?? ""), String(body.password ?? ""));
+    const cookie = sessionCookie(tenant.tenantId, r.token, 12 * 3600);
+    if (isForm(req)) return redirect(safeBack(body.next, `/campus/${tenant.slug}/dashboard`), [cookie]);
+    return json({ data: { userId: r.userId } }, 200, { "set-cookie": cookie });
   }
   if (route === "auth/qr" && method === "POST") {
     const r = redeemQrLogin(store, String(body.code ?? ""));

@@ -1524,7 +1524,7 @@ ${timed.map((s, k) => `## Scene ${k + 1} (${mmss(s.start)}–${mmss(s.end)}): ${
 |---|---|---|---|---|
 ${timed.map((s, k) => `| ${k + 1}. ${s.title} | ${mmss(s.start)}–${mmss(s.end)} | ${s.visual} | ${md(excerpt(s.onscreen, 14))} | ${md(s.visual)} |`).join("\n")}
 `;
-  return { scriptMd, board, vtt: vttFromCues(cues), sents: m.sentences.filter((s) => used.has(s.idx)), duration: t };
+  return { scriptMd, board, vtt: vttFromCues(cues), sents: m.sentences.filter((s) => used.has(s.idx)), duration: t, scenes: timed.map((s) => ({ title: s.title, onscreen: s.onscreen, text: s.text, start: s.start, end: s.end })) };
 }
 
 export const REQ_SEGMENTS = [
@@ -1686,8 +1686,25 @@ Every command is an authenticated campus operation (POST /api/campus/v1/t/{tenan
 
 Adding a source to a topic that already has a run regenerates it as a new version automatically (pass autoRegenerate=false to studio.add_source to skip).
 
-Media: set a text-to-speech provider and media renderer, then run studio.regenerate to replace files marked awaiting rendering.
+Media: Render narration (studio.render_media) produces the narrated MP3s and MP4s with offline synthetic voices when the server has ffmpeg with Flite; until then those files say what's needed.
 `;
+}
+
+/** What the narration renderer speaks: the same scripts the Studio publishes, spoken form (citations dropped). */
+export function narrationPlan(m: Model) {
+  const slides = buildSlides(m);
+  const au = audioLecture(m, slides);
+  const dd = deepDive(m);
+  const vo = videoOverview(m);
+  return {
+    lecture: au.transcript.split(/\n\n+/).map((t) => t.trim()).filter(Boolean),
+    deepDive: dd.transcript.split(/\n\n+/).map((l) => {
+      const k = l.indexOf(": ");
+      return { speaker: l.slice(0, k), text: l.slice(k + 2).trim() };
+    }).filter((l) => l.text),
+    overview: vo.scenes.map((s) => ({ title: s.title, lines: [s.onscreen], narration: spoken(s.text), minSec: Math.max(6, s.end - s.start) })),
+    requirements: m.assessments.map((a) => ({ key: a.key, title: a.title, segments: requirementsSegments(m, a).map((s) => ({ title: s.title, lines: s.lines, narration: s.lines.map(spoken).join(" "), minSec: s.end - s.start })) })),
+  };
 }
 
 export function genStudioTextVisual(m: Model): GeneratedFile[] {
@@ -1736,7 +1753,7 @@ export function genStudioTextVisual(m: Model): GeneratedFile[] {
  * Step: render_media (placeholders; the pipeline adds the optional silent preview)
  * ==================================================================== */
 
-export const NO_TTS = "No text-to-speech provider is configured";
+export const NO_TTS = "Narration not rendered yet: use Render narration in the Lecture Studio (offline synthetic voices)";
 
 export function genRenderPlaceholders(m: Model): GeneratedFile[] {
   const R = "render_media" as const;

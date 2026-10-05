@@ -263,7 +263,7 @@ describe("Scholarion Course Studio", () => {
     for (const p of ["04_Audio/audio_lecture.mp3", "04_Audio/deep_dive.mp3", "05_Video/video_overview.mp4", "05_Video/lab3_requirements.mp4"]) {
       const o = outs.find((x) => x.relPath === p)!;
       assert.equal(o.status, "awaiting_rendering", p);
-      assert.match(String(o.reason), /No text-to-speech provider is configured/);
+      assert.match(String(o.reason), /Render narration/);
       assert.equal(o.size, 0, "no fake audio/video bytes");
     }
     for (const p of ["04_Audio/audio_lecture.vtt", "04_Audio/deep_dive.vtt", "05_Video/video_overview.vtt", "05_Video/lab3_requirements.vtt"]) {

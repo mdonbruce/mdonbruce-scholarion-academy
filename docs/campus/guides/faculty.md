@@ -42,9 +42,13 @@ Press **Student View** to create (or reuse) the course's test student, then **En
 
 ## Agentic Cloud Labs (AI-801 and similar courses)
 
-- Learners work in saved workspaces (files, editor, simulated terminal, run/stop/reset/save/resume, budgets). Agent runs are autonomous within the lab policy you set in Environment; blocked actions fail automatically.
+- Learners work in saved workspaces (files, editor, simulated terminal, run/stop/reset/save/resume, budgets). Where the campus has a lab runner, **Run in container** executes their command for real in an isolated, network-less container; your lab policy still decides whether the shell is allowed and which files may be written back. Agent runs are autonomous within the lab policy you set in Environment; blocked actions fail automatically.
 - The graded lab **Implement a bounded tool runner** is scored on architecture (30), tool bounds (30, must pass), task completion (30) and code structure (10). Learner code is never executed on the server: structure is checked and the learner's plan is replayed against their bounds.
 - Every graded lab, mini-lab, quiz, worksheet and project allows two attempts; the highest counts; practice never uses an attempt.
+
+## Narrated media
+
+In the Lecture Studio, **Render narration** turns the published scripts into a narrated audio lecture, a two-host deep dive, a narrated video overview and one narrated video per requirement, with captions. The voices are generic synthetic voices and are labelled that way; your photo appears at its original size, and no likeness or voice of yours is generated.
 
 ## New in 0.3.0
 

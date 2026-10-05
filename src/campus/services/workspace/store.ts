@@ -1,7 +1,7 @@
 import { CampusError, nowIso, sha256, type Row, type TenantStore } from "../../core";
 import { effectiveRoles, type Actor } from "../../iam";
 import { activeStudents, audit, course, isStaff, isStudentIn, requireCourse, userName } from "../common";
-import { checkFileRead, checkFileWrite, effectivePolicy, remainingUsage, savePolicyVersion, usageLimits, zeroUsage, type ExecPolicy, type Usage } from "./policy";
+import { budgetExhausted, budgetMessage, checkBash, checkFileRead, checkFileWrite, effectivePolicy, remainingUsage, savePolicyVersion, usageLimits, zeroUsage, type ExecPolicy, type Usage } from "./policy";
 import { describeReset, getTemplate, runValidation, templateVfs, type ResetPlan, type ValidationResult } from "./templates";
 import { runShell, type ShellState } from "./terminal";
 import { normalizePath, relPath, vfsClone, vfsListing, vfsMkdir, vfsRead, vfsRemove, vfsToFiles, vfsTree, vfsUsage, vfsWrite, WORKSPACE_ROOT, type Vfs } from "./vfs";
@@ -502,4 +502,147 @@ export function createTeam(store: TenantStore, actor: Actor, input: { courseId: 
 /** Internal: used by the agent runner to persist VFS changes and history. */
 export function _loadForAgent(store: TenantStore, actor: Actor, wsId: string): Row {
   return load(store, actor, wsId, "write");
+}
+
+/* ---------------- Container runner (data only) ----------------
+ * The real container runner is a separate service (runner/server.mjs). Nothing here executes,
+ * fetches or touches the server filesystem: these two functions only prepare the request from
+ * the saved workspace (after the policy and budget checks) and apply the returned file changes
+ * back under the same frozen policy.
+ */
+
+export interface ContainerRequest {
+  wsId: string;
+  command: string;
+  cwd: string;
+  files: Record<string, string>;
+  timeoutSec: number;
+  limits: { memoryMb: number; cpus: number; pids: number };
+  /** Content checksum at dispatch; changes made meanwhile are never overwritten. */
+  baseChecksum: string;
+}
+
+export interface ContainerResult {
+  exitCode: number | null;
+  stdout: string;
+  stderr: string;
+  timedOut: boolean;
+  infra?: boolean;
+  durationMs: number;
+  files: { changed: Record<string, string>; deleted: string[] };
+}
+
+const CONTAINER_TIMEOUT_CAP_SEC = 60;
+
+export type ContainerPrep = { ok: true; request: ContainerRequest } | { ok: false; output: string; exitCode: number; blocked?: { tool: string; reason: string } };
+
+export function prepareContainerRun(store: TenantStore, actor: Actor, wsId: string, command: string): ContainerPrep {
+  const ws = load(store, actor, wsId, "write");
+  if (typeof command !== "string" || !command.trim()) throw new CampusError("invalid_command", "Type a command to run.", 400);
+  if (command.length > 4000) throw new CampusError("invalid_command", "Commands are limited to 4,000 characters.", 400);
+  if (ws.status === "paused_by_instructor") return { ok: false, output: "Paused by your instructor. Commands are disabled until the lab is resumed; your files are saved.\n", exitCode: 75 };
+  if (ws.status === "stopped") return { ok: false, output: "This workspace is stopped. Resume it to continue; your files are saved.\n", exitCode: 1 };
+  const policy = policyOf(ws);
+  const cwd = (ws.settings as { cwd: string }).cwd;
+  const d = checkBash(policy, cwd);
+  if (!d.ok) {
+    store.audit({ actorId: actor.id, actorRoles: effectiveRoles(actor, ws.courseId as string), action: "workspace.exec", resource: `${WS_TABLE}/${ws.id}`, outcome: "denied", reason: `policy:${d.tool}` });
+    return { ok: false, output: `Blocked by policy (${d.tool}): ${d.reason}\n`, exitCode: 126, blocked: { tool: d.tool, reason: d.reason } };
+  }
+  const used = usageOf(ws);
+  const dim = budgetExhausted(used, policy.limits);
+  if (dim) return { ok: false, output: budgetMessage(dim, used, policy.limits) + "\n", exitCode: 137 };
+  const files = vfsToFiles(filesOf(ws));
+  const remainingMs = Math.max(1000, policy.limits.runtimeMs - used.runtimeMs);
+  return {
+    ok: true,
+    request: {
+      wsId: ws.id,
+      command,
+      cwd: cwd === WORKSPACE_ROOT ? "" : relPath(cwd),
+      files,
+      timeoutSec: Math.max(1, Math.min(CONTAINER_TIMEOUT_CAP_SEC, Math.floor(remainingMs / 1000))),
+      limits: { memoryMb: 512, cpus: 1, pids: 128 },
+      baseChecksum: snapshotChecksum(files),
+    },
+  };
+}
+
+/** Apply a runner result: only files inside the policy's write boundary, never over newer edits. */
+export function applyContainerResult(store: TenantStore, actor: Actor, req: ContainerRequest, result: ContainerResult) {
+  const ws = load(store, actor, req.wsId, "write");
+  const policy = policyOf(ws);
+  return store.tx(() => {
+    const v = vfsClone(filesOf(ws));
+    const current = vfsToFiles(v);
+    const written: string[] = [];
+    const removed: string[] = [];
+    const refused: { path: string; reason: string }[] = [];
+    const conflicts: string[] = [];
+    const sent = req.files;
+    const touch = (rel: string, fn: (abs: string) => void) => {
+      let abs: string;
+      try {
+        abs = normalizePath(rel, WORKSPACE_ROOT);
+      } catch {
+        refused.push({ path: rel, reason: "invalid path" });
+        return;
+      }
+      const dec = checkFileWrite(policy, abs);
+      if (!dec.ok) return void refused.push({ path: rel, reason: dec.reason });
+      if (current[relPath(abs)] !== sent[relPath(abs)]) return void conflicts.push(relPath(abs));
+      try {
+        fn(abs);
+      } catch (e) {
+        refused.push({ path: rel, reason: e instanceof Error ? e.message : String(e) });
+      }
+    };
+    for (const [rel, content] of Object.entries(result.files?.changed ?? {})) {
+      touch(rel, (abs) => {
+        vfsWrite(v, abs, String(content), { createParents: true, maxTotalBytes: policy.limits.memoryKb * 1024 });
+        written.push(relPath(abs));
+      });
+    }
+    for (const rel of result.files?.deleted ?? []) {
+      touch(rel, (abs) => {
+        if (v[abs]?.type === "file") {
+          vfsRemove(v, abs, false);
+          removed.push(relPath(abs));
+        }
+      });
+    }
+    const used = { ...usageOf(ws) };
+    const ms = Math.max(0, Math.round(Number(result.durationMs) || 0));
+    const out = `${result.stdout ?? ""}${result.stderr ?? ""}`;
+    used.steps += 1;
+    used.runtimeMs += ms;
+    used.cpuUnits += Math.max(1, Math.ceil(ms / 100));
+    used.tokens += (req.command.match(/\S+/g)?.length ?? 0) + (out.match(/\S+/g)?.length ?? 0);
+    used.costUnits += 1;
+    const now = nowIso();
+    const exhausted = budgetExhausted(used, policy.limits);
+    const patch: Record<string, unknown> = { budget: { used }, history: [...(ws.history as string[]), `[container] ${req.command}`].slice(-500), lastActivityAt: now };
+    if (written.length || removed.length) Object.assign(patch, { files: v, autosaveAt: now, saveStatus: "autosaved" });
+    if (exhausted) Object.assign(patch, { status: "stopped", stopReason: "budget_exhausted" });
+    const next = store.update(WS_TABLE, ws.id, patch);
+    audit(store, actor, "workspace.exec", `${WS_TABLE}/${ws.id}`, result.timedOut ? "timed_out" : `exit_${result.exitCode}`);
+    const notes: string[] = [];
+    if (result.timedOut) notes.push(`[stopped: the ${req.timeoutSec}s time limit was reached]`);
+    if (written.length || removed.length) notes.push(`[files synced: ${[...written.map((p) => `+${p}`), ...removed.map((p) => `-${p}`)].join(", ")}]`);
+    if (conflicts.length) notes.push(`[not synced because you edited them while the command ran: ${conflicts.join(", ")}]`);
+    if (refused.length) notes.push(`[not synced (policy): ${refused.map((r) => `${r.path} — ${r.reason}`).join("; ")}]`);
+    if (exhausted) notes.push(budgetMessage(exhausted, used, policy.limits));
+    return {
+      output: `${out}${out && !out.endsWith("\n") ? "\n" : ""}${notes.join("\n")}${notes.length ? "\n" : ""}`,
+      exitCode: result.timedOut ? 124 : (result.exitCode ?? 1),
+      timedOut: !!result.timedOut,
+      durationMs: ms,
+      synced: { written, removed, conflicts, refused },
+      budget: resourceUsage(next),
+      status: next.status as WorkspaceStatus,
+      saveStatus: next.saveStatus as string,
+      cwd: (next.settings as { cwd: string }).cwd,
+      sandbox: "container" as const,
+    };
+  });
 }

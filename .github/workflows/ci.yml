@@ -24,6 +24,8 @@ jobs:
         run: |
           set -o pipefail
           (if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi) 2>&1 | tee install.log
+      - name: Media tools (narration tests)
+        run: sudo apt-get install -y --no-install-recommends ffmpeg > apt.log 2>&1 || (tail -n 20 apt.log; echo "ffmpeg unavailable; narration render tests will skip")
       - name: Test
         env:
           CLOUDLAB_LOCAL_RUNNER: "1"
@@ -77,3 +79,29 @@ jobs:
             msg=$(python3 -c "import sys;print(open('tail.txt').read().replace('%','%25').replace('\r','').replace('\n','%0A'))")
             echo "::error title=$f output (last 80 lines)::$msg"
           done
+
+  container-runner:
+    # The lab terminal's "Run in container" service, checked against real Docker.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build sandbox image
+        run: docker build -q -t scholarion/lab-sandbox:ci -f runner/Dockerfile.sandbox runner
+      - name: Build runner image
+        run: docker build -q -t scholarion/lab-runner:ci -f runner/Dockerfile runner
+      - name: Isolation checks
+        env:
+          RUNNER_IMAGE: scholarion/lab-sandbox:ci
+        run: |
+          set -o pipefail
+          node runner/integration.mjs 2>&1 | tee runner.log
+          echo "::notice title=Container runner::$(tail -n 1 runner.log)"
+      - name: Report failure output
+        if: failure()
+        run: |
+          [ -f runner.log ] || exit 0
+          msg=$(python3 -c "import sys;print(open('runner.log').read()[-6000:].replace('%','%25').replace('\r','').replace('\n','%0A'))")
+          echo "::error title=runner output::$msg"

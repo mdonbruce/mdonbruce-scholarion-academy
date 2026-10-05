@@ -1,5 +1,19 @@
 # Release notes
 
+## Scholarion Campus 0.4.0 — federation, narration and container runs (2026-10-05)
+
+Version identifier: `campus-0.4.0+round4`. Staging only.
+
+- **SAML 2.0 sign-in:** a built-in service provider with its own strict XML parser (no DTDs or entities), exclusive canonicalization and RSA-SHA256 signature verification over the assertion, certificate pinning, audience/recipient/time checks, single-use requests and a replay guard; SP metadata for your IdP. Verified against independently signed fixtures, including tampering, signature wrapping, comment-split NameIDs and replay.
+- **LDAP sign-in:** search-then-bind over TLS with injection-safe filters, lockout and one generic failure message.
+- Identity providers are enabled only after a passing **live check**; secrets stay in server environment variables.
+- **Narrated media:** narrated audio lecture, two-host deep dive, narrated video overview and per-requirement narrated videos with captions timed to the audio, rendered in the background with offline synthetic voices (clearly labelled). Module bundles include them once rendered.
+- **Run in container:** the lab terminal can run real commands through a separate, hardened runner service (no network, read-only root, unprivileged user, CPU/memory/process/time limits). Changed files sync back only where the lab policy allows; edits made while a command runs are never overwritten.
+- CI: failing test names are reported in the run summary; a new job checks the runner's isolation against real Docker.
+- Fix: inserting a record with an explicit empty id no longer drops the generated id (affected SIS-created and just-in-time accounts).
+
+Parity ledger: every row is now done.
+
 ## Scholarion Campus 0.3.0 — parity round 3 (2026-10-05)
 
 Version identifier: `campus-0.3.0+parity3`. Staging only.
@@ -13,7 +27,7 @@ Version identifier: `campus-0.3.0+parity3`. Staging only.
 - **Keyboard gradebook:** edit scores in a grid with arrow keys, Enter and Escape; only changed cells are saved.
 - **Localization:** campus navigation and frame in English, Spanish, French, Portuguese and Arabic (right-to-left); dates in each person's own time zone.
 
-Still partial: SAML and LDAP sign-in (configuration records only).
+Still partial at the time: SAML and LDAP sign-in (completed in 0.4.0).
 
 ## Scholarion Campus 0.2.0 — parity round 2 (2026-10-04)
 

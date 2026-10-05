@@ -1,6 +1,6 @@
 import { createHash, createPublicKey, randomBytes, verify as cryptoVerify } from "node:crypto";
 import { broker, CampusError, nowIso, nowMs, sha256, type Row, type TenantStore } from "../core";
-import { createUser } from "../iam";
+import { federatedSignIn } from "./sso/session";
 
 /**
  * OpenID Connect sign-in (authorization code flow with PKCE, RS256 ID tokens).
@@ -140,19 +140,8 @@ export async function finishOidc(store: TenantStore, input: { state: string; cod
   if (claims.nonce !== row.nonce) throw new CampusError("oidc_token", "Nonce mismatch", 401);
   const email = String(claims.email ?? "").toLowerCase();
   if (!email || claims.email_verified === false) throw new CampusError("oidc_email", "The provider didn't share a verified email address.", 403);
-  let user = store.list("users", (u) => u.email === email)[0];
-  if (!user) {
-    if (!idp.jitProvisioning) throw new CampusError("oidc_no_account", "No campus account uses that email. Ask an administrator for access.", 403);
-    user = store.tx(() => createUser(store, { name: String(claims.name ?? email.split("@")[0]), email }));
-    store.tx(() => store.update("users", user!.id, { idpId: idp.id, idpSubject: String(claims.sub ?? "") }));
-  }
-  if (user.status !== "active") throw new CampusError("oidc_inactive", "This account is suspended.", 403);
   const amr = Array.isArray(claims.amr) ? claims.amr.map(String) : [];
   const mfa = amr.some((x) => ["mfa", "otp", "hwk", "swk", "fido"].includes(x));
-  const secretToken = b64url(randomBytes(32));
-  store.tx(() => {
-    store.insert("sessions", { tokenHash: sha256(secretToken), userId: user!.id, mfa, via: `oidc:${idp.id}`, expiresAt: new Date(nowMs() + 12 * 3600_000).toISOString() }, "ses");
-    store.audit({ actorId: user!.id, actorRoles: [], action: "session.create", resource: "session", outcome: "allowed", reason: `oidc:${String(idp.name)}` });
-  });
-  return { token: secretToken, userId: user.id, next: String(row.next || "") };
+  const r = federatedSignIn(store, idp, { email, name: claims.name ? String(claims.name) : undefined, subject: String(claims.sub ?? ""), mfa, via: "oidc" });
+  return { token: r.token, userId: r.userId, next: String(row.next || "") };
 }

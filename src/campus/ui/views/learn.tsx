@@ -11,6 +11,7 @@ import { AI801_LAB_KEY, AI801_PROJECT_KEY, AI801_RUNNER_ITEM_KEY, AI801_RUNNER_L
 import * as G from "../../services/graded";
 import * as studio from "../../services/studio";
 import * as W from "../../services/workspace";
+import { runnerStatus } from "../../services/runnerclient";
 import * as eco from "../../services/ecosystem";
 import { hasPin } from "../../services/projection";
 import { LEARN_SECTIONS, learnOverview, type LearnOverview, type LearnSection } from "../../services/learnarea";
@@ -401,6 +402,12 @@ function LectureStudio({ t }: { t: Ctx }) {
                           <button className="btn btn-ghost btn-sm">Regenerate</button>
                         </form>
                       )}
+                      {r && r.state !== "failed" && (
+                        <form method="post" action={api(slug, "a/studio.render_media")}>
+                          <Hidden values={{ back: here, notice: "Narration is rendering in the background (about a minute or two). Review the media, then release.", runId: r.id }} />
+                          <button className="btn btn-ghost btn-sm">Render narration</button>
+                        </form>
+                      )}
                       {r && r.reviewState !== "released" && (
                         <form method="post" action={api(slug, "a/studio.release")}>
                           <Hidden values={{ back: here, notice: "Released to learners.", runId: r.id }} />
@@ -415,6 +422,26 @@ function LectureStudio({ t }: { t: Ctx }) {
           </tbody>
         </table>
       </div>
+      {v.staff &&
+        (() => {
+          const runIds = new Set(v.runs.map((x) => x.id));
+          const jobs = t.store.list("async_jobs", (j) => j.kind === "studio_narration" && runIds.has(String((j.params as { runId?: string })?.runId))).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))).slice(0, 5);
+          return jobs.length ? (
+            <section className="card card-pad stack" aria-labelledby="ls-nar" aria-live="polite">
+              <h3 id="ls-nar" className="card-title">
+                Narration rendering
+              </h3>
+              <ul className="small">
+                {jobs.map((j) => (
+                  <li key={j.id}>
+                    {String(v.runs.find((x) => x.id === (j.params as { runId: string }).runId)?.topic ?? "")}: <Chip s={String(j.state)} /> {j.state === "running" ? "synthesizing and encoding — refresh in a minute or two" : ((j.issues as { path?: string; message?: string }[]) ?? []).map((x) => `${x.path ?? ""} ${x.message ?? ""}`).join("; ")}
+                  </li>
+                ))}
+              </ul>
+              <p className="tiny muted">Voices are synthetic (offline text-to-speech) and labelled as such; they never imitate a real person.</p>
+            </section>
+          ) : null;
+        })()}
       {v.staff && (
         <section className="card card-pad stack" aria-labelledby="ls-up">
           <h3 id="ls-up" className="card-title">
@@ -1082,7 +1109,8 @@ function Workspaces({ t }: { t: Ctx }) {
   }
   const here = `${t.here}${ws ? `?ws=${ws.id}` : ""}`;
   const file = sp.file ?? (ws ? Object.keys(ws.files)[0] : undefined);
-  const term = parse<{ output: string; exitCode: number }>(sp.result);
+  const term = parse<{ output: string; exitCode: number; sandbox?: string }>(sp.result);
+  const runner = runnerStatus();
   let snaps: ReturnType<typeof W.listSnapshots> = [];
   try {
     snaps = ws ? W.listSnapshots(store, actor, ws.id) : [];
@@ -1179,9 +1207,17 @@ function Workspaces({ t }: { t: Ctx }) {
               Terminal (simulated shell over your saved files — try <code>ls</code>, <code>cat README.md</code>, <code>scholarion validate</code>)
               <input name="command" className="mono" autoComplete="off" />
             </label>
-            <button className="btn btn-outline btn-sm">Run</button>
+            <div className="row">
+              <button className="btn btn-outline btn-sm">Run (simulated)</button>
+              {runner.configured && (
+                <button className="btn btn-primary btn-sm" type="submit" formAction={api(slug, "a/workspace.exec")}>
+                  Run in container
+                </button>
+              )}
+            </div>
+            <p className="small muted">{runner.configured ? runner.note : "Container runs aren't configured on this campus; the simulated shell works over your saved files."}</p>
             {term && (
-              <pre className="mono learn-term-out" aria-label="Terminal output">
+              <pre className="mono learn-term-out" aria-label={term.sandbox === "container" ? "Container output" : "Terminal output"}>
                 {term.output}
                 {`\n[exit ${term.exitCode}]`}
               </pre>

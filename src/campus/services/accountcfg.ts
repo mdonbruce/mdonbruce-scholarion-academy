@@ -300,6 +300,20 @@ export function enqueueJob(store: TenantStore, a: Actor, kind: JobKind, params: 
   });
 }
 
+/**
+ * Long work that must not hold a request (e.g. narrated media rendering): record a running job,
+ * start the promise, and update the job when it settles. Progress is visible in jobs.status.
+ */
+export function startBackgroundJob(store: TenantStore, a: Actor, kind: string, params: Record<string, unknown>, work: () => Promise<{ resultRef?: string; issues?: unknown[] }>) {
+  const busy = store.list("async_jobs", (j) => j.kind === kind && j.state === "running" && JSON.stringify(j.params) === JSON.stringify(params))[0];
+  if (busy) return busy;
+  const job = store.tx(() => store.insert("async_jobs", { kind, params, state: "running", progress: 5, issues: [], requestedBy: a.id, startedAt: nowIso() }, "job"));
+  void work()
+    .then((r) => store.tx(() => store.update("async_jobs", job.id, { state: r.issues?.length ? "completed_with_errors" : "completed", progress: 100, resultRef: r.resultRef ?? null, issues: r.issues ?? [], finishedAt: nowIso() })))
+    .catch((e: unknown) => store.tx(() => store.update("async_jobs", job.id, { state: "failed", progress: 100, issues: [{ message: (e as Error).message ?? String(e) }], finishedAt: nowIso() })));
+  return job;
+}
+
 /** Run queued jobs (the scheduler calls this; status checks also drain the queue so nothing waits forever). */
 export function runQueuedJobs(store: TenantStore, max = 5) {
   const queued = store.list("async_jobs", (j) => j.state === "queued").sort((x, y) => String(x.createdAt).localeCompare(String(y.createdAt))).slice(0, max);
@@ -331,7 +345,8 @@ export function runQueuedJobs(store: TenantStore, max = 5) {
 }
 
 export function jobStatus(store: TenantStore, a: Actor, jobId?: string) {
-  requireTenant(store, a, ["admin", "registrar"], "jobs.read");
+  const own = jobId ? store.get("async_jobs", jobId) : undefined;
+  if (!(own && own.requestedBy === a.id)) requireTenant(store, a, ["admin", "registrar"], "jobs.read");
   runQueuedJobs(store);
   const view = (j: Row) => ({ id: j.id, kind: String(j.kind), detail: String((j.params as Record<string, unknown>)?.kind ?? ""), state: String(j.state), progress: Number(j.progress ?? 0), resultRef: (j.resultRef as string) || null, issues: (j.issues as unknown[]) ?? [], requestedAt: String(j.createdAt), finishedAt: (j.finishedAt as string) ?? null });
   if (jobId) {
@@ -344,7 +359,8 @@ export function jobStatus(store: TenantStore, a: Actor, jobId?: string) {
 
 /* ---------------- identity providers ---------------- */
 
-const IDP_FIELDS: Record<string, string[]> = { saml: ["entityId", "ssoUrl", "metadataUrl", "certificateFingerprint", "nameIdFormat"], oidc: ["issuer", "clientId", "scopes", "clientSecretEnv"], ldap: ["host", "port", "baseDn", "userFilter", "useTls"] };
+const IDP_FIELDS: Record<string, string[]> = { saml: ["entityId", "ssoUrl", "metadataUrl", "certificateFingerprint", "certificatePem", "nameIdFormat"], oidc: ["issuer", "clientId", "scopes", "clientSecretEnv"], ldap: ["host", "port", "baseDn", "userFilter", "bindDn", "bindPasswordEnv", "mailAttribute", "nameAttribute", "caPem", "useTls"] };
+const ENV_NAME_FIELDS = ["clientSecretEnv", "bindPasswordEnv"];
 
 export function configureIdp(store: TenantStore, a: Actor, input: { kind: string; name: string; config: Record<string, unknown>; jitProvisioning?: boolean; id?: string }) {
   requireTenant(store, a, ["admin"], "identity_providers.configure");
@@ -353,18 +369,37 @@ export function configureIdp(store: TenantStore, a: Actor, input: { kind: string
   const name = String(input.name ?? "").trim().slice(0, 80);
   if (!name) throw new CampusError("invalid", "Name the provider.", 422);
   const raw = input.config ?? {};
-  if (raw.clientSecretEnv !== undefined && !/^[A-Z][A-Z0-9_]{2,63}$/.test(String(raw.clientSecretEnv))) throw new CampusError("invalid", "clientSecretEnv is the NAME of a server environment variable (like CAMPUS_OIDC_SECRET), not the secret.", 422);
-  if (Object.keys(raw).some((k) => k !== "clientSecretEnv" && /secret|password|private/i.test(k))) throw new CampusError("no_secrets", "Don't store secrets here. Client secrets and bind passwords belong in the deployment's secret manager.", 422);
+  for (const k of ENV_NAME_FIELDS) if (raw[k] !== undefined && raw[k] !== "" && !/^[A-Z][A-Z0-9_]{2,63}$/.test(String(raw[k]))) throw new CampusError("invalid", `${k} is the NAME of a server environment variable (like CAMPUS_IDP_SECRET), not the secret itself.`, 422);
+  if (Object.keys(raw).some((k) => !ENV_NAME_FIELDS.includes(k) && /secret|password|private/i.test(k))) throw new CampusError("no_secrets", "Don't store secrets here. Client secrets and bind passwords belong in the deployment's secret manager.", 422);
   const config: Record<string, unknown> = {};
   for (const k of fields) if (raw[k] !== undefined && raw[k] !== "") config[k] = raw[k];
   for (const k of ["ssoUrl", "metadataUrl", "issuer"]) if (config[k] !== undefined && !/^https:\/\//.test(String(config[k]))) throw new CampusError("invalid", `${k} must be an https:// address.`, 422);
-  if (input.kind === "ldap" && config.useTls === false) throw new CampusError("invalid", "LDAP must use TLS (ldaps or StartTLS).", 422);
+  if (input.kind === "ldap" && config.useTls === false) throw new CampusError("invalid", "LDAP must use TLS (ldaps).", 422);
+  if (input.kind === "ldap" && config.port !== undefined && !(Number(config.port) > 0 && Number(config.port) < 65536)) throw new CampusError("invalid", "port must be a TCP port.", 422);
+  for (const k of ["certificatePem", "caPem"]) if (config[k] !== undefined && !/-----BEGIN (CERTIFICATE|PUBLIC KEY)-----/.test(String(config[k])) && !/^[A-Za-z0-9+/=\s]{200,}$/.test(String(config[k]))) throw new CampusError("invalid", `${k} must be a PEM certificate.`, 422);
   return store.tx(() => {
     const vals = { kind: input.kind, name, config, state: "not_connected", jitProvisioning: !!input.jitProvisioning };
     const row = input.id ? store.update("identity_providers", input.id, vals) : store.insert("identity_providers", vals, "idp");
     audit(store, a, "identity_providers.configure", `identity_providers/${row.id}`, input.kind);
     return row;
   });
+}
+
+/** Turn sign-in with a provider on or off. Turning on requires a successful live check. */
+export function setIdpEnabled(store: TenantStore, a: Actor, id: string, on: boolean) {
+  requireTenant(store, a, ["admin"], "identity_providers.enable");
+  const p = store.get("identity_providers", id);
+  if (!p) throw new CampusError("not_found", "Provider not found", 404);
+  if (on && !(p.lastTest as { connected?: boolean } | undefined)?.connected) throw new CampusError("idp_unchecked", "Run a successful check before enabling this provider.", 409);
+  return store.tx(() => {
+    const row = store.update("identity_providers", p.id, { state: on ? "enabled" : "not_connected" });
+    audit(store, a, "identity_providers.enable", `identity_providers/${p.id}`, on ? "enabled" : "disabled");
+    return row;
+  });
+}
+
+export function enabledProviders(store: TenantStore) {
+  return store.list("identity_providers", (p) => p.state === "enabled").map((p) => ({ id: p.id, name: String(p.name), kind: String(p.kind) as "oidc" | "saml" | "ldap" }));
 }
 
 /** Configuration check only — there is no live connection from this environment. */
